@@ -6,6 +6,11 @@ module.exports = function karmaConfig(config) {
 
   config.set({
     browsers: ['PhantomJS'],
+    browserConsoleLogOptions: {
+      level: 'log',
+      format: '%b %T: %m',
+      terminal: true
+    },
     files: [
       'test/loadtests.js'
     ],
