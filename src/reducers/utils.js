@@ -1,20 +1,17 @@
 const isUndefNull = val => val === null || val === undefined;
 
-export const checkAttr = (obj, attr) => {
-  return !isUndefNull(obj[attr]) ? obj[attr] : {};
-};
+export const checkAttr = (obj, attr) => (!isUndefNull(obj[attr]) ? obj[attr] : {});
 
-export const getNextIdFromArr = (arr) => {
-  // find the maximum of the array and add one to it.
-  // zero index.
-  return arr.length < 1 ? 0 : Math.max(...arr) + 1;
-};
+// find the maximum of the array and add one to it.
+// zero index.
+export const getNextIdFromArr = (arr) => (arr.length < 1 ? 0 : Math.max(...arr) + 1);
 
 export const getNextIdFromObj = (obj) => {
   const keys = Object.keys(obj);
   return getNextIdFromArr(keys);
 };
 
+// check if you can delete this on final refactor.
 export const checkAction = (action) => {
   const {collapserId, scrollerId} = action;
   try {

@@ -1,11 +1,12 @@
 {
   "presets": [
-    "es2015-native-modules",
+    ["es2015", {"modules": false}],
     "react",
     "airbnb"
   ],
   "plugins": [
     "transform-decorators-legacy",
-    "transform-object-rest-spread"
+    "transform-object-rest-spread",
+    "transform-runtime",
   ]
 }

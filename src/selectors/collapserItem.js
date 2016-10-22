@@ -26,9 +26,7 @@ export const selectItemWaitingForHeightFunc = innerSelectItemFunc => itemId => {
 export const itemsSelector = createSelector(entitiesSelector, getItems);
 
 export const nextItemIdSelector = createSelector(
-  itemsSelector, items => {
-    return getNextIdFromObj(items);
-  }
+  itemsSelector, items => getNextIdFromObj(items)
 );
 
 export const itemSelector = createSelector(itemsSelector, selectItemFunc);
