@@ -1,7 +1,7 @@
 import {waitForCollapser} from './collapser';
 import {scrollerInitWatch} from './scroller';
 
-export default function *rootSaga() {
+export function *reactScrollCollapseSagas() {
   yield [
     waitForCollapser(),
     scrollerInitWatch(),

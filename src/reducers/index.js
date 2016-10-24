@@ -10,7 +10,7 @@ const entities = combineReducers({
   scrollers: scrollersReducer,
 });
 
-export default combineReducers({
+export const reactScrollCollapse = combineReducers({
   entities,
   scrollers,
 });

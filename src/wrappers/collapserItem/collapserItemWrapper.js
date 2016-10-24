@@ -7,7 +7,7 @@ import {bindActionCreators} from 'redux';
 import {setOffsetTop, expandCollapse, heightReady} from '../../actions';
 
 import selectors from '../../selectors';
-const {itemExpandedSelector} = selectors.collapser;
+const {itemExpandedSelector} = selectors.collapserItem;
 
 
 /*
@@ -25,14 +25,6 @@ const {itemExpandedSelector} = selectors.collapser;
 export const collapserItemWrapper = (WrappedComponent) => {
 
   class CollapserItemController extends Component {
-
-    static propTypes = {
-      actions: PropTypes.object,
-      isOpened: PropTypes.bool.isRequired,
-      itemId: PropTypes.number.isRequired,
-      parentCollapserId: PropTypes.number.isRequired,
-      setOffsetTop: PropTypes.func,
-    }
 
     constructor(props) {
       super(props);
@@ -74,6 +66,14 @@ export const collapserItemWrapper = (WrappedComponent) => {
       );
     }
   }
+
+  CollapserItemController.propTypes = {
+    actions: PropTypes.object,
+    isOpened: PropTypes.bool.isRequired,
+    itemId: PropTypes.number.isRequired,
+    parentCollapserId: PropTypes.number.isRequired,
+    setOffsetTop: PropTypes.func,
+  };
 
   const mapStateToProps = (state, ownProps) => ({
     isOpened: itemExpandedSelector(state)(ownProps.itemId),

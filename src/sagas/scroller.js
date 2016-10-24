@@ -1,10 +1,8 @@
 import {call, take, fork, actionChannel, put} from 'redux-saga/effects';
 
-import * as types from '../actions/const';
-import actions from '../actions';
+import {HEIGHT_READY_ALL, SET_OFFSET_TOP, WATCH_INITIALISE} from '../actions/const';
+import {scrollTo} from '../actions';
 
-const {scrollTo} = actions;
-const {HEIGHT_READY_ALL, SET_OFFSET_TOP, WATCH_INITIALISE} = types;
 
 /*
   Scroller UI related sagas
@@ -42,13 +40,20 @@ export function *waitForCollapserFinishSignal(scrollerId, getScrollTop, getOffse
   Now that we have everything we need to query the dom to make the scroll happen
   We just have to wait for the collapser to finish.  This is done in the final saga
   waitForCollapserFinishSignal which is forked next.
+
+  Multiple instances of this saga will take the SET_OFFSET_TOP action.  So we send
+  the scrollerId as well with the action - so that it will only fork
+  waitForCollapserFinishSignal if the scrollerId matches the one that was used
+  to init the saga instance.
 */
-export function *waitForSetOffsetTop(scrollerId, getScrollTop) {
+export function *waitForSetOffsetTop(scrollerIdInit, getScrollTop) {
   const initChannel = yield actionChannel(SET_OFFSET_TOP);
   const condition = true;
   while (condition) {
-    const {payload: {getOffsetTop}} = yield take(initChannel);
-    yield fork(waitForCollapserFinishSignal, scrollerId, getScrollTop, getOffsetTop);
+    const {payload: {getOffsetTop, scrollerId}} = yield take(initChannel);
+    if (scrollerId === scrollerIdInit) {
+      yield fork(waitForCollapserFinishSignal, scrollerId, getScrollTop, getOffsetTop);
+    }
   }
 }
 

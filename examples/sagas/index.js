@@ -1,7 +1,7 @@
-import reactScrollCollapse from '../../src/sagas';
+import {reactScrollCollapseSagas} from '../../src';
 
 export default function *sagas() {
   yield [
-    reactScrollCollapse(),
+    reactScrollCollapseSagas(),
   ];
 }

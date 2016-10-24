@@ -113,6 +113,8 @@ const allNestedCollapsersSelector = () => {
   ).toEqual([1, 2]);
 };
 
+/* Big Test */
+
 const childItemsSelector = () => {
   const items = state.reactScrollCollapse.entities.collapsers[0].items;
   expect(
@@ -121,9 +123,163 @@ const childItemsSelector = () => {
 };
 
 const allChildItemsSelector = () => {
+  const newState = {
+    reactScrollCollapse: {
+      entities: {
+        collapsers: {
+          0: {
+            collapsers: [1, 2, 3, 4, 5],
+            id: 0,
+            items: [0]
+          },
+          1: {
+            collapsers: [6, 7, 10, 11],
+            id: 1,
+            items: [1]
+          },
+          2: {
+            collapsers: [9],
+            id: 2,
+            items: [2]
+          },
+          3: {
+            collapsers: [8],
+            id: 3,
+            items: [3]
+          },
+          4: {
+            collapsers: [],
+            id: 4,
+            items: [4]
+          },
+          5: {
+            collapsers: [],
+            id: 5,
+            items: [5]
+          },
+          6: {
+            collapsers: [],
+            id: 6,
+            items: [6]
+          },
+          7: {
+            collapsers: [],
+            id: 7,
+            items: [7]
+          },
+          8: {
+            collapsers: [],
+            id: 8,
+            items: [8]
+          },
+          9: {
+            collapsers: [],
+            id: 9,
+            items: [9]
+          },
+          10: {
+            collapsers: [],
+            id: 10,
+            items: [10]
+          },
+          11: {
+            collapsers: [],
+            id: 11,
+            items: [11]
+          }
+        },
+        items: {
+          0: {
+            expanded: true,
+            id: 0,
+            waitingForHeight: false
+          },
+          1: {
+            expanded: true,
+            id: 1,
+            waitingForHeight: false
+          },
+          2: {
+            expanded: true,
+            id: 2,
+            waitingForHeight: false
+          },
+          3: {
+            expanded: true,
+            id: 3,
+            waitingForHeight: false
+          },
+          4: {
+            expanded: true,
+            id: 4,
+            waitingForHeight: false
+          },
+          5: {
+            expanded: true,
+            id: 5,
+            waitingForHeight: false
+          },
+          6: {
+            expanded: true,
+            id: 6,
+            waitingForHeight: false
+          },
+          7: {
+            expanded: true,
+            id: 7,
+            waitingForHeight: false
+          },
+          8: {
+            expanded: true,
+            id: 8,
+            waitingForHeight: false
+          },
+          9: {
+            expanded: true,
+            id: 9,
+            waitingForHeight: false
+          },
+          10: {
+            expanded: true,
+            id: 10,
+            waitingForHeight: false
+          },
+          11: {
+            expanded: true,
+            id: 11,
+            waitingForHeight: false
+          }
+        },
+        scrollers: {
+          0: {
+            collapsers: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+            id: 0,
+            offsetTop: 0,
+            scrollTop: 0
+          }
+        }
+      },
+      scrollers: [
+        0
+      ]
+    }
+  };
+
   expect(
     selectors.allChildItemsSelector(state)(0)
   ).toEqual([0, 1, 2]);
+
+  expect(
+    selectors.allChildItemsSelector(newState)(0)
+  ).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 10, 11, 9, 8]);
+
+  expect(
+    selectors.allChildItemsSelector(newState)(1)
+  ).toEqual([1, 6, 7, 10, 11]);
+
+  expect(
+    selectors.allChildItemsSelector(newState)(2)
+  ).toEqual([2, 9]);
 };
 
 const itemExpandedArrSelector = () => {

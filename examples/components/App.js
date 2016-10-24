@@ -1,13 +1,24 @@
 import React from 'react';
 import './app.css';
 
+import Scroller from '../../src';
+
+import CommentThread from './CommentThread';
+
 class AppComponent extends React.Component {
 
   render() {
     return (
-      <div className="index">
-        <div className="notice">
-          Please edit <code>src/components/App.js</code> to get started!
+      <div>
+        <div className="index">
+          <Scroller style={{height: '300px'}}>
+            <CommentThread maxNest={4} />
+          </Scroller>
+        </div>
+        <div className="index">
+          <Scroller style={{height: '300px'}}>
+            <CommentThread maxNest={40} />
+          </Scroller>
         </div>
       </div>
     );

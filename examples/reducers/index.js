@@ -1,8 +1,6 @@
 import {combineReducers} from 'redux';
-import reactScrollCollapse from '../../src/reducers';
+import {reactScrollCollapse} from '../../src';
 
-const reducers = combineReducers({
+export default combineReducers({
   reactScrollCollapse,
 });
-
-export default reducers;

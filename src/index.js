@@ -1,15 +1,35 @@
-import React from 'react';
-import { render } from 'react-dom';
-import { Provider } from 'react-redux';
-import configureStore from './stores';
-import App from './containers/App';
+import Scroller from './containers/Scroller';
 
-const store = configureStore();
+/*
+  These are the two main public HoC wrapper functions used to control components
+  using react-collapse.
 
-render(
-  <Provider store={store}>
-    <App />
-  </Provider>,
+  Create your component and then wrap in your export eg:
 
-  document.getElementById('app')
-);
+    export default collapserItemController(YourItemComponent);
+
+  It should work with redux connected components ass well:
+
+    const YourConnectedCollapserComponent = connect(
+      mapStateToProps,
+      mapDispatchToProps,
+    )(YourCollapserComponent);
+    export default collapserController(YourConnectedCollapserComponent);
+
+*/
+export {collapserController} from './wrappers/collapser';
+export {collapserItemController} from './wrappers/collapserItem';
+
+/*
+  The reducers file is named as the state name space required ('reactScrollCollapse')
+  so users can just import and add to their root reducer like so:
+
+  const reducers = combineReducers({
+    reactScrollCollapse,
+  });
+*/
+export {reactScrollCollapse} from './reducers';
+
+/* root sagas func name: reactScrollCollapseSagas */
+export {reactScrollCollapseSagas} from './sagas';
+export default Scroller;
