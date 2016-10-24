@@ -8,22 +8,7 @@ import React, {
   Component,
   PropTypes
 } from 'react';
-import {
-  addCollapser,
-  removeCollapser,
-  expandCollapseAll,
-  heightReadyAll,
-  addItem,
-  removeItem,
-  expandCollapse,
-  transitionWait,
-  heightReady,
-  addScroller,
-  removeScroller,
-  setOffsetTop,
-  watchInitialise,
-  scrollTo
-} from '../actions/';
+
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import Main from '../components/App';
@@ -42,31 +27,19 @@ class App extends Component {
 App.propTypes = {
   actions: PropTypes.object.isRequired,
 };
+
 function mapStateToProps(state) {
   // eslint-disable-line no-unused-vars
   /* Populated by react-webpack-redux:reducer */
   const props = {};
   return props;
 }
+
 function mapDispatchToProps(dispatch) {
   /* Populated by react-webpack-redux:action */
-  const actions = {
-    addCollapser,
-    removeCollapser,
-    expandCollapseAll,
-    heightReadyAll,
-    addItem,
-    removeItem,
-    expandCollapse,
-    transitionWait,
-    heightReady,
-    addScroller,
-    removeScroller,
-    setOffsetTop,
-    watchInitialise,
-    scrollTo
-  };
+  const actions = {};
   const actionMap = { actions: bindActionCreators(actions, dispatch) };
   return actionMap;
 }
+
 export default connect(mapStateToProps, mapDispatchToProps)(App);

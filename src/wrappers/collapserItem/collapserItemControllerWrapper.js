@@ -6,7 +6,7 @@ import {bindActionCreators} from 'redux';
 import {addItem} from '../../actions';
 
 import selectors from '../../selectors';
-const {nextItemIdSelector} = selectors.collapser;
+const {nextItemIdSelector} = selectors.collapserItem;
 const {ifNotFirstSec} = selectors.utils;
 
 /*
@@ -19,29 +19,6 @@ export const collapserItemControllerWrapper = (CollapserItemController) => {
 
   class WrappedCollapserItemController extends Component {
 
-    static propTypes = {
-      actions: PropTypes.object,
-      /*
-        isOpenedInit: overrides the default isOpened status.
-      */
-      isOpenedInit: PropTypes.bool,
-       /*
-        Pass itemId as prop if you want to overwrite automated id generated
-        from state and passed automatically in nextItemId.
-      */
-      itemId: PropTypes.bool,
-      nextItemId: PropTypes.number,
-      /*
-       Pass parentCollapserId as prop if you want to overwrite automated id generated
-       from context.parentCollapserId.
-     */
-      parentCollapserId: PropTypes.number,
-    }
-
-    static contextTypes = {
-      parentCollapserId: React.PropTypes.number,
-    }
-
     componentWillMount() {
       /*
         If parent supplied itemId / parentCollapserId props - else use values
@@ -53,11 +30,12 @@ export const collapserItemControllerWrapper = (CollapserItemController) => {
         generated in the first render.)  This is why we can only
         use it in willMount to set the id.
       */
-      const {itemId, nextItemId, parentCollapserId} = this.props;
+      const {itemId, nextItemId, parentCollapserId, parentScrollerId} = this.props;
       this.itemId = ifNotFirstSec(itemId, nextItemId);
       this.parentCollapserId = ifNotFirstSec(parentCollapserId,
         this.context.parentCollapserId);
-
+      this.parentScrollerId = ifNotFirstSec(parentScrollerId,
+        this.context.parentScrollerId);
       /*
         create state slice for this collapserItem in redux store.
       */
@@ -84,7 +62,7 @@ export const collapserItemControllerWrapper = (CollapserItemController) => {
         Pulling these props out so they don't get passed on.  Ignore linting
         error.
       */
-      const {nextItemId, itemId, parentCollapserId, actions, isOpenedInit,
+      const {nextItemId, itemId, parentCollapserId, parentScrollerId, actions, isOpenedInit,
         ...otherProps} = this.props;
       if (this.itemId >= 0 && this.parentCollapserId >= 0) {
         return (
@@ -92,12 +70,38 @@ export const collapserItemControllerWrapper = (CollapserItemController) => {
             {...otherProps}
             itemId={this.itemId}
             parentCollapserId={this.parentCollapserId}
+            parentScrollerId={this.parentScrollerId}
           />
         );
       }
       return <div />;
     }
   }
+
+  WrappedCollapserItemController.propTypes = {
+    actions: PropTypes.object,
+    /*
+      isOpenedInit: overrides the default isOpened status.
+    */
+    isOpenedInit: PropTypes.bool,
+     /*
+      Pass itemId as prop if you want to overwrite automated id generated
+      from state and passed automatically in nextItemId.
+    */
+    itemId: PropTypes.bool,
+    nextItemId: PropTypes.number,
+    /*
+     Pass parentCollapserId as prop if you want to overwrite automated id generated
+     from context.parentCollapserId.
+   */
+    parentCollapserId: PropTypes.number,
+    parentScrollerId: PropTypes.number,
+  };
+
+  WrappedCollapserItemController.contextTypes = {
+    parentCollapserId: React.PropTypes.number,
+    parentScrollerId: React.PropTypes.number,
+  };
 
   const mapState = (state) => ({
     nextItemId: nextItemIdSelector(state),

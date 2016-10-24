@@ -6,22 +6,12 @@ import {bindActionCreators} from 'redux';
 import {addScroller} from '../../actions';
 
 import selectors from '../../selectors';
-const {nextScrollerIdSelector} = selectors.collapser;
+const {nextScrollerIdSelector} = selectors.scroller;
 const {ifNotFirstSec} = selectors.utils;
 
-export const ScrollerWrapper = (ScrollerComponent) => {
+export const scrollerWrapper = (ScrollerComponent) => {
 
   class WrappedScroller extends Component {
-
-    static propTypes = {
-      actions: PropTypes.object.isRequired,
-      nextScrollerId: PropTypes.number.isRequired,
-      scrollerId: PropTypes.number,
-    }
-
-    static childContextTypes = {
-      parentScrollerId: React.PropTypes.number,
-    }
 
     getChildContext() {
       return {
@@ -53,6 +43,16 @@ export const ScrollerWrapper = (ScrollerComponent) => {
       return <div />;
     }
   }
+
+  WrappedScroller.propTypes = {
+    actions: PropTypes.object.isRequired,
+    nextScrollerId: PropTypes.number.isRequired,
+    scrollerId: PropTypes.number,
+  };
+
+  WrappedScroller.childContextTypes = {
+    parentScrollerId: React.PropTypes.number,
+  };
 
   const mapState = (state) => ({
     nextScrollerId: nextScrollerIdSelector(state),

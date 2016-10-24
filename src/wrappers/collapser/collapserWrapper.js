@@ -25,31 +25,6 @@ export const collapserWrapper = (WrappedComponent) => {
 
   class CollapserController extends Component {
 
-    static propTypes = {
-      /* provided by collapserControllerWrapper */
-      collapserId: PropTypes.number.isRequired,
-
-      /* provided by redux */
-      areAllItemsExpanded: PropTypes.bool,
-      allChildItems: PropTypes.array,
-      actions: PropTypes.object,
-    }
-
-    constructor(props) {
-      super(props);
-      /*
-        this.setOffsetTop: defines a callback for the saga to call that allows
-          the saga to obtain the offsetTop value of the backing instance of this
-          component and dispatch that to the redux store.  The saga grabs the
-          offsetTop val once the onHeightReady callback has been
-          called for every wrapped <Collapse> element in the Collapser.
-      */
-      this.expandCollapseAll = (allChildItems, areAllItemsExpanded) => () => {
-        this.props.actions.setOffsetTop(() => this.elem.offsetTop);
-        this.props.actions.expandCollapseAll(allChildItems, areAllItemsExpanded);
-      };
-    }
-
     /*
       allChildItems, areAllItemsExpanded are passed into the expandCollapseAll
       callback at render - to ensure allChildItems have been initialised in redux..
@@ -65,10 +40,28 @@ export const collapserWrapper = (WrappedComponent) => {
       ...it will only use the props values as supplied on the first render - i.e.
       the empty array for allChildItems.  So instead - those values are passed into
       the function on render - which are gauranteed to be up to date.
+
+      BUT this means that you are generating a new function on every render and
+      passing into props - forcing child renders.  Figure out fix.
     */
 
     componentDidMount() {
-      this.elem = ReactDOM.findDOMNode(this);
+      const domNode = this.getWrappedDomNode();
+      this.expandCollapseAll = (allChildItems, areAllItemsExpanded) => () => {
+        /*
+          this.setOffsetTop: defines a callback for the saga to call that allows
+            the saga to obtain the offsetTop value of the backing instance of this
+            component and dispatch that to the redux store.  The saga grabs the
+            offsetTop val once the onHeightReady callback has been
+            called for every wrapped <Collapse> element in the Collapser.
+        */
+        this.props.actions.setOffsetTop(
+          () => domNode.offsetTop,
+          this.props.parentScrollerId,
+          this.props.collapserId,
+        );
+        this.props.actions.expandCollapseAll(allChildItems, areAllItemsExpanded);
+      };
     }
 
     /*
@@ -76,9 +69,8 @@ export const collapserWrapper = (WrappedComponent) => {
       by the allChildItemsSelector returning an array.  The array is a different
       object no matter what so reselect doesn't memoize it.  I did try a quick
       fix of replacing createSelector's identity function to the lodash isEqual,
-      but no luck.  Requires either different memoization function or better
-      selector composition to match reselect docs.  Might not be worth
-      the performance gain either way.
+      but no luck.  Probably will require either different memoization function
+      or better selector composition to match reselect docs.
 
       the should component update solution below is stopgap.
     */
@@ -97,17 +89,51 @@ export const collapserWrapper = (WrappedComponent) => {
       return shouldUpdate;
     }
 
+    getWrappedDomNode() {
+      /*
+        isInAnyDOM tests whether an object is a DOM object.
+        taken from here: http://stackoverflow.com/a/20476546/1914452
+      */
+      const isInAnyDOM = (o) => (o !== null) &&
+        !!(o.ownerDocument && (o.ownerDocument.defaultView || o.ownerDocument.parentWindow).alert);
+      let domNode;
+      if (!isInAnyDOM(this.elem)) {
+        domNode = ReactDOM.findDOMNode(this.elem);
+      } else {
+        domNode = this.elem;
+      }
+      return domNode;
+    }
+
     render() {
-      const {allChildItems, areAllItemsExpanded, ...other} = this.props;
+      const {actions, allChildItems, areAllItemsExpanded, ...other} = this.props;
+      const expandCollapseAllBind = !this.expandCollapseAll ? null :
+        this.expandCollapseAll(allChildItems, areAllItemsExpanded);
       return (
         <WrappedComponent
           {...other}
-          expandCollapseAll={this.expandCollapseAll(allChildItems, areAllItemsExpanded).bind(this)}
+          ref={
+            elem => {
+              this.elem = elem;
+            }
+          }
+          expandCollapseAll={expandCollapseAllBind}
           areAllItemsExpanded={areAllItemsExpanded}
         />
       );
     }
   }
+
+  CollapserController.propTypes = {
+    /* provided by collapserControllerWrapper */
+    collapserId: PropTypes.number.isRequired,
+    parentScrollerId: PropTypes.number.isRequired,
+
+    /* provided by redux */
+    areAllItemsExpanded: PropTypes.bool,
+    allChildItems: PropTypes.array,
+    actions: PropTypes.object,
+  };
 
   const mapStateToProps = (state, ownProps) => ({
     allChildItems: allChildItemsSelector(state)(ownProps.collapserId),

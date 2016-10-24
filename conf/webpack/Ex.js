@@ -1,99 +1,37 @@
 'use strict';
 
 /**
- * Webpack configuration base class
+ * Examples server configuration.
  */
-const path = require('path');
-const npmBase = path.join(__dirname, '../../node_modules');
+const webpack = require('webpack');
+const WebpackBaseConfig = require('./Base');
 
-class WebpackBaseConfig {
+class WebpackExConfig extends WebpackBaseConfig {
 
   constructor() {
-    this._config = {};
-  }
+    super();
 
-  /**
-   * Get the list of included packages
-   * @return {Array} List of included packages
-   */
-  get includedPackages() {
-    return [].map((pkg) => path.join(npmBase, pkg));
-  }
-
-  /**
-   * Set the config data.
-   * This will always return a new config
-   * @param {Object} data Keys to assign
-   * @return {Object}
-   */
-  set config(data) {
-    this._config = Object.assign({}, this.defaultSettings, data);
-    return this._config;
-  }
-
-  /**
-   * Get the global config
-   * @param {Object} config Final webpack config
-   */
-  get config() {
-    return this._config;
-  }
-
-  /**
-   * Get the environment name
-   * @return {String} The current environment
-   */
-  get env() {
-    return 'dev';
-  }
-
-  /**
-   * Get the absolute path to examples directory
-   * @return {String}
-   */
-  get examplesPathAbsolute() {
-    return path.resolve('./examples');
-  }
-
-  /**
-   * Get the absolute path to src directory
-   * @return {String}
-   */
-  get srcPathAbsolute() {
-    return path.resolve('./src');
-  }
-
-  /**
-   * Get the absolute path to tests directory
-   * @return {String}
-   */
-  get testPathAbsolute() {
-    return path.resolve('./test');
-  }
-
-  /**
-   * Get the default settings
-   * @return {Object}
-   */
-  get defaultSettings() {
-    return {
-      context: this.srcPathAbsolute,
-      debug: false,
-      devtool: 'eval',
+    this.config = {
+      context: this.examplesPathAbsolute,
+      devtool: 'cheap-module-source-map',
       devServer: {
-        contentBase: './src/',
+        contentBase: './examples/',
         publicPath: '/assets/',
         historyApiFallback: true,
         hot: true,
         inline: true,
         port: 8000
       },
-      entry: './index.js',
+      entry: [
+        'webpack-dev-server/client?http://0.0.0.0:8000/',
+        'webpack/hot/only-dev-server',
+        './index.js'
+      ],
       module: {
         preLoaders: [
           {
             test: /\.(js|jsx)$/,
-            include: this.srcPathAbsolute,
+            include: this.examplesPathAbsolute,
             loader: 'eslint'
           }
         ],
@@ -172,36 +110,43 @@ class WebpackBaseConfig {
             test: /\.(js|jsx)$/,
             include: [].concat(
               this.includedPackages,
-              [this.srcPathAbsolute]
+              [this.examplesPathAbsolute, this.srcPathAbsolute]
             ),
             loaders: ['react-hot', 'babel']
           }
         ]
       },
-      output: {
-        path: path.resolve('./dist/assets'),
-        filename: 'app.js',
-        publicPath: './assets/'
-      },
-      plugins: [],
+      plugins: [
+        new webpack.HotModuleReplacementPlugin(),
+        new webpack.NoErrorsPlugin()
+      ],
       resolve: {
         alias: {
-          actions: `${this.srcPathAbsolute}/actions/`,
-          components: `${this.srcPathAbsolute}/components/`,
-          config: `${this.srcPathAbsolute}/config/${this.env}.js`,
-          images: `${this.srcPathAbsolute}/images/`,
-          sources: `${this.srcPathAbsolute}/sources/`,
-          stores: `${this.srcPathAbsolute}/stores/`,
-          styles: `${this.srcPathAbsolute}/styles/`
+          actions: `${this.examplesPathAbsolute}/actions/`,
+          components: `${this.examplesPathAbsolute}/components/`,
+          config: `${this.examplesPathAbsolute}/config/${this.env}.js`,
+          images: `${this.examplesPathAbsolute}/images/`,
+          sources: `${this.examplesPathAbsolute}/sources/`,
+          stores: `${this.examplesPathAbsolute}/stores/`,
+          styles: `${this.examplesPathAbsolute}/styles/`
         },
         extensions: ['', '.js', '.jsx'],
         modules: [
-          this.srcPathAbsolute,
+          this.examplesPathAbsolute,
           'node_modules'
         ]
       }
     };
   }
+
+  /**
+   * Get the environment name
+   * @return {String} The current environment
+   */
+  get env() {
+    return 'ex';
+  }
+
 }
 
-module.exports = WebpackBaseConfig;
+module.exports = WebpackExConfig;

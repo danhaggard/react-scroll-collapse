@@ -1,18 +1,8 @@
 import React, {PropTypes, Component} from 'react';
 import styles from './Scroller.scss';
-
+import classnames from 'classnames';
 
 class Scroller extends Component {
-
-  static propTypes = {
-    component: PropTypes.string,
-    windowInnerHeight: PropTypes.number,
-    children: PropTypes.node,
-    style: PropTypes.object,
-    scrollTop: PropTypes.number,
-    actions: PropTypes.object,
-    scrollerId: PropTypes.number,
-  };
 
   // The scroller wrapper will pass in an interpolated scrollTop value for
   // the scroll animation.  Once the update is successful, we make sure the dom
@@ -30,21 +20,46 @@ class Scroller extends Component {
     }
   }
 
+  getClassName(className) {
+    const initClassName = {};
+    initClassName[styles.scroller] = true;
+    return classnames({
+      ...initClassName,
+    }, className);
+  }
+
   render() {
-    const {children, style, windowInnerHeight} = this.props;
-    const newHeight = windowInnerHeight === undefined ? 0 : windowInnerHeight - 88;
+    /*
+      The use of a ref here allows us to define a method on the component
+      that returns the scrollTop property of the corresponding dom object.
+
+      But the cool thing is that this is that it will make this method accessible
+      to the ScrollerMotion HoC that will wrap this component so as to add the
+      auto scroll animation.  ScrollerMotion will pass this method to the sagas
+      handling the control flow so they can access the scrollTop value when
+      it's needed. No other methods are exposed.
+    */
+    const {className, children, style} = this.props;
     return (
       <div
+        children={children}
+        className={this.getClassName(className)}
+        style={style}
         ref={elem => {
           this.elem = elem;
           this.getScrollTop = () => (elem ? elem.scrollTop : null);
         }}
-        className={styles.scroller}
-        children={children}
-        style={{...style, height: newHeight}}
       />
     );
   }
 }
+
+Scroller.propTypes = {
+  children: PropTypes.node,
+  className: PropTypes.string,
+  scrollerId: PropTypes.number.isRequired,
+  scrollTop: PropTypes.number.isRequired,
+  style: PropTypes.object,
+};
 
 export default Scroller;
