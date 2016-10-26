@@ -82,7 +82,7 @@ class ScrollerMotion extends Component {
         /*
           this.props.scrollTop !== nextProps.scrollTop
 
-          This condition is the one that actually handles the ui sync issue.
+          This condition is the one that handles the ui sync issue.
         */
         this.props.scrollTop !== nextProps.scrollTop || (
           /*
@@ -91,8 +91,7 @@ class ScrollerMotion extends Component {
             collapse action is fired the new scrollTop prop value isn't passed into
             this component and the auto scroll fails.
 
-            I haven't tracked down th real source of the problem yet.  So consider
-            this fix temporary.
+            I haven't tracked down the real source of the problem yet. fix temporary.
           */
           this.props.scrollTop === 0 && nextProps.scrollTop === 0
         )

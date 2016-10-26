@@ -11,10 +11,11 @@ body {
   white-space: normal;
 }
 
-.index {
+.example {
   width: 90%;
   margin: 1rem;
   padding: 1rem;
+  padding-top: 0;
   background: #FFF;
   border: 1px solid #AAA;
   border-radius: 2px;

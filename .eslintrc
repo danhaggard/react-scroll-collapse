@@ -13,6 +13,7 @@
     "padded-blocks": ["off"],
     "react/jsx-closing-bracket-location": ["off"],
     "react/jsx-space-before-closing": ["off"],
+    "react/no-did-update-set-state": ["warn"],
     "react/prefer-stateless-function": ["off"],
     "no-underscore-dangle": [ "error", { "allowAfterThis": true }],
     "import/no-unresolved": ["error", {

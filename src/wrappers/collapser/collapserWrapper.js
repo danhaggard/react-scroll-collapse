@@ -4,26 +4,36 @@ import isEqual from 'lodash/isEqual';
 
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-
-import {setOffsetTop, expandCollapseAll} from '../../actions';
+import {watchCollapser, watchInitCollapser,
+  setOffsetTop, expandCollapseAll} from '../../actions';
 
 import selectors from '../../selectors';
 const {allChildItemsSelector, areAllItemsExpandedSelector} = selectors.collapser;
 
-/*
-  collapseWrapper is an HoC that is to be used to wrap components which make use
-  of react-collapse components.  (although it could be used with others conceivably)
 
-  It provides the wrapped component with the props:
-    isOpened: boolean - which can be used as the <Collapse> isOpened prop.
-    onHeightReady: function - which should be passed into the  <Collapse>
-      onHeightReady prop.
-    expandCollapse: function - which can be used as an event callback to trigger
-      change of state.
-*/
 export const collapserWrapper = (WrappedComponent) => {
 
   class CollapserController extends Component {
+
+    constructor(props) {
+      super(props);
+      this.expandCollapseAll = (allChildItems, areAllItemsExpanded) => () => {
+        /*
+          setOffsetTop: defines a callback for the saga to call that allows
+          the saga to obtain the offsetTop value of the backing instance of this
+          component and dispatch that to the redux store.  The saga grabs the
+          offsetTop val once the onHeightReady callback has been
+          called for every wrapped <Collapse> element in the Collapser.
+        */
+        this.props.actions.watchCollapser(this.props.collapserId);
+        this.props.actions.setOffsetTop(
+          () => this.elem.offsetTop,
+          this.props.parentScrollerId,
+          this.props.collapserId,
+        );
+        this.props.actions.expandCollapseAll(allChildItems, areAllItemsExpanded);
+      };
+    }
 
     /*
       allChildItems, areAllItemsExpanded are passed into the expandCollapseAll
@@ -39,33 +49,19 @@ export const collapserWrapper = (WrappedComponent) => {
         }
       ...it will only use the props values as supplied on the first render - i.e.
       the empty array for allChildItems.  So instead - those values are passed into
-      the function on render - which are gauranteed to be up to date.
+      the function in render - which are gauranteed to be up to date.
 
-      BUT this means that you are generating a new function on every render and
-      passing into props - forcing child renders.  Figure out fix.
+      The tradeoff is that this causes double render on init.  I don't see any
+      way around this.
     */
 
     componentDidMount() {
-      const domNode = this.getWrappedDomNode();
-      this.expandCollapseAll = (allChildItems, areAllItemsExpanded) => () => {
-        /*
-          this.setOffsetTop: defines a callback for the saga to call that allows
-            the saga to obtain the offsetTop value of the backing instance of this
-            component and dispatch that to the redux store.  The saga grabs the
-            offsetTop val once the onHeightReady callback has been
-            called for every wrapped <Collapse> element in the Collapser.
-        */
-        this.props.actions.setOffsetTop(
-          () => domNode.offsetTop,
-          this.props.parentScrollerId,
-          this.props.collapserId,
-        );
-        this.props.actions.expandCollapseAll(allChildItems, areAllItemsExpanded);
-      };
+      this.elem = ReactDOM.findDOMNode(this);
+      this.props.actions.watchInitCollapser(this.props.collapserId);
     }
 
     /*
-      This is necesssary at the moment to prevent unecessary renders caused
+      shouldComponentUpdate is necesssary at the moment to prevent unecessary renders caused
       by the allChildItemsSelector returning an array.  The array is a different
       object no matter what so reselect doesn't memoize it.  I did try a quick
       fix of replacing createSelector's identity function to the lodash isEqual,
@@ -89,22 +85,6 @@ export const collapserWrapper = (WrappedComponent) => {
       return shouldUpdate;
     }
 
-    getWrappedDomNode() {
-      /*
-        isInAnyDOM tests whether an object is a DOM object.
-        taken from here: http://stackoverflow.com/a/20476546/1914452
-      */
-      const isInAnyDOM = (o) => (o !== null) &&
-        !!(o.ownerDocument && (o.ownerDocument.defaultView || o.ownerDocument.parentWindow).alert);
-      let domNode;
-      if (!isInAnyDOM(this.elem)) {
-        domNode = ReactDOM.findDOMNode(this.elem);
-      } else {
-        domNode = this.elem;
-      }
-      return domNode;
-    }
-
     render() {
       const {actions, allChildItems, areAllItemsExpanded, ...other} = this.props;
       const expandCollapseAllBind = !this.expandCollapseAll ? null :
@@ -112,11 +92,6 @@ export const collapserWrapper = (WrappedComponent) => {
       return (
         <WrappedComponent
           {...other}
-          ref={
-            elem => {
-              this.elem = elem;
-            }
-          }
           expandCollapseAll={expandCollapseAllBind}
           areAllItemsExpanded={areAllItemsExpanded}
         />
@@ -127,6 +102,7 @@ export const collapserWrapper = (WrappedComponent) => {
   CollapserController.propTypes = {
     /* provided by collapserControllerWrapper */
     collapserId: PropTypes.number.isRequired,
+    parentCollapserId: PropTypes.number,
     parentScrollerId: PropTypes.number.isRequired,
 
     /* provided by redux */
@@ -144,6 +120,8 @@ export const collapserWrapper = (WrappedComponent) => {
     actions: bindActionCreators({
       setOffsetTop,
       expandCollapseAll,
+      watchCollapser,
+      watchInitCollapser,
     }, dispatch),
   });
 

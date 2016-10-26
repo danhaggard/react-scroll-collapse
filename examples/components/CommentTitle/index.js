@@ -14,9 +14,10 @@ const CommentTitle = (props) => {
 };
 
 CommentTitle.propTypes = {
+  onClick: PropTypes.func,
+  isOpened: PropTypes.bool,
   title: PropTypes.string,
   userName: PropTypes.string,
-  isOpened: PropTypes.bool,
 };
 
 export default CommentTitle;

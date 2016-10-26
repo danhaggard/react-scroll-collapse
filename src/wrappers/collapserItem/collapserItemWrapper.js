@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 
-import {setOffsetTop, expandCollapse, heightReady} from '../../actions';
+import {watchCollapser, setOffsetTop, expandCollapse, heightReady} from '../../actions';
 
 import selectors from '../../selectors';
 const {itemExpandedSelector} = selectors.collapserItem;
@@ -35,9 +35,13 @@ export const collapserItemWrapper = (WrappedComponent) => {
           offsetTop val once the onHeightReady callback has been
           called for every wrapped <Collapse> element in the Collapser.
       */
-      this.setOffsetTop = () => props.actions.setOffsetTop(() => this.elem.offsetTop);
       this.expandCollapse = () => {
-        this.setOffsetTop();
+        this.props.actions.watchCollapser(this.props.parentCollapserId);
+        this.props.actions.setOffsetTop(
+          () => this.elem.offsetTop,
+            this.props.parentScrollerId,
+            this.props.parentCollapserId,
+        );
         props.actions.expandCollapse(this.props.itemId);
       };
       /*
@@ -60,8 +64,8 @@ export const collapserItemWrapper = (WrappedComponent) => {
         <WrappedComponent
           {...this.props}
           isOpened={isOpened}
-          expandCollapse={this.expandCollapse.bind(this)}
-          onHeightReady={this.onHeightReady.bind(this)}
+          expandCollapse={this.expandCollapse}
+          onHeightReady={this.onHeightReady}
         />
       );
     }
@@ -72,6 +76,7 @@ export const collapserItemWrapper = (WrappedComponent) => {
     isOpened: PropTypes.bool.isRequired,
     itemId: PropTypes.number.isRequired,
     parentCollapserId: PropTypes.number.isRequired,
+    parentScrollerId: PropTypes.number.isRequired,
     setOffsetTop: PropTypes.func,
   };
 
@@ -84,6 +89,7 @@ export const collapserItemWrapper = (WrappedComponent) => {
       expandCollapse,
       heightReady,
       setOffsetTop,
+      watchCollapser,
     }, dispatch),
   });
 

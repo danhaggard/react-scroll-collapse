@@ -4,20 +4,23 @@ import './app.css';
 import Scroller from '../../src';
 
 import CommentThread from './CommentThread';
+import SimpleCollapser from './SimpleCollapser';
 
 class AppComponent extends React.Component {
-
   render() {
     return (
       <div>
-        <div className="index">
+        <div className="example">
+          <h3>Nested Example</h3>
           <Scroller style={{height: '300px'}}>
-            <CommentThread maxNest={4} />
+            <CommentThread/>
           </Scroller>
         </div>
-        <div className="index">
+        <div className="example">
+          <h3>Simple Example</h3>
           <Scroller style={{height: '300px'}}>
-            <CommentThread maxNest={40} />
+            <SimpleCollapser />
+            <SimpleCollapser />
           </Scroller>
         </div>
       </div>

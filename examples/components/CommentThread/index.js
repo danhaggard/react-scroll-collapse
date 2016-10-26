@@ -2,76 +2,67 @@ import React, {PropTypes, Component} from 'react';
 import styles from './CommentThread.scss';
 
 import Comment from './../Comment';
+import CommentTitle from './../CommentTitle';
+
 import {collapserController} from '../../../src';
+import {genRandText} from './../../utils';
 
 
 class CommentThread extends Component {
 
-  componentWillMount() {
-    /*
-      I miss python: range(a,b) - sigh.
-      This trick comes from: http://stackoverflow.com/a/20066663/1914452
-    */
-    const noOfWords = Math.floor((Math.random() * 50) + 10);
-    const arr = Array.apply(null, {length: noOfWords}).map(Number.call, Number);
-    this.randText = '';
-    arr.forEach(() => {
-      this.randText += ` ${this.getRandString()}`;
-    });
+  constructor(props) {
+    super(props);
+    this.state = {
+      childThreads: 2
+    };
   }
 
-  /*
-    This comes from: http://stackoverflow.com/a/8084248/1914452
-  */
-  getRandString() {
-    const letters = 'abcdefghijklmnopqrstuvwxyz';
-    const N = Math.floor((Math.random() * 10) + 1);
-    const selection = Array.apply(null, Array(N)).map(
-      () => letters.charAt(Math.floor(Math.random() * letters.length))
-    ).join('');
-    return selection;
+  componentWillMount() {
+    this.randText = genRandText();
+  }
+
+  handleClick(childThreads) {
+    this.setState({childThreads: childThreads + 1});
   }
 
   render() {
-    const {collapserId, expandCollapseAll, maxNest} = this.props;
-    /*
-      Recursively nesting this component is just a dirty way to generate nested
-      comments I'm using for the purpose of this demo.
-      The maxNest value- prevents infinite recursion
-    */
-    const nested = collapserId > maxNest ? null : ([
-      <WrappedCommentThread key={0} maxNest={maxNest} />,
-      <WrappedCommentThread key={1} maxNest={maxNest} />,
-      <WrappedCommentThread key={2} maxNest={maxNest} />
-    ]);
+    const {areAllItemsExpanded, collapserId, expandCollapseAll, maxNest} = this.props;
+    const idStr = collapserId.toString();
+    const text = ` Comment Text ${idStr}: --- ${this.randText}`;
+    const title = ` Comment Title ${idStr}`;
 
-    const id = {idStr: collapserId.toString(), randText: this.randText};
-    const text = ` Comment Text ${id.idStr}: --- ${id.randText}`;
-    const title = ` Comment Title ${id.idStr}`;
+    /* Some  recursion to generate nested threads. */
+    const nested = collapserId > maxNest ? null :
+      Array.apply(null, Array(this.state.childThreads)).map(
+        (key, index) => <WrappedCommentThread key={index} maxNest={this.state.childThreads} />
+      );
+
+    // Add content dynamically to show that the scroller will track it.
+    const addToThread = collapserId < this.state.childThreads || collapserId < maxNest ? (
+      <button onClick={() => this.handleClick(this.state.childThreads)}>
+        Insert Thread
+      </button>
+    ) : null;
+
     return (
-      <div className={styles.commentThread}>
-        <Comment
-          text={text}
-          title={title}
-          expandCollapseAll={expandCollapseAll}
-        />
-      {nested}
+      <div className={styles.commentThread} >
+        <div onClick={expandCollapseAll}>
+          <CommentTitle title={title} isOpened={areAllItemsExpanded} />
+        </div>
+        <Comment text={text} />
+        {nested}
+        {addToThread}
       </div>
     );
   }
 }
 
 CommentThread.propTypes = {
-  areAllItemsExpanded: PropTypes.bool,
-  collapserId: PropTypes.number,
-  expandCollapseAll: PropTypes.func,
-  maxNest: PropTypes.number.isRequired,
+  areAllItemsExpanded: PropTypes.bool.isRequired, // provided by collapserController
+  collapserId: PropTypes.number.isRequired, // provided by collapserController
+  expandCollapseAll: PropTypes.func, // provided by collapserController
+  maxNest: PropTypes.number,
 };
 
-/*
-  Normally would just do: export default collapserController(CommentThread);
-  But this allows us to recursively nest WrappedCommentThread with all the redux
-  bindings attached in each instance.
-*/
 const WrappedCommentThread = collapserController(CommentThread);
 export default WrappedCommentThread;

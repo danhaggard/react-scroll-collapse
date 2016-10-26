@@ -19,11 +19,15 @@ import heightReadyAll from './collapser/heightReadyAll.js';
 import expandCollapseAll from './collapser/expandCollapseAll.js';
 import removeCollapser from './collapser/removeCollapser.js';
 import addCollapser from './collapser/addCollapser.js';
+import watchCollapser from './collapser/watchCollapser';
+import watchInitCollapser from './collapser/watchInitCollapser';
 const actions = {
   addCollapser,
   removeCollapser,
   expandCollapseAll,
   heightReadyAll,
+  watchCollapser,
+  watchInitCollapser,
   addItem,
   removeItem,
   expandCollapse,

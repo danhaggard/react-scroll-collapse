@@ -56,13 +56,13 @@ export const collapserControllerWrapper = (CollapserController) => {
         Pulling these props out so they don't get passed on.  Ignore linting
         error.
       */
-      const {actions, collapserId, nextCollapserId, parentCollapserId,
-        ...other} = this.props;
+      const {actions, collapserId, nextCollapserId, ...other} = this.props;
       if (this.collapserId >= 0 && this.parentScrollerId >= 0) {
         return (
           <CollapserController
             {...other}
             collapserId={this.collapserId}
+            parentCollapserId={this.parentCollapserId}
             parentScrollerId={this.parentScrollerId}
           />
         );

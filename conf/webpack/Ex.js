@@ -3,6 +3,9 @@
 /**
  * Examples server configuration.
  */
+
+const path = require('path');
+
 const webpack = require('webpack');
 const WebpackBaseConfig = require('./Base');
 
@@ -116,6 +119,11 @@ class WebpackExConfig extends WebpackBaseConfig {
           }
         ]
       },
+      output: {
+        path: path.resolve('./dist/assets'),
+        filename: 'app.js',
+        publicPath: './assets/'
+      },
       plugins: [
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NoErrorsPlugin()
@@ -133,6 +141,7 @@ class WebpackExConfig extends WebpackBaseConfig {
         extensions: ['', '.js', '.jsx'],
         modules: [
           this.examplesPathAbsolute,
+          this.srcPathAbsolute,
           'node_modules'
         ]
       }
@@ -145,6 +154,27 @@ class WebpackExConfig extends WebpackBaseConfig {
    */
   get env() {
     return 'ex';
+  }
+
+  /**
+   * Set the config data.
+   * Will remove the devServer config value as we do not need it in test environments
+   * This function will always return a new config
+   * @param {Object} data Keys to assign
+   * @return {Object}
+   */
+  set config(data) {
+    const baseSettings = this.defaultSettings;
+    this._config = Object.assign({}, baseSettings, data);
+    return this._config;
+  }
+
+  /**
+   * Get the global config
+   * @param {Object} config Final webpack config
+   */
+  get config() {
+    return super.config;
   }
 
 }

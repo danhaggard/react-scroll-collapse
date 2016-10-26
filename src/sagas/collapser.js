@@ -1,4 +1,4 @@
-import {call, take, actionChannel, select, put} from 'redux-saga/effects';
+import {call, take, fork, actionChannel, select, put} from 'redux-saga/effects';
 
 import * as types from '../actions/const';
 import actions from '../actions';
@@ -6,35 +6,70 @@ import selectors from '../selectors';
 
 const {haveAllItemsReportedHeightSelector} = selectors.collapser;
 const {heightReadyAll} = actions;
-const {HEIGHT_READY} = types;
-
+const {HEIGHT_READY, WATCH_COLLAPSER, WATCH_INIT_COLLAPSER} = types;
 
 /*
   Collapser UI related sagas
   ==========================
-
-  Using action channels means we can have use the same sagas for multiple UI
-  components.
 */
-
 
 /*
-  this is initiated as a root saga.  It waits for the onHeightReady callback
-  on the Collapser child elements to fire (which dispatches the action used in the
-  action channel).  It will do a check for every collapser that fires the callback
-  and if none of them are transitioning any more, then dispatches a signal
-  saying that they are all done.  This is so we can ensure dom measurements
-  are not performed during transitions.
+  This saga waits for HEIGHT_READY reports from the collapserItems.
+  It continues to wait until all the child items for that collapser have reported.
 */
-export function *waitForCollapser() {
-  const initChannel = yield actionChannel(HEIGHT_READY);
+export function *waitForHeightReady(collapserIdInit) {
+  let waiting = true;
+  while (waiting) {
+    yield take(HEIGHT_READY);
+    const selector = yield select(haveAllItemsReportedHeightSelector);
+    const haveAllReported = yield call(selector, collapserIdInit);
+    if (haveAllReported) {
+      waiting = false;
+      yield put(heightReadyAll());
+    }
+  }
+  return;
+}
+
+/*
+  This saga is initiated for each mounted collapser.  It watches for when the
+  WATCH_COLLAPSER action is fired (along side with expandCollapse(All))
+*/
+export function *waitForCollapser(collapserIdInit) {
+  const initChannel = yield actionChannel(WATCH_COLLAPSER);
   const condition = true;
   while (condition) {
     const {payload: {collapserId}} = yield take(initChannel);
-    const selector = yield select(haveAllItemsReportedHeightSelector);
-    const haveAllReported = yield call(selector, collapserId);
-    if (haveAllReported) {
-      yield put(heightReadyAll());
+    /*
+      A generator is initiated for every collapser.  So they will ALL take
+      the WATCH_COLLAPSER action when it is called.  So we have to check for
+      each collapser that it was the one that fired the WATCH_COLLAPSER action.
+
+      Screening here allows us to deal with nested collapsers correctly.  If a
+      nested collapser reports that all it's child items have finished transitioning
+      then it coupld possibly fire the HEIGHT_READY_ALL action - even though some items in
+      parent collapsers haven't finished transitioning yet.
+    */
+    if (collapserIdInit === collapserId) {
+      /* Don't need to fork here as only one collapser will be active at a time */
+      yield call(waitForHeightReady, collapserIdInit);
     }
+  }
+}
+
+/*
+  this is initiated as a root saga.  It watches for the WATCH_INIT_COLLAPSER
+  action which is fired whenever a collapser is mounted.  It then initiates
+  the waitForCollapsers saga for that collapser.
+*/
+export function *collapserInitWatch() {
+  const initChannel = yield actionChannel(WATCH_INIT_COLLAPSER);
+  const condition = true;
+  while (condition) {
+    const {payload: {collapserId}} = yield take(initChannel);
+    /*
+      Fork here because we can have multiple collapsers mounting.
+    */
+    yield fork(waitForCollapser, collapserId);
   }
 }
