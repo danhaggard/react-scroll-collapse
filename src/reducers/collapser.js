@@ -1,6 +1,8 @@
 import {
   ADD_COLLAPSER,
   ADD_ITEM,
+  REMOVE_ITEM,
+  REMOVE_COLLAPSER,
 } from '../actions/const';
 
 import {checkAttr} from './utils';
@@ -18,21 +20,25 @@ export const collapserIdReducer = (state = null, action) => {
 
 //  handles the collapsers attr in collapsers entities.
 export const collapsersIdArray = (state = [], action) => {
-  const {collapser} = checkAttr(action, 'payload');
+  const {collapser, collapserId} = checkAttr(action, 'payload');
   switch (action.type) {
     case ADD_COLLAPSER:
       return [...state, collapser.id];
+    case REMOVE_COLLAPSER:
+      return state.filter(val => val !== collapserId);
     default:
       return state;
   }
 };
 
-// handles the list of items nested under a collapser.
+// handles the list of immediate child items nested under a collapser.
 export const itemsIdArray = (state = [], action) => {
-  const {item} = checkAttr(action, 'payload');
+  const {item, itemId} = checkAttr(action, 'payload');
   switch (action.type) {
     case ADD_ITEM:
       return [...state, item.id];
+    case REMOVE_ITEM:
+      return state.filter(val => val !== itemId);
     default:
       return state;
   }
@@ -50,6 +56,7 @@ export const collapserReducer = (state = {}, action) => {
         items: [],
       });
     case ADD_ITEM:
+    case REMOVE_ITEM:
       // item is included in the item array for the parent collapser.
       return {...state, items: itemsIdArray(state.items, action)};
     default:
@@ -66,6 +73,7 @@ export const collapserReducer = (state = {}, action) => {
 export const parentCollapserReducer = (state = {}, action) => {
   switch (action.type) {
     case ADD_COLLAPSER:
+    case REMOVE_COLLAPSER:
       return {...state, collapsers: collapsersIdArray(state.collapsers, action)};
     default:
       return state;
@@ -86,7 +94,17 @@ export const collapsersReducer = (state = {}, action) => {
       // now we add this new collapser to the total set in entities.
       newState[collapser.id] = collapserReducer(undefined, action);
       return newState;
+    case REMOVE_COLLAPSER:
+      newState = {...state};
+      if (parentCollapserId >= 0) {
+        // then this collapser is nested under another collapser and we make sure
+        // that the id of the collapser is removed from its list of children.
+        newState[parentCollapserId] = parentCollapserReducer(state[parentCollapserId], action);
+      }
+      delete newState[collapserId];
+      return newState;
     case ADD_ITEM:
+    case REMOVE_ITEM:
       newState = {...state};
       // we assume we aren't adding an item to a collapser that doesn't exit.
       newState[collapserId] = collapserReducer(state[collapserId], action);

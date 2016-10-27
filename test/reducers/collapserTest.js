@@ -87,6 +87,23 @@ const itemsIdArrayAddItem = () => {
   ).toEqual(stateAfter);
 };
 
+const itemsIdArrayRemoveItem = () => {
+  const stateBefore = [0, 1];
+  const stateAfter = [0];
+  const action = {
+    type: types.REMOVE_ITEM,
+    payload: {
+      collapserId: 0,
+      itemId: 1,
+    },
+  };
+  Object.freeze(action);
+  Object.freeze(stateBefore);
+  expect(
+    reducers.itemsIdArray(stateBefore, action)
+  ).toEqual(stateAfter);
+};
+
 const collapserReducerDefault = () => {
   const stateBefore = {};
   const stateAfter = {};
@@ -190,6 +207,12 @@ describe('react=scroll-collapse', () => {
         describe('type: ADD_ITEM', () => {
           it('adds the item id to the array', () => {
             itemsIdArrayAddItem();
+          });
+        });
+
+        describe('type: REMOVE_ITEM', () => {
+          it('removes the itemId from the array', () => {
+            itemsIdArrayRemoveItem();
           });
         });
       });

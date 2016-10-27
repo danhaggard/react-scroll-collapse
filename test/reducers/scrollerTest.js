@@ -21,6 +21,22 @@ const scrollerCollapsersIdArrayReducerAddCollapser = () => {
   ).toEqual(stateAfter);
 };
 
+const scrollerCollapsersIdArrayReducerRemoveCollapser = () => {
+  const stateBefore = [0, 1];
+  const stateAfter = [0];
+  const action = {
+    type: types.REMOVE_COLLAPSER,
+    payload: {
+      collapserId: 1,
+    },
+  };
+  Object.freeze(stateBefore);
+  Object.freeze(action);
+  expect(
+    reducers.scrollerCollapsersIdArrayReducer(stateBefore, action)
+  ).toEqual(stateAfter);
+};
+
 const scrollerIdReducerAddScroller = () => {
   const stateBefore = null;
   const stateAfter = 0;
@@ -169,10 +185,15 @@ describe('react-scroll-collapse', () => {
   describe('reducers', () => {
     describe('scroller', () => {
 
-      describe('function: scrollerCollapsersIdArray', () => {
+      describe('function: scrollerCollapsersIdArrayReducer', () => {
         describe('type: ADD_COLLAPSER', () => {
           it('adds the collapser id', () => {
             scrollerCollapsersIdArrayReducerAddCollapser();
+          });
+        });
+        describe('type: REMOVE_COLLAPSER', () => {
+          it('removes the collapserId from the array', () => {
+            scrollerCollapsersIdArrayReducerRemoveCollapser();
           });
         });
       });

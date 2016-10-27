@@ -24,6 +24,8 @@ class ScrollerMotion extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      onWheel: false,
+      springConfig: {stiffness: 170, damping: 20},
       motionStyle: {y: 0},
       prevRenderType: null,
     };
@@ -67,7 +69,13 @@ class ScrollerMotion extends Component {
     more re-renders than this solution.
   */
   componentWillReceiveProps(nextProps) {
+    /* Update the springConfig without a re-render */
+    if (this.props.springConfig !== nextProps.springConfig) {
+      this.setState({springConfig: nextProps.springConfig});
+    }
+
     if (
+      this.state.onWheel ||
       /*
         this.props.offsetTop !== nextProps.offsetTop
 
@@ -105,15 +113,15 @@ class ScrollerMotion extends Component {
   }
 
   /*
-   Now that react motion is in sync with the dom scrollTop state, we need
-   to precipitate another render to start the animation.  So we call
+   Now that react motion is assured to be in sync with the dom scrollTop state,
+   we need to precipitate another render to start the animation.  So we call
    setState here to do so - but only conditional on the previous render being
    a scrollTop ui sync so we don't get infinite loop.
   */
   componentDidUpdate() {
     if (this.state.prevRenderType === 'uiSync') {
       this.setState({
-        motionStyle: {y: spring(this.props.offsetTop, presets.noWobble)},
+        motionStyle: {y: spring(this.props.offsetTop, this.state.springConfig)},
         prevRenderType: 'autoScroll',
       });
     }
@@ -122,7 +130,7 @@ class ScrollerMotion extends Component {
   render() {
     const {children, scrollerId} = this.props;
     /*
-      theprops.offsetTop value is passed into the motionStyle state object.
+      the props.offsetTop value is passed into the motionStyle state object.
       Which is in turn passes into the style prop of the Motion element.  This
       interpolates that y value - and does a bunch of timed renders to yield
       a smooth animation.
@@ -142,6 +150,7 @@ class ScrollerMotion extends Component {
             ref: child => {
               this.child = child;
             },
+            onWheel: this.handleOnWheel,
             scrollTop: value.y,
             scrollerId,
           });
@@ -159,6 +168,7 @@ ScrollerMotion.propTypes = {
   scrollTop: PropTypes.number.isRequired,
   offsetTop: PropTypes.number.isRequired,
   scrollerId: PropTypes.number.isRequired,
+  springConfig: PropTypes.object,
 };
 
 // using a higher order component to fuse the two components together.

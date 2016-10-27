@@ -17,9 +17,15 @@ class SimpleCollapser extends Component {
     };
   }
 
-  handleClick(comments) {
+  addComment(comments) {
     this.setState({
       comments: [...comments, genRandText()]
+    });
+  }
+
+  removeComment(comments) {
+    this.setState({
+      comments: comments.slice(0, comments.length - 1)
     });
   }
 
@@ -31,14 +37,18 @@ class SimpleCollapser extends Component {
         <div onClick={expandCollapseAll}>
           <CommentTitle title={title} isOpened={areAllItemsExpanded} />
         </div>
+
         {this.state.comments.map((text, index) =>
           <SimpleComment
             key={index}
             text={text}
           />
         )}
-        <button onClick={() => this.handleClick(this.state.comments)}>
+        <button onClick={() => this.addComment(this.state.comments)}>
           Add Comment
+        </button>
+        <button onClick={() => this.removeComment(this.state.comments)}>
+          Remove Comment
         </button>
       </div>
     );

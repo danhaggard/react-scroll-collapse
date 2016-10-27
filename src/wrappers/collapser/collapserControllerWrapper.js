@@ -3,7 +3,7 @@ import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 
-import {addCollapser} from '../../actions';
+import {addCollapser, removeCollapser} from '../../actions';
 
 import selectors from '../../selectors';
 const {nextCollapserIdSelector} = selectors.collapser;
@@ -37,8 +37,11 @@ export const collapserControllerWrapper = (CollapserController) => {
       this.addCollapser();
     }
 
-    componentWillUnMount() {
-    //  console.log('unMounting collapser - collapserId', this.props.collapserId);
+    componentWillUnmount() {
+      console.log('componentWillUnmount: this.parentCollapserId, this.parentScrollerId, this.collapserId',
+        this.parentCollapserId, this.parentScrollerId, this.collapserId);
+      this.props.actions.removeCollapser(this.parentCollapserId, this.parentScrollerId,
+        this.collapserId);
     }
 
     addCollapser() {
@@ -56,7 +59,7 @@ export const collapserControllerWrapper = (CollapserController) => {
         Pulling these props out so they don't get passed on.  Ignore linting
         error.
       */
-      const {actions, collapserId, nextCollapserId, ...other} = this.props;
+      const {actions, nextCollapserId, ...other} = this.props;
       if (this.collapserId >= 0 && this.parentScrollerId >= 0) {
         return (
           <CollapserController
@@ -105,6 +108,7 @@ export const collapserControllerWrapper = (CollapserController) => {
   const mapDispatch = (dispatch) => ({
     actions: bindActionCreators({
       addCollapser,
+      removeCollapser,
     }, dispatch),
   });
 

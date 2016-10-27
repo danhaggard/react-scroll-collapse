@@ -1,6 +1,7 @@
 import {
   ADD_COLLAPSER,
   ADD_SCROLLER,
+  REMOVE_COLLAPSER,
   SCROLL_TO,
 } from '../actions/const';
 
@@ -8,10 +9,12 @@ import {checkAttr, getNextIdFromArr} from './utils';
 
 //  handles the collapsers attr in scroller entities.
 export const scrollerCollapsersIdArrayReducer = (state = [], action) => {
-  const {collapser} = checkAttr(action, 'payload');
+  const {collapser, collapserId} = checkAttr(action, 'payload');
   switch (action.type) {
     case ADD_COLLAPSER:
       return [...state, collapser.id];
+    case REMOVE_COLLAPSER:
+      return state.filter(val => val !== collapserId);
     default:
       return state;
   }
@@ -69,6 +72,7 @@ export const scrollerReducer = (state = {}, action) => {
         scrollTop: scrollTopReducer(state.scrollTop, action),
       };
     case ADD_COLLAPSER:
+    case REMOVE_COLLAPSER:
       return {
         ...state,
         collapsers: scrollerCollapsersIdArrayReducer(state.collapsers, action),
@@ -87,6 +91,7 @@ export const scrollersReducer = (state = {}, action) => {
       newState[scroller.id] = scrollerReducer(null, action);
       return newState;
     case ADD_COLLAPSER:
+    case REMOVE_COLLAPSER:
       newState = {...state};
       // if no scrollerId supplied - then this collapser is nested under another collapser
       if (scrollerId >= 0) {

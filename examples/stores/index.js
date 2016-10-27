@@ -3,11 +3,14 @@ import createSagaMiddleware from 'redux-saga';
 
 import reducers from '../reducers';
 import sagas from '../sagas';
+import {reactScrollCollapseMiddleWare} from '../../src';
 
 function reduxStore(initialState) {
   const sagaMiddleware = createSagaMiddleware();
 
-  const middleware = applyMiddleware(...[sagaMiddleware]);
+  const middleware = applyMiddleware(
+    ...[sagaMiddleware, reactScrollCollapseMiddleWare]
+  );
   const enhancer = compose(
     middleware,
     window.devToolsExtension && window.devToolsExtension(),

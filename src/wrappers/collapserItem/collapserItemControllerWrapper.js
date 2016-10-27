@@ -3,7 +3,7 @@ import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 
-import {addItem} from '../../actions';
+import {addItem, removeItem} from '../../actions';
 
 import selectors from '../../selectors';
 const {nextItemIdSelector} = selectors.collapserItem;
@@ -40,6 +40,10 @@ export const collapserItemControllerWrapper = (CollapserItemController) => {
         create state slice for this collapserItem in redux store.
       */
       this.addItem();
+    }
+
+    componentWillUnmount() {
+      this.props.actions.removeItem(this.parentCollapserId, this.itemId);
     }
 
     addItem() {
@@ -110,6 +114,7 @@ export const collapserItemControllerWrapper = (CollapserItemController) => {
   const mapDispatch = (dispatch) => ({
     actions: bindActionCreators({
       addItem,
+      removeItem,
     }, dispatch),
   });
 

@@ -184,6 +184,29 @@ const itemsReducerAddItem = () => {
   ).toEqual(stateAfter);
 };
 
+const itemsReducerRemoveItem = () => {
+  const stateBefore = {
+    0: {
+      expanded: true,
+      id: 0,
+      waitingForHeight: false,
+    },
+  };
+  const stateAfter = {};
+  const action = {
+    type: types.REMOVE_ITEM,
+    payload: {
+      collapserId: 0,
+      itemId: 0,
+    },
+  };
+  Object.freeze(stateBefore);
+  Object.freeze(action);
+  expect(
+    reducers.itemsReducer(stateBefore, action)
+  ).toEqual(stateAfter);
+};
+
 const itemsReducerExpandCollapse = () => {
   const stateBefore = {
     0: {
@@ -318,6 +341,11 @@ describe('react=scroll-collapse', () => {
         describe('type: ADD_ITEM', () => {
           it('creates item state for each id in the array', () => {
             itemsReducerAddItem();
+          });
+        });
+        describe('type: REMOVE_ITEM', () => {
+          it('creates item state for each id in the array', () => {
+            itemsReducerRemoveItem();
           });
         });
         describe('type: EXPAND_COLLAPSE', () => {

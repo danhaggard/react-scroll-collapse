@@ -3,6 +3,7 @@ import {
   EXPAND_COLLAPSE,
   EXPAND_COLLAPSE_ALL,
   HEIGHT_READY,
+  REMOVE_ITEM,
 } from '../actions/const';
 
 import {checkAttr} from './utils';
@@ -74,6 +75,10 @@ export const itemsReducer = (state = {}, action) => {
     case ADD_ITEM:
       newState = {...state};
       newState[item.id] = itemReducer(undefined, action);
+      return newState;
+    case REMOVE_ITEM:
+      newState = {...state};
+      delete newState[itemId];
       return newState;
     case HEIGHT_READY:
     case EXPAND_COLLAPSE:

@@ -1,4 +1,4 @@
-import {call, take, fork, actionChannel, select, put} from 'redux-saga/effects';
+import {call, take, race, fork, actionChannel, select, put} from 'redux-saga/effects';
 
 import * as types from '../actions/const';
 import actions from '../actions';
@@ -6,7 +6,7 @@ import selectors from '../selectors';
 
 const {haveAllItemsReportedHeightSelector} = selectors.collapser;
 const {heightReadyAll} = actions;
-const {HEIGHT_READY, WATCH_COLLAPSER, WATCH_INIT_COLLAPSER} = types;
+const {HEIGHT_READY, REMOVE_COLLAPSER, WATCH_COLLAPSER, WATCH_INIT_COLLAPSER} = types;
 
 /*
   Collapser UI related sagas
@@ -36,10 +36,34 @@ export function *waitForHeightReady(collapserIdInit) {
   WATCH_COLLAPSER action is fired (along side with expandCollapse(All))
 */
 export function *waitForCollapser(collapserIdInit) {
-  const initChannel = yield actionChannel(WATCH_COLLAPSER);
+  const watchCollapserChannel = yield actionChannel(WATCH_COLLAPSER);
+  const removeCollapserChannel = yield actionChannel(REMOVE_COLLAPSER);
   const condition = true;
   while (condition) {
-    const {payload: {collapserId}} = yield take(initChannel);
+
+    const {watchCollapser, removeCollapser} = yield race({
+      watchCollapser: take(watchCollapserChannel),
+      removeCollapser: take(removeCollapserChannel)
+    });
+
+    if (watchCollapser) {
+      const {payload: {collapserId}} = watchCollapser;
+      if (collapserIdInit === collapserId) {
+        console.log('watchCollapser, collapserId', collapserId);
+        /* Don't need to fork here as only one collapser will be active at a time */
+        yield call(waitForHeightReady, collapserIdInit);
+      }
+    } else {
+      const {payload: {collapserId}} = removeCollapser;
+      if (collapserIdInit === collapserId) {
+        console.log('removeCollapser, collapserId', collapserId);
+        watchCollapserChannel.close();
+        removeCollapserChannel.close();
+        return;
+      }
+    }
+
+    // const {payload: {collapserId}} = yield take(watchCollapserChannel);
     /*
       A generator is initiated for every collapser.  So they will ALL take
       the WATCH_COLLAPSER action when it is called.  So we have to check for
@@ -50,10 +74,7 @@ export function *waitForCollapser(collapserIdInit) {
       then it coupld possibly fire the HEIGHT_READY_ALL action - even though some items in
       parent collapsers haven't finished transitioning yet.
     */
-    if (collapserIdInit === collapserId) {
-      /* Don't need to fork here as only one collapser will be active at a time */
-      yield call(waitForHeightReady, collapserIdInit);
-    }
+
   }
 }
 
