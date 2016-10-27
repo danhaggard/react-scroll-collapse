@@ -38,8 +38,6 @@ export const collapserControllerWrapper = (CollapserController) => {
     }
 
     componentWillUnmount() {
-      console.log('componentWillUnmount: this.parentCollapserId, this.parentScrollerId, this.collapserId',
-        this.parentCollapserId, this.parentScrollerId, this.collapserId);
       this.props.actions.removeCollapser(this.parentCollapserId, this.parentScrollerId,
         this.collapserId);
     }

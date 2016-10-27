@@ -7,8 +7,9 @@ import CommentBody from './../CommentBody';
 
 import {collapserItemController} from '../../../src';
 
+
 const Comment = (props) => {
-  const {text, isOpened, onHeightReady} = props;
+  const {text, isOpened, onHeightReady, deleteThread, addToThread} = props;
   return (
     <div className={styles.comment}>
       <Collapse
@@ -18,12 +19,16 @@ const Comment = (props) => {
         onHeightReady={onHeightReady}
       >
         <CommentBody text={text} />
+        {deleteThread}
+        {addToThread}
       </Collapse>
     </div>
   );
 };
 
 Comment.propTypes = {
+  deleteThread: PropTypes.node,
+  addToThread: PropTypes.node,
   expandCollapse: PropTypes.func, // provided by collapserItemController
   isOpened: PropTypes.bool.isRequired, // provided by collapserItemController
   itemId: PropTypes.number, // provided by collapserItemController

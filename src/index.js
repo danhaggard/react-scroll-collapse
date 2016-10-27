@@ -32,5 +32,4 @@ export {reactScrollCollapse} from './reducers';
 
 /* root sagas func name: reactScrollCollapseSagas */
 export {reactScrollCollapseSagas} from './sagas';
-export {reactScrollCollapseMiddleWare} from './middleware';
 export default Scroller;

@@ -32,15 +32,19 @@ const removeScroller = () => {
 
 const setOffsetTop = () => {
   const getOffsetTop = () => 'dummy func';
+  const [scrollerId, collapserId, itemId] = [0, 0, 0];
   const output = {
     type: types.SET_OFFSET_TOP,
     payload: {
       getOffsetTop,
+      scrollerId,
+      collapserId,
+      itemId,
     },
   };
 
   expect(
-    actions.setOffsetTop(getOffsetTop)
+    actions.setOffsetTop(getOffsetTop, scrollerId, collapserId, itemId)
   ).toEqual(output);
 };
 

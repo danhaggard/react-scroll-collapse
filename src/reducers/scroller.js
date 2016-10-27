@@ -2,6 +2,7 @@ import {
   ADD_COLLAPSER,
   ADD_SCROLLER,
   REMOVE_COLLAPSER,
+  REMOVE_SCROLLER,
   SCROLL_TO,
 } from '../actions/const';
 
@@ -90,11 +91,16 @@ export const scrollersReducer = (state = {}, action) => {
       newState = {...state};
       newState[scroller.id] = scrollerReducer(null, action);
       return newState;
+    case REMOVE_SCROLLER:
+      newState = {...state};
+      // newState[scrollerId] = scrollerReducer(state[scrollerId], action);
+      delete newState[scrollerId];
+      return newState;
     case ADD_COLLAPSER:
     case REMOVE_COLLAPSER:
       newState = {...state};
       // if no scrollerId supplied - then this collapser is nested under another collapser
-      if (scrollerId >= 0) {
+      if (scrollerId >= 0 && scrollerId in state) {
         newState[scrollerId] = scrollerReducer(state[scrollerId], action);
       }
       return newState;
@@ -108,9 +114,12 @@ export const scrollersReducer = (state = {}, action) => {
 };
 
 export const scrollers = (state = [], action) => {
+  const {scrollerId} = checkAttr(action, 'payload');
   switch (action.type) {
     case ADD_SCROLLER:
       return [...state, getNextIdFromArr(state)];
+    case REMOVE_SCROLLER:
+      return state.filter(val => val !== scrollerId);
     default:
       return state;
   }

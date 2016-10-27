@@ -96,19 +96,30 @@ export const collapsersReducer = (state = {}, action) => {
       return newState;
     case REMOVE_COLLAPSER:
       newState = {...state};
-      if (parentCollapserId >= 0) {
-        // then this collapser is nested under another collapser and we make sure
-        // that the id of the collapser is removed from its list of children.
+      if (parentCollapserId >= 0 && parentCollapserId in state) {
+        /*
+          if parentCollapserId >= 0 then this collapser is nested under
+          another collapser so we remove its id from the parents list of children.
+
+          However the parent may already have been removed by the middleware
+        */
         newState[parentCollapserId] = parentCollapserReducer(state[parentCollapserId], action);
       }
       delete newState[collapserId];
       return newState;
     case ADD_ITEM:
     case REMOVE_ITEM:
-      newState = {...state};
-      // we assume we aren't adding an item to a collapser that doesn't exit.
-      newState[collapserId] = collapserReducer(state[collapserId], action);
-      return newState;
+      /*
+        collapser may have already been removed - so we check that it exists,
+        otherwise we will re-add it's add back into state.
+      */
+      if (collapserId in state) {
+        newState = {...state};
+        newState[collapserId] = collapserReducer(state[collapserId], action);
+        return newState;
+      }
+      return state;
+
     default:
       return state;
   }

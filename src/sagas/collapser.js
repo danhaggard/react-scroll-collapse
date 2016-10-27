@@ -33,7 +33,8 @@ export function *waitForHeightReady(collapserIdInit) {
 
 /*
   This saga is initiated for each mounted collapser.  It watches for when the
-  WATCH_COLLAPSER action is fired (along side with expandCollapse(All))
+  WATCH_COLLAPSER action is fired (along side with expandCollapse(All)) - and
+  performs cleanup on unmount.
 */
 export function *waitForCollapser(collapserIdInit) {
   const watchCollapserChannel = yield actionChannel(WATCH_COLLAPSER);
@@ -41,6 +42,16 @@ export function *waitForCollapser(collapserIdInit) {
   const condition = true;
   while (condition) {
 
+    /*
+      This sets up a race between a collapser's expandCollapseAll action being
+      fired (handled by watchCollapser) and the collapser being unmounted.
+
+      Since we are in a never ending loop - the race will keep being run
+      until removeCollapser channel finally wins (because of unmount).
+
+      At this point we close both channels (to prevent any possible overflows)
+      and return (closing out this saga)
+    */
     const {watchCollapser, removeCollapser} = yield race({
       watchCollapser: take(watchCollapserChannel),
       removeCollapser: take(removeCollapserChannel)
@@ -48,32 +59,31 @@ export function *waitForCollapser(collapserIdInit) {
 
     if (watchCollapser) {
       const {payload: {collapserId}} = watchCollapser;
+
+      /*
+        remember that this generator is initiated for every collapser.  So they
+        will ALL take the WATCH_COLLAPSER action when it is called.  So we check for
+        that the payload collapserId matches the collapserId that this instance
+        was called.
+
+        Screening here allows us to deal with nested collapsers correctly.  If a
+        nested collapser reports that all it's child items have finished transitioning
+        then it coupld possibly fire the HEIGHT_READY_ALL action - even though some items in
+        parent collapsers haven't finished transitioning yet.
+      */
+
       if (collapserIdInit === collapserId) {
-        console.log('watchCollapser, collapserId', collapserId);
         /* Don't need to fork here as only one collapser will be active at a time */
         yield call(waitForHeightReady, collapserIdInit);
       }
     } else {
       const {payload: {collapserId}} = removeCollapser;
       if (collapserIdInit === collapserId) {
-        console.log('removeCollapser, collapserId', collapserId);
-        watchCollapserChannel.close();
-        removeCollapserChannel.close();
+        yield call(watchCollapserChannel.close);
+        yield call(removeCollapserChannel.close);
         return;
       }
     }
-
-    // const {payload: {collapserId}} = yield take(watchCollapserChannel);
-    /*
-      A generator is initiated for every collapser.  So they will ALL take
-      the WATCH_COLLAPSER action when it is called.  So we have to check for
-      each collapser that it was the one that fired the WATCH_COLLAPSER action.
-
-      Screening here allows us to deal with nested collapsers correctly.  If a
-      nested collapser reports that all it's child items have finished transitioning
-      then it coupld possibly fire the HEIGHT_READY_ALL action - even though some items in
-      parent collapsers haven't finished transitioning yet.
-    */
 
   }
 }

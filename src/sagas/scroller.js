@@ -1,6 +1,7 @@
-import {call, take, fork, actionChannel, put} from 'redux-saga/effects';
+import {call, race, take, fork, actionChannel, put} from 'redux-saga/effects';
 
-import {HEIGHT_READY_ALL, SET_OFFSET_TOP, WATCH_INITIALISE} from '../actions/const';
+import {HEIGHT_READY_ALL, SET_OFFSET_TOP,
+  WATCH_INITIALISE, REMOVE_SCROLLER} from '../actions/const';
 import {scrollTo} from '../actions';
 
 
@@ -47,12 +48,29 @@ export function *waitForCollapserFinishSignal(scrollerId, getScrollTop, getOffse
   to init the saga instance.
 */
 export function *waitForSetOffsetTop(scrollerIdInit, getScrollTop) {
-  const initChannel = yield actionChannel(SET_OFFSET_TOP);
+  const setOffsetTopChannel = yield actionChannel(SET_OFFSET_TOP);
+  const removeScrollerChannel = yield actionChannel(REMOVE_SCROLLER);
+
   const condition = true;
   while (condition) {
-    const {payload: {getOffsetTop, scrollerId}} = yield take(initChannel);
-    if (scrollerId === scrollerIdInit) {
-      yield fork(waitForCollapserFinishSignal, scrollerId, getScrollTop, getOffsetTop);
+
+    const {setOffsetTop, removeScroller} = yield race({
+      setOffsetTop: take(setOffsetTopChannel),
+      removeScroller: take(removeScrollerChannel)
+    });
+
+    if (setOffsetTop) {
+      const {payload: {getOffsetTop, scrollerId}} = setOffsetTop;
+      if (scrollerId === scrollerIdInit) {
+        yield fork(waitForCollapserFinishSignal, scrollerId, getScrollTop, getOffsetTop);
+      }
+    } else {
+      const {payload: {scrollerId}} = removeScroller;
+      if (scrollerId === scrollerIdInit) {
+        yield call(setOffsetTopChannel.close);
+        yield call(removeScrollerChannel.close);
+        return;
+      }
     }
   }
 }

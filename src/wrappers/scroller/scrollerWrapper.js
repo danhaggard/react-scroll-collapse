@@ -3,7 +3,7 @@ import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 
-import {addScroller} from '../../actions';
+import {addScroller, removeScroller} from '../../actions';
 
 import selectors from '../../selectors';
 const {nextScrollerIdSelector} = selectors.scroller;
@@ -23,6 +23,10 @@ export const scrollerWrapper = (ScrollerComponent) => {
       const {scrollerId, nextScrollerId} = this.props;
       this.scrollerId = ifNotFirstSec(scrollerId, nextScrollerId);
       this.addScroller();
+    }
+
+    componentWillUnmount() {
+      this.props.actions.removeScroller(this.scrollerId);
     }
 
     addScroller() {
@@ -61,6 +65,7 @@ export const scrollerWrapper = (ScrollerComponent) => {
   const mapDispatch = (dispatch) => ({
     actions: bindActionCreators({
       addScroller,
+      removeScroller,
     }, dispatch),
   });
 

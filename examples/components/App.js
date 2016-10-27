@@ -13,7 +13,7 @@ class AppComponent extends React.Component {
         <div className="example">
           <h3>Nested Example</h3>
           <Scroller style={{height: '300px'}}>
-            <CommentThread/>
+            <CommentThread childThreads={2}/>
           </Scroller>
         </div>
         <div className="example">
@@ -27,8 +27,5 @@ class AppComponent extends React.Component {
     );
   }
 }
-
-AppComponent.defaultProps = {
-};
 
 export default AppComponent;

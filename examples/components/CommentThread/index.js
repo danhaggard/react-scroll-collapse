@@ -8,75 +8,76 @@ import {collapserController} from '../../../src';
 import {genRandText} from './../../utils';
 
 
+const getNested = (childThreads) => (
+  childThreads === 0 ? null :
+    Array.apply(null, Array(childThreads)).map(
+      (key, index) => (
+        <WrappedCommentThread
+          key={index}
+          childThreads={childThreads - 1}
+        />
+      )
+    )
+  );
+
+const addToThread = (addToThreadFunc) =>
+  <button onClick={addToThreadFunc}>
+    Insert Thread
+  </button>;
+
+const deleteThread = (childThreads, deleteThreadFunc) => (
+  childThreads === 0 ? null :
+    <button onClick={deleteThreadFunc}>
+      Delete Thread
+    </button>
+);
+
+
 class CommentThread extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      childThreads: 2
+      childThreads: 0,
+      randText: '',
     };
-    this.unMountChildren = this.unMountChildren.bind(this);
-    this.unMount = this.unMount.bind(this);
+    this.deleteThread = this.deleteThread.bind(this);
+    this.addToThread = this.addToThread.bind(this);
   }
 
   componentWillMount() {
     this.randText = genRandText();
+    this.setState({
+      childThreads: this.props.childThreads,
+      randText: genRandText(),
+    });
   }
 
-  handleClick(childThreads) {
-    this.setState({childThreads: childThreads + 1});
+  addToThread() {
+    this.setState({childThreads: this.state.childThreads + 1});
   }
 
-  unMountChildren() {
+  deleteThread() {
     this.setState({childThreads: 0});
   }
 
-  unMount() {
-    this.props.unMountChildren();
-  }
-
   render() {
-    const {areAllItemsExpanded, collapserId, expandCollapseAll, maxNest,
-      unMountChildren} = this.props;
+    const {areAllItemsExpanded, collapserId, expandCollapseAll} = this.props;
+    const {childThreads, randText} = this.state;
     const idStr = collapserId.toString();
-    const text = ` Comment Text ${idStr}: --- ${this.randText}`;
+    const text = ` Comment Text ${idStr}: --- ${randText}`;
     const title = ` Comment Title ${idStr}`;
-
-    /* Some  recursion to generate nested threads. */
-    const nested = collapserId > maxNest ? null :
-      Array.apply(null, Array(this.state.childThreads)).map(
-        (key, index) => (
-          <WrappedCommentThread
-            key={index}
-            maxNest={this.state.childThreads}
-            unMountChildren={this.unMountChildren}
-          />
-        )
-      );
-
-    // Add content dynamically to show that the scroller will track it.
-    const addToThread = collapserId < this.state.childThreads || collapserId < maxNest ? (
-      <button onClick={() => this.handleClick(this.state.childThreads)}>
-        Insert Thread
-      </button>
-    ) : null;
-
-    const deleteThread = collapserId === 0 ? null : (
-      <button onClick={this.unMount}>
-        Delete Thread
-      </button>
-    );
-
     return (
       <div className={styles.commentThread} >
         <div onClick={expandCollapseAll}>
           <CommentTitle title={title} isOpened={areAllItemsExpanded} />
         </div>
-        <Comment text={text} />
-        {deleteThread}
-        {nested}
-        {addToThread}
-
+        <Comment
+          text={text}
+          deleteThread={deleteThread(childThreads, this.deleteThread)}
+          addToThread={addToThread(this.addToThread)}
+        />
+        {getNested(childThreads)}
       </div>
     );
   }
@@ -86,8 +87,7 @@ CommentThread.propTypes = {
   areAllItemsExpanded: PropTypes.bool.isRequired, // provided by collapserController
   collapserId: PropTypes.number.isRequired, // provided by collapserController
   expandCollapseAll: PropTypes.func, // provided by collapserController
-  maxNest: PropTypes.number,
-  unMountChildren: PropTypes.func,
+  childThreads: PropTypes.number,
 };
 
 const WrappedCommentThread = collapserController(CommentThread);
