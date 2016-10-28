@@ -59,10 +59,10 @@ export const collapserItemWrapper = (WrappedComponent) => {
     }
 
     render() {
-      const {isOpened} = this.props;
+      const {isOpened, actions, ...other} = this.props;
       return (
         <WrappedComponent
-          {...this.props}
+          {...other}
           isOpened={isOpened}
           expandCollapse={this.expandCollapse}
           onHeightReady={this.onHeightReady}

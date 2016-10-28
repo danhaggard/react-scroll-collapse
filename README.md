@@ -55,7 +55,7 @@ wrapped with collapserControllerItem.
 collapserControllerItem provides controls to expand/collapse that single element.
 
 
-### Scroller
+### <Scroller>
 
 #### Usage
 
@@ -101,7 +101,10 @@ default style is applied using css modules:
 It is possible to overwrite this default - but will probably break things.
 
 
-### collapserController
+### collapserController()
+
+collapserController provides controls to expand/collapse all child components
+wrapped with collapserControllerItem.
 
 Components wrapped with collapserController must be a child of the Scroller
 component (but do not have to be immediate children).
@@ -134,7 +137,7 @@ class YourComponent extends Component {
 export default collapserController(YourComponent);
 ```
 
-You can see full implementations of the wrapper in the [SimpleCollapser component example](https://github.com/danhaggard/react-scroll-collapse/blob/master/examples/components/SimpleCollapser/index.js) and the [CommmentThread component example](https://github.com/danhaggard/react-scroll-collapse/blob/master/examples/components/CommentThread/index.js)
+You can see full implementations of the wrapper in the [SimpleCollapser component example](https://github.com/danhaggard/react-scroll-collapse/blob/master/examples/components/SimpleCollapser/index.js) and the [CommentThread component example](https://github.com/danhaggard/react-scroll-collapse/blob/master/examples/components/CommentThread/index.js)
 
 
 #### Props
@@ -154,6 +157,77 @@ If some children are expanded and some collapsed then it will expand them all.
 ##### areAllItemsExpanded : PropTypes.bool
 
 A boolean telling your component if all the child collapserItems are expanded.
-Use this to display information to the user about whether it will expand it children or close them the next time expandCollapseAll is called.
+Use this to display information to the user about whether it will expand its
+children or close them the next time expandCollapseAll is called.
 
-If areAllItemsExpanded is true, then the next call will collapse all expand children -otherwise it will expand all children.
+If areAllItemsExpanded is true, then the next call will collapse all expand
+children - otherwise it will expand all children.
+
+
+##### collapserId, parentCollapserId, parentScrollerId : PropTypes.number
+
+These are the ids used in redux to track components.
+
+
+### collapserControllerItem()
+
+collapserControllerItem provides controls to expand/collapse a single component
+that uses the [react-collapse](https://github.com/nkbt/react-collapse) <Collapse>
+component.  The actual collapse/expand animation is handled by <Collapse> so
+consult its docs for usage information.
+
+All components wrapped with collapserControllerItem need to be a child of a
+component wrapped with collapserController.
+
+#### Usage
+```
+import Collapse from 'react-collapse';
+import {collapserControllerItem} from 'react-scroll-collapse';
+
+class YourComponent extends Component {
+
+  ...
+
+  render() {
+    const {isOpened, onHeightReady, expandCollapse} = this.props;
+    return (
+      <div onClick={expandCollapse}>
+        ...
+        <Collapse
+          isOpened={isOpened}
+          onHeightReady={onHeightReady}
+        >
+          ...nested components
+        </Collapse>
+        ...
+      </div>
+    );
+  }
+}
+
+export default collapserItemController(YourComponent);
+```
+
+You can see full implementations of the wrapper in the [SimpleComment component example](https://github.com/danhaggard/react-scroll-collapse/blob/master/examples/components/SimpleComment/index.js) and the [Comment component example](https://github.com/danhaggard/react-scroll-collapse/blob/master/examples/components/Comment/index.js)
+
+
+#### Props
+
+Because it's a HoC wrapper - collapserItemController passes props to your component.
+
+##### isOpened : PropTypes.bool
+
+A boolean to pass into the <Collapse> component (also uses isOpened) which controls the expanded state.
+
+##### expandCollapse : PropTypes.func
+
+Flips the value of the isOpened boolean - and scrolls your component to the top of the <Scroller> component.
+
+##### onHeightReady : PropTypes.func
+
+A callback that MUST be passed into the <Collapse> component (also as the
+  onHeightReady prop) - otherwise the auto-scroll won't work.
+
+##### itemId, parentCollapserId, parentScrollerId : PropTypes.number
+
+These are the ids used in redux to track components.
