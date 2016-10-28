@@ -11,16 +11,16 @@ class AppComponent extends React.Component {
     return (
       <div>
         <div className="example">
-          <h3>Nested Example</h3>
-          <Scroller style={{height: '300px'}}>
-            <CommentThread childThreads={2}/>
-          </Scroller>
-        </div>
-        <div className="example">
           <h3>Simple Example</h3>
           <Scroller style={{height: '300px'}}>
             <SimpleCollapser />
             <SimpleCollapser />
+          </Scroller>
+        </div>
+        <div className="example">
+          <h3>Nested Example</h3>
+          <Scroller style={{height: '300px'}}>
+            <CommentThread childThreads={2}/>
           </Scroller>
         </div>
       </div>
