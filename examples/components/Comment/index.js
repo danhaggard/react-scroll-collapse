@@ -9,7 +9,10 @@ import {collapserItemController} from '../../../src';
 
 
 const Comment = (props) => {
-  const {text, isOpened, onHeightReady, deleteThread, addToThread} = props;
+  const {isOpened, onHeightReady, deleteThread, addToThread, itemId} = props;
+  let {text} = props;
+  const idStr = itemId.toString();
+  text = `Collapser Item ${idStr}: --- ${text}`;
   return (
     <div className={styles.comment}>
       <Collapse

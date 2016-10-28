@@ -11,6 +11,9 @@ const {HEIGHT_READY, REMOVE_COLLAPSER, WATCH_COLLAPSER, WATCH_INIT_COLLAPSER} = 
 /*
   Collapser UI related sagas
   ==========================
+
+  Check out sagas.js for more detail on how these sagas work as much of the
+  control flow is similar.
 */
 
 /*
@@ -32,26 +35,15 @@ export function *waitForHeightReady(collapserIdInit) {
 }
 
 /*
-  This saga is initiated for each mounted collapser.  It watches for when the
-  WATCH_COLLAPSER action is fired (along side with expandCollapse(All)) - and
-  performs cleanup on unmount.
+  waitForCollapser is called for each mounted collapser.
 */
 export function *waitForCollapser(collapserIdInit) {
   const watchCollapserChannel = yield actionChannel(WATCH_COLLAPSER);
   const removeCollapserChannel = yield actionChannel(REMOVE_COLLAPSER);
+
   const condition = true;
   while (condition) {
 
-    /*
-      This sets up a race between a collapser's expandCollapseAll action being
-      fired (handled by watchCollapser) and the collapser being unmounted.
-
-      Since we are in a never ending loop - the race will keep being run
-      until removeCollapser channel finally wins (because of unmount).
-
-      At this point we close both channels (to prevent any possible overflows)
-      and return (closing out this saga)
-    */
     const {watchCollapser, removeCollapser} = yield race({
       watchCollapser: take(watchCollapserChannel),
       removeCollapser: take(removeCollapserChannel)
@@ -60,20 +52,7 @@ export function *waitForCollapser(collapserIdInit) {
     if (watchCollapser) {
       const {payload: {collapserId}} = watchCollapser;
 
-      /*
-        remember that this generator is initiated for every collapser.  So they
-        will ALL take the WATCH_COLLAPSER action when it is called.  So we check for
-        that the payload collapserId matches the collapserId that this instance
-        was called.
-
-        Screening here allows us to deal with nested collapsers correctly.  If a
-        nested collapser reports that all it's child items have finished transitioning
-        then it coupld possibly fire the HEIGHT_READY_ALL action - even though some items in
-        parent collapsers haven't finished transitioning yet.
-      */
-
       if (collapserIdInit === collapserId) {
-        /* Don't need to fork here as only one collapser will be active at a time */
         yield call(waitForHeightReady, collapserIdInit);
       }
     } else {
@@ -89,9 +68,8 @@ export function *waitForCollapser(collapserIdInit) {
 }
 
 /*
-  this is initiated as a root saga.  It watches for the WATCH_INIT_COLLAPSER
-  action which is fired whenever a collapser is mounted.  It then initiates
-  the waitForCollapsers saga for that collapser.
+  collapserInitWatch watches for the WATCH_INIT_COLLAPSER action which is dispatch
+  whenever a collapser is mounted.  It then calls the waitForCollapsers saga.
 */
 export function *collapserInitWatch() {
   const initChannel = yield actionChannel(WATCH_INIT_COLLAPSER);

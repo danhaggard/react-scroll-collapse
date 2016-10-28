@@ -12,7 +12,7 @@ const SimpleComment = (props) => {
   const {text, isOpened, onHeightReady, expandCollapse, itemId} = props;
 
   const idStr = itemId.toString();
-  const title = ` Comment Title ${idStr}`;
+  const title = ` Collapser Item ${idStr}`;
   return (
     <div className={styles.simpleComment}>
       <div onClick={expandCollapse}>
@@ -24,7 +24,7 @@ const SimpleComment = (props) => {
         springConfig={presets.noWobble}
         onHeightReady={onHeightReady}
       >
-        <CommentBody text={` Comment Text ${idStr}: --- ${text}`} />
+        <CommentBody text={` Collapser Item Text ${idStr}: --- ${text}`} />
       </Collapse>
     </div>
   );

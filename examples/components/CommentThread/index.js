@@ -65,8 +65,8 @@ class CommentThread extends Component {
     const {areAllItemsExpanded, collapserId, expandCollapseAll} = this.props;
     const {childThreads, randText} = this.state;
     const idStr = collapserId.toString();
-    const text = ` Comment Text ${idStr}: --- ${randText}`;
-    const title = ` Comment Title ${idStr}`;
+    const text = `${randText}`;
+    const title = ` Collapser ${idStr}`;
     return (
       <div className={styles.commentThread} >
         <div onClick={expandCollapseAll}>

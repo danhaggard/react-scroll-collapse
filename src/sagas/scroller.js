@@ -11,11 +11,12 @@ import {scrollTo} from '../actions';
 */
 
 /*
-  not a root saga.  Is called by waitForSetOffsetTop below after a user action
-  of clicking a collapser button.  Once it gets the signal that all collapsers
-  have finished transitioning.  The call back methods passed from the view
-  are now used to query the dom.  The results are dispatched to the store
-  and used by the scroller to initiate the scroll.
+  waitForCollapserFinishSignal waits for the HEIGHT_READY_CALL action fired by
+  a collapser - telling it that all collapserItems have reported their height
+  and thus that it is safe to inspect the dom for scrollTop and offsetTop values.
+
+  It then commences the scroll by putting the SCROLL_TO action - and then ends
+  the saga instance.
 */
 export function *waitForCollapserFinishSignal(scrollerId, getScrollTop, getOffsetTop) {
   const condition = true;
@@ -31,21 +32,36 @@ export function *waitForCollapserFinishSignal(scrollerId, getScrollTop, getOffse
 }
 
 /*
-  this is not a root saga - ensuring it is only called after the scroller has mounted.
-  This ensures that it doesn't receive any getOffsetTop callbacks without having
-  a corresponding getScrollTop callback to go with it.
-  It then waits for the user to click an expander button - at which point, the
-  action below is dispatched by the collapsing element and 'taken' by the saga.
-  the collapsing element passes it's getOffsetTop callback that allows us to
-  query its backing instance for it's offsetTop info.
-  Now that we have everything we need to query the dom to make the scroll happen
-  We just have to wait for the collapser to finish.  This is done in the final saga
-  waitForCollapserFinishSignal which is forked next.
+  The waitForSetOffsetTop saga is called once for every Scroller that is mounted.
 
-  Multiple instances of this saga will take the SET_OFFSET_TOP action.  So we send
-  the scrollerId as well with the action - so that it will only fork
-  waitForCollapserFinishSignal if the scrollerId matches the one that was used
-  to init the saga instance.
+  It waits for the SET_OFFSET_TOP action and is passed a getOffsetTop callback
+  by a collapser or collapserItem.
+
+  The control flow between scrollerInitWatch and waitForSetOffsetTop ensures
+  that waitForSetOffsetTop doesn't receive any getOffsetTop callbacks without having
+  a corresponding getScrollTop callback to go with it.
+
+  Because there are multiple instances of this saga running (one for each scroller),
+  once it has received both the getOffsetTop and getScrollTop callbacks it
+  checks to make sure the collapser(Item) that dispatched the getOffsetTop callback
+  is nested in the scroller corresponding to this saga instance - using the scrollerId
+  passed in on saga init and the id passed in by the collapser(Item).
+
+  it then forks waitForCollapserFinishSignal - and starts waiting again.
+
+  If it receives a REMOVE_SCROLLER action - that means the scroller has unmounted
+  It therefore cleans up the channels and returns - ending the saga instance for
+  that scroller.
+
+  -----
+  Note on how the race call works.
+  -----
+  race allows you to watch for multiple actions and then do different
+  things in response.
+
+  Since we are in a never ending loop - the race will keep being run;
+  receiving SET_OFFSET_TOP dispatches and causing auto scroll events in the view;
+  until finally a REMOVE_SCROLLER action is dispatched ending the loop.
 */
 export function *waitForSetOffsetTop(scrollerIdInit, getScrollTop) {
   const setOffsetTopChannel = yield actionChannel(SET_OFFSET_TOP);
@@ -62,11 +78,18 @@ export function *waitForSetOffsetTop(scrollerIdInit, getScrollTop) {
     if (setOffsetTop) {
       const {payload: {getOffsetTop, scrollerId}} = setOffsetTop;
       if (scrollerId === scrollerIdInit) {
-        yield fork(waitForCollapserFinishSignal, scrollerId, getScrollTop, getOffsetTop);
+        yield call(waitForCollapserFinishSignal, scrollerId, getScrollTop, getOffsetTop);
       }
     } else {
       const {payload: {scrollerId}} = removeScroller;
       if (scrollerId === scrollerIdInit) {
+        /*
+          Returning from the generator ends the saga instance - but I have had
+          cases where the channels created in that saga continue to receive
+          messages - but not clear them, leading to buffer overflow messages.
+
+          So here we close the channels explicitly to prevent that from happening.
+        */
         yield call(setOffsetTopChannel.close);
         yield call(removeScrollerChannel.close);
         return;
@@ -76,16 +99,19 @@ export function *waitForSetOffsetTop(scrollerIdInit, getScrollTop) {
 }
 
 /*
-  This is a root saga. It is activated by the scroller on mount.  It receives the
-  getScrollTop call back and immediately fires the next saga waitForSetOffsetTop.
-  Which waits to be passed the getOffsetTop callback by the view when a user
-  clicks an expander button.
+  This is a root saga. It is activated by a Scroller on mount.  It receives the
+  getScrollTop call back and calls the next saga waitForSetOffsetTop.
 */
 export function *scrollerInitWatch() {
   const initChannel = yield actionChannel(WATCH_INITIALISE);
   const condition = true;
   while (condition) {
     const {payload: {scrollerId, getScrollTop}} = yield take(initChannel);
+    /*
+      Using fork here means that the loop can continue - allowing multiple sagas
+      to be initialised for multiple scrollers if they are mounted - combined
+      with using action channels which have a message buffer.
+    */
     yield fork(waitForSetOffsetTop, scrollerId, getScrollTop);
   }
 }
