@@ -1,13 +1,9 @@
-'use strict';
-
-const dev = require('./Dev');
-const dist = require('./Dist');
-const ex = require('./Ex');
-const test = require('./Test');
+import dev from './dev';
+import dist from './dist';
+import test from './test';
 
 module.exports = {
   dev,
   dist,
-  ex,
   test
 };
