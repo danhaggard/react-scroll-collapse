@@ -15,7 +15,11 @@ const testConfig = (opts) => {
   console.log('includedPackages', includedPackages);
 
   const resolve = {
-    extensions: ['', '.js', '.jsx']
+    extensions: ['', '.js', '.jsx'],
+    modules: [
+      srcPath,
+      'node_modules'
+    ]
   };
   return {
     ...config,
