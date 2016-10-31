@@ -24,7 +24,8 @@ const ghPagesConfig = (opts) => {
         comments: false,
       },
       sourceMap: true,
-    })
+    }),
+    new webpack.optimize.DedupePlugin()
   ];
   const srcPath = path.resolve(PROJECT_ROOT, 'src');
   const resolve = {
@@ -32,6 +33,7 @@ const ghPagesConfig = (opts) => {
   };
   return {
     ...config,
+    cache: false,
     devTool: 'source-map',
     plugins,
     entry: examplesPath,
