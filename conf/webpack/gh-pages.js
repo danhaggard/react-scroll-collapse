@@ -39,7 +39,6 @@ const ghPagesConfig = (opts) => {
     output: {
       path: bundlesPath,
       filename: 'app.js',
-      publicPath: './bundles/'
     },
     module: {
       loaders: [

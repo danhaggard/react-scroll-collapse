@@ -18,7 +18,7 @@ module.exports = (opts) => {
     output: {
       path: bundlesPath,
       filename: 'app.js',
-      publicPath: './bundles/'
+      publicPath: '/bundles/'
     },
     devServer: {
       contentBase: './examples/',

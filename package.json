@@ -17,6 +17,7 @@
     "serve:ex": "webpack-dev-server --open --env ex",
     "serve:dev": "NODE_ENV=dev webpack-dev-server --open",
     "serve:dist": "webpack-dev-server --open --env dist -p --progress",
+    "serve:ghPages": "NODE_ENV=ghPages webpack-dev-server --open -p --progress",
     "start": "npm run serve:dev",
     "test": "NODE_ENV=test karma start",
     "test:watch": "karma start --autoWatch=true --singleRun=false --reporters=mocha,coverage"
