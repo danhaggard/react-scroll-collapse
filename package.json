@@ -7,14 +7,16 @@
   "scripts": {
     "clean": "rimraf dist/*",
     "copy": "copyfiles -f ./src/index.html ./src/favicon.ico ./dist",
-    "ghPages": "cross-env NODE_ENV=ghPages webpack",
+    "gh-pages": "git checkout gh-pages && git rebase origin/master --force-rebase && npm run build:ghPages && git add . && git commit --amend --no-edit && git push --force && git checkout master",
+
+    "build:ghPages": "cross-env NODE_ENV=ghPages webpack",
     "dist": "npm run clean && npm run copy && webpack --progress --bail --env dist -p",
     "lint": "eslint ./src",
     "posttest": "npm run lint",
     "release:major": "npm version prerelease && git push --follow-tags && npm publish --tag beta",
     "release:minor": "npm version prerelease && git push --follow-tags && npm publish --tag beta",
     "release:patch": "npm version prerelease && git push --follow-tags && npm publish --tag beta",
-    "serve:dev": "cross-env NODE_ENV=dev webpack-dev-server --open",
+    "serve:dev": "cross-env NODE_ENV=dev webpack-dev-server --open -p --progress",
     "serve:dist": "webpack-dev-server --open --env dist -p --progress",
     "serve:ghPages": "cross-env NODE_ENV=ghPages webpack-dev-server --open -p --progress",
     "start": "npm run serve:dev",
@@ -78,8 +80,8 @@
     "sinon": "^1.17.3",
     "style-loader": "^0.13.1",
     "url-loader": "^0.5.7",
-    "webpack": "^2.1.0-beta.22",
-    "webpack-dev-server": "^2.1.0-beta.0"
+    "webpack": "2.1.0-beta.22",
+    "webpack-dev-server": "2.1.0-beta.0"
   },
   "dependencies": {
     "classnames": "^2.2.5",
