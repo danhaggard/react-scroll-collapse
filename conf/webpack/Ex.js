@@ -16,7 +16,7 @@ class WebpackExConfig extends WebpackBaseConfig {
 
     this.config = {
       context: this.examplesPathAbsolute,
-      devtool: 'cheap-module-source-map',
+      devtool: 'eval-source-map',
       devServer: {
         contentBase: './examples/',
         publicPath: '/assets/',

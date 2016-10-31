@@ -11,7 +11,7 @@ body {
   white-space: normal;
 }
 
-.example {
+:local(.example) {
   width: 90%;
   margin: 1rem;
   padding: 1rem;
