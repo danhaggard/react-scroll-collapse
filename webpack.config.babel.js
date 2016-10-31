@@ -1,5 +1,6 @@
 import {dev, dist, test} from './conf/webpack';
 
+
 /**
  * The main webpack configuration.
  * @returns {object} - returns a webpack config object
@@ -9,7 +10,7 @@ const OPTIONS = {
   NODE_ENV: process.env.NODE_ENV,
 };
 
-module.exports = (() => {
+const config = (() => {
   switch (process.env.NODE_ENV) {
     case 'dev':
       return dev;
@@ -18,10 +19,11 @@ module.exports = (() => {
     case 'test':
       return test;
     default:
-      return dev;
+      return test;
   }
 })()(OPTIONS);
 
+export default config;
 
 /*
 /* eslint no-console: "off"

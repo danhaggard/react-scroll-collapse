@@ -12,10 +12,6 @@ module.exports = (opts) => {
     })
   ];
 
-  const loaders = [
-    { test: /\.jsx?$/, exclude: /node_modules/, loaders: ['babel-loader'] },
-  ];
-
   return {
     context: PROJECT_ROOT,
     plugins,

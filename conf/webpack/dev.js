@@ -62,7 +62,6 @@ module.exports = (opts) => {
         },
         {
           test: /\.css$/,
-          include: './examples/index.css',
           loader: 'style-loader!css-loader?modules&localIdentName=[path][name]---[local]'
         }
       ],
