@@ -13,7 +13,7 @@ const ghPagesConfig = (opts) => {
     }),
     new webpack.LoaderOptionsPlugin({
       minimize: true,
-      debug: false,
+      debug: true,
     }),
     // minifies your code
     new webpack.optimize.UglifyJsPlugin({
@@ -23,7 +23,7 @@ const ghPagesConfig = (opts) => {
       output: {
         comments: false,
       },
-      sourceMap: false,
+      sourceMap: true,
     }),
     new webpack.optimize.AggressiveMergingPlugin(),
     new webpack.NoErrorsPlugin()
@@ -34,6 +34,7 @@ const ghPagesConfig = (opts) => {
   };
   return {
     ...config,
+    devTool: 'source-map',
     plugins,
     entry: examplesPath,
     output: {
