@@ -8,10 +8,19 @@ function reduxStore(initialState) {
   const sagaMiddleware = createSagaMiddleware();
 
   const middleware = applyMiddleware(...[sagaMiddleware]);
-  const enhancer = compose(
-    middleware,
-    window.devToolsExtension && window.devToolsExtension(),
-  );
+  let enhancer;
+
+  if (process.env.NODE_ENV !== 'production') {
+    enhancer = compose(
+      middleware,
+      window.devToolsExtension && window.devToolsExtension(),
+    );
+  } else {
+    enhancer = compose(
+      middleware,
+    );
+  }
+
   const store = createStore(reducers, initialState, enhancer);
 
   if (module.hot) {
