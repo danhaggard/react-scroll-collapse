@@ -6,6 +6,7 @@ module.exports = (opts) => {
   const {PROJECT_ROOT} = opts;
   const config = baseConfig(opts);
   const examplesPath = path.resolve(PROJECT_ROOT, 'examples');
+  const bundlesPath = path.resolve(examplesPath, 'bundles');
   const srcPath = path.resolve(PROJECT_ROOT, 'src');
   const resolve = {
     extensions: ['', '.js', '.jsx']
@@ -15,13 +16,13 @@ module.exports = (opts) => {
     devtool: 'eval-source-map',
     entry: './examples',
     output: {
-      path: path.resolve('./dist/assets'),
+      path: bundlesPath,
       filename: 'app.js',
-      publicPath: './assets/'
+      publicPath: './bundles/'
     },
     devServer: {
       contentBase: './examples/',
-      publicPath: '/assets/',
+      publicPath: '/bundles/',
       historyApiFallback: true,
       hot: true,
       inline: true,

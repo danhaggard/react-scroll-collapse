@@ -1,22 +1,45 @@
 import path from 'path';
 import baseConfig from './base';
+import webpack from 'webpack';
 
 const ghPagesConfig = (opts) => {
   const {PROJECT_ROOT} = opts;
   const config = baseConfig(opts);
   const examplesPath = path.resolve(PROJECT_ROOT, 'examples');
+  const bundlesPath = path.resolve(examplesPath, 'bundles');
+  const plugins = [
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': '"production"'
+    }),
+    new webpack.LoaderOptionsPlugin({
+      minimize: true,
+      debug: false,
+    }),
+    // minifies your code
+    new webpack.optimize.UglifyJsPlugin({
+      compress: {
+        warnings: false,
+      },
+      output: {
+        comments: false,
+      },
+      sourceMap: false,
+    }),
+    new webpack.optimize.AggressiveMergingPlugin(),
+    new webpack.NoErrorsPlugin()
+  ];
   const srcPath = path.resolve(PROJECT_ROOT, 'src');
   const resolve = {
     extensions: ['', '.js', '.jsx']
   };
   return {
     ...config,
-    devtool: '#source-map',
+    plugins,
     entry: examplesPath,
     output: {
-      path: examplesPath,
-      filename: 'bundle.js',
-      publicPath: './assets/'
+      path: bundlesPath,
+      filename: 'app.js',
+      publicPath: './bundles/'
     },
     module: {
       loaders: [
