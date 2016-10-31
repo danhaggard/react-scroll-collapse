@@ -1,7 +1,7 @@
 import webpackCfg from './webpack.config.babel';
 
 
-console.log(webpackCfg);
+console.log(webpackCfg.module.loaders);
 
 export default (config) => {
 
@@ -32,7 +32,7 @@ export default (config) => {
       output: 'autowatch'
     },
     preprocessors: {
-      '../../test/loadtests.js': ['webpack', 'sourcemap']
+      'test/loadtests.js': ['webpack', 'sourcemap']
     },
     webpack: webpackCfg,
     webpackServer: {
