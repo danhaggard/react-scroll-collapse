@@ -11,20 +11,6 @@ const ghPagesConfig = (opts) => {
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"production"'
     }),
-    new webpack.LoaderOptionsPlugin({
-      minimize: true,
-      debug: true,
-    }),
-    // minifies your code
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false,
-      },
-      output: {
-        comments: false,
-      },
-      sourceMap: true,
-    }),
     new webpack.optimize.DedupePlugin()
   ];
   const srcPath = path.resolve(PROJECT_ROOT, 'src');
