@@ -1,8 +1,5 @@
 import webpackCfg from './webpack.config.babel';
 
-
-console.log(webpackCfg.module.loaders);
-
 export default (config) => {
 
   config.set({
