@@ -7,6 +7,7 @@
   "scripts": {
     "clean": "rimraf dist/*",
     "copy": "copyfiles -f ./src/index.html ./src/favicon.ico ./dist",
+    "ghPages": "NODE_ENV=ghPages webpack",
     "dist": "npm run clean && npm run copy && webpack --progress --bail --env dist -p",
     "lint": "eslint ./src",
     "posttest": "npm run lint",

@@ -1,4 +1,4 @@
-import {dev, dist, test} from './conf/webpack';
+import {dev, dist, ghPages, test} from './conf/webpack';
 
 
 /**
@@ -16,6 +16,8 @@ const config = (() => {
       return dev;
     case 'dist':
       return dist;
+    case 'ghPages':
+      return ghPages;
     case 'test':
       return test;
     default:
