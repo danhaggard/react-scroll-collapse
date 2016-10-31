@@ -1,37 +1,57 @@
-'use strict';
+import path from 'path';
+import baseConfig from './base';
+import webpack from 'webpack';
 
-/**
- * Dist configuration. Used to build the
- * final output when running npm run dist.
- */
-const webpack = require('webpack');
-const WebpackBaseConfig = require('./Base');
+const distConfig = (opts) => {
+  const {PROJECT_ROOT} = opts;
+  const config = baseConfig(opts);
+  const srcPath = path.resolve(PROJECT_ROOT, 'src');
+  const distPath = path.resolve(PROJECT_ROOT, 'dist/assets');
+  const plugins = [
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': '"production"'
+    }),
+    new webpack.optimize.DedupePlugin(),
+    new webpack.optimize.AggressiveMergingPlugin(),
+    new webpack.NoErrorsPlugin()
+  ];
+  const resolve = {
+    extensions: ['', '.js', '.jsx']
+  };
+  return {
+    ...config,
+    cache: false,
+    devtool: 'source-map',
+    plugins,
+    entry: srcPath,
+    output: {
+      path: distPath,
+      filename: 'app.js',
+    },
+    module: {
+      loaders: [
+        {
+          test: /\.(js|jsx)$/,
+          include: [srcPath],
+          exclude: /node_modules/,
+          loader: 'babel'
+        },
+        {
+          test: /\.scss$/,
+          loaders: [
+            'style',
+            'css?sourceMap&localIdentName=[path][name]---[local]',
+            'sass?sourceMap&localIdentName=[path][name]---[local]'
+          ]
+        },
+        {
+          test: /\.css$/,
+          loader: 'style-loader!css-loader?modules&localIdentName=[path][name]---[local]'
+        }
+      ],
+    },
+    resolve,
+  };
+};
 
-class WebpackDistConfig extends WebpackBaseConfig {
-
-  constructor() {
-    super();
-    this.config = {
-      cache: false,
-      devtool: 'source-map',
-      plugins: [
-        new webpack.DefinePlugin({
-          'process.env.NODE_ENV': '"production"'
-        }),
-        new webpack.optimize.DedupePlugin(),
-        new webpack.optimize.AggressiveMergingPlugin(),
-        new webpack.NoErrorsPlugin()
-      ]
-    };
-  }
-
-  /**
-   * Get the environment name
-   * @return {String} The current environment
-   */
-  get env() {
-    return 'dist';
-  }
-}
-
-module.exports = WebpackDistConfig;
+export default distConfig;

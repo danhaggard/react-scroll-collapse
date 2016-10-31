@@ -8,9 +8,8 @@
     "clean": "rimraf dist/*",
     "copy": "copyfiles -f ./src/index.html ./src/favicon.ico ./dist",
     "gh-pages": "git checkout gh-pages && git rebase origin/master --force-rebase && npm run build:ghPages && git add . && git commit --amend --no-edit && git push --force && git checkout master",
-
     "build:ghPages": "cross-env NODE_ENV=ghPages webpack",
-    "dist": "npm run clean && npm run copy && webpack --progress --bail --env dist -p",
+    "dist": "NODE_ENV=dist npm run clean && npm run copy && webpack --progress --bail -p",
     "lint": "eslint ./src",
     "posttest": "npm run lint",
     "release:major": "npm version prerelease && git push --follow-tags && npm publish --tag beta",
