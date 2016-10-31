@@ -24,9 +24,7 @@ const ghPagesConfig = (opts) => {
         comments: false,
       },
       sourceMap: true,
-    }),
-    new webpack.optimize.AggressiveMergingPlugin(),
-    new webpack.NoErrorsPlugin()
+    })
   ];
   const srcPath = path.resolve(PROJECT_ROOT, 'src');
   const resolve = {
