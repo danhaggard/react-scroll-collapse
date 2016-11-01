@@ -1,5 +1,6 @@
 # react-scroll-collapse
-Component wrappers for auto-scrolling collapsible elements - with smooth animations powered by [react-motion](https://github.com/chenglou/react-motion) and [react-collapse](https://github.com/nkbt/react-collapse).
+Component wrappers for auto-scrolling collapsible elements - with smooth animations powered by [react-motion](https://github.com/chenglou/react-motion) and
+[react-collapse](https://github.com/nkbt/react-collapse).
 
 **Warning:** This is currently an unstable beta release and probably not ready
 for production.  Development is ongoing and feedback is welcome.
@@ -7,6 +8,20 @@ for production.  Development is ongoing and feedback is welcome.
 ## Demo
 
 https://danhaggard.github.io/react-scroll-collapse/examples/
+
+## Overview
+
+react-scroll-collapse provides a scrolling container (<Scroller>) and two higher
+order components (collapserController, collapserControllerItem) which provide props
+and callbacks to use when designing your react-collapse based components.
+
+Scroller will auto-scroll your nested components to the top when they are wrapped
+with either the collapserController or collapserControllerItem HoCs.
+
+collapserController provides controls to expand/collapse all child components
+wrapped with collapserControllerItem.
+
+collapserControllerItem provides controls to expand/collapse a single element.
 
 ## Installation
 
@@ -24,15 +39,16 @@ npm install --save classnames react react-collapse react-dom react-height react-
 
 ### redux Integration
 
-react-scroll-collapse relies on [Redux](https://github.com/reactjs/redux) for state management.
+react-scroll-collapse relies on [Redux](https://github.com/reactjs/redux) for
+state management.
 
 #### Importing the reducers:
 ```
 import {reactScrollCollapse} from 'react-scroll-collapse';
 ```
 
-You will need to include the 'reactScrollCollapse' reducer in your top level reducer with the same state key (i.e. reactScrollCollapse).  [See example](https://github.com/danhaggard/react-scroll-collapse/examples/reducers/index.js)
-
+You will need to include the 'reactScrollCollapse' reducer in your top level
+reducer with the same state key (i.e. reactScrollCollapse).  [See example](https://github.com/danhaggard/react-scroll-collapse/blob/master/examples/reducers/index.js)
 
 ### redux-saga Integration
 
@@ -45,29 +61,39 @@ import {reactScrollCollapseSagas} from 'react-scroll-collapse';
 
 You will need to include 'reactScrollCollapseSagas' in your root saga - [See example](https://github.com/danhaggard/react-scroll-collapse/blob/master/examples/sagas/index.js) - which in turn must be included in your redux middleware [See example](https://github.com/danhaggard/react-scroll-collapse/blob/master/examples/stores/index.js)
 
+*Handy tip:*
+redux-sagas uses generators which aren't supported widely by browsers at the
+moment.  If you are using webpack - install the transform runtime via npm:
+
+```
+npm install --save-dev babel-plugin-transform-runtime
+```
+
+...and add it to your .babelrc file in the root of your project.  It should look
+something like:
+
+```
+{
+  "presets": [
+    ["es2015", {"modules": false}],
+    "react",
+  ],
+  "plugins": [
+    "transform-decorators-legacy",
+    "transform-object-rest-spread",
+    "transform-runtime", // this is the one!
+  ]
+}
+```
 
 Consult both the redux and redux-saga docs for more information about installing
 and using those libraries.
 
-
-## Overview
-
-react-scroll-collapse provides a scrolling container (<Scroller>) and two higher order components (collapserController, collapserControllerItem) which provide props
-and callbacks to use when designing your react-collapse based components.
-
-Scroller will auto-scroll your nested components to the top when they are wrapped
-with either the collapserController or collapserControllerItem HoCs.
-
-collapserController provides controls to expand/collapse all child components
-wrapped with collapserControllerItem.
-
-collapserControllerItem provides controls to expand/collapse a single element.
-
+## Component Wrappers
 
 ### <Scroller>
 
 #### Usage
-
 ```
 import Scroller from 'react-scroll-collapse';
 
@@ -86,8 +112,7 @@ You can see this component implemented in the examples folder [here](https://git
 
 Note - Scrollers seem to be nestable - but I haven't tested this extensively.
 
-
-#### Props
+#### <Scroller> - Props
 
 ##### springConfig : PropTypes.object (default: {stiffness: 170, damping: 20})
 
@@ -152,7 +177,7 @@ export default collapserController(YourComponent);
 You can see full implementations of the wrapper in the [SimpleCollapser component example](https://github.com/danhaggard/react-scroll-collapse/blob/master/examples/components/SimpleCollapser/index.js) and the [CommentThread component example](https://github.com/danhaggard/react-scroll-collapse/blob/master/examples/components/CommentThread/index.js)
 
 
-#### Props
+#### collapserController - Props
 
 Because it's a HoC wrapper - collapserController passes props to your component.
 
@@ -188,9 +213,6 @@ that uses the [react-collapse](https://github.com/nkbt/react-collapse) <Collapse
 component.  The actual collapse/expand animation is handled by <Collapse> so
 consult its docs for usage information.
 
-All components wrapped with collapserControllerItem need to be a child of a
-component wrapped with collapserController.
-
 #### Usage
 ```
 import Collapse from 'react-collapse';
@@ -206,8 +228,8 @@ class YourComponent extends Component {
       <div onClick={expandCollapse}>
         ...
         <Collapse
-          isOpened={isOpened}
-          onHeightReady={onHeightReady}
+          isOpened={isOpened}    // make sure you pass the isOpened prop to <Collapse> !!
+          onHeightReady={onHeightReady}   // ditto for the onHeightReady prop!!
         >
           ...nested components
         </Collapse>
@@ -220,10 +242,29 @@ class YourComponent extends Component {
 export default collapserItemController(YourComponent);
 ```
 
+All components wrapped with collapserControllerItem need to be a child of a
+component wrapped with collapserController.  However, if you don't need to
+have multiple children of a particular collapserController then you don't need
+to create an additional component just to serve as the input for collapserController.
+
+You can just wrap your collapserControllerItem immediately upon export like so:
+
+```
+import {collapserController, collapserControllerItem} from 'react-scroll-collapse';
+
+class YourComponent extends Component {
+
+  ...(your inner component stuff)
+
+}
+
+export default collapserControler(ItemController(YourComponent));  // wrap the item immediately with collapserController!
+```
+
 You can see full implementations of the wrapper in the [SimpleComment component example](https://github.com/danhaggard/react-scroll-collapse/blob/master/examples/components/SimpleComment/index.js) and the [Comment component example](https://github.com/danhaggard/react-scroll-collapse/blob/master/examples/components/Comment/index.js)
 
 
-#### Props
+#### collapserControllerItem - Props
 
 Because it's a HoC wrapper - collapserItemController passes props to your component.
 
