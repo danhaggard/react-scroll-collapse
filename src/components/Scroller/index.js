@@ -2,18 +2,39 @@ import React, {PropTypes, Component} from 'react';
 import styles from './Scroller.scss';
 import classnames from 'classnames';
 
+
+/*
+  <Scroller> renders a <div>. that will overflow and scroll using
+  styles.scroller as the css class.
+
+  The bigger picture is that it will be rendered by <ScrollerMotion> which
+  uses react-motion to pass an interpolated series of values for the scrollTop
+  prop.  Scroller uses this to set the dom node scrollTop property - thus creating
+  the animation.
+
+  Scroller.getClassName adds any classNames supplied via props.  So
+  styles.scroller can be over-written if desired - which could break
+  the css potentially.  I prefer to err on the side of freedom though.
+
+  Scroller.getScrollTop is a callback defined that returns the
+  scrollTop property of the dom element.  It is passed by ScrollerMotion to
+  the sagas to be called when needed.
+*/
+
 class Scroller extends Component {
 
-  // The scroller wrapper will pass in an interpolated scrollTop value for
-  // the scroll animation.  Once the update is successful, we make sure the dom
-  // object matches.
+  /*
+    componentDidUpdate ensures that the dom element's scrollTop value matches
+    what was passed in through props in the previous update.
+  */
   componentDidUpdate(prevProps) {
     const {elem} = this;
     if (elem && this.props.scrollTop !== undefined
-        // sometime this component will re-render when the winder is resized
-        // caused by the Responsive component used a parent.
-        // the follow check prevents it from changing the current scrollTop
-        // value in such cases (as it can cause a sudden jump)
+        /*
+          Only update elem.scrollTop if parent sends new value through props.
+
+          See: https://github.com/danhaggard/react-scroll-collapse/issues/2#issue-186472122
+        */
         && this.props.scrollTop !== prevProps.scrolltop
       ) {
       elem.scrollTop = this.props.scrollTop;
@@ -28,17 +49,11 @@ class Scroller extends Component {
     }, className);
   }
 
+  /*
+    Defining the getScrollTop method in the ref allows ScrollerMotion to use this
+    method when wrapping Scroller.
+  */
   render() {
-    /*
-      The use of a ref here allows us to define a method on the component
-      that returns the scrollTop property of the corresponding dom object.
-
-      But the cool thing is that this is that it will make this method accessible
-      to the ScrollerMotion HoC that will wrap this component so as to add the
-      auto scroll animation.  ScrollerMotion will pass this method to the sagas
-      handling the control flow so they can access the scrollTop value when
-      it's needed. No other methods are exposed.
-    */
     const {className, children, style} = this.props;
     return (
       <div

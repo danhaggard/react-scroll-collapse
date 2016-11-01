@@ -302,3 +302,9 @@ To run the tests and view coverage:
 ```
 npm test
 ```
+
+## Acknowledgements
+
+### generator-react-webpack-redux
+
+The original template for the project came from [generator-react-webpack-redux](https://github.com/stylesuxx/generator-react-webpack-redux)
