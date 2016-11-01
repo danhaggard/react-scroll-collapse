@@ -3,7 +3,6 @@ import baseConfig from './base';
 import webpack from 'webpack';
 
 const distConfig = (opts) => {
-  console.log('distConfig called');
   const {PROJECT_ROOT} = opts;
   const config = baseConfig(opts);
   const srcPath = path.resolve(PROJECT_ROOT, 'src');

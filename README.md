@@ -1,6 +1,5 @@
 # react-scroll-collapse
-Component wrappers for auto-scrolling collapsible elements - with smooth animations
-powered by react-motion and react-collapse.
+Component wrappers for auto-scrolling collapsible elements - with smooth animations powered by [react-motion](https://github.com/chenglou/react-motion) and [react-collapse](https://github.com/nkbt/react-collapse).
 
 **Warning:** This is currently an unstable beta release and probably not ready
 for production.  Development is ongoing and feedback is welcome.
@@ -20,23 +19,10 @@ npm install --save react-scroll-collapse
 If you use npm@3 you'll need to install the peer dependencies
 
 ```
-npm install --save classnames react react-dom react-motion react-redux redux redux-saga reselect
+npm install --save classnames react react-collapse react-dom react-height react-motion react-redux redux redux-saga reselect
 ```
 
-If you have cloned the project and want to run the example demo then you will also
-need to install react-collapse:
-
-```
-npm install --save react-collapse react-height
-```
-
-
-#### Importing the collapser HoCs:
-```
-import {collapserController, collapserItemController} from 'react-scroll-collapse';
-```
-
-### Redux Integration
+### redux Integration
 
 react-scroll-collapse relies on [Redux](https://github.com/reactjs/redux) for state management.
 
@@ -45,19 +31,20 @@ react-scroll-collapse relies on [Redux](https://github.com/reactjs/redux) for st
 import {reactScrollCollapse} from 'react-scroll-collapse';
 ```
 
-You will need to include the 'reactScrollCollapse' reducer in your top level reducer with
-the same state key (i.e. reactScrollCollapse).  [See example](https://github.com/danhaggard/react-scroll-collapse/examples/reducers/index.js)
+You will need to include the 'reactScrollCollapse' reducer in your top level reducer with the same state key (i.e. reactScrollCollapse).  [See example](https://github.com/danhaggard/react-scroll-collapse/examples/reducers/index.js)
 
 
-### redux-saga
+### redux-saga Integration
 
 react-scroll-collapse also relies on [redux-saga](https://github.com/yelouafi/redux-saga)
-You will need to include 'reactScrollCollapseSagas' in your root saga - [See example](https://github.com/danhaggard/react-scroll-collapse/blob/master/examples/sagas/index.js) - which in turn must be included in your redux middleware [See example](https://github.com/danhaggard/react-scroll-collapse/blob/master/examples/stores/index.js)
 
 #### Importing the sagas:
 ```
 import {reactScrollCollapseSagas} from 'react-scroll-collapse';
 ```
+
+You will need to include 'reactScrollCollapseSagas' in your root saga - [See example](https://github.com/danhaggard/react-scroll-collapse/blob/master/examples/sagas/index.js) - which in turn must be included in your redux middleware [See example](https://github.com/danhaggard/react-scroll-collapse/blob/master/examples/stores/index.js)
+
 
 Consult both the redux and redux-saga docs for more information about installing
 and using those libraries.
@@ -74,7 +61,7 @@ with either the collapserController or collapserControllerItem HoCs.
 collapserController provides controls to expand/collapse all child components
 wrapped with collapserControllerItem.
 
-collapserControllerItem provides controls to expand/collapse that single element.
+collapserControllerItem provides controls to expand/collapse a single element.
 
 
 ### <Scroller>
@@ -121,6 +108,9 @@ default style is applied using css modules:
 ```
 
 It is possible to overwrite this default - but will probably break things.
+
+The scroll to top functionality relies on the <Scroller> DOM element being the first relatively positioned parent.  Other then this limitation - wrapped child
+collapserController and collapserItemController elements can be as deeply nested in other components as you like.
 
 
 ### collapserController()
