@@ -106,8 +106,8 @@ export const collapserWrapper = (WrappedComponent) => {
     parentScrollerId: PropTypes.number.isRequired,
 
     /* provided by redux */
-    areAllItemsExpanded: PropTypes.bool,
-    allChildItems: PropTypes.array,
+    areAllItemsExpanded: PropTypes.bool, // includes item children of nested collapsers
+    allChildItems: PropTypes.array, // array of collapserItem ids
     actions: PropTypes.object,
   };
 

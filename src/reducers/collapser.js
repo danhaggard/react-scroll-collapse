@@ -7,6 +7,35 @@ import {
 
 import {checkAttr} from './utils';
 
+/*
+  State shape
+  ===========
+  reactScrollCollapse.entities = {
+    ...entities,  -- (other reducers)
+    collapsers: {
+      0: {
+        collapsers: [array of collapserIds],
+        id: 0 (matches key)
+        items: [array of collapserItemIds]
+      },
+      ... and so on.
+    }
+  }
+
+  Some notes regarding state:
+
+  collapsers.(id).collapsers = is an array of collapserIds.  Represents the
+  list of elemets wrapped with collapserController  - who comprise the first
+  level of nested collapserController children.  i.e. they are the first collapsers
+  encountered nested within the current collapser (they don't have to be the immediate
+  children in the dom).  Array does not include ids of children of children.
+
+  collapsers.(id).items - array of collapserItemIds.  Same principle - items
+  included can't be direct children on other collapsers - but again can be nested
+  arbitrarily deep in other components.
+*/
+
+
 // handles the id attr for collapsers.
 export const collapserIdReducer = (state = null, action) => {
   const {collapser} = checkAttr(action, 'payload');
@@ -80,6 +109,7 @@ export const parentCollapserReducer = (state = {}, action) => {
   }
 };
 
+/* handles reactScrollCollapse.entities.collapsers state */
 export const collapsersReducer = (state = {}, action) => {
   const {collapser, collapserId, parentCollapserId} = checkAttr(action, 'payload');
   let newState;
@@ -111,7 +141,7 @@ export const collapsersReducer = (state = {}, action) => {
     case REMOVE_ITEM:
       /*
         collapser may have already been removed - so we check that it exists,
-        otherwise we will re-add it's add back into state.
+        otherwise we will re-add it's id back into state.
       */
       if (collapserId in state) {
         newState = {...state};

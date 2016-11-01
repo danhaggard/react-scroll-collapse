@@ -10,17 +10,3 @@ export const getNextIdFromObj = (obj) => {
   const keys = Object.keys(obj);
   return getNextIdFromArr(keys);
 };
-
-// check if you can delete this on final refactor.
-export const checkAction = (action) => {
-  const {collapserId, scrollerId} = action;
-  try {
-    if (collapserId >= 0 && scrollerId >= 0) {
-      // both aren't needed and it simplifies reducer logic if we can rely on
-      // them not being there.
-      throw new Error('Action should not contain both collapserId and scrollerId');
-    }
-  } catch (e) {
-//    console.error(e);
-  }
-};

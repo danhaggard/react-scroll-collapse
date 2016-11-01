@@ -93,7 +93,6 @@ export const scrollersReducer = (state = {}, action) => {
       return newState;
     case REMOVE_SCROLLER:
       newState = {...state};
-      // newState[scrollerId] = scrollerReducer(state[scrollerId], action);
       delete newState[scrollerId];
       return newState;
     case ADD_COLLAPSER:
