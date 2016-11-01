@@ -3,10 +3,11 @@ import baseConfig from './base';
 import webpack from 'webpack';
 
 const distConfig = (opts) => {
+  console.log('distConfig called');
   const {PROJECT_ROOT} = opts;
   const config = baseConfig(opts);
   const srcPath = path.resolve(PROJECT_ROOT, 'src');
-  const distPath = path.resolve(PROJECT_ROOT, 'dist/assets');
+  const distPath = path.resolve(PROJECT_ROOT, 'dist');
   const plugins = [
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"production"'
@@ -24,9 +25,21 @@ const distConfig = (opts) => {
     devtool: 'source-map',
     plugins,
     entry: srcPath,
+    externals: {
+      classnames: 'classnames',
+      react: 'react',
+      'react-dom': 'react-dom',
+      'react-motion': 'react-motion',
+      'react-redux': 'react-redux',
+      redux: 'redux',
+      'redux-saga': 'redux-saga',
+      reselect: 'reselect',
+    },
     output: {
       path: distPath,
-      filename: 'app.js',
+      filename: 'index.js',
+      libraryTarget: 'umd',
+      library: 'ReactScrollCollapse'
     },
     module: {
       loaders: [

@@ -1,12 +1,34 @@
 # react-scroll-collapse
-Component wrappers for auto-scrolling with elements using react-collapse
+Component wrappers for auto-scrolling collapsible elements - with smooth animations
+powered by react-motion and react-collapse.
+
+**Warning:** This is currently an unstable beta release and probably not ready
+for production.  Development is ongoing and feedback is welcome.
 
 ## Demo
+
+https://danhaggard.github.io/react-scroll-collapse/examples/
 
 ## Installation
 
 ### NPM
-Coming Soon
+```
+npm install --save react-scroll-collapse
+```
+
+#### Installing peer dependencies
+If you use npm@3 you'll need to install the peer dependencies
+
+```
+npm install --save classnames react react-dom react-motion react-redux redux redux-saga reselect
+```
+
+If you have cloned the project and want to run the example demo then you will also
+need to install react-collapse:
+
+```
+npm install --save react-collapse react-height
+```
 
 
 #### Importing the collapser HoCs:
@@ -24,21 +46,21 @@ import {reactScrollCollapse} from 'react-scroll-collapse';
 ```
 
 You will need to include the 'reactScrollCollapse' reducer in your top level reducer with
-the same state key.  [See example](https://github.com/danhaggard/react-scroll-collapse/examples/reducers/index.js)
+the same state key (i.e. reactScrollCollapse).  [See example](https://github.com/danhaggard/react-scroll-collapse/examples/reducers/index.js)
 
 
 ### redux-saga
 
 react-scroll-collapse also relies on [redux-saga](https://github.com/yelouafi/redux-saga)
-You will need to include 'reactScrollCollapseSagas' in your root saga - [See example](https://github.com/danhaggard/react-scroll-collapse/blob/master/examples/sagas/index.js) - which in turn must be included in your redux middlewares [See example](https://github.com/danhaggard/react-scroll-collapse/blob/master/examples/stores/index.js)
+You will need to include 'reactScrollCollapseSagas' in your root saga - [See example](https://github.com/danhaggard/react-scroll-collapse/blob/master/examples/sagas/index.js) - which in turn must be included in your redux middleware [See example](https://github.com/danhaggard/react-scroll-collapse/blob/master/examples/stores/index.js)
 
 #### Importing the sagas:
 ```
 import {reactScrollCollapseSagas} from 'react-scroll-collapse';
 ```
 
-Consult both the redux and redux-saga docs for more information about using those
-libraries.
+Consult both the redux and redux-saga docs for more information about installing
+and using those libraries.
 
 
 ## Overview
@@ -231,3 +253,21 @@ A callback that MUST be passed into the <Collapse> component (also as the
 ##### itemId, parentCollapserId, parentScrollerId : PropTypes.number
 
 These are the ids used in redux to track components.
+
+## Development
+### Running the example demo
+
+```
+git@github.com:danhaggard/react-scroll-collapse.git
+cd react-scroll-collapse
+npm install
+npm start
+```
+
+### Testing
+
+To run the tests and view coverage:
+
+```
+npm test
+```

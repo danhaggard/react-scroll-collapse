@@ -1,9 +1,0 @@
-{
-  "generator-react-webpack": {
-    "appName": "react-scroll-collapse",
-    "style": "scss",
-    "cssmodules": true,
-    "postcss": true,
-    "generatedWithVersion": 4
-  }
-}

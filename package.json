@@ -1,26 +1,25 @@
 {
   "name": "react-scroll-collapse",
-  "private": true,
   "version": "0.1.0",
   "description": "React/redux wrappers for auto-scrolling react-collapse components",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "clean": "rimraf dist/*",
     "copy": "copyfiles -f ./src/index.html ./src/favicon.ico ./dist",
     "gh-pages": "git checkout gh-pages && git rebase origin/master --force-rebase && npm run build:ghPages && git add . && git commit --amend --no-edit && git push --force && git checkout master",
     "build:ghPages": "cross-env NODE_ENV=ghPages webpack",
-    "dist": "NODE_ENV=dist npm run clean && npm run copy && webpack --progress --bail -p",
+    "dist": "npm run clean && cross-env NODE_ENV=dist webpack --progress --bail -p",
     "lint": "eslint ./src",
     "posttest": "npm run lint",
+    "prepublish": "npm run dist",
     "release:major": "npm version prerelease && git push --follow-tags && npm publish --tag beta",
     "release:minor": "npm version prerelease && git push --follow-tags && npm publish --tag beta",
     "release:patch": "npm version prerelease && git push --follow-tags && npm publish --tag beta",
     "serve:dev": "cross-env NODE_ENV=dev webpack-dev-server --open -p --progress",
-    "serve:dist": "webpack-dev-server --open --env dist -p --progress",
     "serve:ghPages": "cross-env NODE_ENV=ghPages webpack-dev-server --open -p --progress",
     "start": "npm run serve:dev",
     "test": "cross-env NODE_ENV=test karma start",
-    "test:watch": "karma start --autoWatch=true --singleRun=false --reporters=mocha,coverage"
+    "test:watch": "cross-env NODE_ENV=test karma start --autoWatch=true --singleRun=false --reporters=mocha,coverage"
   },
   "repository": {
     "type": "git",
@@ -82,7 +81,7 @@
     "webpack": "2.1.0-beta.22",
     "webpack-dev-server": "2.1.0-beta.0"
   },
-  "dependencies": {
+  "peerDependencies": {
     "classnames": "^2.2.5",
     "react": "^15.0.1",
     "react-collapse": "^2.3.3",
