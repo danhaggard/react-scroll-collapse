@@ -3,7 +3,14 @@ import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 
-import {addCollapser, removeCollapser, addScrollerChild, removeScrollerChild} from '../../actions';
+import {
+  addCollapser,
+  addCollapserChild,
+  removeCollapser,
+  removeCollapserChild,
+  addScrollerChild,
+  removeScrollerChild,
+} from '../../actions';
 
 import selectors from '../../selectors';
 const {nextCollapserIdSelector} = selectors.collapser;
@@ -38,11 +45,14 @@ export const collapserControllerWrapper = (CollapserController) => {
     }
 
     componentWillUnmount() {
-      this.props.actions.removeCollapser(this.parentCollapserId, this.parentScrollerId,
-        this.collapserId);
+      if (this.parentCollapserId >= 0) {
+        this.props.actions.removeCollapserChild(this.parentCollapserId, this.collapserId);
+      }
       if (this.parentScrollerId >= 0) {
         this.props.actions.removeScrollerChild(this.parentScrollerId, this.collapserId);
       }
+      this.props.actions.removeCollapser(this.parentCollapserId, this.parentScrollerId,
+        this.collapserId);
     }
 
     addCollapser() {
@@ -55,6 +65,9 @@ export const collapserControllerWrapper = (CollapserController) => {
         this.parentCollapserId, collapser);
       if (this.parentScrollerId >= 0) {
         this.props.actions.addScrollerChild(this.parentScrollerId, collapser);
+      }
+      if (this.parentCollapserId >= 0) {
+        this.props.actions.addCollapserChild(this.parentCollapserId, collapser);
       }
     }
 
@@ -112,7 +125,9 @@ export const collapserControllerWrapper = (CollapserController) => {
   const mapDispatch = (dispatch) => ({
     actions: bindActionCreators({
       addCollapser,
+      addCollapserChild,
       removeCollapser,
+      removeCollapserChild,
       addScrollerChild,
       removeScrollerChild,
     }, dispatch),

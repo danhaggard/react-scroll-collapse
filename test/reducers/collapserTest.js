@@ -44,7 +44,7 @@ const collapsersIdArrayAddCollapser = () => {
   const stateBefore = [0];
   const stateAfter = [0, 1];
   const action = {
-    type: types.ADD_COLLAPSER,
+    type: types.ADD_COLLAPSER_CHILD,
     payload: {
       collapser: {
         id: 1,
@@ -105,8 +105,16 @@ const itemsIdArrayRemoveItem = () => {
 };
 
 const collapserReducerDefault = () => {
-  const stateBefore = {};
-  const stateAfter = {};
+  const stateBefore = {
+    collapsers: [0],
+    id: 0,
+    items: [0],
+  };
+  const stateAfter = {
+    collapsers: [0],
+    id: 0,
+    items: [0],
+  };
   const action = {type: 'DEFAULT'};
   Object.freeze(action);
   Object.freeze(stateBefore);

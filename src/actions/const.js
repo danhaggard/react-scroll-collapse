@@ -9,7 +9,9 @@ export const SCROLL_TO = 'react-scroll-collapse/SCROLL_TO';
 
 /* collapser action types */
 export const ADD_COLLAPSER = 'react-scroll-collapse/ADD_COLLAPSER';
+export const ADD_COLLAPSER_CHILD = 'react-scroll-collapse/ADD_COLLAPSER_CHILD';
 export const REMOVE_COLLAPSER = 'react-scroll-collapse/REMOVE_COLLAPSER';
+export const REMOVE_COLLAPSER_CHILD = 'react-scroll-collapse/REMOVE_COLLAPSER_CHILD';
 export const EXPAND_COLLAPSE_ALL = 'react-scroll-collapse/EXPAND_COLLAPSE_ALL';
 export const HEIGHT_READY_ALL = 'react-scroll-collapse/HEIGHT_READY_ALL';
 export const WATCH_INIT_COLLAPSER = 'react-scroll-collapse/WATCH_INIT_COLLAPSER';

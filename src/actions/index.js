@@ -7,12 +7,13 @@ import addScroller from './scroller/addScroller.js';
 import addScrollerChild from './scroller/addScrollerChild.js';
 import removeScrollerChild from './scroller/removeScrollerChild.js';
 
-
 /* collapser actions */
 import heightReadyAll from './collapser/heightReadyAll.js';
 import expandCollapseAll from './collapser/expandCollapseAll.js';
 import removeCollapser from './collapser/removeCollapser.js';
+import removeCollapserChild from './collapser/removeCollapserChild.js';
 import addCollapser from './collapser/addCollapser.js';
+import addCollapserChild from './collapser/addCollapserChild.js';
 import watchCollapser from './collapser/watchCollapser';
 import watchInitCollapser from './collapser/watchInitCollapser';
 
@@ -25,7 +26,9 @@ import addItem from './collapserItem/addItem.js';
 
 const actions = {
   addCollapser,
+  addCollapserChild,
   removeCollapser,
+  removeCollapserChild,
   expandCollapseAll,
   heightReadyAll,
   watchCollapser,
