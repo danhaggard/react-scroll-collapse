@@ -32,9 +32,7 @@ module.exports = (opts) => {
     },
     plugins: [
       ...config.plugins,
-      new webpack.HotModuleReplacementPlugin({
-        multiStep: true
-      })
+      new webpack.HotModuleReplacementPlugin()
     ],
     module: {
       preLoaders: [
