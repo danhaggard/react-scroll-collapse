@@ -23,24 +23,6 @@ import classnames from 'classnames';
 
 class Scroller extends Component {
 
-  /*
-    componentDidUpdate ensures that the dom element's scrollTop value matches
-    what was passed in through props in the previous update.
-  */
-  componentDidUpdate(prevProps) {
-    const {elem} = this;
-    if (elem && this.props.scrollTop !== undefined
-        /*
-          Only update elem.scrollTop if parent sends new value through props.
-
-          See: https://github.com/danhaggard/react-scroll-collapse/issues/2#issue-186472122
-        */
-        && this.props.scrollTop !== prevProps.scrolltop
-      ) {
-      elem.scrollTop = this.props.scrollTop;
-    }
-  }
-
   getClassName(className) {
     const initClassName = {};
     initClassName[styles.scroller] = true;
@@ -55,14 +37,21 @@ class Scroller extends Component {
   */
   render() {
     const {className, children, style} = this.props;
+    console.log('scroller child rendering');
     return (
       <div
         children={children}
         className={this.getClassName(className)}
         style={style}
-        ref={elem => {
-          this.elem = elem;
-          this.getScrollTop = () => (elem ? elem.scrollTop : null);
+        ref={elemArg => {
+          this.elem = elemArg;
+          this.getScrollTop = () => (this.elem ? this.elem.scrollTop : null);
+          this.setScrollTop = (val) => {
+            if (this.elem && val >= 0) {
+              this.elem.scrollTop = val;
+            }
+            return null;
+          };
         }}
       />
     );
@@ -73,7 +62,7 @@ Scroller.propTypes = {
   children: PropTypes.node,
   className: PropTypes.string,
   scrollerId: PropTypes.number.isRequired,
-  scrollTop: PropTypes.number.isRequired,
+//  scrollTop: PropTypes.number.isRequired,
   style: PropTypes.object,
 };
 
