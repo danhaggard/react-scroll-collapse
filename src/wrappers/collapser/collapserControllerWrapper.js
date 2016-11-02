@@ -3,7 +3,7 @@ import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 
-import {addCollapser, removeCollapser} from '../../actions';
+import {addCollapser, removeCollapser, addScrollerChild, removeScrollerChild} from '../../actions';
 
 import selectors from '../../selectors';
 const {nextCollapserIdSelector} = selectors.collapser;
@@ -40,6 +40,9 @@ export const collapserControllerWrapper = (CollapserController) => {
     componentWillUnmount() {
       this.props.actions.removeCollapser(this.parentCollapserId, this.parentScrollerId,
         this.collapserId);
+      if (this.parentScrollerId >= 0) {
+        this.props.actions.removeScrollerChild(this.parentScrollerId, this.collapserId);
+      }
     }
 
     addCollapser() {
@@ -50,6 +53,9 @@ export const collapserControllerWrapper = (CollapserController) => {
       const collapser = {id: this.collapserId};
       this.props.actions.addCollapser(this.parentScrollerId,
         this.parentCollapserId, collapser);
+      if (this.parentScrollerId >= 0) {
+        this.props.actions.addScrollerChild(this.parentScrollerId, collapser);
+      }
     }
 
     render() {
@@ -107,6 +113,8 @@ export const collapserControllerWrapper = (CollapserController) => {
     actions: bindActionCreators({
       addCollapser,
       removeCollapser,
+      addScrollerChild,
+      removeScrollerChild,
     }, dispatch),
   });
 

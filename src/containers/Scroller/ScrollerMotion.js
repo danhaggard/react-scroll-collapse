@@ -54,7 +54,6 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
         see:
         https://github.com/danhaggard/react-scroll-collapse/issues/2#issue-186472122
       */
-
       if (this.props.toggleScroll !== nextProps.toggleScroll) {
         this.setState({
           motionStyle: {y: nextProps.scrollTop},
@@ -114,12 +113,10 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
         return scroller;
       } : () => scroller;
 
-      const motionStyle = {y: spring(this.props.offsetTop, this.state.springConfig)};
-
       return (
         <Motion
           onRest={onRest}
-          style={motionStyle} >
+          style={this.state.motionStyle} >
           {motionChild}
         </Motion>
       );

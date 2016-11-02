@@ -7,7 +7,7 @@ const scrollerCollapsersIdArrayReducerAddCollapser = () => {
   const stateBefore = [0];
   const stateAfter = [0, 1];
   const action = {
-    type: types.ADD_COLLAPSER,
+    type: types.ADD_SCROLLER_CHILD,
     payload: {
       collapser: {
         id: 1,
@@ -25,7 +25,7 @@ const scrollerCollapsersIdArrayReducerRemoveCollapser = () => {
   const stateBefore = [0, 1];
   const stateAfter = [0];
   const action = {
-    type: types.REMOVE_COLLAPSER,
+    type: types.REMOVE_SCROLLER_CHILD,
     payload: {
       collapserId: 1,
     },
@@ -92,6 +92,7 @@ const scrollersReducerAddScroller = () => {
       scrollTop: 0,
       id: 0,
       collapsers: [],
+      toggleScroll: false,
     },
   };
   const action = {
@@ -116,6 +117,7 @@ const scrollersReducerAddCollapser = () => {
       scrollTop: 0,
       id: 0,
       collapsers: [],
+      toggleScroll: false,
     },
   };
   const stateAfter = {
@@ -124,18 +126,11 @@ const scrollersReducerAddCollapser = () => {
       scrollTop: 0,
       id: 0,
       collapsers: [0],
-    },
-  };
-  const stateAfterSecond = {
-    0: {
-      offsetTop: 0,
-      scrollTop: 0,
-      id: 0,
-      collapsers: [],
+      toggleScroll: false,
     },
   };
   const action = {
-    type: types.ADD_COLLAPSER,
+    type: types.ADD_SCROLLER_CHILD,
     payload: {
       collapser: {
         id: 0,
@@ -143,24 +138,13 @@ const scrollersReducerAddCollapser = () => {
       scrollerId: 0,
     },
   };
-  const actionSecond = {
-    type: types.ADD_COLLAPSER,
-    payload: {
-      collapser: {
-        id: 1,
-      },
-      collapserId: 0,
-    },
-  };
+
   Object.freeze(stateBefore);
   Object.freeze(action);
-  Object.freeze(actionSecond);
   expect(
     reducers.scrollersReducer(stateBefore, action)
   ).toEqual(stateAfter);
-  expect(
-    reducers.scrollersReducer(stateBefore, actionSecond)
-  ).toEqual(stateAfterSecond);
+
 };
 
 const scrollersAddScroller = () => {
@@ -186,12 +170,12 @@ describe('react-scroll-collapse', () => {
     describe('scroller', () => {
 
       describe('function: scrollerCollapsersIdArrayReducer', () => {
-        describe('type: ADD_COLLAPSER', () => {
+        describe('type: ADD_SCROLLER_CHILD', () => {
           it('adds the collapser id', () => {
             scrollerCollapsersIdArrayReducerAddCollapser();
           });
         });
-        describe('type: REMOVE_COLLAPSER', () => {
+        describe('type: REMOVE_SCROLLER_CHILD', () => {
           it('removes the collapserId from the array', () => {
             scrollerCollapsersIdArrayReducerRemoveCollapser();
           });
@@ -228,8 +212,8 @@ describe('react-scroll-collapse', () => {
             scrollersReducerAddScroller();
           });
         });
-        describe('type: ADD_COLLAPSER', () => {
-          it('adds the collapser as a child if scroller id provided', () => {
+        describe('type: ADD_SCROLLER_CHILD', () => {
+          it('adds the collapser as a child', () => {
             scrollersReducerAddCollapser();
           });
         });

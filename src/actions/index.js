@@ -4,6 +4,9 @@ import watchInitialise from './scroller/watchInitialise.js';
 import setOffsetTop from './scroller/setOffsetTop.js';
 import removeScroller from './scroller/removeScroller.js';
 import addScroller from './scroller/addScroller.js';
+import addScrollerChild from './scroller/addScrollerChild.js';
+import removeScrollerChild from './scroller/removeScrollerChild.js';
+
 
 /* collapser actions */
 import heightReadyAll from './collapser/heightReadyAll.js';
@@ -33,7 +36,9 @@ const actions = {
   transitionWait,
   heightReady,
   addScroller,
+  addScrollerChild,
   removeScroller,
+  removeScrollerChild,
   setOffsetTop,
   watchInitialise,
   scrollTo

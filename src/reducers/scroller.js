@@ -1,8 +1,10 @@
+import {combineReducers} from 'redux';
+
 import {
-  ADD_COLLAPSER,
   ADD_SCROLLER,
-  REMOVE_COLLAPSER,
+  ADD_SCROLLER_CHILD,
   REMOVE_SCROLLER,
+  REMOVE_SCROLLER_CHILD,
   SCROLL_TO,
 } from '../actions/const';
 
@@ -12,9 +14,9 @@ import {checkAttr, getNextIdFromArr} from './utils';
 export const scrollerCollapsersIdArrayReducer = (state = [], action) => {
   const {collapser, collapserId} = checkAttr(action, 'payload');
   switch (action.type) {
-    case ADD_COLLAPSER:
+    case ADD_SCROLLER_CHILD:
       return [...state, collapser.id];
-    case REMOVE_COLLAPSER:
+    case REMOVE_SCROLLER_CHILD:
       return state.filter(val => val !== collapserId);
     default:
       return state;
@@ -32,24 +34,24 @@ export const scrollerIdReducer = (state = null, action) => {
 };
 
 export const offsetTopReducer = (state = 0, action) => {
-  const {payload: {scroller}, payload} = action;
+  const {scroller, offsetTop} = checkAttr(action, 'payload');
   switch (action.type) {
     case ADD_SCROLLER:
       return scroller.offsetTop ? scroller.offsetTop : state;
     case SCROLL_TO:
-      return payload.offsetTop;
+      return offsetTop;
     default:
       return state;
   }
 };
 
 export const scrollTopReducer = (state = 0, action) => {
-  const {payload: {scroller}, payload} = action;
+  const {scroller, scrollTop} = checkAttr(action, 'payload');
   switch (action.type) {
     case ADD_SCROLLER:
       return scroller.scrollTop ? scroller.scrollTop : state;
     case SCROLL_TO:
-      return payload.scrollTop;
+      return scrollTop;
     default:
       return state;
   }
@@ -64,35 +66,13 @@ export const toggleScrollReducer = (state = false, action) => {
   }
 };
 
-export const scrollerReducer = (state = {}, action) => {
-  switch (action.type) {
-    case ADD_SCROLLER:
-      return {
-        ...state,
-        // array of collapserIds for collapsers nested directly under this collapser
-        collapsers: scrollerCollapsersIdArrayReducer(undefined, action),
-        id: scrollerIdReducer(undefined, action),
-        offsetTop: offsetTopReducer(undefined, action),
-        scrollTop: scrollTopReducer(undefined, action),
-        toggleScroll: toggleScrollReducer(undefined, action),
-      };
-    case SCROLL_TO:
-      return {
-        ...state,
-        offsetTop: offsetTopReducer(state.offsetTop, action),
-        scrollTop: scrollTopReducer(state.scrollTop, action),
-        toggleScroll: toggleScrollReducer(state.toggleScroll, action),
-      };
-    case ADD_COLLAPSER:
-    case REMOVE_COLLAPSER:
-      return {
-        ...state,
-        collapsers: scrollerCollapsersIdArrayReducer(state.collapsers, action),
-      };
-    default:
-      return state;
-  }
-};
+const scrollerReducer = combineReducers({
+  collapsers: scrollerCollapsersIdArrayReducer,
+  id: scrollerIdReducer,
+  offsetTop: offsetTopReducer,
+  scrollTop: scrollTopReducer,
+  toggleScroll: toggleScrollReducer,
+});
 
 export const scrollersReducer = (state = {}, action) => {
   const {scroller, scrollerId} = checkAttr(action, 'payload');
@@ -100,20 +80,14 @@ export const scrollersReducer = (state = {}, action) => {
   switch (action.type) {
     case ADD_SCROLLER:
       newState = {...state};
-      newState[scroller.id] = scrollerReducer(null, action);
+      newState[scroller.id] = scrollerReducer({}, action);
       return newState;
     case REMOVE_SCROLLER:
       newState = {...state};
       delete newState[scrollerId];
       return newState;
-    case ADD_COLLAPSER:
-    case REMOVE_COLLAPSER:
-      newState = {...state};
-      // if no scrollerId supplied - then this collapser is nested under another collapser
-      if (scrollerId >= 0 && scrollerId in state) {
-        newState[scrollerId] = scrollerReducer(state[scrollerId], action);
-      }
-      return newState;
+    case ADD_SCROLLER_CHILD:
+    case REMOVE_SCROLLER_CHILD:
     case SCROLL_TO:
       newState = {...state};
       newState[scrollerId] = scrollerReducer(state[scrollerId], action);
