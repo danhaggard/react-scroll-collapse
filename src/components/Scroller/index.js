@@ -32,12 +32,11 @@ class Scroller extends Component {
   }
 
   /*
-    Defining the getScrollTop method in the ref allows ScrollerMotion to use this
-    method when wrapping Scroller.
+    Defining methods in the ref allows ScrollerMotion to use them when
+    wrapping Scroller.
   */
   render() {
     const {className, children, style} = this.props;
-    console.log('scroller child rendering');
     return (
       <div
         children={children}
@@ -62,7 +61,6 @@ Scroller.propTypes = {
   children: PropTypes.node,
   className: PropTypes.string,
   scrollerId: PropTypes.number.isRequired,
-//  scrollTop: PropTypes.number.isRequired,
   style: PropTypes.object,
 };
 

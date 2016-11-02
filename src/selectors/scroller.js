@@ -13,6 +13,9 @@ export const getOffsetTop = scroller => selector(scroller, 'offsetTop');
 
 export const getScrollTop = scroller => selector(scroller, 'scrollTop');
 
+export const getToggleScroll = scroller => selector(scroller, 'toggleScroll');
+
+
 export const getScrollerIdArray = scrollerCollapser => selector(scrollerCollapser, 'scrollers');
 
 export const nextScrollerIdSelector = createSelector(
@@ -34,4 +37,8 @@ export const offsetTopSelector = createSelector(
 
 export const scrollTopSelector = createSelector(
   scrollerSelector, selectFunc(getScrollTop)
+);
+
+export const toggleScrollSelector = createSelector(
+  scrollerSelector, selectFunc(getToggleScroll)
 );

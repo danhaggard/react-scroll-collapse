@@ -36,7 +36,6 @@ export const collapserItemWrapper = (WrappedComponent) => {
           called for every wrapped <Collapse> element in the Collapser.
       */
       this.expandCollapse = () => {
-        console.log('this.elem.offsetTop', this.elem.offsetTop);
         this.props.actions.watchCollapser(this.props.parentCollapserId);
         this.props.actions.setOffsetTop(
           () => this.elem.offsetTop,

@@ -7,7 +7,7 @@ import {bindActionCreators} from 'redux';
 import {watchInitialise} from '../../actions';
 
 import selectors from '../../selectors';
-const {offsetTopSelector, scrollTopSelector} = selectors.scroller;
+const {offsetTopSelector, scrollTopSelector, toggleScrollSelector} = selectors.scroller;
 
 import Scroller from '../../components/Scroller';
 
@@ -48,31 +48,20 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
       if (this.props.springConfig !== nextProps.springConfig) {
         this.setState({springConfig: nextProps.springConfig});
       }
-      console.log('this.props.scrollTop, nextProps.scrollTop, this.child.elem.scrollTop',
-        this.props.scrollTop, nextProps.scrollTop, this.child.elem.scrollTop);
-      console.log('this.props.offsetTop, nextProps.offsetTop',
-        this.props.offsetTop, nextProps.offsetTop);
-      console.log('call getScrollTop', this.child ? this.child.getScrollTop() : 'noChild');
+
       /*
-        This long disjunction handles various rendering edge cases.  Detail here:
+        Ensures that the scrollTop start val for <Motion> is in sync with the UI
+        see:
         https://github.com/danhaggard/react-scroll-collapse/issues/2#issue-186472122
       */
-      /*
-      if (
-        this.props.offsetTop !== nextProps.offsetTop || (
 
-          this.props.scrollTop !== nextProps.scrollTop || (
-
-            this.props.scrollTop === 0 && nextProps.scrollTop === 0
-          )
-        )
-      ) {
+      if (this.props.toggleScroll !== nextProps.toggleScroll) {
         this.setState({
           motionStyle: {y: nextProps.scrollTop},
           prevRenderType: 'uiSync',
         });
       }
-      */
+
     }
 
     /*
@@ -80,7 +69,7 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
      we need to precipitate another render to start the animation.  So we call
      setState here to do so - but only conditional on the previous render being
      a scrollTop ui sync so we don't get infinite loop.
-    */
+     */
     componentDidUpdate() {
       if (this.state.prevRenderType === 'uiSync') {
         this.setState({
@@ -90,27 +79,14 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
       }
     }
 
-    getDefaultStyle(child) {
-      return child && child.elem ? {y: this.child.elem.scrollTop} : null;
-    }
-
-    getMotionStyle() {
-      return {y: spring(this.props.offsetTop, this.state.springConfig)};
-    }
 
     render() {
       const {children, scrollerId, style, className, onRest} = this.props;
-      const defaultStyle = this.getDefaultStyle(this.child);
-//      console.log('defaultStyle', defaultStyle);
-//      console.log('this.props.offsetTop, this.state.springConfig',
-//        this.props.offsetTop, this.state.springConfig);
+
       /*
-        The use of the ref in the cloned childComponent (Scroller) allows ScrollerMotion
+        The use of the ref in ScrollerComponent allows ScrollerMotion
         to access the methods we defined on Scroller using ref.  In this case
         getScrollTop which is now accessible via: this.child.getScrollTop
-        (Could use this to set elem.scrollTop as well from here.)
-
-        value.y is the interpolated scrollTop value we pass back into Scroller.
       */
       const scroller = (
         <ScrollerComponent
@@ -123,13 +99,28 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
           style={style}
         />
       );
+
+      /*
+        I was previously passing val.y into ScrollerComponent - which resulted
+        in a render of ScrollerComponent for every val.y passed by <Motion>.
+        Now on every render in <Motion> - it calls the setScrollTop callback
+        which creates the scroll animation - but doesn't re-render ScrollerComponent
+        at all.
+
+        Kudos to nktb: https://github.com/chenglou/react-motion/issues/357#issuecomment-237741940
+      */
+      const motionChild = this.child ? (val) => {
+        this.child.setScrollTop(val.y);
+        return scroller;
+      } : () => scroller;
+
+      const motionStyle = {y: spring(this.props.offsetTop, this.state.springConfig)};
+
       return (
-        <Motion onRest={onRest} defaultStyle={defaultStyle} style={this.state.motionStyle} >
-          {this.child ? (val) => {
-            console.log('val', val);
-            this.child.setScrollTop(val.y);
-            return scroller;
-          } : (val) => scroller}
+        <Motion
+          onRest={onRest}
+          style={motionStyle} >
+          {motionChild}
         </Motion>
       );
     }
@@ -145,11 +136,11 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
     scrollTop: PropTypes.number.isRequired,
     springConfig: PropTypes.object,
     style: PropTypes.object,
+    toggleScroll: PropTypes.bool.isRequired,
   };
 
   return ScrollerMotion;
 };
-
 
 /*
   the final offsetTop and scrollTop values (representing state at end of scrolling)
@@ -159,6 +150,7 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
 const mapStateToProps = (state, ownProps) => ({
   offsetTop: offsetTopSelector(state)(ownProps.scrollerId),
   scrollTop: scrollTopSelector(state)(ownProps.scrollerId),
+  toggleScroll: toggleScrollSelector(state)(ownProps.scrollerId)
 });
 
 const mapDispatchToProps = (dispatch) => ({

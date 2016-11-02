@@ -55,6 +55,15 @@ export const scrollTopReducer = (state = 0, action) => {
   }
 };
 
+export const toggleScrollReducer = (state = false, action) => {
+  switch (action.type) {
+    case SCROLL_TO:
+      return !state;
+    default:
+      return state;
+  }
+};
+
 export const scrollerReducer = (state = {}, action) => {
   switch (action.type) {
     case ADD_SCROLLER:
@@ -65,12 +74,14 @@ export const scrollerReducer = (state = {}, action) => {
         id: scrollerIdReducer(undefined, action),
         offsetTop: offsetTopReducer(undefined, action),
         scrollTop: scrollTopReducer(undefined, action),
+        toggleScroll: toggleScrollReducer(undefined, action),
       };
     case SCROLL_TO:
       return {
         ...state,
         offsetTop: offsetTopReducer(state.offsetTop, action),
         scrollTop: scrollTopReducer(state.scrollTop, action),
+        toggleScroll: toggleScrollReducer(state.toggleScroll, action),
       };
     case ADD_COLLAPSER:
     case REMOVE_COLLAPSER:

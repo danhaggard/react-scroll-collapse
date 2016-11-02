@@ -23,10 +23,7 @@ export function *waitForCollapserFinishSignal(scrollerId, getScrollTop, getOffse
   while (condition) {
     yield take(HEIGHT_READY_ALL);
     const scrollTop = yield call(getScrollTop);
-    console.log('scrollTop in saga', scrollTop);
     const offsetTop = yield call(getOffsetTop);
-    console.log('offsetTop in saga', offsetTop);
-
     yield put(scrollTo(scrollerId, offsetTop, scrollTop));
     // returning here ensures the saga does not persist after the auto-scroll is finished
     // a new one will be generated each time a collapser button is clicked.
