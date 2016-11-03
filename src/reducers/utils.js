@@ -1,4 +1,4 @@
-const isUndefNull = val => val === null || val === undefined;
+export const isUndefNull = val => val === null || val === undefined;
 
 export const checkAttr = (obj, attr) => (!isUndefNull(obj[attr]) ? obj[attr] : {});
 

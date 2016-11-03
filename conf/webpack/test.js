@@ -20,7 +20,6 @@ const testConfig = (opts) => {
   };
   return {
     ...config,
-//    debug: false,
     devtool: 'inline-source-map',
     entry: './src',
     externals: {

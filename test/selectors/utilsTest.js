@@ -120,43 +120,6 @@ const getAllNested = () => {
   ).toEqual([7, 10]);
 };
 
-const getAllNestedNew = () => {
-  const dummySelector = (id) => {
-    const state = {
-      0: [1, 2, 3, 4],
-      1: [],
-      2: [5, 6],
-      3: [],
-      4: [],
-      5: [8, 9],
-      6: [7],
-      7: [10],
-      8: [],
-      9: [],
-      10: [],
-    };
-    return state[id];
-  };
-
-  expect(
-    selectors.getAllNested(0, dummySelector)
-  ).toEqual([1, 2, 3, 4, 5, 6, 8, 9, 7, 10]);
-
-  expect(
-    selectors.getAllNested(1, dummySelector)
-  ).toEqual([]);
-
-  expect(
-    selectors.getAllNested(2, dummySelector)
-  ).toEqual([5, 6, 8, 9, 7, 10]);
-
-  expect(
-    selectors.getAllNested(6, dummySelector)
-  ).toEqual([7, 10]);
-};
-
-
-
 describe('react-scroll-collapse', () => {
   describe('selectors', () => {
     describe('utils', () => {

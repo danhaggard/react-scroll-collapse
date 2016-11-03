@@ -18,6 +18,14 @@ export const collapserWrapper = (WrappedComponent) => {
     constructor(props) {
       super(props);
       this.expandCollapseAll = (allChildItems, areAllItemsExpanded) => () => {
+
+        /*
+          This activates a saga that will ensure that all the onHeightReady
+          callbacks of nested <Collapse> elements have fired - before the Scroller
+          related sagas will be allowed to initiate the scrolling.
+        */
+        this.props.actions.watchCollapser(this.props.collapserId);
+
         /*
           setOffsetTop: defines a callback for the saga to call that allows
           the saga to obtain the offsetTop value of the backing instance of this
@@ -25,7 +33,7 @@ export const collapserWrapper = (WrappedComponent) => {
           offsetTop val once the onHeightReady callback has been
           called for every wrapped <Collapse> element in the Collapser.
         */
-        this.props.actions.watchCollapser(this.props.collapserId);
+
         this.props.actions.setOffsetTop(
           () => this.elem.offsetTop,
           this.props.parentScrollerId,

@@ -3,17 +3,18 @@ import actions from '../../src/actions/';
 import * as types from '../../src/actions/const';
 
 const addItem = () => {
-  const [collapserId, item] = [0, {expanded: false}];
+  const [collapserId, item, itemId] = [0, {expanded: false}, 0];
   const output = {
     type: types.ADD_ITEM,
     payload: {
       collapserId,
       item,
+      itemId,
     },
   };
 
   expect(
-    actions.addItem(collapserId, item)
+    actions.addItem(collapserId, item, itemId)
   ).toEqual(output);
 };
 

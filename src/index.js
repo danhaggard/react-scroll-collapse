@@ -8,7 +8,7 @@ import Scroller from './containers/Scroller';
 
     export default collapserItemController(YourItemComponent);
 
-  It should work with redux connected components ass well:
+  It should work with redux connected components as well:
 
     const YourConnectedCollapserComponent = connect(
       mapStateToProps,

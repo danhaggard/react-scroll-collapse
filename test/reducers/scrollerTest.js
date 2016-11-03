@@ -101,6 +101,7 @@ const scrollersReducerAddScroller = () => {
       scroller: {
         id: 0,
       },
+      scrollerId: 0
     },
   };
   Object.freeze(stateBefore);

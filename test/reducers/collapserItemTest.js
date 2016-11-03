@@ -175,6 +175,7 @@ const itemsReducerAddItem = () => {
       item: {
         id: 0,
       },
+      itemId: 0,
     },
   };
   Object.freeze(stateBefore);
@@ -260,9 +261,9 @@ const itemsReducerExpandCollapseAll = () => {
       waitingForHeight: true,
     },
     1: {
-      expanded: true,
+      expanded: false,
       id: 1,
-      waitingForHeight: true,
+      waitingForHeight: false,
     },
     2: {
       expanded: false,
@@ -273,7 +274,13 @@ const itemsReducerExpandCollapseAll = () => {
   const action = {
     type: types.EXPAND_COLLAPSE_ALL,
     payload: {
-      items: [0, 1],
+      item: {
+        expanded: false,
+        id: 0,
+        waitingForHeight: false,
+      },
+      areAllItemsExpanded: false,
+      itemId: 0,
     },
   };
   Object.freeze(stateBefore);

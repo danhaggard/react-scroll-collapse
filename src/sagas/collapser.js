@@ -12,7 +12,7 @@ const {HEIGHT_READY, REMOVE_COLLAPSER, WATCH_COLLAPSER, WATCH_INIT_COLLAPSER} = 
   Collapser UI related sagas
   ==========================
 
-  Check out sagas.js for more detail on how these sagas work as much of the
+  Check out sagas/scroller.js for more detail on how these sagas work as much of the
   control flow is similar.
 */
 

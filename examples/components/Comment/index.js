@@ -39,4 +39,4 @@ Comment.propTypes = {
   text: PropTypes.string,
 };
 
-export default collapserItemController(Comment);
+export default collapserItemController(Comment); // wrap and export your component

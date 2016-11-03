@@ -19,7 +19,6 @@ import watchInitCollapser from './collapser/watchInitCollapser';
 
 /* collapserItem actions */
 import heightReady from './collapserItem/heightReady.js';
-import transitionWait from './collapserItem/transitionWait.js';
 import expandCollapse from './collapserItem/expandCollapse.js';
 import removeItem from './collapserItem/removeItem.js';
 import addItem from './collapserItem/addItem.js';
@@ -36,7 +35,6 @@ const actions = {
   addItem,
   removeItem,
   expandCollapse,
-  transitionWait,
   heightReady,
   addScroller,
   addScrollerChild,

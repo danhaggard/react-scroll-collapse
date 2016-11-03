@@ -40,7 +40,7 @@ const collapsersIdArrayDefault = () => {
   ).toEqual(stateAfter);
 };
 
-const collapsersIdArrayAddCollapser = () => {
+const collapsersIdArrayAddCollapserChild = () => {
   const stateBefore = [0];
   const stateAfter = [0, 1];
   const action = {
@@ -49,6 +49,23 @@ const collapsersIdArrayAddCollapser = () => {
       collapser: {
         id: 1,
       },
+    },
+  };
+  Object.freeze(action);
+  Object.freeze(stateBefore);
+  expect(
+    reducers.collapsersIdArray(stateBefore, action)
+  ).toEqual(stateAfter);
+};
+
+const collapsersIdArrayRemoveCollapserChild = () => {
+  const stateBefore = [0, 1];
+  const stateAfter = [0];
+  const action = {
+    type: types.REMOVE_COLLAPSER_CHILD,
+    payload: {
+      collapserId: 1,
+      parentCollapserId: 0,
     },
   };
   Object.freeze(action);
@@ -145,6 +162,58 @@ const collapserReducerAddCollapser = () => {
   ).toEqual(stateAfter);
 };
 
+const collapserReducerAddCollapserChild = () => {
+  const stateBefore = {
+    collapsers: [],
+    id: 0,
+    items: [],
+  };
+  const stateAfter = {
+    collapsers: [1],
+    id: 0,
+    items: [],
+  };
+  const action = {
+    type: types.ADD_COLLAPSER_CHILD,
+    payload: {
+      collapser: {
+        id: 1,
+      },
+      parentCollapserId: 0,
+    },
+  };
+  Object.freeze(action);
+  Object.freeze(stateBefore);
+  expect(
+    reducers.collapserReducer(stateBefore, action)
+  ).toEqual(stateAfter);
+};
+
+const collapserReducerRemoveCollapserChild = () => {
+  const stateBefore = {
+    collapsers: [1],
+    id: 0,
+    items: [],
+  };
+  const stateAfter = {
+    collapsers: [],
+    id: 0,
+    items: [],
+  };
+  const action = {
+    type: types.REMOVE_COLLAPSER_CHILD,
+    payload: {
+      collapserId: 1,
+      parentCollapserId: 0,
+    },
+  };
+  Object.freeze(action);
+  Object.freeze(stateBefore);
+  expect(
+    reducers.collapserReducer(stateBefore, action)
+  ).toEqual(stateAfter);
+};
+
 const collapserReducerAddItem = () => {
   const stateBefore = {
     collapsers: [],
@@ -198,11 +267,18 @@ describe('react=scroll-collapse', () => {
           });
         });
 
-        describe('type: ADD_COLLAPSER', () => {
+        describe('type: ADD_COLLAPSER_CHILD', () => {
           it('adds the collapser id to the array', () => {
-            collapsersIdArrayAddCollapser();
+            collapsersIdArrayAddCollapserChild();
           });
         });
+
+        describe('type: REMOVE_COLLAPSER_CHILD', () => {
+          it('removes the collapser id from the array', () => {
+            collapsersIdArrayRemoveCollapserChild();
+          });
+        });
+
       });
 
       describe('function: itemsIdArray', () => {
@@ -235,6 +311,18 @@ describe('react=scroll-collapse', () => {
         describe('type: ADD_COLLAPSER', () => {
           it('returns the init state for added collapser', () => {
             collapserReducerAddCollapser();
+          });
+        });
+
+        describe('type: ADD_COLLAPSER_CHILD', () => {
+          it('Adds the child collapser to the collapsers array', () => {
+            collapserReducerAddCollapserChild();
+          });
+        });
+
+        describe('type: REMOVE_COLLAPSER_CHILD', () => {
+          it('Adds the child collapser to the collapsers array', () => {
+            collapserReducerRemoveCollapserChild();
           });
         });
 

@@ -266,19 +266,19 @@ const allChildItemsSelector = () => {
   };
 
   expect(
-    selectors.allChildItemsSelector(state)(0)
+    selectors.allChildItemsIdSelector(state)(0)
   ).toEqual([0, 1, 2]);
 
   expect(
-    selectors.allChildItemsSelector(newState)(0)
+    selectors.allChildItemsIdSelector(newState)(0)
   ).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 10, 11, 9, 8]);
 
   expect(
-    selectors.allChildItemsSelector(newState)(1)
+    selectors.allChildItemsIdSelector(newState)(1)
   ).toEqual([1, 6, 7, 10, 11]);
 
   expect(
-    selectors.allChildItemsSelector(newState)(2)
+    selectors.allChildItemsIdSelector(newState)(2)
   ).toEqual([2, 9]);
 };
 
@@ -447,7 +447,7 @@ describe('react-scroll-collapse', () => {
         });
       });
 
-      describe('function: allChildItemsSelector', () => {
+      describe('function: allChildItemsIdSelector', () => {
         it('selects', () => {
           allChildItemsSelector();
         });

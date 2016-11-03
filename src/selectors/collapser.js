@@ -131,17 +131,3 @@ export const haveAllItemsReportedHeightSelector = createSelector(
     return !(waitingForHeightArr.length > 0);
   }
 );
-
-
-// Check if you can delete these two selectors:
-export const checkAllHeightReports = (items) => {
-  const vals = Object.values(items).filter(val => val.waitingForHeight === false);
-  // if there are true vals - then an item is still yet to report it's height.
-  return !(vals.length > 0);
-};
-
-export const checkAllExpanded = (collapser) => {
-  const vals = Object.values(collapser).filter(val => val.expanded === false);
-  // if some false, then not all expanded - otherwise all expanded.
-  return !(vals.length > 0);
-};

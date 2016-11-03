@@ -99,7 +99,8 @@ export function *waitForSetOffsetTop(scrollerIdInit, getScrollTop) {
 }
 
 /*
-  This is a root saga. It is activated by a Scroller on mount.  It receives the
+  This is a root saga. It waits for the WATCH_INITIALISE action which is dispatched
+  by the Scroller component when mounted.  It receives the
   getScrollTop call back and calls the next saga waitForSetOffsetTop.
 */
 export function *scrollerInitWatch() {

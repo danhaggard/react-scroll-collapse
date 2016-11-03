@@ -9,16 +9,35 @@ const addCollapser = () => {
   const collapser = {
     test: 'test',
   };
+  const collapserId = 0;
   const output = {
     type: types.ADD_COLLAPSER,
     payload: {
       scrollerId,
       collapser,
       parentCollapserId,
+      collapserId,
     },
   };
   expect(
-    actions.addCollapser(scrollerId, parentCollapserId, collapser)
+    actions.addCollapser(scrollerId, parentCollapserId, collapser, collapserId)
+  ).toEqual(output);
+};
+
+const addCollapserChild = () => {
+  const parentCollapserId = 0;
+  const collapser = {
+    test: 'test',
+  };
+  const output = {
+    type: types.ADD_COLLAPSER_CHILD,
+    payload: {
+      collapser,
+      parentCollapserId,
+    },
+  };
+  expect(
+    actions.addCollapserChild(parentCollapserId, collapser)
   ).toEqual(output);
 };
 
@@ -40,20 +59,37 @@ const removeCollapser = () => {
   ).toEqual(output);
 };
 
+const removeCollapserChild = () => {
+  const parentCollapserId = 0;
+  const collapserId = 1;
+  const output = {
+    type: types.REMOVE_COLLAPSER_CHILD,
+    payload: {
+      collapserId,
+      parentCollapserId,
+    },
+  };
+  expect(
+    actions.removeCollapserChild(parentCollapserId, collapserId)
+  ).toEqual(output);
+};
+
 
 const expandCollapseAll = () => {
-  const items = [0, 1, 2];
+  const item = {dummy: 'dummy'};
   const areAllItemsExpanded = true;
+  const itemId = 0;
   const output = {
     type: types.EXPAND_COLLAPSE_ALL,
     payload: {
-      items,
+      item,
       areAllItemsExpanded,
+      itemId,
     },
   };
 
   expect(
-    actions.expandCollapseAll(items, areAllItemsExpanded)
+    actions.expandCollapseAll(item, areAllItemsExpanded, itemId)
   ).toEqual(output);
 };
 
@@ -67,6 +103,35 @@ const heightReadyAll = () => {
   ).toEqual(output);
 };
 
+const watchCollapser = () => {
+  const collapserId = 0;
+  const output = {
+    type: types.WATCH_COLLAPSER,
+    payload: {
+      collapserId,
+    }
+  };
+
+  expect(
+    actions.watchCollapser(collapserId)
+  ).toEqual(output);
+};
+
+const watchInitCollapser = () => {
+  const collapserId = 0;
+  const output = {
+    type: types.WATCH_INIT_COLLAPSER,
+    payload: {
+      collapserId,
+    }
+  };
+
+  expect(
+    actions.watchInitCollapser(collapserId)
+  ).toEqual(output);
+};
+
+
 describe('react-scroll-collapse', () => {
   describe('actions', () => {
     describe('collapser', () => {
@@ -77,9 +142,21 @@ describe('react-scroll-collapse', () => {
         });
       });
 
+      describe('function: addCollapserChild', () => {
+        it('returns the right action object', () => {
+          addCollapserChild();
+        });
+      });
+
       describe('function: removeCollapser', () => {
         it('returns the right action object', () => {
           removeCollapser();
+        });
+      });
+
+      describe('function: removeCollapserChild', () => {
+        it('returns the right action object', () => {
+          removeCollapserChild();
         });
       });
 
@@ -94,6 +171,19 @@ describe('react-scroll-collapse', () => {
           heightReadyAll();
         });
       });
+
+      describe('function: watchCollapser', () => {
+        it('returns the right action object', () => {
+          watchCollapser();
+        });
+      });
+
+      describe('function: watchInitCollapser', () => {
+        it('returns the right action object', () => {
+          watchInitCollapser();
+        });
+      });
+
     });
   });
 });

@@ -4,15 +4,33 @@ import * as types from '../../src/actions/const';
 
 const addScroller = () => {
   const scroller = {scrollTop: 200};
+  const scrollerId = 0;
   const output = {
     type: types.ADD_SCROLLER,
     payload: {
       scroller,
+      scrollerId,
     },
   };
 
   expect(
-    actions.addScroller(scroller)
+    actions.addScroller(scroller, scrollerId)
+  ).toEqual(output);
+};
+
+const addScrollerChild = () => {
+  const collapser = {id: 0};
+  const scrollerId = 0;
+  const output = {
+    type: types.ADD_SCROLLER_CHILD,
+    payload: {
+      collapser,
+      scrollerId,
+    },
+  };
+
+  expect(
+    actions.addScrollerChild(scrollerId, collapser)
   ).toEqual(output);
 };
 
@@ -27,6 +45,22 @@ const removeScroller = () => {
 
   expect(
     actions.removeScroller(scrollerId)
+  ).toEqual(output);
+};
+
+const removeScrollerChild = () => {
+  const scrollerId = 0;
+  const collapserId = 0;
+  const output = {
+    type: types.REMOVE_SCROLLER_CHILD,
+    payload: {
+      scrollerId,
+      collapserId,
+    },
+  };
+
+  expect(
+    actions.removeScrollerChild(scrollerId, collapserId)
   ).toEqual(output);
 };
 
@@ -90,9 +124,21 @@ describe('react-scroll-collapse', () => {
         });
       });
 
+      describe('function: addScrollerChild', () => {
+        it('returns the right action object', () => {
+          addScrollerChild();
+        });
+      });
+
       describe('function: removeScroller', () => {
         it('returns the right action object', () => {
           removeScroller();
+        });
+      });
+
+      describe('function: removeScrollerChild', () => {
+        it('returns the right action object', () => {
+          removeScrollerChild();
         });
       });
 
