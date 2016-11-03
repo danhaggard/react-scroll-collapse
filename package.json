@@ -1,7 +1,7 @@
 {
   "name": "react-scroll-collapse",
   "version": "0.1.0",
-  "description": "React/redux wrappers for auto-scrolling react-collapse components",
+  "description": "React / redux component wrappers for auto-scrolling react-collapse components",
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
@@ -27,7 +27,15 @@
     "url": "https://github.com/danhaggard/react-scroll-collapse"
   },
   "bugs": "https://github.com/danhaggard/react-scroll-collapse/issues",
-  "keywords": [],
+  "keywords": [
+    "react",
+    "redux",
+    "react-motion",
+    "react-collapse",
+    "component-wrapper",
+    "scroll",
+    "auto-scroll"
+  ],
   "author": "Dan Haggard",
   "devDependencies": {
     "babel-core": "^6.7.6",
