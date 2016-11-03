@@ -58,7 +58,7 @@ export const collapserItemControllerWrapper = (CollapserItemController) => {
         id: this.itemId,
         expanded: this.props.isOpenedInit,
       };
-      this.props.actions.addItem(this.parentCollapserId, item);
+      this.props.actions.addItem(this.parentCollapserId, item, this.itemId);
     }
 
     render() {

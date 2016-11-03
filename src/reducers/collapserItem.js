@@ -1,12 +1,9 @@
-import {
-  ADD_ITEM,
-  EXPAND_COLLAPSE,
-  EXPAND_COLLAPSE_ALL,
-  HEIGHT_READY,
-  REMOVE_ITEM,
-} from '../actions/const';
+import {combineReducers} from 'redux';
 
-import {checkAttr} from './utils';
+import {ADD_ITEM, EXPAND_COLLAPSE, EXPAND_COLLAPSE_ALL, HEIGHT_READY,
+  REMOVE_ITEM} from '../actions/const';
+
+import {checkAttr, addToState, removeFromState} from './utils';
 
 import selectors from '../selectors';
 const {getItemId, getItemExpanded} = selectors.collapserItem;
@@ -39,7 +36,7 @@ export const itemIdReducer = (state = null, action) => {
 };
 
 export const waitingForHeightReducer = (state = false, action) => {
-  const {expanded, areAllItemsExpanded} = checkAttr(action, 'payload');
+  const {item, areAllItemsExpanded} = checkAttr(action, 'payload');
   switch (action.type) {
     case ADD_ITEM:
     case HEIGHT_READY:
@@ -54,54 +51,30 @@ export const waitingForHeightReducer = (state = false, action) => {
         return true.
         note: !(!a && b) === a || !b;
       */
-      return areAllItemsExpanded || !expanded;
+      return areAllItemsExpanded || !getItemExpanded(item);
     default:
       return state;
   }
 };
 
 // handle state for individual items.
-export const itemReducer = (state = {}, action) => ({
-  expanded: expandedReducer(state.expanded, action),
-  id: itemIdReducer(state.id, action),
-  waitingForHeight: waitingForHeightReducer(state.waitingForHeight, action),
+const itemReducer = combineReducers({
+  expanded: expandedReducer,
+  id: itemIdReducer,
+  waitingForHeight: waitingForHeightReducer,
 });
 
 // handles items state
 export const itemsReducer = (state = {}, action) => {
-  const {item, itemId, items} = checkAttr(action, 'payload');
-  let newState;
+  const {itemId} = checkAttr(action, 'payload');
   switch (action.type) {
-    case ADD_ITEM:
-      newState = {...state};
-      newState[item.id] = itemReducer(undefined, action);
-      return newState;
     case REMOVE_ITEM:
-      newState = {...state};
-      delete newState[itemId];
-      return newState;
+      return removeFromState(state, itemId);
+    case ADD_ITEM:
     case HEIGHT_READY:
     case EXPAND_COLLAPSE:
-      newState = {...state};
-      newState[itemId] = itemReducer(state[itemId], action);
-      return newState;
     case EXPAND_COLLAPSE_ALL:
-      newState = {...state};
-      /*
-        itemReducer will need to know for each item what its current expanded
-        state is.  So we create a new action and insert that information.
-      */
-      items.forEach(id => {
-        const newAction = {
-          ...action,
-          payload: {
-            ...action.payload,
-            expanded: state[id].expanded,
-          },
-        };
-        newState[id] = itemReducer(state[id], newAction);
-      });
-      return newState;
+      return addToState(state, action, itemId, itemReducer);
     default:
       return state;
   }

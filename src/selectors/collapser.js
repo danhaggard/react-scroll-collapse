@@ -16,7 +16,7 @@ import {
   getAllNested,
   selectFunc,
 } from './utils';
-import {itemExpandedSelector, itemWaitingForHeightSelector} from './collapserItem';
+import {itemSelector, itemExpandedSelector, itemWaitingForHeightSelector} from './collapserItem';
 import {getNextIdFromObj} from '../reducers/utils';
 
 
@@ -57,7 +57,7 @@ export const childItemsSelector = createSelector(
 
 /*
   a reminder note about how createSelector works - with
-  respect to allChildItemsSelector as example.
+  respect to allChildItemsIdSelector as example.
 
   It is taking two arguments.  The first arg is:
     [allNestedCollapsersSelector, childItemsSelector]
@@ -76,13 +76,21 @@ export const childItemsSelector = createSelector(
   And this func is also a func that takes collapserId as it's arg.
 */
 
-// state => id => { all nested items of scrollerCollapser.entities.collapsers[id] }
-export const allChildItemsSelector = createSelector(
+// state => id => { all nested item ids of scrollerCollapser.entities.collapsers[id] }
+export const allChildItemsIdSelector = createSelector(
   [allNestedCollapsersSelector, childItemsSelector],
   (getAllNestedFromId, getAllItemsFromId) => collapserId => {
     const allNested = getAllNestedFromId(collapserId);
     return getAllItemsFromId(collapserId).concat(
       ...allNested.map(id => getAllItemsFromId(id)));
+  }
+);
+
+export const allChildItemsSelector = createSelector(
+  [allChildItemsIdSelector, itemSelector],
+  (getAllChildItemsFromId, getItemFromId) => collapserId => {
+    const allChildItemIds = getAllChildItemsFromId(collapserId);
+    return allChildItemIds.map(itemId => getItemFromId(itemId));
   }
 );
 
@@ -92,7 +100,7 @@ export const allChildItemsSelector = createSelector(
    itemIds of the collapser.
 */
 export const itemExpandedArrSelector = createSelector(
-  [allChildItemsSelector, itemExpandedSelector],
+  [allChildItemsIdSelector, itemExpandedSelector],
   (getAllChildItemsFromId, getItemExpandedFromId) => collapserId => {
     const allChildItemIds = getAllChildItemsFromId(collapserId);
     return allChildItemIds.map(itemId => getItemExpandedFromId(itemId));
@@ -100,7 +108,7 @@ export const itemExpandedArrSelector = createSelector(
 );
 
 export const itemWaitingForHeightArrSelector = createSelector(
-  [allChildItemsSelector, itemWaitingForHeightSelector],
+  [allChildItemsIdSelector, itemWaitingForHeightSelector],
   (getAllChildItemsFromId, getItemWaitingForHeightFromId) => collapserId => {
     const allChildItemIds = getAllChildItemsFromId(collapserId);
     return allChildItemIds.map(itemId => getItemWaitingForHeightFromId(itemId));

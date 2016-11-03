@@ -62,7 +62,7 @@ export const collapserControllerWrapper = (CollapserController) => {
       */
       const collapser = {id: this.collapserId};
       this.props.actions.addCollapser(this.parentScrollerId,
-        this.parentCollapserId, collapser);
+        this.parentCollapserId, collapser, this.collapserId);
       if (this.parentScrollerId >= 0) {
         this.props.actions.addScrollerChild(this.parentScrollerId, collapser);
       }

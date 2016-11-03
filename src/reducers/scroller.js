@@ -1,14 +1,10 @@
 import {combineReducers} from 'redux';
 
-import {
-  ADD_SCROLLER,
-  ADD_SCROLLER_CHILD,
-  REMOVE_SCROLLER,
-  REMOVE_SCROLLER_CHILD,
-  SCROLL_TO,
-} from '../actions/const';
+import {ADD_SCROLLER, ADD_SCROLLER_CHILD, REMOVE_SCROLLER,
+  REMOVE_SCROLLER_CHILD, SCROLL_TO} from '../actions/const';
 
-import {checkAttr, getNextIdFromArr} from './utils';
+import {checkAttr, getNextIdFromArr, addToState, removeFromState,
+  updateState} from './utils';
 
 //  handles the collapsers attr in scroller entities.
 export const scrollerCollapsersIdArrayReducer = (state = [], action) => {
@@ -75,28 +71,16 @@ const scrollerReducer = combineReducers({
 });
 
 export const scrollersReducer = (state = {}, action) => {
-  const {scroller, scrollerId} = checkAttr(action, 'payload');
-  let newState;
+  const {scrollerId} = checkAttr(action, 'payload');
   switch (action.type) {
     case ADD_SCROLLER:
-      newState = {...state};
-      newState[scroller.id] = scrollerReducer({}, action);
-      return newState;
+      return addToState(state, action, scrollerId, scrollerReducer);
     case REMOVE_SCROLLER:
-      newState = {...state};
-      delete newState[scrollerId];
-      return newState;
+      return removeFromState(state, scrollerId);
     case REMOVE_SCROLLER_CHILD:
-      newState = {...state};
-      if (newState[scrollerId]) {
-        newState[scrollerId] = scrollerReducer(state[scrollerId], action);
-      }
-      return newState;
     case ADD_SCROLLER_CHILD:
     case SCROLL_TO:
-      newState = {...state};
-      newState[scrollerId] = scrollerReducer(state[scrollerId], action);
-      return newState;
+      return updateState(state, action, scrollerId, scrollerReducer);
     default:
       return state;
   }

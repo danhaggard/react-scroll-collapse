@@ -1,11 +1,12 @@
 import { EXPAND_COLLAPSE_ALL } from './../const';
 
-function action(items, areAllItemsExpanded) {
+function action(item, areAllItemsExpanded, itemId) {
   return {
     type: EXPAND_COLLAPSE_ALL,
     payload: {
-      items,
+      item,
       areAllItemsExpanded,
+      itemId,
     },
   };
 }

@@ -1,44 +1,24 @@
 import {combineReducers} from 'redux';
 
-import {
-  ADD_COLLAPSER,
-  ADD_COLLAPSER_CHILD,
-  ADD_ITEM,
-  REMOVE_ITEM,
-  REMOVE_COLLAPSER,
-  REMOVE_COLLAPSER_CHILD
-} from '../actions/const';
+import {ADD_COLLAPSER, ADD_COLLAPSER_CHILD, ADD_ITEM, REMOVE_ITEM,
+  REMOVE_COLLAPSER, REMOVE_COLLAPSER_CHILD} from '../actions/const';
 
-import {checkAttr} from './utils';
+import {checkAttr, addToState, removeFromState, updateState} from './utils';
 
 /*
-  State shape
-  ===========
-  reactScrollCollapse.entities = {
-    ...entities,  -- (other reducers)
-    collapsers: {
-      0: {
-        collapsers: [array of collapserIds],
-        id: 0 (matches key)
-        items: [array of collapserItemIds]
-      },
-      ... and so on.
-    }
-  }
-
   Some notes regarding state:
 
   collapsers.(id).collapsers = is an array of collapserIds.  Represents the
-  list of elemets wrapped with collapserController  - who comprise the first
-  level of nested collapserController children.  i.e. they are the first collapsers
-  encountered nested within the current collapser (they don't have to be the immediate
-  children in the dom).  Array does not include ids of children of children.
+  list of collapserController components that are nested one collapser level below
+  the current.  Note - in the DOM a child collapser could still be arbitrarily
+  deep even if the immediate child of a particular collapser.
+  Array does not include ids of children of children - i.e. only 1 level of
+  depth.
 
   collapsers.(id).items - array of collapserItemIds.  Same principle - items
-  included can't be direct children on other collapsers - but again can be nested
-  arbitrarily deep in other components.
+  included can't be immediate children of other collapsers - but again can be nested
+  arbitrarily deep in other components in the DOM.
 */
-
 
 // handles the id attr for collapsers.
 export const collapserIdReducer = (state = null, action) => {
@@ -85,31 +65,18 @@ export const collapserReducer = combineReducers({
 
 /* handles reactScrollCollapse.entities.collapsers state */
 export const collapsersReducer = (state = {}, action) => {
-  const {collapser, collapserId, parentCollapserId} = checkAttr(action, 'payload');
-  let newState;
+  const {collapserId, parentCollapserId} = checkAttr(action, 'payload');
   switch (action.type) {
     case ADD_COLLAPSER:
-      newState = {...state};
-      newState[collapser.id] = collapserReducer(undefined, action);
-      return newState;
+      return addToState(state, action, collapserId, collapserReducer);
     case ADD_COLLAPSER_CHILD:
     case REMOVE_COLLAPSER_CHILD:
-      newState = {...state};
-      if (state[parentCollapserId]) {
-        newState[parentCollapserId] = collapserReducer(state[parentCollapserId], action);
-      }
-      return newState;
+      return updateState(state, action, parentCollapserId, collapserReducer);
     case REMOVE_COLLAPSER:
-      newState = {...state};
-      delete newState[collapserId];
-      return newState;
+      return removeFromState(state, collapserId);
     case ADD_ITEM:
     case REMOVE_ITEM:
-      newState = {...state};
-      if (collapserId in state) {
-        newState[collapserId] = collapserReducer(state[collapserId], action);
-      }
-      return newState;
+      return updateState(state, action, collapserId, collapserReducer);
     default:
       return state;
   }

@@ -10,3 +10,23 @@ export const getNextIdFromObj = (obj) => {
   const keys = Object.keys(obj);
   return getNextIdFromArr(keys);
 };
+
+export const addToState = (state, action, id, reducer) => {
+  const newState = {...state};
+  newState[id] = reducer(state[id], action);
+  return newState;
+};
+
+export const updateState = (state, action, id, reducer) => {
+  const newState = {...state};
+  if (id in newState) {
+    newState[id] = reducer(state[id], action);
+  }
+  return newState;
+};
+
+export const removeFromState = (state, id) => {
+  const newState = {...state};
+  delete newState[id];
+  return newState;
+};

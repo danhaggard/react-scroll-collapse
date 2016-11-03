@@ -31,7 +31,9 @@ export const collapserWrapper = (WrappedComponent) => {
           this.props.parentScrollerId,
           this.props.collapserId,
         );
-        this.props.actions.expandCollapseAll(allChildItems, areAllItemsExpanded);
+        allChildItems.forEach(item => {
+          this.props.actions.expandCollapseAll(item, areAllItemsExpanded, item.id);
+        });
       };
     }
 
@@ -61,19 +63,24 @@ export const collapserWrapper = (WrappedComponent) => {
     }
 
     /*
-      shouldComponentUpdate is necesssary at the moment to prevent unecessary renders caused
-      by the allChildItemsSelector returning an array.  The array is a different
-      object no matter what so reselect doesn't memoize it.  I did try a quick
-      fix of replacing createSelector's identity function to the lodash isEqual,
-      but no luck.  Probably will require either different memoization function
-      or better selector composition to match reselect docs.
+      shouldComponentUpdate used to prevent unecessary renders caused
+      by the allChildItemsSelector returning an array of item objects.  If any
+      item changes one of it's properties a re-render is forced on the entire
+      collapser.
 
-      the should component update solution below is stopgap.
+      Using the entire item object made the reducers cleaner - and using just
+      an array of ids had a similar problem because the selectors were creating
+      arrays with distinct object ids even when equivlent.
+
+      This check could get expensive though.  Ideally we want a selector
+      that can properly memoize the array of item ids - and find some other
+      way to keep the reducers clean.
     */
     shouldComponentUpdate(nextProps) {
       let shouldUpdate = true;
       // don't update if the two arrays have the same ids...
-      shouldUpdate = !isEqual(this.props.allChildItems, nextProps.allChildItems);
+      shouldUpdate = !isEqual(this.props.allChildItems.map(item => item.id),
+        nextProps.allChildItems.map(item => item.id));
       if (!shouldUpdate) {
         // unless some other prop has changed...
         Object.keys(this.props).forEach(prop => {
