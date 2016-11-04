@@ -1,6 +1,6 @@
 {
   "name": "react-scroll-collapse",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "React / redux component wrappers for auto-scrolling react-collapse components",
   "main": "dist/index.js",
   "license": "MIT",
@@ -51,7 +51,6 @@
     "babel-preset-react": "^6.5.0",
     "babel-register": "^6.18.0",
     "chai": "^3.5.0",
-    "classnames": "^2.2.5",
     "classnames": "^2.2.5",
     "copyfiles": "^1.0.0",
     "cross-env": "^3.1.3",
