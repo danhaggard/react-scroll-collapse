@@ -94,6 +94,10 @@ and using those libraries.
 ### <Scroller>
 
 #### Usage
+
+For the auto-scroll functionality to work, components wrapped with collapserController
+should be nested within the scope of <Scroller>.  collapserControllerItem wrapped
+components should be nested in the scope of the
 ```
 import Scroller from 'react-scroll-collapse';
 
@@ -101,16 +105,26 @@ import Scroller from 'react-scroll-collapse';
 
 <Scroller>
   ...
-  <YourComponent - wrapped by collapserController>
+  <YourComponent - wrapped by collapserController>  // nested under Scroller
     ...
-    <AnotherComponent - wrapped by collapserControllerItem />
+    <AnotherComponent - wrapped by collapserControllerItem />  // nested under a collapserController
   </YourComponent>
+
+  or...
+
+  <YourComponent - wrapped by collapserController>  // nested under Scroller
+    ...
+    <AnotherComponent - wrapped by collapserControllerItem />  // nested under a collapserController
+    <ThirdComponent wrapped by collapserController> // you can nest collapserControllers under each other
+      <FourthComponent wrapped by collapserControllerItem />
+    </ThirdComponent>
+  </YourComponent>
+
 </Scroller>
 ```
 
 You can see this component implemented in the examples folder [here](https://github.com/danhaggard/react-scroll-collapse/blob/master/examples/components/App.js)
 
-Note - Scrollers seem to be nestable - but I haven't tested this extensively.
 
 #### <Scroller> - Props
 
@@ -134,8 +148,10 @@ default style is applied using css modules:
 
 It is possible to overwrite this default - but will probably break things.
 
-The scroll to top functionality relies on the <Scroller> DOM element being the first relatively positioned parent.  Other then this limitation - wrapped child
-collapserController and collapserItemController elements can be as deeply nested in other components as you like.
+The scroll to top functionality relies on the <Scroller> DOM element being the
+first relatively positioned parent.  Other then this limitation - wrapped child
+collapserController and collapserItemController elements can be as deeply nested
+in other components as you like.
 
 
 ### collapserController()
@@ -143,13 +159,14 @@ collapserController and collapserItemController elements can be as deeply nested
 collapserController provides controls to expand/collapse all child components
 wrapped with collapserControllerItem.
 
-Components wrapped with collapserController must be a child of the Scroller
+Components wrapped with collapserController must be a child of a Scroller
 component (but do not have to be immediate children).
 
-You can nest wrapped collapserController components within other collapserController components (again they don't have to be immediate children).
+You can nest wrapped collapserController components within other collapserController
+components (again they don't have to be immediate children).
 
 But - at the moment - you can't nest them within components wrapped with the
-collapserItemController wrapper.  (Well - you can try!)
+collapserItemController wrapper.
 
 #### Usage
 ```
@@ -184,9 +201,10 @@ Because it's a HoC wrapper - collapserController passes props to your component.
 
 ##### expandCollapseAll : PropTypes.func
 
-Calling this function in your component will expand/collapse any components
-wrapped with the collapserItemController HoC; scrolling your component to the
-top of the scroller.
+Calling this function in your component will scroll your component to the top
+of the parent <Scroller> component and expand/collapse any components
+wrapped with the collapserItemController HoC nested within the scope of the
+collapserController.
 
 If some children are expanded and some collapsed then it will expand them all.
 
@@ -197,8 +215,8 @@ A boolean telling your component if all the child collapserItems are expanded.
 Use this to display information to the user about whether it will expand its
 children or close them the next time expandCollapseAll is called.
 
-If areAllItemsExpanded is true, then the next call will collapse all expand
-children - otherwise it will expand all children.
+If areAllItemsExpanded is true, then the next expandCollapseAll call will
+collapse all expand children - otherwise it will expand all children.
 
 
 ##### collapserId, parentCollapserId, parentScrollerId : PropTypes.number
@@ -213,6 +231,7 @@ that uses the [react-collapse](https://github.com/nkbt/react-collapse) <Collapse
 component.  The actual collapse/expand animation is handled by <Collapse> so
 consult its docs for usage information.
 
+
 #### Usage
 ```
 import Collapse from 'react-collapse';
@@ -225,7 +244,7 @@ class YourComponent extends Component {
   render() {
     const {isOpened, onHeightReady, expandCollapse} = this.props;
     return (
-      <div onClick={expandCollapse}>
+      <div onClick={expandCollapse}> // use expandCollapse as an event callback.
         ...
         <Collapse
           isOpened={isOpened}    // make sure you pass the isOpened prop to <Collapse> !!
@@ -289,11 +308,13 @@ These are the ids used in redux to track components.
 ### Running the example demo
 
 ```
-git@github.com:danhaggard/react-scroll-collapse.git
+git clone https://github.com/danhaggard/react-scroll-collapse.git
 cd react-scroll-collapse
 npm install
 npm start
 ```
+
+Demo content will be served at http://localhost:8080
 
 ### Testing
 

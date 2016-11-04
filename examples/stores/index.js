@@ -10,7 +10,7 @@ function reduxStore(initialState) {
   const middleware = applyMiddleware(...[sagaMiddleware]);
   let enhancer;
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production' && window.devToolsExtension) {
     enhancer = compose(
       middleware,
       window.devToolsExtension && window.devToolsExtension(),
