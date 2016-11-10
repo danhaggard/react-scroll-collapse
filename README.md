@@ -128,11 +128,27 @@ You can see this component implemented in the examples folder [here](https://git
 
 #### <Scroller> - Props
 
+##### onRest : PropTypes.function
+
+Scroller makes use of the [react-motion](https://github.com/chenglou/react-motion)
+<Motion> component to perform the scrolling animation.  The onRest prop is passed
+directly into the <Motion> component.  It is a callback that is fired when the
+animation is finished.  Consult the react-motion docs for more information.
+
+##### scrollTo : PropTypes.number
+
+Scroller will scroll to the offsetTop value of the nested collapserControllerItem
+that has its expandCollapse function called.  You can over ride this completely
+by setting a value for this prop.
+
+##### offsetScrollTo : PropTypes.number
+
+Alternatively you can set an offset that will be added to the offsetTop value.
+
 ##### springConfig : PropTypes.object (default: {stiffness: 170, damping: 20})
 
-Scroller makes use of [react-motion](https://github.com/chenglou/react-motion) to
-perform the scrolling animation.  You can change the style of animation using
-the springConfig prop.  Consult the react-motion docs on using animation springs.
+You can change the style of animation using the springConfig prop.  Consult the
+react-motion docs on using animation springs.
 
 ##### className, style
 

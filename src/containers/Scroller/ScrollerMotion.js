@@ -72,10 +72,25 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
     componentDidUpdate() {
       if (this.state.prevRenderType === 'uiSync') {
         this.setState({
-          motionStyle: {y: spring(this.props.offsetTop, this.state.springConfig)},
+          motionStyle: {y: spring(this.getScrollTo(),
+            this.state.springConfig)},
           prevRenderType: 'autoScroll',
         });
       }
+    }
+
+    /*
+      If scrollTo prop passed a value - use that.  Otherwise use the current
+      offsetTop value added to any supplied offset.
+    */
+    getScrollTo() {
+      const {offsetTop, scrollTo} = this.props;
+      let {offsetScrollTo} = this.props;
+      if (typeof scrollTo === 'number') {
+        return scrollTo;
+      }
+      offsetScrollTo = offsetScrollTo === undefined || null ? 0 : offsetScrollTo;
+      return offsetTop + offsetScrollTo;
     }
 
 
@@ -127,9 +142,11 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
     actions: PropTypes.object.isRequired,
     children: PropTypes.node,
     className: PropTypes.string,
+    offsetScrollTo: PropTypes.number,
     offsetTop: PropTypes.number.isRequired,
     onRest: PropTypes.func,
     scrollerId: PropTypes.number.isRequired,
+    scrollTo: PropTypes.number,
     scrollTop: PropTypes.number.isRequired,
     springConfig: PropTypes.object,
     style: PropTypes.object,
