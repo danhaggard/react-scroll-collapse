@@ -1,7 +1,7 @@
-import {collapserInitWatch} from './collapser';
-import {scrollerInitWatch} from './scroller';
+import { collapserInitWatch } from './collapser';
+import { scrollerInitWatch } from './scroller';
 
-export function *reactScrollCollapseSagas() {
+export function* reactScrollCollapseSagas() {
   yield [
     collapserInitWatch(),
     scrollerInitWatch(),

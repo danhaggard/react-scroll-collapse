@@ -10,4 +10,4 @@ function action(scrollerId, collapser) {
   };
 }
 
-module.exports = action;
+export default action;

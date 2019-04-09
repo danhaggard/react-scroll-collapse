@@ -1,28 +1,37 @@
-import {createSelector} from 'reselect';
+import { createSelector } from 'reselect';
 
 /* helper funcs used by all components */
-
 
 export const isUndefNull = val => val === null || val === undefined;
 
 // ensure state slice and attribute exist - else return null;
-export const selector = (state, attr) => {
+export const selector = (state, attr, defaultValue = null) => {
   if (isUndefNull(state)) {
     // return now to prevent access of state[attr]
-    return null;
+    return defaultValue;
   }
   if (!isUndefNull(state[attr])) {
     return state[attr];
   }
-  return null;
+  return defaultValue;
 };
 
-export const ifNotFirstSec = (firstVal, secondVal) =>
-  (isUndefNull(firstVal) ? secondVal : firstVal);
+export const getNextIdFactory = (initialId = -1) => {
+  let currentId = initialId;
+  return () => {
+    currentId += 1;
+    return currentId;
+  };
+};
+
+export const ifNotFirstSec = (
+  firstVal,
+  secondVal
+) => (isUndefNull(firstVal) ? secondVal : firstVal);
 
 export const arrSelector = (state, attr) => (state && state[attr] ? state[attr] : []);
 
-export const selectFunc = getAttrFunc => innerSelectFunc => stateId => {
+export const selectFunc = getAttrFunc => innerSelectFunc => (stateId) => {
   const state = innerSelectFunc(stateId);
   return getAttrFunc(state);
 };
@@ -59,7 +68,7 @@ export const getAllNested = (id, selectorFunc) => {
 };
 
 /* common state selectors */
-export const reactScrollCollapseSelector = (state) => selector(state, 'reactScrollCollapse');
+export const reactScrollCollapseSelector = state => selector(state, 'reactScrollCollapse');
 
 export const entitiesSelector = createSelector(
   reactScrollCollapseSelector, reactScrollCollapse => selector(reactScrollCollapse, 'entities')

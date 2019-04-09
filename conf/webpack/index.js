@@ -1,9 +1,10 @@
-import base from './base';
-import dev from './dev';
-import ghPages from './gh-pages';
-import dist from './dist';
-import test from './test';
+export base from './base';
+export development from './dev';
+export ghPages from './gh-pages';
+export dist from './dist';
+export test from './test';
 
+/*
 module.exports = {
   base,
   dev,
@@ -11,3 +12,4 @@ module.exports = {
   test,
   ghPages,
 };
+*/

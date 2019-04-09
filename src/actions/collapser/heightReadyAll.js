@@ -4,4 +4,4 @@ function action() {
   return { type: HEIGHT_READY_ALL };
 }
 
-module.exports = action;
+export default action;

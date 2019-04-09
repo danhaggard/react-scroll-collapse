@@ -17,8 +17,8 @@ import Scroller from './containers/Scroller';
     export default collapserController(YourConnectedCollapserComponent);
 
 */
-export {collapserController} from './wrappers/collapser';
-export {collapserItemController} from './wrappers/collapserItem';
+export { collapserController } from './wrappers/collapser';
+export { collapserItemController } from './wrappers/collapserItem';
 
 /*
   The reducers file is named as the state name space required ('reactScrollCollapse')
@@ -28,8 +28,8 @@ export {collapserItemController} from './wrappers/collapserItem';
     reactScrollCollapse,
   });
 */
-export {reactScrollCollapse} from './reducers';
+export { reactScrollCollapse } from './reducers';
 
 /* root sagas func name: reactScrollCollapseSagas */
-export {reactScrollCollapseSagas} from './sagas';
+export { reactScrollCollapseSagas } from './sagas';
 export default Scroller;

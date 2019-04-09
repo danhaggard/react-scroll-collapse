@@ -1,0 +1,56 @@
+{
+  "extends": [
+    "airbnb",
+    "plugin:jsx-a11y/recommended"
+  ],
+  "parser": "babel-eslint",
+  "env": {
+    "browser": true,
+    "node": true,
+    "jest": true
+  },
+  "plugins": [
+      "import",
+      "jsx-a11y",
+      "react",
+      "react-hooks"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 8,
+    "sourcetype": "module",
+    "ecmaFeatures": {
+      "experimentalObjectRestSpread": true,
+      "jsx": true
+    }
+  },
+  "rules": {
+    "comma-dangle": ["off"],
+    "import/no-unresolved": ["error", {
+      "ignore": [
+        "config",
+        "src/"
+      ]
+    }],
+    "class-methods-use-this": ["off"],
+    "import/no-extraneous-dependencies": ["error", {"devDependencies": true, "optionalDependencies": false, "peerDependencies": false}],
+    "no-return-assign": [2, "except-parens"],
+    "no-mixed-operators": ["error", {"allowSamePrecedence": true}],
+    "no-unused-vars": ["warn"],
+    "no-underscore-dangle": [ "error", { "allowAfterThis": true }],
+    "padded-blocks": ["off"],
+    "react/jsx-closing-bracket-location": ["off"],
+    "react/jsx-space-before-closing": ["off"],
+    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+    "react/jsx-uses-react": "error",
+    "react/jsx-uses-vars": "error",
+    "react/no-did-update-set-state": ["warn"],
+    "react/prefer-stateless-function": ["off"],
+    "react/forbid-prop-types": ["off"],
+    "react/destructuring-assignment": [1],
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
+  },
+  "globals": {
+    "DEVELOPMENT": true
+  }
+}

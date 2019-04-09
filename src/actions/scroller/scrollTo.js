@@ -11,4 +11,4 @@ function action(scrollerId, offsetTop, scrollTop) {
   };
 }
 
-module.exports = action;
+export default action;

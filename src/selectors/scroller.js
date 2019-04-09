@@ -1,11 +1,10 @@
-import {createSelector} from 'reselect';
+import { createSelector } from 'reselect';
 import {
   selector,
   entitiesSelector,
   selectFunc,
-  reactScrollCollapseSelector,
+  getNextIdFactory
 } from './utils';
-import {getNextIdFromArr} from '../reducers/utils';
 
 export const getScrollers = entities => selector(entities, 'scrollers');
 
@@ -18,12 +17,7 @@ export const getToggleScroll = scroller => selector(scroller, 'toggleScroll');
 
 export const getScrollerIdArray = scrollerCollapser => selector(scrollerCollapser, 'scrollers');
 
-export const nextScrollerIdSelector = createSelector(
-  reactScrollCollapseSelector, reactScrollCollapse => {
-    const scrollerIdArray = getScrollerIdArray(reactScrollCollapse);
-    return getNextIdFromArr(scrollerIdArray);
-  }
-);
+export const nextScrollerIdSelector = getNextIdFactory();
 
 export const scrollersSelector = createSelector(entitiesSelector, getScrollers);
 

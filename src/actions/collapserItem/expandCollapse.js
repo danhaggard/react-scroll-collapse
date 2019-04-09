@@ -9,4 +9,4 @@ function action(itemId) {
   };
 }
 
-module.exports = action;
+export default action;

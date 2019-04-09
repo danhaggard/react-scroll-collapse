@@ -1,13 +1,11 @@
-import { HEIGHT_READY } from './../const';
+import { HEIGHT_READY } from '../const';
 
-function action(collapserId, itemId) {
-  return {
-    type: HEIGHT_READY,
-    payload: {
-      collapserId,
-      itemId,
-    },
-  };
-}
+const heightReady = (collapserId, itemId) => ({
+  type: HEIGHT_READY,
+  payload: {
+    collapserId,
+    itemId,
+  },
+});
 
-module.exports = action;
+export default heightReady;

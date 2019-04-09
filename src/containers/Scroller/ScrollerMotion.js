@@ -1,16 +1,19 @@
-import React, {PropTypes, Component} from 'react';
-import {Motion, spring} from 'react-motion';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { Motion, spring } from 'react-motion';
 
-import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 
-import {watchInitialise} from '../../actions';
+import { ofFuncTypeOrNothing, ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
 
+import actions from '../../actions';
 import selectors from '../../selectors';
-const {offsetTopSelector, scrollTopSelector, toggleScrollSelector} = selectors.scroller;
 
 import Scroller from '../../components/Scroller';
 
+const { offsetTopSelector, scrollTopSelector, toggleScrollSelector } = selectors.scroller;
+const { watchInitialise } = actions;
 
 const scrollerMotionWrapper = (ScrollerComponent) => {
 
@@ -28,8 +31,8 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
     constructor(props) {
       super(props);
       this.state = {
-        springConfig: {stiffness: 170, damping: 20},
-        motionStyle: {y: 0},
+        springConfig: { stiffness: 170, damping: 20 },
+        motionStyle: { y: 0 },
         prevRenderType: null,
       };
     }
@@ -38,15 +41,17 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
       Initiate a saga to watch this Scroller for ExpandCollapse/All actions.
     */
     componentDidMount() {
-      this.props.actions.watchInitialise(this.props.scrollerId, this.child.getScrollTop);
+      const { scrollerId } = this.props;
+      this.props.actions.watchInitialise(scrollerId, this.child.getScrollTop); // eslint-disable-line
     }
 
     componentWillReceiveProps(nextProps) {
+      const { springConfig, toggleScroll } = this.props;
       /*
         springConfig overide default -  when supplied by parent.
       */
-      if (this.props.springConfig !== nextProps.springConfig) {
-        this.setState({springConfig: nextProps.springConfig});
+      if (springConfig !== nextProps.springConfig) {
+        this.setState({ springConfig: nextProps.springConfig });
       }
 
       /*
@@ -54,9 +59,9 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
         see:
         https://github.com/danhaggard/react-scroll-collapse/issues/2#issue-186472122
       */
-      if (this.props.toggleScroll !== nextProps.toggleScroll) {
+      if (toggleScroll !== nextProps.toggleScroll) {
         this.setState({
-          motionStyle: {y: nextProps.scrollTop},
+          motionStyle: { y: nextProps.scrollTop },
           prevRenderType: 'uiSync',
         });
       }
@@ -70,10 +75,12 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
      a scrollTop ui sync so we don't get infinite loop.
      */
     componentDidUpdate() {
-      if (this.state.prevRenderType === 'uiSync') {
-        this.setState({
-          motionStyle: {y: spring(this.getScrollTo(),
-            this.state.springConfig)},
+      const { prevRenderType, springConfig } = this.state;
+      if (prevRenderType === 'uiSync') {
+        this.setState({ // eslint-disable-line react/no-did-update-set-state
+          motionStyle: {
+            y: spring(this.getScrollTo(), springConfig)
+          },
           prevRenderType: 'autoScroll',
         });
       }
@@ -84,8 +91,8 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
       offsetTop value added to any supplied offset.
     */
     getScrollTo() {
-      const {offsetTop, scrollTo} = this.props;
-      let {offsetScrollTo} = this.props;
+      const { offsetTop, scrollTo } = this.props;
+      let { offsetScrollTo } = this.props;
       if (typeof scrollTo === 'number') {
         return scrollTo;
       }
@@ -95,8 +102,15 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
 
 
     render() {
-      const {children, scrollerId, style, className, onRest} = this.props;
+      const {
+        children,
+        scrollerId,
+        style,
+        className,
+        onRest
+      } = this.props;
 
+      const { motionStyle } = this.state;
       /*
         The use of the ref in ScrollerComponent allows ScrollerMotion
         to access the methods we defined on Scroller using ref.  In this case
@@ -104,14 +118,15 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
       */
       const scroller = (
         <ScrollerComponent
-          children={children}
           className={className}
-          ref={child => {
+          ref={(child) => {
             this.child = child;
           }}
           scrollerId={scrollerId}
           style={style}
-        />
+        >
+          { children }
+        </ScrollerComponent>
       );
 
       /*
@@ -127,30 +142,44 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
         this.child.setScrollTop(val.y);
         return scroller;
       } : () => scroller;
-
       return (
         <Motion
           onRest={onRest}
-          style={this.state.motionStyle} >
+          style={motionStyle}>
           {motionChild}
         </Motion>
       );
     }
   }
 
+  ScrollerMotion.defaultProps = {
+    children: [],
+    className: '',
+    offsetScrollTo: null,
+    offsetTop: null,
+    onRest: null,
+    scrollerId: null,
+    scrollTo: null,
+    scrollTop: null,
+    springConfig: {},
+    style: {},
+    // redux sets default as well - but this renders before that state is set.  TODO: investigate
+    toggleScroll: false,
+  };
+
   ScrollerMotion.propTypes = {
     actions: PropTypes.object.isRequired,
     children: PropTypes.node,
     className: PropTypes.string,
-    offsetScrollTo: PropTypes.number,
-    offsetTop: PropTypes.number.isRequired,
-    onRest: PropTypes.func,
-    scrollerId: PropTypes.number.isRequired,
-    scrollTo: PropTypes.number,
-    scrollTop: PropTypes.number.isRequired,
+    offsetScrollTo: ofNumberTypeOrNothing,
+    offsetTop: ofNumberTypeOrNothing,
+    onRest: ofFuncTypeOrNothing,
+    scrollerId: ofNumberTypeOrNothing,
+    scrollTo: ofNumberTypeOrNothing,
+    scrollTop: ofNumberTypeOrNothing,
     springConfig: PropTypes.object,
     style: PropTypes.object,
-    toggleScroll: PropTypes.bool.isRequired,
+    toggleScroll: PropTypes.bool,
   };
 
   return ScrollerMotion;
@@ -167,7 +196,7 @@ const mapStateToProps = (state, ownProps) => ({
   toggleScroll: toggleScrollSelector(state)(ownProps.scrollerId)
 });
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators({
     watchInitialise,
   }, dispatch),

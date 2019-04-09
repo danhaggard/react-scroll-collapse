@@ -1,25 +1,31 @@
-import React, {PropTypes} from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
+
+import { presets } from 'react-motion';
+import { UnmountClosed as Collapse } from 'react-collapse';
+import CommentBody from '../CommentBody';
+
+import { collapserItemController } from '../../../src';
 import styles from './Comment.scss';
-
-import {presets} from 'react-motion';
-import Collapse from 'react-collapse';
-import CommentBody from './../CommentBody';
-
-import {collapserItemController} from '../../../src';
 
 
 const Comment = (props) => {
-  const {isOpened, onHeightReady, deleteThread, addToThread, itemId} = props;
-  let {text} = props;
+  const {
+    isOpened,
+    onHeightReady,
+    deleteThread,
+    addToThread,
+    itemId
+  } = props;
+  let { text } = props;
   const idStr = itemId.toString();
   text = `Collapser Item ${idStr}: --- ${text}`;
   return (
     <div className={styles.comment}>
       <Collapse
-        keepCollapsedContent
         isOpened={isOpened}
         springConfig={presets.noWobble}
-        onHeightReady={onHeightReady}
+        onMeasure={onHeightReady}
       >
         <CommentBody text={text} />
         {deleteThread}
@@ -31,12 +37,11 @@ const Comment = (props) => {
 
 Comment.propTypes = {
   deleteThread: PropTypes.node,
-  addToThread: PropTypes.node,
-  expandCollapse: PropTypes.func, // provided by collapserItemController
+  addToThread: PropTypes.node.isRequired,
   isOpened: PropTypes.bool.isRequired, // provided by collapserItemController
-  itemId: PropTypes.number, // provided by collapserItemController
+  itemId: PropTypes.number.isRequired, // provided by collapserItemController
   onHeightReady: PropTypes.func.isRequired, // provided by collapserItemController
-  text: PropTypes.string,
+  text: PropTypes.string.isRequired,
 };
 
 export default collapserItemController(Comment); // wrap and export your component

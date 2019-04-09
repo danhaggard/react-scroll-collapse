@@ -25,7 +25,7 @@ function reduxStore(initialState) {
 
   if (module.hot) {
     module.hot.accept('../reducers', () => {
-      const nextReducer = require('../reducers');  // eslint-disable-line global-require
+      const nextReducer = require('../reducers'); // eslint-disable-line global-require
       store.replaceReducer(nextReducer);
     });
   }

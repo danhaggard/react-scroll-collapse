@@ -1,13 +1,21 @@
-import React, {PropTypes, Component} from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 
-import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 
-import {watchCollapser, setOffsetTop, expandCollapse, heightReady} from '../../actions';
+import actions from '../../actions';
 
 import selectors from '../../selectors';
-const {itemExpandedSelector} = selectors.collapserItem;
+
+const { itemExpandedSelector } = selectors.collapserItem;
+const {
+  watchCollapser,
+  setOffsetTop,
+  expandCollapse,
+  heightReady
+} = actions;
 
 
 /*
@@ -36,13 +44,14 @@ export const collapserItemWrapper = (WrappedComponent) => {
           called for every wrapped <Collapse> element in the Collapser.
       */
       this.expandCollapse = () => {
-        this.props.actions.watchCollapser(this.props.parentCollapserId);
+        const { itemId, parentScrollerId, parentCollapserId } = this.props;
+        this.props.actions.watchCollapser(parentCollapserId);
         this.props.actions.setOffsetTop(
           () => this.elem.offsetTop,
-            this.props.parentScrollerId,
-            this.props.parentCollapserId,
+          parentScrollerId,
+          parentCollapserId,
         );
-        props.actions.expandCollapse(this.props.itemId);
+        props.actions.expandCollapse(itemId);
       };
       /*
         Callback to let the collapser know that the height calculated by this
@@ -50,7 +59,8 @@ export const collapserItemWrapper = (WrappedComponent) => {
         unless it sees the HEIGHT_READY action.
       */
       this.onHeightReady = () => {
-        props.actions.heightReady(this.props.parentCollapserId, this.props.itemId);
+        const { itemId, parentCollapserId } = this.props;
+        props.actions.heightReady(parentCollapserId, itemId);
       };
     }
 
@@ -59,7 +69,7 @@ export const collapserItemWrapper = (WrappedComponent) => {
     }
 
     render() {
-      const {isOpened, actions, ...other} = this.props;
+      const { isOpened, actions, ...other } = this.props;
       return (
         <WrappedComponent
           {...other}
@@ -72,7 +82,7 @@ export const collapserItemWrapper = (WrappedComponent) => {
   }
 
   CollapserItemController.propTypes = {
-    actions: PropTypes.object,
+    actions: PropTypes.object.isRequired,
     isOpened: PropTypes.bool.isRequired,
     itemId: PropTypes.number.isRequired,
     parentCollapserId: PropTypes.number.isRequired,
@@ -84,7 +94,7 @@ export const collapserItemWrapper = (WrappedComponent) => {
     isOpened: itemExpandedSelector(state)(ownProps.itemId),
   });
 
-  const mapDispatchToProps = (dispatch) => ({
+  const mapDispatchToProps = dispatch => ({
     actions: bindActionCreators({
       expandCollapse,
       heightReady,
@@ -100,3 +110,5 @@ export const collapserItemWrapper = (WrappedComponent) => {
 
   return CollapserItemControllerConnect;
 };
+
+export default collapserItemWrapper;

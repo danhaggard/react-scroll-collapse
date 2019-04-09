@@ -10,4 +10,4 @@ function action(scrollerId, getScrollTop) {
   };
 }
 
-module.exports = action;
+export default action;

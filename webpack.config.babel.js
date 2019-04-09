@@ -1,10 +1,51 @@
-import {dev, dist, ghPages, test} from './conf/webpack';
+/*
+import {
+  dev,
+  dist,
+  ghPages,
+  test
+} from './conf/webpack';
+*/
 
+const path = require('path');
+
+const prodConfig = require('./config/webpack.production.config.js');
+const devConfig = require('./config/webpack.development.config.js');
+// const testConfig = require('./config/webpack.test.config.js');
+
+const EXAMPLES_PATH = path.join(__dirname, 'examples');
+const BUNDLES_PATH = path.resolve(EXAMPLES_PATH, 'bundles');
+
+const OPTIONS = {
+  PROJECT_ROOT: __dirname,
+  BUNDLES_PATH,
+  DIST_PATH: path.join(__dirname, 'dist'),
+  EXAMPLES_PATH,
+  SRC_PATH: path.join(__dirname, 'src'),
+  DEVELOPMENT: process.env.NODE_ENV === 'development',
+  PRODUCTION: process.env.NODE_ENV === 'production',
+  TEST: process.env.NODE_ENV === 'test',
+};
+
+module.exports = (() => {
+  switch (process.env.NODE_ENV) {
+    case 'production':
+      return prodConfig;
+    case 'development':
+      return devConfig;
+    // case 'test':
+      // return testConfig;
+    default:
+      return devConfig;
+  }
+})()(OPTIONS);
 
 /**
  * The main webpack configuration.
  * @returns {object} - returns a webpack config object
  */
+
+/*
 const OPTIONS = {
   PROJECT_ROOT: __dirname,
   NODE_ENV: process.env.NODE_ENV,
@@ -26,3 +67,4 @@ const config = (() => {
 })()(OPTIONS);
 
 export default config;
+*/

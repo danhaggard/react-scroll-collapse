@@ -1,15 +1,13 @@
-import { ADD_COLLAPSER } from './../const';
+import { ADD_COLLAPSER } from '../const';
 
-function action(scrollerId, parentCollapserId, collapser, collapserId) {
-  return {
-    type: ADD_COLLAPSER,
-    payload: {
-      collapser,
-      collapserId,
-      parentCollapserId,
-      scrollerId,
-    },
-  };
-}
+const addCollapser = (scrollerId, parentCollapserId, collapser, collapserId) => ({
+  type: ADD_COLLAPSER,
+  payload: {
+    collapser,
+    collapserId,
+    parentCollapserId,
+    scrollerId,
+  }
+});
 
-module.exports = action;
+export default addCollapser;

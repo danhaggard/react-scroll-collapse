@@ -1,6 +1,7 @@
-import React, {PropTypes, Component} from 'react';
-import styles from './Scroller.scss';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import classnames from 'classnames';
+import styles from './Scroller.scss';
 
 
 /*
@@ -36,13 +37,12 @@ class Scroller extends Component {
     wrapping Scroller.
   */
   render() {
-    const {className, children, style} = this.props;
+    const { className, children, style } = this.props;
     return (
       <div
-        children={children}
         className={this.getClassName(className)}
         style={style}
-        ref={elemArg => {
+        ref={(elemArg) => {
           this.elem = elemArg;
           this.getScrollTop = () => (this.elem ? this.elem.scrollTop : null);
           this.setScrollTop = (val) => {
@@ -52,7 +52,9 @@ class Scroller extends Component {
             return null;
           };
         }}
-      />
+      >
+        { children }
+      </div>
     );
   }
 }

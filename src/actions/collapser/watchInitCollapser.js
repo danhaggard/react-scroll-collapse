@@ -9,4 +9,4 @@ function action(collapserId) {
   };
 }
 
-module.exports = action;
+export default action;

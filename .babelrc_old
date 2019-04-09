@@ -1,0 +1,13 @@
+{
+  "presets": [
+    ["es2015", {"modules": false}],
+    "react",
+    "airbnb"
+  ],
+  "plugins": [
+    "add-module-exports",
+    "transform-decorators-legacy",
+    "transform-object-rest-spread",
+    "transform-runtime",
+  ]
+}

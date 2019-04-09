@@ -11,4 +11,4 @@ function action(item, areAllItemsExpanded, itemId) {
   };
 }
 
-module.exports = action;
+export default action;

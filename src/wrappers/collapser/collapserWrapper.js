@@ -1,14 +1,21 @@
-import React, {PropTypes, Component} from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import isEqual from 'lodash/isEqual';
 
-import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
-import {watchCollapser, watchInitCollapser,
-  setOffsetTop, expandCollapseAll} from '../../actions';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import actions from '../../actions';
 
 import selectors from '../../selectors';
-const {allChildItemsSelector, areAllItemsExpandedSelector} = selectors.collapser;
+
+const { allChildItemsSelector, areAllItemsExpandedSelector } = selectors.collapser;
+const {
+  watchCollapser,
+  watchInitCollapser,
+  setOffsetTop,
+  expandCollapseAll
+} = actions;
 
 
 export const collapserWrapper = (WrappedComponent) => {
@@ -39,7 +46,7 @@ export const collapserWrapper = (WrappedComponent) => {
           this.props.parentScrollerId,
           this.props.collapserId,
         );
-        allChildItems.forEach(item => {
+        allChildItems.forEach((item) => {
           this.props.actions.expandCollapseAll(item, areAllItemsExpanded, item.id);
         });
       };
@@ -85,13 +92,14 @@ export const collapserWrapper = (WrappedComponent) => {
       way to keep the reducers clean.
     */
     shouldComponentUpdate(nextProps) {
+      const { allChildItems } = this.props;
       let shouldUpdate = true;
       // don't update if the two arrays have the same ids...
-      shouldUpdate = !isEqual(this.props.allChildItems.map(item => item.id),
+      shouldUpdate = !isEqual(allChildItems.map(item => item.id),
         nextProps.allChildItems.map(item => item.id));
       if (!shouldUpdate) {
         // unless some other prop has changed...
-        Object.keys(this.props).forEach(prop => {
+        Object.keys(this.props).forEach((prop) => {
           if (prop !== 'allChildItems' && this.props[prop] !== nextProps[prop]) {
             shouldUpdate = true;
           }
@@ -101,9 +109,14 @@ export const collapserWrapper = (WrappedComponent) => {
     }
 
     render() {
-      const {actions, allChildItems, areAllItemsExpanded, ...other} = this.props;
-      const expandCollapseAllBind = !this.expandCollapseAll ? null :
-        this.expandCollapseAll(allChildItems, areAllItemsExpanded);
+      const {
+        actions,
+        allChildItems,
+        areAllItemsExpanded,
+        ...other
+      } = this.props;
+      const expandCollapseAllBind = !this.expandCollapseAll ? null
+        : this.expandCollapseAll(allChildItems, areAllItemsExpanded);
       return (
         <WrappedComponent
           {...other}
@@ -131,7 +144,7 @@ export const collapserWrapper = (WrappedComponent) => {
     areAllItemsExpanded: areAllItemsExpandedSelector(state)(ownProps.collapserId),
   });
 
-  const mapDispatchToProps = (dispatch) => ({
+  const mapDispatchToProps = dispatch => ({
     actions: bindActionCreators({
       setOffsetTop,
       expandCollapseAll,
@@ -147,3 +160,5 @@ export const collapserWrapper = (WrappedComponent) => {
 
   return CollapserControllerConnect;
 };
+
+export default collapserWrapper;

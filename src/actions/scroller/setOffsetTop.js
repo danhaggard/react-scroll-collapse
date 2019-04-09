@@ -12,4 +12,4 @@ function action(getOffsetTop, scrollerId, collapserId, itemId) {
   };
 }
 
-module.exports = action;
+export default action;

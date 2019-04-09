@@ -11,4 +11,4 @@ function action(parentCollapserId, scrollerId, collapserId) {
   };
 }
 
-module.exports = action;
+export default action;

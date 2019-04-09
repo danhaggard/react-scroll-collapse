@@ -1,8 +1,22 @@
-import {call, race, take, fork, actionChannel, put} from 'redux-saga/effects';
+import {
+  call,
+  race,
+  take,
+  fork,
+  actionChannel,
+  put
+} from 'redux-saga/effects';
 
-import {HEIGHT_READY_ALL, SET_OFFSET_TOP,
-  WATCH_INITIALISE, REMOVE_SCROLLER} from '../actions/const';
-import {scrollTo} from '../actions';
+import {
+  HEIGHT_READY_ALL,
+  SET_OFFSET_TOP,
+  WATCH_INITIALISE,
+  REMOVE_SCROLLER
+} from '../actions/const';
+
+import actions from '../actions';
+
+const { scrollTo } = actions;
 
 
 /*
@@ -18,7 +32,7 @@ import {scrollTo} from '../actions';
   It then commences the scroll by putting the SCROLL_TO action - and then ends
   the saga instance.
 */
-export function *waitForCollapserFinishSignal(scrollerId, getScrollTop, getOffsetTop) {
+export function* waitForCollapserFinishSignal(scrollerId, getScrollTop, getOffsetTop) {
   const condition = true;
   while (condition) {
     yield take(HEIGHT_READY_ALL);
@@ -63,25 +77,25 @@ export function *waitForCollapserFinishSignal(scrollerId, getScrollTop, getOffse
   receiving SET_OFFSET_TOP dispatches and causing auto scroll events in the view;
   until finally a REMOVE_SCROLLER action is dispatched ending the loop.
 */
-export function *waitForSetOffsetTop(scrollerIdInit, getScrollTop) {
+export function* waitForSetOffsetTop(scrollerIdInit, getScrollTop) {
   const setOffsetTopChannel = yield actionChannel(SET_OFFSET_TOP);
   const removeScrollerChannel = yield actionChannel(REMOVE_SCROLLER);
 
   const condition = true;
   while (condition) {
 
-    const {setOffsetTop, removeScroller} = yield race({
+    const { setOffsetTop, removeScroller } = yield race({
       setOffsetTop: take(setOffsetTopChannel),
       removeScroller: take(removeScrollerChannel)
     });
 
     if (setOffsetTop) {
-      const {payload: {getOffsetTop, scrollerId}} = setOffsetTop;
+      const { payload: { getOffsetTop, scrollerId } } = setOffsetTop;
       if (scrollerId === scrollerIdInit) {
         yield call(waitForCollapserFinishSignal, scrollerId, getScrollTop, getOffsetTop);
       }
     } else {
-      const {payload: {scrollerId}} = removeScroller;
+      const { payload: { scrollerId } } = removeScroller;
       if (scrollerId === scrollerIdInit) {
         /*
           Returning from the generator ends the saga instance - but I have had
@@ -103,11 +117,11 @@ export function *waitForSetOffsetTop(scrollerIdInit, getScrollTop) {
   by the Scroller component when mounted.  It receives the
   getScrollTop call back and calls the next saga waitForSetOffsetTop.
 */
-export function *scrollerInitWatch() {
+export function* scrollerInitWatch() {
   const initChannel = yield actionChannel(WATCH_INITIALISE);
   const condition = true;
   while (condition) {
-    const {payload: {scrollerId, getScrollTop}} = yield take(initChannel);
+    const { payload: { scrollerId, getScrollTop } } = yield take(initChannel);
     /*
       Using fork here means that the loop can continue - allowing multiple sagas
       to be initialised for multiple scrollers if they are mounted - combined
