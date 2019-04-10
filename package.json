@@ -19,7 +19,8 @@
     "serve:dev": "cross-env NODE_ENV=development node server/dev-server-hot.js",
     "serve:ghPages": "cross-env NODE_ENV=ghPages node server/dev-server.js",
     "start": "npm run serve:dev",
-    "stats": "webpack --config NODE_ENV=production --profile --json > ./stats/stats.json",
+    "stats": "cross-env NODE_ENV=production webpack --profile --json > ./stats/stats.json",
+    "stats-gh": "cross-env NODE_ENV=ghPages webpack --profile --json > ./stats/stats-gh.json",
     "test": "jest --runInBand --config ./test/jest.config.js --rootDir",
     "test:watch": "cross-env NODE_ENV=test karma start --autoWatch=true --singleRun=false --reporters=mocha,coverage"
   },
