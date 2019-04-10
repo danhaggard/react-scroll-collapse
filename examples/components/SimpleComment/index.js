@@ -2,11 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { presets } from 'react-motion';
-// import Collapse from 'react-collapse';
 
 import { UnmountClosed as Collapse } from 'react-collapse';
 import CommentBody from '../CommentBody';
-import CommentTitle from '../CommentTitle';
+import ExpanderButton from '../ExpandButton';
 
 import { collapserItemController } from '../../../src';
 import styles from './SimpleComment.scss';
@@ -24,9 +23,11 @@ const SimpleComment = (props) => {
   const title = ` Collapser Item ${idStr}`;
   return (
     <div className={styles.simpleComment}>
-      <div onClick={expandCollapse} type="button" role="button" tabIndex={0}>
-        <CommentTitle title={title} isOpened={isOpened} />
-      </div>
+      <ExpanderButton
+        isOpened={isOpened}
+        onClick={expandCollapse}
+        title={title}
+      />
       <Collapse
         isOpened={isOpened}
         springConfig={presets.noWobble}

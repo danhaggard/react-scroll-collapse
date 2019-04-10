@@ -2,20 +2,19 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styles from './SimpleCollapser.scss';
 
-import SimpleComment from './../SimpleComment';
-import CommentTitle from './../CommentTitle';
-import {collapserController} from '../../../src';
-import {genRandText} from './../../utils';
+import ExpanderButton from '../ExpandButton';
+import SimpleComment from '../SimpleComment';
+import { collapserController } from '../../../src';
+import { genRandText } from '../../utils';
 
 
 class SimpleCollapser extends Component {
 
-  constructor(props) {
-    super(props);
-    const comments = Array.apply(null, Array(5)).map(() => genRandText());
-    this.state = {
-      comments,
-    };
+  state = {
+    comments: [...Array(5).keys()].map(key => ({
+      key,
+      text: genRandText()
+    }))
   }
 
   addComment(comments) {
@@ -31,24 +30,21 @@ class SimpleCollapser extends Component {
   }
 
   render() {
-    const {expandCollapseAll, areAllItemsExpanded, collapserId} = this.props;
+    const { expandCollapseAll, areAllItemsExpanded, collapserId } = this.props;
+    const { comments } = this.state;
     const title = ` Collapser ${collapserId.toString()}`;
     return (
       <div className={styles.simpleCollapser}>
-        <div onClick={expandCollapseAll}>
-          <CommentTitle title={title} isOpened={areAllItemsExpanded} />
-        </div>
-
-        {this.state.comments.map((text, index) =>
-          <SimpleComment
-            key={index}
-            text={text}
-          />
-        )}
-        <button onClick={() => this.addComment(this.state.comments)}>
+        <ExpanderButton
+          isOpened={areAllItemsExpanded}
+          onClick={expandCollapseAll}
+          title={title}
+        />
+        {comments.map(comment => <SimpleComment {...comment} />)}
+        <button onClick={() => this.addComment(comments)} type="button">
           Add Comment
         </button>
-        <button onClick={() => this.removeComment(this.state.comments)}>
+        <button onClick={() => this.removeComment(comments)} type="button">
           Remove Comment
         </button>
       </div>
@@ -57,9 +53,9 @@ class SimpleCollapser extends Component {
 }
 
 SimpleCollapser.propTypes = {
-  areAllItemsExpanded: PropTypes.bool,
-  collapserId: PropTypes.number,
-  expandCollapseAll: PropTypes.func,
+  areAllItemsExpanded: PropTypes.bool.isRequired,
+  collapserId: PropTypes.number.isRequired,
+  expandCollapseAll: PropTypes.func.isRequired,
 };
 
 export default collapserController(SimpleCollapser);

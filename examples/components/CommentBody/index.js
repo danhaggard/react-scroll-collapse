@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import styles from './CommentBody.scss';
 
 const CommentBody = (props) => {
-  const {text} = props;
+  const { text } = props;
   return (
     <div className={styles.commentBody}>
       {text}
@@ -13,7 +13,7 @@ const CommentBody = (props) => {
 };
 
 CommentBody.propTypes = {
-  text: PropTypes.string,
+  text: PropTypes.string.isRequired,
 };
 
 export default CommentBody;

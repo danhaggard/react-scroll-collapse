@@ -2,77 +2,69 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styles from './CommentThread.scss';
 
-import Comment from './../Comment';
-import CommentTitle from './../CommentTitle';
+import Comment from '../Comment';
+import ExpanderButton from '../ExpandButton';
 
-import {collapserController} from '../../../src';
-import {genRandText} from './../../utils';
+import { collapserController } from '../../../src';
+import { genRandText } from '../../utils';
 
 
-const getNested = (childThreads) => (
-  childThreads === 0 ? null :
-    Array.apply(null, Array(childThreads)).map(
-      (key, index) => (
+const getNested = noOfChildThreads => (
+  noOfChildThreads === 0 ? null
+    : [...Array(noOfChildThreads).keys()].map(
+      key => (
         <WrappedCommentThread
-          key={index}
-          childThreads={childThreads - 1}
+          key={key}
+          childThreads={noOfChildThreads - 1}
         />
       )
-    )
-  );
+    ));
 
-const addToThread = (addToThreadFunc) =>
-  <button onClick={addToThreadFunc}>
+
+const addToThread = addToThreadFunc => (
+  <button onClick={addToThreadFunc} type="button">
     Insert Thread
-  </button>;
+  </button>
+);
 
 const deleteThread = (childThreads, deleteThreadFunc) => (
-  childThreads === 0 ? null :
-    <button onClick={deleteThreadFunc}>
+  childThreads === 0 ? null : (
+    <button onClick={deleteThreadFunc} type="button">
       Delete Thread
     </button>
+  )
 );
 
 
 class CommentThread extends Component {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      childThreads: 0,
-      randText: '',
-    };
-    this.deleteThread = this.deleteThread.bind(this);
-    this.addToThread = this.addToThread.bind(this);
+  randText = genRandText();
+
+  state = {
+    childThreads: this.props.childThreads, // eslint-disable-line react/destructuring-assignment
+    randText: genRandText(),
   }
 
-  componentWillMount() {
-    this.randText = genRandText();
-    this.setState({
-      childThreads: this.props.childThreads,
-      randText: genRandText(),
-    });
+  addToThread = () => {
+    const { childThreads } = this.state;
+    this.setState({ childThreads: childThreads + 1 });
   }
 
-  addToThread() {
-    this.setState({childThreads: this.state.childThreads + 1});
-  }
-
-  deleteThread() {
-    this.setState({childThreads: 0});
-  }
+  deleteThread = () => this.setState({ childThreads: 0 });
 
   render() {
-    const {areAllItemsExpanded, collapserId, expandCollapseAll} = this.props;
-    const {childThreads, randText} = this.state;
+    const { areAllItemsExpanded, collapserId, expandCollapseAll } = this.props;
+    const { childThreads, randText } = this.state;
     const idStr = collapserId.toString();
     const text = `${randText}`;
     const title = ` Collapser ${idStr}`;
     return (
-      <div className={styles.commentThread} >
-        <div onClick={expandCollapseAll}>
-          <CommentTitle title={title} isOpened={areAllItemsExpanded} />
-        </div>
+      <div className={styles.commentThread}>
+        <ExpanderButton
+          isOpened={areAllItemsExpanded}
+          onClick={expandCollapseAll}
+          title={title}
+        />
         <Comment
           text={text}
           deleteThread={deleteThread(childThreads, this.deleteThread)}
@@ -87,8 +79,8 @@ class CommentThread extends Component {
 CommentThread.propTypes = {
   areAllItemsExpanded: PropTypes.bool.isRequired, // provided by collapserController
   collapserId: PropTypes.number.isRequired, // provided by collapserController
-  expandCollapseAll: PropTypes.func, // provided by collapserController
-  childThreads: PropTypes.number,
+  expandCollapseAll: PropTypes.func.isRequired, // provided by collapserController
+  childThreads: PropTypes.number.isRequired,
 };
 
 const WrappedCommentThread = collapserController(CommentThread);
