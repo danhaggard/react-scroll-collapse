@@ -49,7 +49,6 @@ module.exports = (opts) => {
 
   const externals = {
     classnames: 'classnames',
-    'lodash.isequal': 'lodash.isequal',
     react: 'react',
     'react-collapse': 'react-collapse',
     'react-dom': 'react-dom',

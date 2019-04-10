@@ -110,7 +110,6 @@
   },
   "peerDependencies": {
     "classnames": "^2.2.6",
-    "lodash.isequal": "^4.5.0",
     "react": "^16.8.4",
     "react-collapse": "^4.0.3",
     "react-dom": "^18.8.4",
@@ -121,5 +120,7 @@
     "redux-saga": "^1.0.2",
     "reselect": "^4.0.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "lodash.isequal": "^4.5.0"
+  }
 }
