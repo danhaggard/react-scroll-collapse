@@ -1,37 +1,41 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import ReactDOM from 'react-dom';
-import isEqual from 'lodash/isEqual';
+import isEqual from 'lodash.isequal';
 
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import actions from '../../actions';
 
+import forwardRefWrapper from '../../utils/forwardRef';
+import { checkForRef } from '../../utils/errorUtils';
+import { ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
+import { collapserWrapperActions } from '../../actions';
 import selectors from '../../selectors';
 
 const { allChildItemsSelector, areAllItemsExpandedSelector } = selectors.collapser;
-const {
-  watchCollapser,
-  watchInitCollapser,
-  setOffsetTop,
-  expandCollapseAll
-} = actions;
-
 
 export const collapserWrapper = (WrappedComponent) => {
 
+  const WrappedComponentRef = forwardRefWrapper(WrappedComponent, 'collapserRef');
+
   class CollapserController extends Component {
+
+    elem = React.createRef();
 
     constructor(props) {
       super(props);
+      const {
+        collapserId,
+        expandCollapseAll,
+        parentScrollerId,
+        setOffsetTop,
+        watchCollapser,
+      } = this.props;
       this.expandCollapseAll = (allChildItems, areAllItemsExpanded) => () => {
-
         /*
           This activates a saga that will ensure that all the onHeightReady
           callbacks of nested <Collapse> elements have fired - before the Scroller
           related sagas will be allowed to initiate the scrolling.
         */
-        this.props.actions.watchCollapser(this.props.collapserId);
+        watchCollapser(collapserId);
 
         /*
           setOffsetTop: defines a callback for the saga to call that allows
@@ -41,13 +45,13 @@ export const collapserWrapper = (WrappedComponent) => {
           called for every wrapped <Collapse> element in the Collapser.
         */
 
-        this.props.actions.setOffsetTop(
-          () => this.elem.offsetTop,
-          this.props.parentScrollerId,
-          this.props.collapserId,
+        setOffsetTop(
+          () => this.elem.current.offsetTop,
+          parentScrollerId,
+          collapserId,
         );
         allChildItems.forEach((item) => {
-          this.props.actions.expandCollapseAll(item, areAllItemsExpanded, item.id);
+          expandCollapseAll(item, areAllItemsExpanded, item.id);
         });
       };
     }
@@ -73,8 +77,9 @@ export const collapserWrapper = (WrappedComponent) => {
     */
 
     componentDidMount() {
-      this.elem = ReactDOM.findDOMNode(this);
-      this.props.actions.watchInitCollapser(this.props.collapserId);
+      const { collapserId, watchInitCollapser } = this.props;
+      checkForRef(WrappedComponent, this.elem, 'collapserRef');
+      watchInitCollapser(collapserId);
     }
 
     /*
@@ -110,7 +115,10 @@ export const collapserWrapper = (WrappedComponent) => {
 
     render() {
       const {
-        actions,
+        expandCollapseAll,
+        setOffsetTop,
+        watchCollapser,
+        watchInitCollapser,
         allChildItems,
         areAllItemsExpanded,
         ...other
@@ -118,8 +126,9 @@ export const collapserWrapper = (WrappedComponent) => {
       const expandCollapseAllBind = !this.expandCollapseAll ? null
         : this.expandCollapseAll(allChildItems, areAllItemsExpanded);
       return (
-        <WrappedComponent
+        <WrappedComponentRef
           {...other}
+          ref={this.elem}
           expandCollapseAll={expandCollapseAllBind}
           areAllItemsExpanded={areAllItemsExpanded}
         />
@@ -127,16 +136,24 @@ export const collapserWrapper = (WrappedComponent) => {
     }
   }
 
+  CollapserController.defaultProps = {
+    collapserId: null,
+    parentCollapserId: null,
+  };
+
   CollapserController.propTypes = {
     /* provided by collapserControllerWrapper */
-    collapserId: PropTypes.number.isRequired,
-    parentCollapserId: PropTypes.number,
+    collapserId: ofNumberTypeOrNothing,
+    parentCollapserId: ofNumberTypeOrNothing,
     parentScrollerId: PropTypes.number.isRequired,
 
     /* provided by redux */
-    areAllItemsExpanded: PropTypes.bool, // includes item children of nested collapsers
-    allChildItems: PropTypes.array, // array of collapserItem ids
-    actions: PropTypes.object,
+    areAllItemsExpanded: PropTypes.bool.isRequired, // includes item children of nested collapsers
+    allChildItems: PropTypes.array.isRequired, // array of collapserItem ids
+    expandCollapseAll: PropTypes.func.isRequired,
+    setOffsetTop: PropTypes.func.isRequired,
+    watchCollapser: PropTypes.func.isRequired,
+    watchInitCollapser: PropTypes.func.isRequired,
   };
 
   const mapStateToProps = (state, ownProps) => ({
@@ -144,18 +161,9 @@ export const collapserWrapper = (WrappedComponent) => {
     areAllItemsExpanded: areAllItemsExpandedSelector(state)(ownProps.collapserId),
   });
 
-  const mapDispatchToProps = dispatch => ({
-    actions: bindActionCreators({
-      setOffsetTop,
-      expandCollapseAll,
-      watchCollapser,
-      watchInitCollapser,
-    }, dispatch),
-  });
-
   const CollapserControllerConnect = connect(
     mapStateToProps,
-    mapDispatchToProps,
+    collapserWrapperActions,
   )(CollapserController);
 
   return CollapserControllerConnect;

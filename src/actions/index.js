@@ -45,4 +45,27 @@ const actions = {
   scrollTo,
 };
 
+export const collapserControllerActions = {
+  addCollapser,
+  addCollapserChild,
+  removeCollapser,
+  removeCollapserChild,
+  addScrollerChild,
+  removeScrollerChild,
+};
+
+export const collapserWrapperActions = {
+  expandCollapseAll,
+  setOffsetTop,
+  watchCollapser,
+  watchInitCollapser,
+};
+
+export const itemWrapperActions = {
+  heightReady,
+  expandCollapse,
+  setOffsetTop,
+  watchCollapser,
+};
+
 export default actions;

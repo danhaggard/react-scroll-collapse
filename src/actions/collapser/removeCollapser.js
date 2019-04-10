@@ -1,14 +1,12 @@
-import { REMOVE_COLLAPSER } from './../const';
+import { REMOVE_COLLAPSER } from '../const';
 
-function action(parentCollapserId, scrollerId, collapserId) {
-  return {
-    type: REMOVE_COLLAPSER,
-    payload: {
-      collapserId,
-      parentCollapserId,
-      scrollerId,
-    },
-  };
-}
+const removeCollapser = (parentCollapserId, scrollerId, collapserId) => ({
+  type: REMOVE_COLLAPSER,
+  payload: {
+    collapserId,
+    parentCollapserId,
+    scrollerId,
+  },
+});
 
-export default action;
+export default removeCollapser;

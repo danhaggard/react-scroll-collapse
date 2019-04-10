@@ -1,10 +1,20 @@
 import { combineReducers } from 'redux';
 
-import { ADD_SCROLLER, ADD_SCROLLER_CHILD, REMOVE_SCROLLER,
-  REMOVE_SCROLLER_CHILD, SCROLL_TO} from '../actions/const';
+import {
+  ADD_SCROLLER,
+  ADD_SCROLLER_CHILD,
+  REMOVE_SCROLLER,
+  REMOVE_SCROLLER_CHILD,
+  SCROLL_TO
+} from '../actions/const';
 
-import { checkAttr, getNextIdFromArr, addToState, removeFromState,
-  updateState} from './utils';
+import {
+  checkAttr,
+  getNextIdFromArr,
+  addToState,
+  removeFromState,
+  updateState
+} from './utils';
 
 //  handles the collapsers attr in scroller entities.
 export const scrollerCollapsersIdArrayReducer = (state = [], action) => {

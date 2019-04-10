@@ -1,14 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import { ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
 import actions from '../../actions';
 import selectors from '../../selectors';
 
 const { nextScrollerIdSelector } = selectors.scroller;
 const { ifNotFirstSec } = selectors.utils;
-const { addScroller, removeScroller } = actions;
 
 export const scrollerWrapper = (ScrollerComponent) => {
 
@@ -28,12 +26,14 @@ export const scrollerWrapper = (ScrollerComponent) => {
     }
 
     componentWillUnmount() {
-      this.props.actions.removeScroller(this.scrollerId);
+      const { removeScroller } = this.props;
+      removeScroller(this.scrollerId);
     }
 
     addScroller() {
+      const { addScroller } = this.props;
       const scroller = { id: this.scrollerId };
-      this.props.actions.addScroller(scroller, this.scrollerId);
+      addScroller(scroller, this.scrollerId);
     }
 
     render() {
@@ -58,22 +58,21 @@ export const scrollerWrapper = (ScrollerComponent) => {
   };
 
   WrappedScroller.propTypes = {
-    actions: PropTypes.object.isRequired,
+    addScroller: PropTypes.func.isRequired,
     scrollerId: ofNumberTypeOrNothing,
+    removeScroller: PropTypes.func.isRequired,
   };
 
   WrappedScroller.childContextTypes = {
     parentScrollerId: PropTypes.number,
   };
 
-  const mapDispatch = dispatch => ({
-    actions: bindActionCreators({
-      addScroller,
-      removeScroller,
-    }, dispatch),
-  });
+  const mapDispatchToProps = {
+    addScroller: actions.addScroller,
+    removeScroller: actions.removeScroller,
+  };
 
-  return connect(undefined, mapDispatch)(WrappedScroller);
+  return connect(undefined, mapDispatchToProps)(WrappedScroller);
 };
 
 export default scrollerWrapper;

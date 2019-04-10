@@ -1,10 +1,10 @@
-import {combineReducers} from 'redux';
+import { combineReducers } from 'redux';
 
-import {scrollers, scrollersReducer} from './scroller';
-import {collapsersReducer} from './collapser';
-import {itemsReducer} from './collapserItem';
+import { scrollers, scrollersReducer } from './scroller';
+import { collapsersReducer } from './collapser';
+import { itemsReducer } from './collapserItem';
 
-const entities = combineReducers({
+export const entities = combineReducers({
   collapsers: collapsersReducer,
   items: itemsReducer,
   scrollers: scrollersReducer,

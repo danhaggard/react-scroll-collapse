@@ -7,7 +7,7 @@ export const ofTypeOrNothing = ofType => PropTypes.oneOfType([
   PropTypes.instanceOf(undefined),
 ]);
 
-const ofChildrenType = PropTypes.oneOfType([
+export const ofChildrenType = PropTypes.oneOfType([
   PropTypes.arrayOf(PropTypes.node),
   PropTypes.node,
 ]);
@@ -19,5 +19,6 @@ export const ofChildrenTypeOrString = PropTypes.oneOfType([
   PropTypes.string,
 ]);
 
+export const ofBoolTypeOrNothing = ofTypeOrNothing(PropTypes.bool);
 export const ofFuncTypeOrNothing = ofTypeOrNothing(PropTypes.func);
 export const ofNumberTypeOrNothing = ofTypeOrNothing(PropTypes.number);

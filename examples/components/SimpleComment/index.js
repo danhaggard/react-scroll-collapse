@@ -12,17 +12,17 @@ import styles from './SimpleComment.scss';
 
 const SimpleComment = (props) => {
   const {
-    text,
-    isOpened,
-    onHeightReady,
+    collapserItemRef,
     expandCollapse,
-    itemId
+    isOpened,
+    itemId,
+    text,
   } = props;
 
   const idStr = itemId.toString();
   const title = ` Collapser Item ${idStr}`;
   return (
-    <div className={styles.simpleComment}>
+    <div className={styles.simpleComment} ref={collapserItemRef}>
       <ExpanderButton
         isOpened={isOpened}
         onClick={expandCollapse}
@@ -31,7 +31,6 @@ const SimpleComment = (props) => {
       <Collapse
         isOpened={isOpened}
         springConfig={presets.noWobble}
-        onMeasure={onHeightReady}
       >
         <CommentBody text={` Collapser Item Text ${idStr}: --- ${text}`} />
       </Collapse>
@@ -40,10 +39,10 @@ const SimpleComment = (props) => {
 };
 
 SimpleComment.propTypes = {
+  collapserItemRef: PropTypes.object.isRequired, // provided by collapserItemController
   expandCollapse: PropTypes.func.isRequired, // provided by collapserItemController
   isOpened: PropTypes.bool.isRequired, // provided by collapserItemController
   itemId: PropTypes.number.isRequired, // provided by collapserItemController
-  onHeightReady: PropTypes.func.isRequired, // provided by collapserItemController
   text: PropTypes.string.isRequired,
 };
 

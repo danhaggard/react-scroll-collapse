@@ -1,19 +1,15 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Motion, spring } from 'react-motion';
-
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
+
+import { Motion, spring } from 'react-motion';
+import Scroller from '../../components/Scroller';
 
 import { ofFuncTypeOrNothing, ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
-
 import actions from '../../actions';
 import selectors from '../../selectors';
 
-import Scroller from '../../components/Scroller';
-
 const { offsetTopSelector, scrollTopSelector, toggleScrollSelector } = selectors.scroller;
-const { watchInitialise } = actions;
 
 const scrollerMotionWrapper = (ScrollerComponent) => {
 
@@ -41,8 +37,8 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
       Initiate a saga to watch this Scroller for ExpandCollapse/All actions.
     */
     componentDidMount() {
-      const { scrollerId } = this.props;
-      this.props.actions.watchInitialise(scrollerId, this.child.getScrollTop); // eslint-disable-line
+      const { scrollerId, watchInitialise } = this.props;
+      watchInitialise(scrollerId, this.child.getScrollTop);
     }
 
     componentWillReceiveProps(nextProps) {
@@ -168,7 +164,6 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
   };
 
   ScrollerMotion.propTypes = {
-    actions: PropTypes.object.isRequired,
     children: PropTypes.node,
     className: PropTypes.string,
     offsetScrollTo: ofNumberTypeOrNothing,
@@ -180,6 +175,7 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
     springConfig: PropTypes.object,
     style: PropTypes.object,
     toggleScroll: PropTypes.bool,
+    watchInitialise: PropTypes.func.isRequired,
   };
 
   return ScrollerMotion;
@@ -196,11 +192,9 @@ const mapStateToProps = (state, ownProps) => ({
   toggleScroll: toggleScrollSelector(state)(ownProps.scrollerId)
 });
 
-const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators({
-    watchInitialise,
-  }, dispatch),
-});
+const mapDispatchToProps = {
+  watchInitialise: actions.watchInitialise
+};
 
 export default connect(
   mapStateToProps,

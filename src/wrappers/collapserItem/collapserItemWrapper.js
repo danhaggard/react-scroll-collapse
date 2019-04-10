@@ -1,21 +1,15 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import ReactDOM from 'react-dom';
 
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 
-import actions from '../../actions';
+import forwardRefWrapper from '../../utils/forwardRef';
+import { checkForRef } from '../../utils/errorUtils';
 
+import { itemWrapperActions } from '../../actions';
 import selectors from '../../selectors';
 
 const { itemExpandedSelector } = selectors.collapserItem;
-const {
-  watchCollapser,
-  setOffsetTop,
-  expandCollapse,
-  heightReady
-} = actions;
 
 
 /*
@@ -32,80 +26,91 @@ const {
 
 export const collapserItemWrapper = (WrappedComponent) => {
 
+  const WrappedComponentRef = forwardRefWrapper(WrappedComponent, 'collapserItemRef');
+
   class CollapserItemController extends Component {
 
-    constructor(props) {
-      super(props);
-      /*
-        this.setOffsetTop: defines a callback for the saga to call that allows
-          the saga to obtain the offsetTop value of the backing instance of this
-          component and dispatch that to the redux store.  The saga grabs the
-          offsetTop val once the onHeightReady callback has been
-          called for every wrapped <Collapse> element in the Collapser.
-      */
-      this.expandCollapse = () => {
-        const { itemId, parentScrollerId, parentCollapserId } = this.props;
-        this.props.actions.watchCollapser(parentCollapserId);
-        this.props.actions.setOffsetTop(
-          () => this.elem.offsetTop,
-          parentScrollerId,
-          parentCollapserId,
-        );
-        props.actions.expandCollapse(itemId);
-      };
-      /*
-        Callback to let the collapser know that the height calculated by this
-        Collapse element is ready.  The saga won't initiate the auto scroll
-        unless it sees the HEIGHT_READY action.
-      */
-      this.onHeightReady = () => {
-        const { itemId, parentCollapserId } = this.props;
-        props.actions.heightReady(parentCollapserId, itemId);
-      };
-    }
+    elem = React.createRef();
 
     componentDidMount() {
-      this.elem = ReactDOM.findDOMNode(this);
+      checkForRef(WrappedComponent, this.elem, 'collapserItemRef');
     }
 
+    /*
+      this.setOffsetTop: defines a callback for the saga to call that allows
+        the saga to obtain the offsetTop value of the backing instance of this
+        component and dispatch that to the redux store.  The saga grabs the
+        offsetTop val once the onHeightReady callback has been
+        called for every wrapped <Collapse> element in the Collapser.
+    */
+    expandCollapse = () => {
+      const {
+        itemId,
+        expandCollapse: expandCollapseAction,
+        parentScrollerId,
+        parentCollapserId,
+        setOffsetTop,
+        watchCollapser,
+      } = this.props;
+      watchCollapser(parentCollapserId);
+      setOffsetTop(
+        () => this.elem.current.offsetTop,
+        parentScrollerId,
+        parentCollapserId,
+      );
+      expandCollapseAction(itemId);
+    };
+
+    /*
+      Callback to let the collapser know that the height calculated by this
+      Collapse element is ready.  The saga won't initiate the auto scroll
+      unless it sees the HEIGHT_READY action.
+    */
+    onHeightReady = () => {
+      const { itemId, heightReady, parentCollapserId } = this.props;
+      heightReady(parentCollapserId, itemId);
+    };
+
+
     render() {
-      const { isOpened, actions, ...other } = this.props;
+      const {
+        isOpened,
+        heightReady,
+        expandCollapse,
+        setOffsetTop,
+        watchCollapser,
+        ...other
+      } = this.props;
       return (
-        <WrappedComponent
+        <WrappedComponentRef
           {...other}
           isOpened={isOpened}
           expandCollapse={this.expandCollapse}
           onHeightReady={this.onHeightReady}
+          ref={this.elem}
         />
       );
     }
   }
 
   CollapserItemController.propTypes = {
-    actions: PropTypes.object.isRequired,
     isOpened: PropTypes.bool.isRequired,
     itemId: PropTypes.number.isRequired,
     parentCollapserId: PropTypes.number.isRequired,
     parentScrollerId: PropTypes.number.isRequired,
-    setOffsetTop: PropTypes.func,
+    heightReady: PropTypes.func.isRequired,
+    expandCollapse: PropTypes.func.isRequired,
+    setOffsetTop: PropTypes.func.isRequired,
+    watchCollapser: PropTypes.func.isRequired,
   };
 
   const mapStateToProps = (state, ownProps) => ({
     isOpened: itemExpandedSelector(state)(ownProps.itemId),
   });
 
-  const mapDispatchToProps = dispatch => ({
-    actions: bindActionCreators({
-      expandCollapse,
-      heightReady,
-      setOffsetTop,
-      watchCollapser,
-    }, dispatch),
-  });
-
   const CollapserItemControllerConnect = connect(
     mapStateToProps,
-    mapDispatchToProps,
+    itemWrapperActions,
   )(CollapserItemController);
 
   return CollapserItemControllerConnect;

@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
+
+import { ofBoolTypeOrNothing, ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
 
 import actions from '../../actions';
 import selectors from '../../selectors';
 
 const { nextItemIdSelector } = selectors.collapserItem;
 const { ifNotFirstSec } = selectors.utils;
-const { addItem, removeItem } = actions;
 
 /*
   collapserItemControllerWrapper is a HoC that is used to manage the dynamic generation of
@@ -33,16 +33,16 @@ export const collapserItemControllerWrapper = (CollapserItemController) => {
         generated in the first render.)  This is why we can only
         use it in willMount to set the id.
       */
+      const { itemId, parentCollapserId, parentScrollerId } = this.props;
+
       const {
-        itemId,
-        parentCollapserId,
-        parentScrollerId
-      } = this.props;
+        parentCollapserId: parentCollapserIdContext,
+        parentScrollerId: parentScrollerIdContext,
+      } = this.context;
+
       this.itemId = ifNotFirstSec(itemId, nextItemIdSelector());
-      this.parentCollapserId = ifNotFirstSec(parentCollapserId,
-        this.context.parentCollapserId);
-      this.parentScrollerId = ifNotFirstSec(parentScrollerId,
-        this.context.parentScrollerId);
+      this.parentCollapserId = ifNotFirstSec(parentCollapserId, parentCollapserIdContext);
+      this.parentScrollerId = ifNotFirstSec(parentScrollerId, parentScrollerIdContext);
       /*
         create state slice for this collapserItem in redux store.
       */
@@ -50,7 +50,8 @@ export const collapserItemControllerWrapper = (CollapserItemController) => {
     }
 
     componentWillUnmount() {
-      this.props.actions.removeItem(this.parentCollapserId, this.itemId);
+      const { removeItem } = this.props;
+      removeItem(this.parentCollapserId, this.itemId);
     }
 
     addItem() {
@@ -61,12 +62,12 @@ export const collapserItemControllerWrapper = (CollapserItemController) => {
         isOpenedInit is a prop they can pass into their wrapped component.
         to set a default value for whether or not the item is expanded or not.
       */
-      const { isOpenedInit } = this.props;
+      const { addItem, isOpenedInit } = this.props;
       const item = {
         id: this.itemId,
         expanded: isOpenedInit,
       };
-      this.props.actions.addItem(this.parentCollapserId, item, this.itemId);
+      addItem(this.parentCollapserId, item, this.itemId);
     }
 
     render() {
@@ -75,7 +76,8 @@ export const collapserItemControllerWrapper = (CollapserItemController) => {
         error.
       */
       const {
-        actions,
+        addItem,
+        removeItem,
         itemId,
         parentCollapserId,
         parentScrollerId,
@@ -96,24 +98,33 @@ export const collapserItemControllerWrapper = (CollapserItemController) => {
     }
   }
 
+  WrappedCollapserItemController.defaultProps = {
+    isOpenedInit: null,
+    itemId: null,
+    parentCollapserId: null,
+    parentScrollerId: null,
+  };
+
   WrappedCollapserItemController.propTypes = {
-    actions: PropTypes.object.isRequired,
+    addItem: PropTypes.func.isRequired,
+    removeItem: PropTypes.func.isRequired,
+
     /*
       isOpenedInit: overrides the default isOpened status.
     */
-    isOpenedInit: PropTypes.bool,
+    isOpenedInit: ofBoolTypeOrNothing,
     /*
       Pass itemId as prop if you want to overwrite automated id generated
       from state and passed automatically in nextItemId.
     */
-    itemId: PropTypes.bool,
+    itemId: ofBoolTypeOrNothing,
 
     /*
      Pass parentCollapserId as prop if you want to overwrite automated id generated
      from context.parentCollapserId.
    */
-    parentCollapserId: PropTypes.number,
-    parentScrollerId: PropTypes.number,
+    parentCollapserId: ofNumberTypeOrNothing,
+    parentScrollerId: ofNumberTypeOrNothing,
   };
 
   WrappedCollapserItemController.contextTypes = {
@@ -121,14 +132,12 @@ export const collapserItemControllerWrapper = (CollapserItemController) => {
     parentScrollerId: PropTypes.number,
   };
 
-  const mapDispatch = dispatch => ({
-    actions: bindActionCreators({
-      addItem,
-      removeItem,
-    }, dispatch),
-  });
+  const mapDispatchToProps = {
+    addItem: actions.addItem,
+    removeItem: actions.removeItem,
+  };
 
-  return connect(undefined, mapDispatch)(WrappedCollapserItemController);
+  return connect(undefined, mapDispatchToProps)(WrappedCollapserItemController);
 };
 
 export default collapserItemControllerWrapper;

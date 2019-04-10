@@ -28,7 +28,7 @@ const addToThread = addToThreadFunc => (
 );
 
 const deleteThread = (childThreads, deleteThreadFunc) => (
-  childThreads === 0 ? null : (
+  childThreads === 0 ? <div /> : (
     <button onClick={deleteThreadFunc} type="button">
       Delete Thread
     </button>
@@ -53,13 +53,18 @@ class CommentThread extends Component {
   deleteThread = () => this.setState({ childThreads: 0 });
 
   render() {
-    const { areAllItemsExpanded, collapserId, expandCollapseAll } = this.props;
+    const {
+      areAllItemsExpanded,
+      collapserId,
+      collapserRef,
+      expandCollapseAll,
+    } = this.props;
     const { childThreads, randText } = this.state;
     const idStr = collapserId.toString();
     const text = `${randText}`;
     const title = ` Collapser ${idStr}`;
     return (
-      <div className={styles.commentThread}>
+      <div className={styles.commentThread} ref={collapserRef}>
         <ExpanderButton
           isOpened={areAllItemsExpanded}
           onClick={expandCollapseAll}
@@ -79,6 +84,7 @@ class CommentThread extends Component {
 CommentThread.propTypes = {
   areAllItemsExpanded: PropTypes.bool.isRequired, // provided by collapserController
   collapserId: PropTypes.number.isRequired, // provided by collapserController
+  collapserRef: PropTypes.object.isRequired, // provided by collapserController
   expandCollapseAll: PropTypes.func.isRequired, // provided by collapserController
   childThreads: PropTypes.number.isRequired,
 };

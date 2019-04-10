@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
+
+import { ofChildrenType } from '../../utils/propTypeHelpers';
 import styles from './Scroller.scss';
 
 
@@ -59,10 +61,15 @@ class Scroller extends Component {
   }
 }
 
+Scroller.defaultProps = {
+  children: [],
+  className: '',
+  style: {},
+};
+
 Scroller.propTypes = {
-  children: PropTypes.node,
+  children: ofChildrenType,
   className: PropTypes.string,
-  scrollerId: PropTypes.number.isRequired,
   style: PropTypes.object,
 };
 

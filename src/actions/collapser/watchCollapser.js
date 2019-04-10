@@ -1,12 +1,10 @@
-import { WATCH_COLLAPSER } from './../const';
+import { WATCH_COLLAPSER } from '../const';
 
-function action(collapserId) {
-  return {
-    type: WATCH_COLLAPSER,
-    payload: {
-      collapserId,
-    },
-  };
-}
+const watchCollapser = collapserId => ({
+  type: WATCH_COLLAPSER,
+  payload: {
+    collapserId,
+  },
+});
 
-export default action;
+export default watchCollapser;

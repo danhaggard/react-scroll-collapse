@@ -7,44 +7,55 @@ import SimpleComment from '../SimpleComment';
 import { collapserController } from '../../../src';
 import { genRandText } from '../../utils';
 
+const createComment = key => ({
+  key,
+  text: genRandText()
+});
 
 class SimpleCollapser extends Component {
 
   state = {
-    comments: [...Array(5).keys()].map(key => ({
-      key,
-      text: genRandText()
-    }))
+    comments: [...Array(5).keys()].map(createComment),
+    commentCount: 5,
   }
 
-  addComment(comments) {
+  addComment = () => {
+    const { comments, commentCount } = this.state;
     this.setState({
-      comments: [...comments, genRandText()]
+      comments: [...comments, createComment(commentCount + 1)],
+      commentCount: commentCount + 1,
     });
   }
 
-  removeComment(comments) {
+  removeComment = () => {
+    const { comments, commentCount } = this.state;
     this.setState({
-      comments: comments.slice(0, comments.length - 1)
+      comments: comments.slice(0, comments.length - 1),
+      commentCount: commentCount - 1,
     });
   }
 
   render() {
-    const { expandCollapseAll, areAllItemsExpanded, collapserId } = this.props;
+    const {
+      expandCollapseAll,
+      areAllItemsExpanded,
+      collapserId,
+      collapserRef,
+    } = this.props;
     const { comments } = this.state;
     const title = ` Collapser ${collapserId.toString()}`;
     return (
-      <div className={styles.simpleCollapser}>
+      <div className={styles.simpleCollapser} ref={collapserRef}>
         <ExpanderButton
           isOpened={areAllItemsExpanded}
           onClick={expandCollapseAll}
           title={title}
         />
         {comments.map(comment => <SimpleComment {...comment} />)}
-        <button onClick={() => this.addComment(comments)} type="button">
+        <button onClick={this.addComment} type="button">
           Add Comment
         </button>
-        <button onClick={() => this.removeComment(comments)} type="button">
+        <button onClick={this.removeComment} type="button">
           Remove Comment
         </button>
       </div>
@@ -56,6 +67,7 @@ SimpleCollapser.propTypes = {
   areAllItemsExpanded: PropTypes.bool.isRequired,
   collapserId: PropTypes.number.isRequired,
   expandCollapseAll: PropTypes.func.isRequired,
+  collapserRef: PropTypes.object.isRequired,
 };
 
 export default collapserController(SimpleCollapser);

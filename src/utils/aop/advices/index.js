@@ -1,1 +1,0 @@
-export extendClassNameAdvice from './extendClassNameAdvice';

@@ -1,15 +1,25 @@
-import {combineReducers} from 'redux';
+import { combineReducers } from 'redux';
 
-import {ADD_ITEM, EXPAND_COLLAPSE, EXPAND_COLLAPSE_ALL, HEIGHT_READY,
-  REMOVE_ITEM} from '../actions/const';
+import {
+  ADD_ITEM,
+  EXPAND_COLLAPSE,
+  EXPAND_COLLAPSE_ALL,
+  HEIGHT_READY,
+  REMOVE_ITEM
+} from '../actions/const';
 
-import {checkAttr, addToState, removeFromState} from './utils';
+import {
+  checkAttr,
+  addToState,
+  removeFromState
+} from './utils';
 
 import selectors from '../selectors';
-const {getItemId, getItemExpanded} = selectors.collapserItem;
+
+const { getItemId, getItemExpanded } = selectors.collapserItem;
 
 export const expandedReducer = (state = true, action) => {
-  const {areAllItemsExpanded, item} = checkAttr(action, 'payload');
+  const { areAllItemsExpanded, item } = checkAttr(action, 'payload');
   switch (action.type) {
     case ADD_ITEM: {
       const val = getItemExpanded(item);
@@ -26,7 +36,7 @@ export const expandedReducer = (state = true, action) => {
 
 // handles 'id' attr for item entities.
 export const itemIdReducer = (state = null, action) => {
-  const {item} = checkAttr(action, 'payload');
+  const { item } = checkAttr(action, 'payload');
   switch (action.type) {
     case ADD_ITEM:
       return getItemId(item);
@@ -36,7 +46,7 @@ export const itemIdReducer = (state = null, action) => {
 };
 
 export const waitingForHeightReducer = (state = false, action) => {
-  const {item, areAllItemsExpanded} = checkAttr(action, 'payload');
+  const { item, areAllItemsExpanded } = checkAttr(action, 'payload');
   switch (action.type) {
     case ADD_ITEM:
     case HEIGHT_READY:
@@ -66,7 +76,7 @@ const itemReducer = combineReducers({
 
 // handles items state
 export const itemsReducer = (state = {}, action) => {
-  const {itemId} = checkAttr(action, 'payload');
+  const { itemId } = checkAttr(action, 'payload');
   switch (action.type) {
     case REMOVE_ITEM:
       return removeFromState(state, itemId);

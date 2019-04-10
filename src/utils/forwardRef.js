@@ -1,41 +1,17 @@
-/*
-  eslint-disable react/forbid-foreign-prop-types
-*/
-/*
-  Is compatible with: transform-react-remove-prop-types babel plugin.
-*/
 import React from 'react';
 
-const cleanStatic = (ComponentArg) => {
-  const CleanComponent = ComponentArg;
-
-  /*
-    Store static properties to be attached to forwardRef components.
-  */
-  const { propTypes, defaultProps } = CleanComponent;
-
-  /*
-    Prevents React console warning about forwardRef not supporting
-    propTypes or defaultProps.
-
-    Allows us to treat render functions passed to forwardRef as
-    components for linting purposes (that we've supplied propTypes etc).
-  */
-  delete CleanComponent.propTypes;
-  delete CleanComponent.defaultProps;
-  return {
-    CleanComponent,
-    propTypes,
-    defaultProps
+const forwardRefWrapper = (Component, refProp) => {
+  const forwardRef = (props, ref) => {
+    const newProps = {
+      ...props,
+      [refProp]: ref
+    };
+    return <Component {...newProps} />;
   };
-};
+  const name = Component.displayName || Component.name;
+  forwardRef.displayName = name;
 
-const forwardRefWrapper = (Component) => {
-  const { CleanComponent, propTypes, defaultProps } = cleanStatic(Component);
-  const ComponentWithRef = React.forwardRef(CleanComponent);
-  ComponentWithRef.propTypes = propTypes;
-  ComponentWithRef.defaultProps = defaultProps;
-  return ComponentWithRef;
+  return React.forwardRef(forwardRef);
 };
 
 export default forwardRefWrapper;
