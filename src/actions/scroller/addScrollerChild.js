@@ -1,4 +1,4 @@
-import { ADD_SCROLLER_CHILD } from './../const';
+import { ADD_SCROLLER_CHILD } from '../const';
 
 function action(scrollerId, collapser) {
   return {

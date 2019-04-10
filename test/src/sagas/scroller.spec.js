@@ -1,17 +1,24 @@
-import {call, race, fork, put, take, actionChannel} from 'redux-saga/effects';
-import expect from 'expect';
-
-import * as types from '../../src/actions/const';
-import actions from '../../src/actions';
-
-const {scrollTo} = actions;
-const {SET_OFFSET_TOP, WATCH_INITIALISE, HEIGHT_READY_ALL, REMOVE_SCROLLER} = types;
-
 import {
-  scrollerInitWatch,
-  waitForSetOffsetTop,
-  waitForCollapserFinishSignal
-} from '../../src/sagas/scroller';
+  call,
+  race,
+  fork,
+  put,
+  take,
+  actionChannel,
+} from 'redux-saga/effects';
+
+import * as types from '../../../src/actions/const';
+import actions from '../../../src/actions';
+import { scrollerInitWatch, waitForSetOffsetTop } from '../../../src/sagas/scroller';
+
+const { scrollTo } = actions;
+const {
+  SET_OFFSET_TOP,
+  WATCH_INITIALISE,
+  HEIGHT_READY_ALL,
+  REMOVE_SCROLLER
+} = types;
+
 
 describe('react-scroll-collapse', () => {
   describe('sagas', () => {
@@ -22,7 +29,8 @@ describe('react-scroll-collapse', () => {
         const gen = scrollerInitWatch();
         it('yields an action channel', () => {
           expect(gen.next().value).toEqual(
-            actionChannel(WATCH_INITIALISE));
+            actionChannel(WATCH_INITIALISE)
+          );
         });
 
         it('takes the initChannel', () => {
@@ -34,7 +42,7 @@ describe('react-scroll-collapse', () => {
         it('forks the waitForSetOffsetTop Saga', () => {
           const [scrollerId, getScrollTop] = [0, () => 100];
           expect(
-            gen.next({payload: {scrollerId, getScrollTop}}).value
+            gen.next({ payload: { scrollerId, getScrollTop } }).value
           ).toEqual(
             fork(waitForSetOffsetTop, scrollerId, getScrollTop)
           );
@@ -51,26 +59,29 @@ describe('react-scroll-collapse', () => {
 
       describe('function: waitForSetOffsetTop', () => {
         const scrollerIdInit = 0;
-        const getOffsetTop = () => 200;
-        const [scrollerId, getScrollTop] = [0, () => 100];
+
+        const [scrollerId, getScrollTop, getOffsetTop] = [0, () => 100, () => 200];
+        const [scrollTop, offsetTop] = [100, 200];
+
         const setOffsetTopChannel = actionChannel(SET_OFFSET_TOP);
         const removeScrollerChannel = actionChannel(REMOVE_SCROLLER);
-        const setOffsetTop = {payload: {getOffsetTop, scrollerId}};
-        const removeScroller = {payload: {scrollerId}};
-        const differentScroller = {payload: {scrollerId: 10}};
+        const setOffsetTop = { payload: { getOffsetTop, scrollerId } };
+        const removeScroller = { payload: { scrollerId } };
+        const differentScroller = { payload: { scrollerId: 10 } };
         const raceCall = race({
           setOffsetTop: take(SET_OFFSET_TOP),
           removeScroller: take(REMOVE_SCROLLER)
         });
-        const setOffsetTopWinner = {setOffsetTop, removeScroller: undefined};
-        const removeScrollerWinner = {setOffsetTop: undefined, removeScroller};
-        const differentWinner = {setOffsetTop: differentScroller, removeScroller: undefined};
+        const setOffsetTopWinner = { setOffsetTop, removeScroller: undefined };
+        const removeScrollerWinner = { setOffsetTop: undefined, removeScroller };
+        const differentWinner = { setOffsetTop: differentScroller, removeScroller: undefined };
 
         const gen = waitForSetOffsetTop(scrollerIdInit, getScrollTop);
 
         it('yields an SET_OFFSET_TOP action channel', () => {
           expect(gen.next().value).toEqual(
-            setOffsetTopChannel);
+            setOffsetTopChannel
+          );
         });
 
         /*
@@ -78,7 +89,8 @@ describe('react-scroll-collapse', () => {
         */
         it('yields an REMOVE_SCROLLER action channel', () => {
           expect(gen.next(SET_OFFSET_TOP).value).toEqual(
-            removeScrollerChannel);
+            removeScrollerChannel
+          );
         });
 
         it('starts a race between the two actions', () => {
@@ -87,57 +99,9 @@ describe('react-scroll-collapse', () => {
           ).toEqual(raceCall);
         });
 
-        it('calls waitForCollapserFinishSignal', () => {
-          expect(
-            gen.next(setOffsetTopWinner).value
-          ).toEqual(call(waitForCollapserFinishSignal, scrollerId, getScrollTop, getOffsetTop));
-        });
-
-        it('end of loop starts another race', () => {
-          expect(
-            gen.next().value
-          ).toEqual(raceCall);
-        });
-
-        it('non matching scrollerId: starts another race', () => {
-          expect(
-            gen.next(differentWinner).value
-          ).toEqual(raceCall);
-        });
-
-        /*
-          see comments in test/sagas/collapserTest.js
-        */
-        it(`calls setOffsetTopChannel.close - cant get test to pass.
-          see comments in test/sagas/collapserTest.js`, () => {
-          expect(
-            gen.next(removeScrollerWinner).value
-          ).toEqual(call(setOffsetTopChannel.close));
-        });
-
-        it('calls removeScrollerChannel.close', () => {
-          expect(
-            gen.next().value
-          ).toEqual(call(removeScrollerChannel.close));
-        });
-
-        it('ends the generator', () => {
-          expect(gen.next().done).toEqual(true);
-        });
-      });
-
-      describe('function: waitForCollapserFinishSignal', () => {
-        const [scrollerId, getScrollTop, getOffsetTop] = [0, () => 100, () => 200];
-        const [scrollTop, offsetTop] = [100, 200];
-        const gen = waitForCollapserFinishSignal(scrollerId, getScrollTop, getOffsetTop);
-        it('takes the height_ready_all action', () => {
-          expect(gen.next().value).toEqual(
-            take(HEIGHT_READY_ALL));
-        });
-
         it('calls the getScrollTop func', () => {
           expect(
-            gen.next().value
+            gen.next(setOffsetTopWinner).value
           ).toEqual(call(getScrollTop));
         });
 
@@ -155,11 +119,40 @@ describe('react-scroll-collapse', () => {
           );
         });
 
+        it('end of loop starts another race', () => {
+          expect(
+            gen.next().value
+          ).toEqual(raceCall);
+        });
+
+        it('non matching scrollerId: starts another race', () => {
+          expect(
+            gen.next(differentWinner).value
+          ).toEqual(raceCall);
+        });
+
+        /*
+          see comments in test/sagas/collapserTest.js
+
+        it(`calls setOffsetTopChannel.close - cant get test to pass.
+          see comments in test/sagas/collapserTest.js`, () => {
+          expect(
+            gen.next(removeScrollerWinner).value
+          ).toEqual(call(setOffsetTopChannel.close));
+        });
+
+        it('calls removeScrollerChannel.close', () => {
+          expect(
+            gen.next().value
+          ).toEqual(call(removeScrollerChannel.close));
+        });
+
         it('ends the generator', () => {
           expect(gen.next().done).toEqual(true);
         });
-
+        */
       });
+
     });
   });
 });

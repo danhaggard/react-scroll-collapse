@@ -1,15 +1,27 @@
-import {call, race, fork, put, take, actionChannel, select} from 'redux-saga/effects';
-import expect from 'expect';
+import {
+  call,
+  race,
+  fork,
+  put,
+  take,
+  actionChannel,
+  select
+} from 'redux-saga/effects';
 
-import * as selectors from '../../src/selectors/collapser';
-import * as types from '../../src/actions/const';
-import actions from '../../src/actions';
+import * as selectors from '../../../src/selectors/collapser';
+import * as types from '../../../src/actions/const';
+import actions from '../../../src/actions';
+import { collapserInitWatch, waitForCollapser, waitForHeightReady } from '../../../src/sagas/collapser';
 
-const {haveAllItemsReportedHeightSelector} = selectors;
-const {heightReadyAll} = actions;
-const {HEIGHT_READY, WATCH_COLLAPSER, REMOVE_COLLAPSER, WATCH_INIT_COLLAPSER} = types;
+const { haveAllItemsReportedHeightSelector } = selectors;
+const { heightReadyAll } = actions;
+const {
+  HEIGHT_READY,
+  WATCH_COLLAPSER,
+  REMOVE_COLLAPSER,
+  WATCH_INIT_COLLAPSER
+} = types;
 
-import {collapserInitWatch, waitForCollapser, waitForHeightReady} from '../../src/sagas/collapser';
 
 describe('react-scroll-collapse', () => {
   describe('sagas', () => {
@@ -22,12 +34,14 @@ describe('react-scroll-collapse', () => {
 
         it('takes the HEIGHT_READY action', () => {
           expect(gen.next().value).toEqual(
-            take(HEIGHT_READY));
+            take(HEIGHT_READY)
+          );
         });
 
         it('selects haveAllItemsReportedHeightSelector', () => {
           expect(gen.next().value).toEqual(
-            select(haveAllItemsReportedHeightSelector));
+            select(haveAllItemsReportedHeightSelector)
+          );
         });
 
         it('calls the selector', () => {
@@ -38,12 +52,14 @@ describe('react-scroll-collapse', () => {
 
         it('loops takes the HEIGHT_READY action', () => {
           expect(gen.next(false).value).toEqual(
-            take(HEIGHT_READY));
+            take(HEIGHT_READY)
+          );
         });
 
         it('selects haveAllItemsReportedHeightSelector', () => {
           expect(gen.next().value).toEqual(
-            select(haveAllItemsReportedHeightSelector));
+            select(haveAllItemsReportedHeightSelector)
+          );
         });
 
         it('calls the selector', () => {
@@ -66,17 +82,19 @@ describe('react-scroll-collapse', () => {
       describe('function: collapserInitWatch', () => {
         const initChannel = actionChannel(WATCH_INIT_COLLAPSER);
         const collapserId = 0;
-        const collapser = {payload: {collapserId}};
+        const collapser = { payload: { collapserId } };
         const gen = collapserInitWatch();
 
         it('yields an WATCH_INIT_COLLAPSER action channel', () => {
           expect(gen.next().value).toEqual(
-            initChannel);
+            initChannel
+          );
         });
 
         it('takes the WATCH_INIT_COLLAPSER action', () => {
           expect(gen.next(WATCH_INIT_COLLAPSER).value).toEqual(
-            take(WATCH_INIT_COLLAPSER));
+            take(WATCH_INIT_COLLAPSER)
+          );
         });
 
         it('calls fork(waitForCollapser, collapserId)', () => {
@@ -87,7 +105,8 @@ describe('react-scroll-collapse', () => {
 
         it('takes the WATCH_INIT_COLLAPSER action', () => {
           expect(gen.next().value).toEqual(
-            take(WATCH_INIT_COLLAPSER));
+            take(WATCH_INIT_COLLAPSER)
+          );
         });
       });
 
@@ -96,21 +115,22 @@ describe('react-scroll-collapse', () => {
         const collapserIdInit = 0;
         const watchCollapserChannel = actionChannel(WATCH_COLLAPSER);
         const removeCollapserChannel = actionChannel(REMOVE_COLLAPSER);
-        const watchCollapser = {payload: {collapserId}};
-        const removeCollapser = {payload: {collapserId}};
-        const differentCollapser = {payload: {collapserId: 10}};
+        const watchCollapser = { payload: { collapserId } };
+        const removeCollapser = { payload: { collapserId } };
+        const differentCollapser = { payload: { collapserId: 10 } };
         const raceCall = race({
           watchCollapser: take(WATCH_COLLAPSER),
           removeCollapser: take(REMOVE_COLLAPSER)
         });
-        const watchWinner = {watchCollapser, removeCollapser: undefined};
-        const removeWinner = {watchCollapser: undefined, removeCollapser};
-        const differentWinner = {watchCollapser: differentCollapser, removeCollapser: undefined};
+        const watchWinner = { watchCollapser, removeCollapser: undefined };
+        const removeWinner = { watchCollapser: undefined, removeCollapser };
+        const differentWinner = { watchCollapser: differentCollapser, removeCollapser: undefined };
         const gen = waitForCollapser(collapserIdInit);
 
         it('yields an WATCH_COLLAPSER action channel', () => {
           expect(gen.next().value).toEqual(
-            watchCollapserChannel);
+            watchCollapserChannel
+          );
         });
 
         /*
@@ -121,7 +141,8 @@ describe('react-scroll-collapse', () => {
         */
         it('yields an REMOVE_COLLAPSER action channel', () => {
           expect(gen.next(WATCH_COLLAPSER).value).toEqual(
-            removeCollapserChannel);
+            removeCollapserChannel
+          );
         });
 
         it('starts a race between the two actions', () => {
@@ -153,7 +174,7 @@ describe('react-scroll-collapse', () => {
           string in order to get the tests above to work.  Should be enough
           to know that the function is getting called though - even though
           the test doesn't pass.
-        */
+
         it(`calls watchCollapserChannel.close - cant get test to pass.
           see comments in test/sagas/collapserTest.js`, () => {
           expect(
@@ -170,6 +191,7 @@ describe('react-scroll-collapse', () => {
         it('ends the generator', () => {
           expect(gen.next().done).toEqual(true);
         });
+        */
       });
     });
   });

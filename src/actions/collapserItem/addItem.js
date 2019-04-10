@@ -1,4 +1,4 @@
-import { ADD_ITEM } from './../const';
+import { ADD_ITEM } from '../const';
 
 function action(collapserId, item, itemId) {
   return {

@@ -1,11 +1,10 @@
-import expect from 'expect';
-import * as reducers from '../../src/reducers/collapser';
-import * as types from '../../src/actions/const';
+import * as reducers from '../../../src/reducers/collapser';
+import * as types from '../../../src/actions/const';
 
 const collapserIdReducerDefault = () => {
   const stateBefore = 0;
   const stateAfter = 0;
-  const action = {type: 'DEFAULT'};
+  const action = { type: 'DEFAULT' };
   Object.freeze(action);
   expect(
     reducers.collapserIdReducer(stateBefore, action)
@@ -32,7 +31,7 @@ const collapserIdReducerAddCollapser = () => {
 const collapsersIdArrayDefault = () => {
   const stateBefore = [0];
   const stateAfter = [0];
-  const action = {type: 'DEFAULT'};
+  const action = { type: 'DEFAULT' };
   Object.freeze(action);
   Object.freeze(stateBefore);
   expect(
@@ -78,7 +77,7 @@ const collapsersIdArrayRemoveCollapserChild = () => {
 const itemsIdArrayDefault = () => {
   const stateBefore = [0];
   const stateAfter = [0];
-  const action = {type: 'DEFAULT'};
+  const action = { type: 'DEFAULT' };
   Object.freeze(action);
   Object.freeze(stateBefore);
   expect(
@@ -132,7 +131,7 @@ const collapserReducerDefault = () => {
     id: 0,
     items: [0],
   };
-  const action = {type: 'DEFAULT'};
+  const action = { type: 'DEFAULT' };
   Object.freeze(action);
   Object.freeze(stateBefore);
   expect(

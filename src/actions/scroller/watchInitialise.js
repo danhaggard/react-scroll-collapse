@@ -1,4 +1,4 @@
-import { WATCH_INITIALISE } from './../const';
+import { WATCH_INITIALISE } from '../const';
 
 function action(scrollerId, getScrollTop) {
   return {

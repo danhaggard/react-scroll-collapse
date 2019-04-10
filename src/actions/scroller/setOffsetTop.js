@@ -1,4 +1,4 @@
-import { SET_OFFSET_TOP } from './../const';
+import { SET_OFFSET_TOP } from '../const';
 
 function action(getOffsetTop, scrollerId, collapserId, itemId) {
   return {

@@ -1,6 +1,5 @@
-import expect from 'expect';
-import * as reducers from '../../src/reducers/collapserItem';
-import * as types from '../../src/actions/const';
+import * as reducers from '../../../src/reducers/collapserItem';
+import * as types from '../../../src/actions/const';
 
 const expandedReducerAddItem = () => {
   const action = {
@@ -142,21 +141,29 @@ const waitingForHeightReducerExpandCollapse = () => {
 };
 
 const waitingForHeightReducerExpandCollapseAll = () => {
-  const stateBefore = false;
-  const stateAfter = true;
-  const action = {
+  const actionFactory = (areAllItemsExpanded = true, expanded = false) => ({
     type: types.EXPAND_COLLAPSE_ALL,
     payload: {
+      item: {
+        expanded,
+      },
+      areAllItemsExpanded,
       itemId: 0,
     },
-  };
-  Object.freeze(action);
+  });
+  const firstAction = actionFactory();
+  const secondAction = actionFactory(false);
+  const thirdAction = actionFactory(false, true);
+
   expect(
-    reducers.waitingForHeightReducer(stateBefore, action)
-  ).toEqual(stateAfter);
+    reducers.waitingForHeightReducer(false, firstAction)
+  ).toEqual(true);
   expect(
-    reducers.waitingForHeightReducer(stateAfter, action)
-  ).toEqual(stateAfter);
+    reducers.waitingForHeightReducer(false, secondAction)
+  ).toEqual(true);
+  expect(
+    reducers.waitingForHeightReducer(false, thirdAction)
+  ).toEqual(false);
 };
 
 const itemsReducerAddItem = () => {

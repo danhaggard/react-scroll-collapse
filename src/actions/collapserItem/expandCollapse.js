@@ -1,4 +1,4 @@
-import { EXPAND_COLLAPSE } from './../const';
+import { EXPAND_COLLAPSE } from '../const';
 
 function action(itemId) {
   return {

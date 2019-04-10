@@ -14,7 +14,6 @@ const compiler = webpack(config);
 
 const server = new WebpackDevServer(compiler, {
   historyApiFallback: true,
-  // contentBase: './src',
   contentBase: config.entry,
   hot: true,
   filename: config.output.filename,

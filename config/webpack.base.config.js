@@ -4,7 +4,7 @@ const webpack = require('webpack');
 
 module.exports = (opts) => {
   const {
-    DEVELOPMENT, PRODUCTION, DIST_PATH, SRC_PATH
+    DEVELOPMENT, PRODUCTION, DIST_PATH
   } = opts;
   // const entry = [path.join(SRC_PATH, 'index.js')];
 
@@ -16,11 +16,6 @@ module.exports = (opts) => {
   });
 
   const rules = [
-    {
-      test: /\.js$/,
-      exclude: /node_modules/,
-      loader: 'babel-loader'
-    },
     {
       test: /\.(jpg|png|gif)$/,
       exclude: /node_modules/,

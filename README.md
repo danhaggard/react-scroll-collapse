@@ -297,11 +297,13 @@ Demo content will be served at http://localhost:8080
 
 ### Testing
 
-To run the tests and view coverage:
+To run the tests:
 
 ```bash
 npm test
 ```
+
+Coverage is found in ./test/coverage/lcov-report
 
 ## Acknowledgements
 

@@ -1,4 +1,4 @@
-import { REMOVE_SCROLLER_CHILD } from './../const';
+import { REMOVE_SCROLLER_CHILD } from '../const';
 
 function action(scrollerId, collapserId) {
   return {

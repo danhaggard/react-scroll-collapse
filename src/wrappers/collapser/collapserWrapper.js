@@ -97,15 +97,16 @@ export const collapserWrapper = (WrappedComponent) => {
       way to keep the reducers clean.
     */
     shouldComponentUpdate(nextProps) {
-      const { allChildItems } = this.props;
+      const { props } = this;
+      const { allChildItems } = props;
       let shouldUpdate = true;
       // don't update if the two arrays have the same ids...
       shouldUpdate = !isEqual(allChildItems.map(item => item.id),
         nextProps.allChildItems.map(item => item.id));
       if (!shouldUpdate) {
         // unless some other prop has changed...
-        Object.keys(this.props).forEach((prop) => {
-          if (prop !== 'allChildItems' && this.props[prop] !== nextProps[prop]) {
+        Object.keys(props).forEach((prop) => {
+          if (prop !== 'allChildItems' && props[prop] !== nextProps[prop]) {
             shouldUpdate = true;
           }
         });

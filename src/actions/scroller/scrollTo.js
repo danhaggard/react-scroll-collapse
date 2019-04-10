@@ -1,4 +1,4 @@
-import { SCROLL_TO } from './../const';
+import { SCROLL_TO } from '../const';
 
 function action(scrollerId, offsetTop, scrollTop) {
   return {

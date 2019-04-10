@@ -1,5 +1,4 @@
-import expect from 'expect';
-import * as selectors from '../../src/selectors/utils';
+import * as selectors from '../../../src/selectors/utils';
 
 const selector = () => {
   const state = {

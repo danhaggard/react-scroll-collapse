@@ -1,56 +1,95 @@
-const path = require('path');
 const webpack = require('webpack');
-const HTMLWebpackPlugin = require('html-webpack-plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const baseConfig = require('./webpack.base.config');
 
 module.exports = (opts) => {
-  const { DEVELOPMENT, SRC_PATH } = opts;
+  const { DEVELOPMENT, DIST_PATH, SRC_PATH } = opts;
   const config = baseConfig(opts);
-  const extractText = new ExtractTextPlugin({
-    filename: 'style-[contenthash:10].css',
-    disable: DEVELOPMENT
+
+  const extractCss = new MiniCssExtractPlugin({
+    filename: 'style-[contenthash:10].css'
   });
-  const uglifyJs = new webpack.optimize.UglifyJsPlugin();
-  const htmlWebpack = new HTMLWebpackPlugin({
-    template: path.join(SRC_PATH, 'index-template.html'),
-  });
-  const cssLoader = extractText.extract({
-    use: [{
-      loader: 'css-loader',
-      options: {
-        camelCase: true,
-        modules: true,
+
+  const aggressiveMergingPlugin = new webpack.optimize.AggressiveMergingPlugin();
+  const noEmitOnErrorsPlugin = new webpack.NoEmitOnErrorsPlugin();
+
+  const jsLoader = {
+    test: /\.(js|jsx)$/,
+    include: [SRC_PATH],
+    exclude: /node_modules/,
+    loader: 'babel-loader'
+  };
+
+  const cssLoader = {
+    test: /\.s?[ac]ss$/,
+    use: [
+      {
+        loader: MiniCssExtractPlugin.loader,
+        options: {
+          // only enable hot in development
+          hmr: DEVELOPMENT,
+          // if hmr does not work, this is a forceful method.
+          reloadAll: true
+        }
+      },
+      {
+        loader: 'css-loader',
+        options: {
+          camelCase: true,
+          modules: true,
+        }
+      },
+      {
+        loader: 'sass-loader',
+        options: {
+          modules: true
+        }
       }
-    }, {
-      loader: 'sass-loader'
-    }],
-    fallback: 'style-loader'
-  });
+    ],
+  };
+
+  const externals = {
+    classnames: 'classnames',
+    'lodash.isequal': 'lodash.isequal',
+    react: 'react',
+    'react-collapse': 'react-collapse',
+    'react-dom': 'react-dom',
+    'react-height': 'react-height',
+    'react-motion': 'react-motion',
+    'react-redux': 'react-redux',
+    redux: 'redux',
+    'redux-saga': 'redux-saga',
+    reselect: 'reselect',
+  };
+
+  const resolve = {
+    extensions: ['.js', '.jsx']
+  };
 
   return {
     ...config,
     mode: 'production',
-    entry: config.entry,
+    entry: SRC_PATH,
+    externals,
     module: {
       rules: [
         ...config.module.rules,
-        {
-          test: /\.s?[ac]ss$/,
-          use: cssLoader,
-        },
+        jsLoader,
+        cssLoader,
       ]
     },
     output: {
-      ...config.output,
-      publicPath: '/',
-      filename: 'bundle-[hash:12].js',
+      path: DIST_PATH,
+      filename: 'index.js',
+      libraryTarget: 'umd',
+      library: 'ReactScrollCollapse'
     },
     plugins: [
       ...config.plugins,
-      extractText,
-      htmlWebpack,
-      uglifyJs
+      aggressiveMergingPlugin,
+      extractCss,
+      noEmitOnErrorsPlugin,
     ],
+    resolve,
   };
 };

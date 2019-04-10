@@ -1,4 +1,4 @@
-import { REMOVE_ITEM } from './../const';
+import { REMOVE_ITEM } from '../const';
 
 function action(collapserId, itemId) {
   return {

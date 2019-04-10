@@ -1,9 +1,8 @@
-import expect from 'expect';
-import actions from '../../src/actions/';
-import * as types from '../../src/actions/const';
+import actions from '../../../src/actions';
+import * as types from '../../../src/actions/const';
 
 const addItem = () => {
-  const [collapserId, item, itemId] = [0, {expanded: false}, 0];
+  const [collapserId, item, itemId] = [0, { expanded: false }, 0];
   const output = {
     type: types.ADD_ITEM,
     payload: {

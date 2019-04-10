@@ -1,6 +1,5 @@
-import expect from 'expect';
-import * as reducers from '../../src/reducers/scroller';
-import * as types from '../../src/actions/const';
+import * as reducers from '../../../src/reducers/scroller';
+import * as types from '../../../src/actions/const';
 
 
 const scrollerCollapsersIdArrayReducerAddCollapser = () => {

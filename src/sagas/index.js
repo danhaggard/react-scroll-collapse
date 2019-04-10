@@ -9,3 +9,5 @@ export function* reactScrollCollapseSagas() {
     scrollerInitWatch()
   ]);
 }
+
+export default reactScrollCollapseSagas;

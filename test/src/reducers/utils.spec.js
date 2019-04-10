@@ -1,5 +1,4 @@
-import expect from 'expect';
-import * as utils from '../../src/reducers/utils';
+import * as utils from '../../../src/reducers/utils';
 
 const isUndefNull = () => {
   const val1 = undefined;

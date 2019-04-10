@@ -1,9 +1,8 @@
-import expect from 'expect';
-import actions from '../../src/actions/';
-import * as types from '../../src/actions/const';
+import actions from '../../../src/actions';
+import * as types from '../../../src/actions/const';
 
 const addScroller = () => {
-  const scroller = {scrollTop: 200};
+  const scroller = { scrollTop: 200 };
   const scrollerId = 0;
   const output = {
     type: types.ADD_SCROLLER,
@@ -19,7 +18,7 @@ const addScroller = () => {
 };
 
 const addScrollerChild = () => {
-  const collapser = {id: 0};
+  const collapser = { id: 0 };
   const scrollerId = 0;
   const output = {
     type: types.ADD_SCROLLER_CHILD,

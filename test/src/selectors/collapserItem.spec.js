@@ -1,5 +1,4 @@
-import expect from 'expect';
-import * as selectors from '../../src/selectors/collapserItem';
+import * as selectors from '../../../src/selectors/collapserItem';
 
 const state = {
   reactScrollCollapse: {

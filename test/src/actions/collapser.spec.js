@@ -1,6 +1,5 @@
-import expect from 'expect';
-import actions from '../../src/actions/';
-import * as types from '../../src/actions/const';
+import actions from '../../../src/actions';
+import * as types from '../../../src/actions/const';
 
 
 const addCollapser = () => {
@@ -76,7 +75,7 @@ const removeCollapserChild = () => {
 
 
 const expandCollapseAll = () => {
-  const item = {dummy: 'dummy'};
+  const item = { dummy: 'dummy' };
   const areAllItemsExpanded = true;
   const itemId = 0;
   const output = {
