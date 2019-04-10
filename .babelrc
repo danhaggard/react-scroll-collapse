@@ -31,6 +31,12 @@
         "transform-react-remove-prop-types"
       ]
     },
-    "test": {}
+    "test": {
+      "presets": [
+        ["@babel/preset-env", {
+          "modules": "auto"
+        }]
+      ]
+    }
   }
 }
