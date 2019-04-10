@@ -8,7 +8,6 @@ import {
 } from 'redux-saga/effects';
 
 import {
-  HEIGHT_READY_ALL,
   SET_OFFSET_TOP,
   WATCH_INITIALISE,
   REMOVE_SCROLLER
@@ -23,27 +22,6 @@ const { scrollTo } = actions;
   Scroller UI related sagas
   ==========================
 */
-
-/*
-  waitForCollapserFinishSignal waits for the HEIGHT_READY_CALL action fired by
-  a collapser - telling it that all collapserItems have reported their height
-  and thus that it is safe to inspect the dom for scrollTop and offsetTop values.
-
-  It then commences the scroll by putting the SCROLL_TO action - and then ends
-  the saga instance.
-*/
-export function* waitForCollapserFinishSignal(scrollerId, getScrollTop, getOffsetTop) {
-  const condition = true;
-  while (condition) {
-    yield take(HEIGHT_READY_ALL);
-    const scrollTop = yield call(getScrollTop);
-    const offsetTop = yield call(getOffsetTop);
-    yield put(scrollTo(scrollerId, offsetTop, scrollTop));
-    // returning here ensures the saga does not persist after the auto-scroll is finished
-    // a new one will be generated each time a collapser button is clicked.
-    return;
-  }
-}
 
 /*
   The waitForSetOffsetTop saga is called once for every Scroller that is mounted.
@@ -92,7 +70,9 @@ export function* waitForSetOffsetTop(scrollerIdInit, getScrollTop) {
     if (setOffsetTop) {
       const { payload: { getOffsetTop, scrollerId } } = setOffsetTop;
       if (scrollerId === scrollerIdInit) {
-        yield call(waitForCollapserFinishSignal, scrollerId, getScrollTop, getOffsetTop);
+        const scrollTop = yield call(getScrollTop);
+        const offsetTop = yield call(getOffsetTop);
+        yield put(scrollTo(scrollerId, offsetTop, scrollTop));
       }
     } else {
       const { payload: { scrollerId } } = removeScroller;
