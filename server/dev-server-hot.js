@@ -8,12 +8,14 @@ const config = require('../webpack.config.babel.js');
 
 const portNumber = 8080;
 const targetEntry = `http://localhost:${portNumber}/`;
+config.entry.unshift(`webpack-dev-server/client?${targetEntry}`);
 
 const compiler = webpack(config);
 
 const server = new WebpackDevServer(compiler, {
   historyApiFallback: true,
   contentBase: config.entry,
+  hot: true,
   filename: config.output.filename,
   publicPath: config.output.publicPath,
   stats: {

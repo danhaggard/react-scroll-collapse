@@ -1,5 +1,7 @@
-const webpack = require('webpack');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+
+// const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
 const baseConfig = require('./webpack.base.config');
 
 module.exports = (opts) => {
@@ -9,9 +11,6 @@ module.exports = (opts) => {
   const extractCss = new MiniCssExtractPlugin({
     filename: 'style-[contenthash:10].css'
   });
-
-  const aggressiveMergingPlugin = new webpack.optimize.AggressiveMergingPlugin();
-  const noEmitOnErrorsPlugin = new webpack.NoEmitOnErrorsPlugin();
 
   const jsLoader = {
     test: /\.(js|jsx)$/,
@@ -86,9 +85,7 @@ module.exports = (opts) => {
     },
     plugins: [
       ...config.plugins,
-      aggressiveMergingPlugin,
       extractCss,
-      noEmitOnErrorsPlugin,
     ],
     resolve,
   };

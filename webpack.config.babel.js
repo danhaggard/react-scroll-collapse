@@ -1,17 +1,12 @@
-/*
-import {
-  dev,
-  dist,
-  ghPages,
-  test
-} from './conf/webpack';
-*/
+require('@babel/register')({
+  presets: ['@babel/preset-env']
+});
 
 const path = require('path');
 
 const prodConfig = require('./config/webpack.production.config.js');
 const devConfig = require('./config/webpack.development.config.js');
-// const testConfig = require('./config/webpack.test.config.js');
+const ghPagesConfig = require('./config/webpack.ghPages.config.js');
 
 const EXAMPLES_PATH = path.join(__dirname, 'examples');
 const BUNDLES_PATH = path.resolve(EXAMPLES_PATH, 'bundles');
@@ -33,8 +28,8 @@ module.exports = (() => {
       return prodConfig;
     case 'development':
       return devConfig;
-    // case 'test':
-      // return testConfig;
+    case 'ghPages':
+      return ghPagesConfig;
     default:
       return devConfig;
   }

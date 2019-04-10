@@ -4,7 +4,12 @@ const baseConfig = require('./webpack.base.config.js');
 
 
 module.exports = (opts) => {
-  const { DEVELOPMENT, BUNDLES_PATH, EXAMPLES_PATH } = opts;
+  const {
+    DEVELOPMENT,
+    BUNDLES_PATH,
+    EXAMPLES_PATH,
+    SRC_PATH
+  } = opts;
   const config = baseConfig(opts);
   // Swaps out newly changed code on the fly and updates the browser.
   const hotModuleReplacement = new webpack.HotModuleReplacementPlugin();
@@ -75,6 +80,7 @@ module.exports = (opts) => {
         ...config.module.rules,
         {
           test: /\.js$/,
+          include: [EXAMPLES_PATH, SRC_PATH],
           exclude: /node_modules/,
           loader: 'babel-loader'
         },
