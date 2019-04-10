@@ -1,16 +1,10 @@
-import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-
-// const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-
 const baseConfig = require('./webpack.base.config');
 
 module.exports = (opts) => {
   const { DEVELOPMENT, DIST_PATH, SRC_PATH } = opts;
   const config = baseConfig(opts);
 
-  const extractCss = new MiniCssExtractPlugin({
-    filename: 'style-[contenthash:10].css'
-  });
+  const cssIdentifier = '[path][name]---[local]';
 
   const jsLoader = {
     test: /\.(js|jsx)$/,
@@ -23,24 +17,23 @@ module.exports = (opts) => {
     test: /\.s?[ac]ss$/,
     use: [
       {
-        loader: MiniCssExtractPlugin.loader,
+        loader: 'style-loader',
         options: {
-          // only enable hot in development
-          hmr: DEVELOPMENT,
-          // if hmr does not work, this is a forceful method.
-          reloadAll: true
+          sourceMap: DEVELOPMENT
         }
       },
       {
         loader: 'css-loader',
         options: {
           camelCase: true,
+          localIdentName: cssIdentifier,
           modules: true,
         }
       },
       {
         loader: 'sass-loader',
         options: {
+          localIdentName: cssIdentifier,
           modules: true
         }
       }
@@ -84,7 +77,6 @@ module.exports = (opts) => {
     },
     plugins: [
       ...config.plugins,
-      extractCss,
     ],
     resolve,
   };
