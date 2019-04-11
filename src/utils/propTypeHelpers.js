@@ -1,5 +1,7 @@
 import PropTypes from 'prop-types';
 
+export const arrayOfType = ofType => PropTypes.arrayOf(ofType);
+export const arrayOfStrings = arrayOfType(PropTypes.string);
 
 export const ofTypeOrNothing = ofType => PropTypes.oneOfType([
   ofType,

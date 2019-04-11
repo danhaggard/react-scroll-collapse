@@ -1,0 +1,34 @@
+body {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  line-height: 1.5rem;
+  font-size: 1rem;
+  font-family: 'Roboto script=all rev=2', sans-serif;
+  font-weight: 300;
+  font-style: normal;
+  white-space: normal;
+}
+
+:local(.codelink) {
+  margin-bottom: 1rem;
+}
+
+:local(.example) {
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  padding-top: 0;
+  background: #FFF;
+  border: 1px solid #AAA;
+  border-radius: 2px;
+}
+
+:local(.main) {
+  width: 60%;
+  margin: 1rem;
+  padding: 1rem;
+  padding-top: 0;
+  background: #FFF;
+}
