@@ -15,9 +15,7 @@ const registryFactory = consumerFactory => (
   providerTypeKey
 ) => {
 
-  // const Consumer = consumerFactory(Context, Comp);
-
-  class RegistryInner extends Component {
+  class Registry extends Component {
 
     state = {
       id: getNextId(providerTypeKey),
@@ -42,10 +40,10 @@ const registryFactory = consumerFactory => (
       return <Comp {...this.props} id={id} />;
     }
   }
-  const Consumer = consumerFactory(Context, RegistryInner);
-  return Consumer;
+
+  return consumerFactory(Context, Registry);
 };
 
-const registryOuter = registryFactory(contextConsumerFactory);
+const registry = registryFactory(contextConsumerFactory);
 
-export default registryOuter;
+export default registry;

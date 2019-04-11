@@ -1,9 +1,6 @@
 import { getNextIdFactory } from '../selectors/utils';
 import hasOwnProperty from '../utils/hasOwnProperty';
 
-// const getNextCollapserId = getNextIdFactory();
-// const getNextItemId = getNextIdFactory();
-
 const getEntityIdObj = {};
 
 const getNextIdFromObj = objArg => (key) => {
@@ -16,7 +13,5 @@ const getNextIdFromObj = objArg => (key) => {
 };
 
 const getNextId = getNextIdFromObj(getEntityIdObj);
-
-console.log('store', getEntityIdObj);
 
 export default getNextId;
