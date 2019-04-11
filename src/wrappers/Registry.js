@@ -12,16 +12,15 @@ export const contextConsumerFactory = (Context, Comp) => props => (
 const registryFactory = consumerFactory => (
   Context,
   Comp,
-  registerMethod,
-  storeKey
+  providerTypeKey
 ) => {
 
-  const Consumer = consumerFactory(Context, Comp);
+  // const Consumer = consumerFactory(Context, Comp);
 
   class RegistryInner extends Component {
 
     state = {
-      id: getNextId(storeKey),
+      id: getNextId(providerTypeKey),
     }
 
     componentDidMount() {
@@ -33,18 +32,18 @@ const registryFactory = consumerFactory => (
     }
 
     registerSelf = (props, { id }) => {
-      if (typeof props[registerMethod] === 'function') {
-        props[registerMethod](id);
+      if (typeof props[providerTypeKey] === 'function') {
+        props[providerTypeKey](id);
       }
     }
 
     render() {
       const { id } = this.state;
-      return <Consumer {...this.props} id={id} />;
+      return <Comp {...this.props} id={id} />;
     }
   }
-
-  return RegistryInner;
+  const Consumer = consumerFactory(Context, RegistryInner);
+  return Consumer;
 };
 
 const registryOuter = registryFactory(contextConsumerFactory);

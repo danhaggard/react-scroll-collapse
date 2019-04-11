@@ -1,47 +1,37 @@
-import React, { Component } from 'react';
+import createProvider from '../provider';
+
+const collapserProvider = createProvider(
+  ['collapsers', 'items'],
+  ({ id, parentScrollerId }) => ({
+    parentCollapserId: id,
+    parentScrollerId,
+  }),
+  'collapsers'
+);
+
+/*
+import React from 'react';
 import PropTypes from 'prop-types';
 import childrenManager from '../ChildrenManager';
-
 import registry from '../Registry';
+
 
 const CollapserChildrenManager = childrenManager(['collapsers', 'items']);
 
 const collapserProvider = (Context, Comp) => {
-  class CollapserProvider extends Component {
 
-    state = {
-      collapsers: [],
-      items: [],
-    }
+  class CollapserProvider extends CollapserChildrenManager {
 
-    createChildContext = ({ id, parentScrollerId }, { registerCollapser, registerItem }) => ({
+    createChildContext = ({ id, parentScrollerId }) => ({
       parentCollapserId: id,
       parentScrollerId,
-      registerCollapser,
-      registerItem,
+      ...this.childRegisterMethods,
     });
 
-    addEntity = (key, id) => this.setState(prevState => ({ [key]: [...prevState[key], id] }));
-
-    removeEntity = (key, id) => this.setState(prevState => prevState[key].filter(
-      val => val !== id
-    ));
-
-    addRemoveEntity = (key, id) => {
-      const { state } = this.state;
-      if (state[key].includes(id)) {
-        return this.removeEntity(key, id);
-      }
-      return this.addEntity(key, id);
-    }
-
-    registerCollapser = childId => this.addRemoveEntity('items', childId);
-
-    registerItem = childId => this.addRemoveEntity('collapsers', childId);
-
     render() {
+      const childContext = this.createChildContext(this.props);
       return (
-        <Context.Provider value={this.createChildContext(this.props, this)}>
+        <Context.Provider value={childContext}>
           <Comp {...this.props} />
         </Context.Provider>
       );
@@ -54,7 +44,10 @@ const collapserProvider = (Context, Comp) => {
     registerCollapser: PropTypes.func.isRequired
   };
 
-  return registry(Context, CollapserProvider, 'registerCollapser', 'collapsers', ['collapsers', 'items']);
+  return registry(Context, CollapserProvider, 'collapsers');
 };
+
+export default collapserProvider;
+*/
 
 export default collapserProvider;

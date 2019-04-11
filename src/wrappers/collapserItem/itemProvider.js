@@ -1,3 +1,12 @@
+import createProvider from '../provider';
+
+const itemProvider = createProvider(
+  [],
+  () => ({}),
+  'items'
+);
+
+/*
 import React, { Component } from 'react';
 import registry from '../Registry';
 
@@ -16,7 +25,7 @@ const itemProvider = (Context, Comp) => {
     }
   }
 
-  return registry(Context, ItemProvider, 'registerItem');
+  return registry(Context, ItemProvider, 'items');
 };
-
+*/
 export default itemProvider;
