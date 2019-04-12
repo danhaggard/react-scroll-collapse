@@ -1,8 +1,11 @@
-import { Component } from 'react';
+import { PureComponent } from 'react';
 
 const childrenManager = (childStateKeys) => {
 
-  class ChildrenManager extends Component {
+  class ChildrenManager extends PureComponent {
+    /*
+      State management and future redux alternative?
+    */
 
     childRegisterMethods = {};
 
