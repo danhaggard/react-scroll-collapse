@@ -5,6 +5,11 @@ import { ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
 import actions from '../../actions';
 import selectors from '../../selectors';
 
+import providers from '../../contextProviders';
+
+const { CONTEXTS, scrollerProvider } = providers;
+const applyContext = comp => scrollerProvider(CONTEXTS.MAIN, comp);
+
 const { nextScrollerIdSelector } = selectors.scroller;
 const { ifNotFirstSec } = selectors.utils;
 
@@ -13,6 +18,8 @@ export const scrollerWrapper = (ScrollerComponent) => {
   class WrappedScroller extends Component {
 
     constructor(props, context) {
+      console.log('WrappedScroller: constructor(props, context', props, context);
+
       super(props, context);
       const { scrollerId } = this.props;
       this.scrollerId = ifNotFirstSec(scrollerId, nextScrollerIdSelector());
@@ -75,4 +82,4 @@ export const scrollerWrapper = (ScrollerComponent) => {
   return connect(undefined, mapDispatchToProps)(WrappedScroller);
 };
 
-export default scrollerWrapper;
+export default applyContext(scrollerWrapper);

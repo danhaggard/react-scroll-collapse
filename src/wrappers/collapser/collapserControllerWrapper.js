@@ -15,18 +15,21 @@ export const collapserControllerWrapper = (CollapserController) => {
 
     constructor(props, context) {
       super(props, context);
+      console.log('WrappedCollapserController: constructor(props, context', props, context);
 
       const {
-        collapserId,
+        id,
         parentCollapserId,
         parentScrollerId
       } = this.props;
-
+      const collapserId = id;
       /*
         If id vals supplied manually through props use those, else use
         auto-generated values.
       */
-      this.collapserId = ifNotFirstSec(collapserId, nextCollapserIdSelector());
+      // this.collapserId = ifNotFirstSec(collapserId, nextCollapserIdSelector());
+      this.collapserId = collapserId;
+
       this.parentCollapserId = ifNotFirstSec(parentCollapserId, this.context.parentCollapserId); // eslint-disable-line
       this.parentScrollerId = ifNotFirstSec(parentScrollerId, this.context.parentScrollerId); // eslint-disable-line
 
@@ -36,11 +39,13 @@ export const collapserControllerWrapper = (CollapserController) => {
       this.addCollapser();
     }
 
+    /*
     getChildContext() {
       return {
         parentCollapserId: this.collapserId,
       };
     }
+    */
 
     componentWillUnmount() {
       const { removeCollapserChild, removeScrollerChild, removeCollapser } = this.props;
@@ -114,7 +119,7 @@ export const collapserControllerWrapper = (CollapserController) => {
   /*
     The following relies on the react context api to pass component
     heirarchy information to children.
-  */
+
   WrappedCollapserController.childContextTypes = {
     parentCollapserId: PropTypes.number,
     parentScrollerId: PropTypes.number,
@@ -124,6 +129,7 @@ export const collapserControllerWrapper = (CollapserController) => {
     parentCollapserId: PropTypes.number,
     parentScrollerId: PropTypes.number,
   };
+  */
 
   return connect(undefined, collapserControllerActions)(WrappedCollapserController);
 };

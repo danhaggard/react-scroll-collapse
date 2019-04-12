@@ -22,6 +22,7 @@ export const collapserItemControllerWrapper = (CollapserItemController) => {
 
     constructor(props, context) {
       super(props, context);
+      console.log('WrappedCollapserItemController: constructor(props, context', props, context);
 
       /*
         If parent supplied itemId / parentCollapserId props - else use values

@@ -39,7 +39,7 @@ const App = () => (
         <CommentThread childThreads={2} />
       </Scroller>
     </div>
-    <ContextTest />
+    { /* <ContextTest /> */}
   </div>
 );
 
