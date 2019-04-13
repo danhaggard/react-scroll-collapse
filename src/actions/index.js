@@ -61,11 +61,22 @@ export const collapserWrapperActions = {
   watchInitCollapser,
 };
 
+export const itemControllerActions = {
+  addItem,
+  removeItem,
+};
+
+
 export const itemWrapperActions = {
   heightReady,
   expandCollapse,
   setOffsetTop,
   watchCollapser,
+};
+
+export const scrollerWrapperActions = {
+  addScroller,
+  removeScroller,
 };
 
 export default actions;

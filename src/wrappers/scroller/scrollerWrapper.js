@@ -2,17 +2,12 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
-import actions from '../../actions';
+import { scrollerWrapperActions } from '../../actions';
 import cleanHoCProps from '../../utils/cleanHoCProps';
 import providers from '../../contextProviders';
 
 const { scrollerProvider } = providers;
 
-const propTypeCache = {
-  addScroller: PropTypes.func.isRequired,
-  scrollerId: ofNumberTypeOrNothing,
-  removeScroller: PropTypes.func.isRequired,
-};
 
 export const scrollerWrapper = (ScrollerComponent) => {
 
@@ -42,7 +37,7 @@ export const scrollerWrapper = (ScrollerComponent) => {
             {...cleanHoCProps(
               this.props,
               WrappedScroller.defaultProps,
-              { ...propTypeCache }
+              scrollerWrapperActions
             )}
             scrollerId={scrollerId}
           />
@@ -56,14 +51,13 @@ export const scrollerWrapper = (ScrollerComponent) => {
     scrollerId: null,
   };
 
-  WrappedScroller.propTypes = propTypeCache;
-
-  const mapDispatchToProps = {
-    addScroller: actions.addScroller,
-    removeScroller: actions.removeScroller,
+  WrappedScroller.propTypes = {
+    addScroller: PropTypes.func.isRequired,
+    scrollerId: ofNumberTypeOrNothing,
+    removeScroller: PropTypes.func.isRequired,
   };
 
-  return connect(undefined, mapDispatchToProps)(scrollerProvider(WrappedScroller));
+  return connect(undefined, scrollerWrapperActions)(scrollerProvider(WrappedScroller));
 };
 
 export default scrollerWrapper;

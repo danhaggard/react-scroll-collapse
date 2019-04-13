@@ -4,21 +4,8 @@ import { connect } from 'react-redux';
 
 import { ofBoolTypeOrNothing, ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
 import cleanHoCProps from '../../utils/cleanHoCProps';
+import { itemControllerActions } from '../../actions';
 
-import actions from '../../actions';
-
-const propTypeCache = {
-  addItem: PropTypes.func.isRequired,
-  removeItem: PropTypes.func.isRequired,
-
-  /*
-    isOpenedInit: overrides the default isOpened status.
-  */
-  isOpenedInit: ofBoolTypeOrNothing,
-  itemId: ofNumberTypeOrNothing,
-  parentCollapserId: ofNumberTypeOrNothing,
-  parentScrollerId: ofNumberTypeOrNothing,
-};
 
 export const collapserItemControllerWrapper = (CollapserItemController) => {
 
@@ -63,7 +50,7 @@ export const collapserItemControllerWrapper = (CollapserItemController) => {
             {...cleanHoCProps(
               this.props,
               WrappedCollapserItemController.defaultProps,
-              ...propTypeCache
+              itemControllerActions
             )}
           />
         );
@@ -79,14 +66,20 @@ export const collapserItemControllerWrapper = (CollapserItemController) => {
     parentScrollerId: null,
   };
 
-  WrappedCollapserItemController.propTypes = propTypeCache;
+  WrappedCollapserItemController.propTypes = {
+    addItem: PropTypes.func.isRequired,
+    removeItem: PropTypes.func.isRequired,
 
-  const mapDispatchToProps = {
-    addItem: actions.addItem,
-    removeItem: actions.removeItem,
+    /*
+      isOpenedInit: overrides the default isOpened status.
+    */
+    isOpenedInit: ofBoolTypeOrNothing,
+    itemId: ofNumberTypeOrNothing,
+    parentCollapserId: ofNumberTypeOrNothing,
+    parentScrollerId: ofNumberTypeOrNothing,
   };
 
-  return connect(undefined, mapDispatchToProps)(WrappedCollapserItemController);
+  return connect(undefined, itemControllerActions)(WrappedCollapserItemController);
 };
 
 export default collapserItemControllerWrapper;

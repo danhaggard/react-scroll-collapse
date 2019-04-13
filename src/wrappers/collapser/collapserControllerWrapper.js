@@ -6,20 +6,6 @@ import { ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
 import { collapserControllerActions } from '../../actions';
 import cleanHoCProps from '../../utils/cleanHoCProps';
 
-const propTypeCache = {
-  addCollapser: PropTypes.func.isRequired,
-  addCollapserChild: PropTypes.func.isRequired,
-  removeCollapser: PropTypes.func.isRequired,
-  removeCollapserChild: PropTypes.func.isRequired,
-  addScrollerChild: PropTypes.func.isRequired,
-  removeScrollerChild: PropTypes.func.isRequired,
-
-  collapserId: ofNumberTypeOrNothing,
-  parentCollapserId: ofNumberTypeOrNothing,
-  parentScrollerId: ofNumberTypeOrNothing,
-};
-
-
 export const collapserControllerWrapper = (CollapserController) => {
 
   class WrappedCollapserController extends Component {
@@ -62,7 +48,7 @@ export const collapserControllerWrapper = (CollapserController) => {
             {...cleanHoCProps(
               this.props,
               WrappedCollapserController.defaultProps,
-              { ...propTypeCache }
+              collapserControllerActions
             )}
           />
         );
@@ -77,7 +63,18 @@ export const collapserControllerWrapper = (CollapserController) => {
     parentScrollerId: null,
   };
 
-  WrappedCollapserController.propTypes = propTypeCache;
+  WrappedCollapserController.propTypes = {
+    addCollapser: PropTypes.func.isRequired,
+    addCollapserChild: PropTypes.func.isRequired,
+    removeCollapser: PropTypes.func.isRequired,
+    removeCollapserChild: PropTypes.func.isRequired,
+    addScrollerChild: PropTypes.func.isRequired,
+    removeScrollerChild: PropTypes.func.isRequired,
+
+    collapserId: ofNumberTypeOrNothing,
+    parentCollapserId: ofNumberTypeOrNothing,
+    parentScrollerId: ofNumberTypeOrNothing,
+  };
 
 
   return connect(undefined, collapserControllerActions)(WrappedCollapserController);
