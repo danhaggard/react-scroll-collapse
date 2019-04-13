@@ -63,7 +63,7 @@ export const collapserItemControllerWrapper = (CollapserItemController) => {
             {...cleanHoCProps(
               this.props,
               WrappedCollapserItemController.defaultProps,
-              propTypeCache
+              ...propTypeCache
             )}
           />
         );

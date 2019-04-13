@@ -42,7 +42,7 @@ export const scrollerWrapper = (ScrollerComponent) => {
             {...cleanHoCProps(
               this.props,
               WrappedScroller.defaultProps,
-              propTypeCache
+              { ...propTypeCache }
             )}
             scrollerId={scrollerId}
           />
