@@ -6,8 +6,6 @@ import Scroller from '../../../src';
 import CommentThread from '../CommentThread';
 import SimpleCollapser from '../SimpleCollapser';
 
-import ContextTest from '../ContextTest';
-
 const App = () => (
   <div className={styles.main}>
     <h2>react-scroll-collapse - Examples</h2>

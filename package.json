@@ -21,8 +21,7 @@
     "start": "npm run serve:dev",
     "stats": "cross-env NODE_ENV=production webpack --profile --json > ./stats/stats.json",
     "stats-gh": "cross-env NODE_ENV=ghPages webpack --profile --json > ./stats/stats-gh.json",
-    "test": "jest --runInBand --config ./test/jest.config.js --rootDir",
-    "test:watch": "cross-env NODE_ENV=test karma start --autoWatch=true --singleRun=false --reporters=mocha,coverage"
+    "test": "jest --runInBand --config ./test/jest.config.js --rootDir"
   },
   "repository": {
     "type": "git",
@@ -119,8 +118,5 @@
     "redux": "^4.0.1",
     "redux-saga": "^1.0.2",
     "reselect": "^4.0.0"
-  },
-  "dependencies": {
-    "lodash.isequal": "^4.5.0"
   }
 }
