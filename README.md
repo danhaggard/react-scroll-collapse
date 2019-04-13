@@ -1,11 +1,17 @@
 # react-scroll-collapse
 Component wrappers for auto-scrolling collapsible elements - with smooth animations powered by [react-motion](https://github.com/chenglou/react-motion) and [react-collapse](https://github.com/nkbt/react-collapse).
 
-**Warning:** This is currently an unstable beta release and probably not ready for production.  Development is ongoing and feedback is welcome.
-
 ## Demo
 
 https://danhaggard.github.io/react-scroll-collapse/examples/
+
+## What's New!
+
+13th April 2019
+
+Dependencies have been updated to their latest version as of: 13th April 2019 - including react-redux@7.0.1 and react@16.8.4
+
+The reliance on the legacy context api has been removed.  This means versions 1.0.0 of react-scroll-collapse won't work with versions of react < 16.  You can still use v0.2.0 if you need an older version of react.
 
 ## Overview
 
