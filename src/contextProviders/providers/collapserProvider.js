@@ -1,13 +1,10 @@
-import { COLLAPSERS, ITEMS } from '../constants';
+import { COLLAPSERS, ITEMS, SCROLLERS } from '../constants';
 import createProvider from '../createProvider';
 
 const collapserProvider = createProvider(
-  [COLLAPSERS, ITEMS],
-  ({ id, parentScrollerId }) => ({
-    parentCollapserId: id,
-    parentScrollerId,
-  }),
-  COLLAPSERS
+  COLLAPSERS, // your provider type
+  [SCROLLERS], // parent provider types
+  [COLLAPSERS, ITEMS], // child provider types
 );
 
 export default collapserProvider;
@@ -24,12 +21,9 @@ export default collapserProvider;
   const ChildrenManager = childrenManager(childStateKeys);
 
   const collapserProvider = createProvider(
-    childStateKeys,
-    ({ id, parentScrollerId }) => ({
-      parentCollapserId: id,
-      parentScrollerId,
-    }),
-    'collapsers',
+    COLLAPSERS, // your provider type
+    [SCROLLERS], // parent provider types
+    [COLLAPSERS, ITEMS], // child provider types
     ChildrenManager
   );
 */

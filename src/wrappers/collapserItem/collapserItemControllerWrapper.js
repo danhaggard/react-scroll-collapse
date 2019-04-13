@@ -5,10 +5,7 @@ import { connect } from 'react-redux';
 import { ofBoolTypeOrNothing, ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
 
 import actions from '../../actions';
-import selectors from '../../selectors';
 
-const { nextItemIdSelector } = selectors.collapserItem;
-const { ifNotFirstSec } = selectors.utils;
 
 /*
   collapserItemControllerWrapper is a HoC that is used to manage the dynamic generation of
@@ -20,9 +17,9 @@ export const collapserItemControllerWrapper = (CollapserItemController) => {
 
   class WrappedCollapserItemController extends Component {
 
-    constructor(props, context) {
-      super(props, context);
-      console.log('WrappedCollapserItemController: constructor(props, context', props, context);
+    constructor(props) {
+      super(props);
+      // console.log('WrappedCollapserItemController: constructor(props, context', props, context);
 
       /*
         If parent supplied itemId / parentCollapserId props - else use values
@@ -36,14 +33,9 @@ export const collapserItemControllerWrapper = (CollapserItemController) => {
       */
       const { itemId, parentCollapserId, parentScrollerId } = this.props;
 
-      const {
-        parentCollapserId: parentCollapserIdContext,
-        parentScrollerId: parentScrollerIdContext,
-      } = this.context;
-
-      this.itemId = ifNotFirstSec(itemId, nextItemIdSelector());
-      this.parentCollapserId = ifNotFirstSec(parentCollapserId, parentCollapserIdContext);
-      this.parentScrollerId = ifNotFirstSec(parentScrollerId, parentScrollerIdContext);
+      this.itemId = itemId;
+      this.parentCollapserId = parentCollapserId;
+      this.parentScrollerId = parentScrollerId;
       /*
         create state slice for this collapserItem in redux store.
       */
@@ -114,23 +106,9 @@ export const collapserItemControllerWrapper = (CollapserItemController) => {
       isOpenedInit: overrides the default isOpened status.
     */
     isOpenedInit: ofBoolTypeOrNothing,
-    /*
-      Pass itemId as prop if you want to overwrite automated id generated
-      from state and passed automatically in nextItemId.
-    */
-    itemId: ofBoolTypeOrNothing,
-
-    /*
-     Pass parentCollapserId as prop if you want to overwrite automated id generated
-     from context.parentCollapserId.
-   */
+    itemId: ofNumberTypeOrNothing,
     parentCollapserId: ofNumberTypeOrNothing,
     parentScrollerId: ofNumberTypeOrNothing,
-  };
-
-  WrappedCollapserItemController.contextTypes = {
-    parentCollapserId: PropTypes.number,
-    parentScrollerId: PropTypes.number,
   };
 
   const mapDispatchToProps = {

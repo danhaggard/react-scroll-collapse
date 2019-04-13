@@ -3,33 +3,22 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
 import actions from '../../actions';
-import selectors from '../../selectors';
-
+import cleanHoCProps from '../../utils/cleanHoCProps';
 import providers from '../../contextProviders';
 
-const { CONTEXTS, scrollerProvider } = providers;
-const applyContext = comp => scrollerProvider(CONTEXTS.MAIN, comp);
+const { scrollerProvider } = providers;
 
-const { nextScrollerIdSelector } = selectors.scroller;
-const { ifNotFirstSec } = selectors.utils;
 
 export const scrollerWrapper = (ScrollerComponent) => {
 
   class WrappedScroller extends Component {
 
     constructor(props, context) {
-      console.log('WrappedScroller: constructor(props, context', props, context);
-
       super(props, context);
       const { scrollerId } = this.props;
-      this.scrollerId = ifNotFirstSec(scrollerId, nextScrollerIdSelector());
-      this.addScroller();
-    }
+      this.scrollerId = scrollerId;
 
-    getChildContext() {
-      return {
-        parentScrollerId: this.scrollerId,
-      };
+      this.addScroller();
     }
 
     componentWillUnmount() {
@@ -44,14 +33,14 @@ export const scrollerWrapper = (ScrollerComponent) => {
     }
 
     render() {
-      const {
-        scrollerId,
-        ...other
-      } = this.props;
       if (this.scrollerId >= 0) {
         return (
           <ScrollerComponent
-            {...other}
+            {...cleanHoCProps(
+              this.props,
+              WrappedScroller.defaultProps,
+              WrappedScroller.propTypes // eslint-disable-line
+            )}
             scrollerId={this.scrollerId}
           />
         );
@@ -70,16 +59,12 @@ export const scrollerWrapper = (ScrollerComponent) => {
     removeScroller: PropTypes.func.isRequired,
   };
 
-  WrappedScroller.childContextTypes = {
-    parentScrollerId: PropTypes.number,
-  };
-
   const mapDispatchToProps = {
     addScroller: actions.addScroller,
     removeScroller: actions.removeScroller,
   };
 
-  return connect(undefined, mapDispatchToProps)(WrappedScroller);
+  return connect(undefined, mapDispatchToProps)(scrollerProvider(WrappedScroller));
 };
 
-export default applyContext(scrollerWrapper);
+export default scrollerWrapper;

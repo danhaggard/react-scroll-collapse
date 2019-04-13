@@ -3,11 +3,10 @@ import { collapserItemControllerWrapper } from './collapserItemControllerWrapper
 
 import providers from '../../contextProviders';
 
-const { CONTEXTS, itemProvider } = providers;
-const applyContext = comp => itemProvider(CONTEXTS.MAIN, comp);
+const { itemProvider } = providers;
 
-export const collapserItemController = wrappedComponent => applyContext(collapserItemControllerWrapper(
-  collapserItemWrapper(wrappedComponent)
-));
+export const collapserItemController = wrappedComponent => itemProvider(
+  collapserItemControllerWrapper(collapserItemWrapper(wrappedComponent))
+);
 
 export default collapserItemController;

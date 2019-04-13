@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import providerIdStore from './providerCounter';
-
+import { getIdKey } from './providerKeyManager';
 import { mergeContextWithPropsConsumerFactory } from '../utils/contextUtils';
 
 /*
@@ -11,7 +11,7 @@ import { mergeContextWithPropsConsumerFactory } from '../utils/contextUtils';
   know what they want, as passed down by ancestors that it should care about
   (designated by its key)
 
-  providerTypeKey - is the provider type key of the provider being registered.
+  typeKey - is the provider type key of the provider being registered.
     it will look in its props for ancestor sent methods it should call on
     mount and unmount.
 
@@ -25,13 +25,13 @@ import { mergeContextWithPropsConsumerFactory } from '../utils/contextUtils';
 const registerConsumerFactory = consumerFactory => (
   Context,
   Comp,
-  providerTypeKey
+  typeKey
 ) => {
 
   class Registry extends Component {
 
     state = {
-      id: providerIdStore(providerTypeKey),
+      id: providerIdStore(typeKey),
     }
 
     componentDidMount() {
@@ -43,14 +43,15 @@ const registerConsumerFactory = consumerFactory => (
     }
 
     registerSelf = (props, { id }) => {
-      if (typeof props[providerTypeKey] === 'function') {
-        props[providerTypeKey](id);
+      if (typeof props[typeKey] === 'function') {
+        props[typeKey](id);
       }
     }
 
     render() {
       const { id } = this.state;
-      return <Comp {...this.props} id={id} />;
+      const newProps = { ...this.props, [getIdKey(typeKey)]: id };
+      return <Comp {...newProps} />;
     }
   }
 

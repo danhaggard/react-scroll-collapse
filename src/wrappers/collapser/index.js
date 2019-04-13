@@ -2,10 +2,9 @@ import { collapserWrapper } from './collapserWrapper';
 import { collapserControllerWrapper } from './collapserControllerWrapper';
 import providers from '../../contextProviders';
 
-const { CONTEXTS, collapserProvider } = providers;
-const applyContext = comp => collapserProvider(CONTEXTS.MAIN, comp);
+const { collapserProvider } = providers;
 
-export const collapserController = wrappedComponent => applyContext(collapserControllerWrapper(
+export const collapserController = wrappedComponent => collapserProvider(collapserControllerWrapper(
   collapserWrapper(wrappedComponent)
 ));
 
