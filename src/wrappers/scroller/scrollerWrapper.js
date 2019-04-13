@@ -8,6 +8,11 @@ import providers from '../../contextProviders';
 
 const { scrollerProvider } = providers;
 
+const propTypeCache = {
+  addScroller: PropTypes.func.isRequired,
+  scrollerId: ofNumberTypeOrNothing,
+  removeScroller: PropTypes.func.isRequired,
+};
 
 export const scrollerWrapper = (ScrollerComponent) => {
 
@@ -37,7 +42,7 @@ export const scrollerWrapper = (ScrollerComponent) => {
             {...cleanHoCProps(
               this.props,
               WrappedScroller.defaultProps,
-              WrappedScroller.propTypes // eslint-disable-line
+              propTypeCache
             )}
             scrollerId={scrollerId}
           />
@@ -51,11 +56,7 @@ export const scrollerWrapper = (ScrollerComponent) => {
     scrollerId: null,
   };
 
-  WrappedScroller.propTypes = {
-    addScroller: PropTypes.func.isRequired,
-    scrollerId: ofNumberTypeOrNothing,
-    removeScroller: PropTypes.func.isRequired,
-  };
+  WrappedScroller.propTypes = propTypeCache;
 
   const mapDispatchToProps = {
     addScroller: actions.addScroller,

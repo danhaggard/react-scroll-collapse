@@ -7,6 +7,18 @@ import cleanHoCProps from '../../utils/cleanHoCProps';
 
 import actions from '../../actions';
 
+const propTypeCache = {
+  addItem: PropTypes.func.isRequired,
+  removeItem: PropTypes.func.isRequired,
+
+  /*
+    isOpenedInit: overrides the default isOpened status.
+  */
+  isOpenedInit: ofBoolTypeOrNothing,
+  itemId: ofNumberTypeOrNothing,
+  parentCollapserId: ofNumberTypeOrNothing,
+  parentScrollerId: ofNumberTypeOrNothing,
+};
 
 export const collapserItemControllerWrapper = (CollapserItemController) => {
 
@@ -51,7 +63,7 @@ export const collapserItemControllerWrapper = (CollapserItemController) => {
             {...cleanHoCProps(
               this.props,
               WrappedCollapserItemController.defaultProps,
-              WrappedCollapserItemController.propTypes // eslint-disable-line
+              propTypeCache
             )}
           />
         );
@@ -67,18 +79,7 @@ export const collapserItemControllerWrapper = (CollapserItemController) => {
     parentScrollerId: null,
   };
 
-  WrappedCollapserItemController.propTypes = {
-    addItem: PropTypes.func.isRequired,
-    removeItem: PropTypes.func.isRequired,
-
-    /*
-      isOpenedInit: overrides the default isOpened status.
-    */
-    isOpenedInit: ofBoolTypeOrNothing,
-    itemId: ofNumberTypeOrNothing,
-    parentCollapserId: ofNumberTypeOrNothing,
-    parentScrollerId: ofNumberTypeOrNothing,
-  };
+  WrappedCollapserItemController.propTypes = propTypeCache;
 
   const mapDispatchToProps = {
     addItem: actions.addItem,
