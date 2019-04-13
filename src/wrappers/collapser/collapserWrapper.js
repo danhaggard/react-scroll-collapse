@@ -19,26 +19,6 @@ export const collapserWrapper = (WrappedComponent) => {
 
     elem = React.createRef();
 
-    /*
-      allChildItems, areAllItemsExpanded are passed into the expandCollapseAll
-      callback at render - to ensure allChildItems have been initialised in redux..
-
-      allChildItems starts out as an empty array on first render because the
-      child collapsers haven't initialised yet.
-
-      If the expandCollapse part of this callBack is defined in mapDispatchToProps
-      using own props - e.g.: {
-        expandCollapseAll: () => expandedCollapseAll(ownProps.allChildItems,
-          ownProps.areAllItemsExpanded),
-        }
-      ...it will only use the props values as supplied on the first render - i.e.
-      the empty array for allChildItems.  So instead - those values are passed into
-      the function in render - which are gauranteed to be up to date.
-
-      The tradeoff is that this causes double render on init.  I don't see any
-      way around this.
-    */
-
     componentDidMount() {
       const { collapserId, watchInitCollapser } = this.props;
       checkForRef(WrappedComponent, this.elem, 'collapserRef');
@@ -51,8 +31,8 @@ export const collapserWrapper = (WrappedComponent) => {
 
       shouldComponentUpdate used to prevent unecessary renders caused
       by the allChildItemsSelector returning an array of item objects.  If any
-      item changes one of it's properties a re-render is forced on the entire
-      collapser.
+      item changes one of it's properties a re-render is forced on every item
+      in the collapser.
 
       Using the entire item object made the reducers cleaner - and using just
       an array of ids had a similar problem because the selectors were creating
@@ -67,21 +47,6 @@ export const collapserWrapper = (WrappedComponent) => {
         prop => (prop !== 'allChildItems' && props[prop] !== nextProps[prop])
       );
 
-      /*
-        Don't update if prev child items were zero.  Prevents a re-render
-        of child items on first mount where collapsers are nested.
-
-      if (!shouldUpdate && allChildItems.length === 0) {
-        return false;
-      }
-      */
-
-      /*
-        Only do a full render of the collapser if an item Id has changed.
-
-      return !isEqual(allChildItems.map(item => item.id),
-        nextProps.allChildItems.map(item => item.id));
-      */
     }
 
     getOffSetTop = () => this.elem.current.offsetTop;
@@ -98,19 +63,16 @@ export const collapserWrapper = (WrappedComponent) => {
       } = this.props;
       /*
         This activates a saga that will ensure that all the onHeightReady
-        callbacks of nested <Collapse> elements have fired - before the Scroller
-        related sagas will be allowed to initiate the scrolling.
+        callbacks of nested <Collapse> elements have fired - before dispatching
+        a HEIGHT_READY action.  Previously scroller would wait for this.
       */
       watchCollapser(collapserId);
 
       /*
         setOffsetTop: defines a callback for the saga to call that allows
         the saga to obtain the offsetTop value of the backing instance of this
-        component and dispatch that to the redux store.  The saga grabs the
-        offsetTop val once the onHeightReady callback has been
-        called for every wrapped <Collapse> element in the Collapser.
+        component and dispatch that to the redux store.
       */
-
       setOffsetTop(
         this.getOffSetTop,
         parentScrollerId,

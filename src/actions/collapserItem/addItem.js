@@ -1,14 +1,12 @@
 import { ADD_ITEM } from '../const';
 
-function action(collapserId, item, itemId) {
-  return {
-    type: ADD_ITEM,
-    payload: {
-      collapserId,
-      item,
-      itemId,
-    },
-  };
-}
+const addItem = (collapserId, item, itemId) => ({
+  type: ADD_ITEM,
+  payload: {
+    collapserId,
+    item,
+    itemId,
+  }
+});
 
-export default action;
+export default addItem;
