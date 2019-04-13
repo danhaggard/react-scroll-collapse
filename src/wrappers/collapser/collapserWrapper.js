@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import isEqual from 'lodash.isequal';
 
 import { connect } from 'react-redux';
 
@@ -19,42 +18,6 @@ export const collapserWrapper = (WrappedComponent) => {
   class CollapserController extends Component {
 
     elem = React.createRef();
-
-    constructor(props) {
-      super(props);
-      const {
-        collapserId,
-        expandCollapseAll,
-        parentScrollerId,
-        setOffsetTop,
-        watchCollapser,
-      } = this.props;
-      this.expandCollapseAll = (allChildItems, areAllItemsExpanded) => () => {
-        /*
-          This activates a saga that will ensure that all the onHeightReady
-          callbacks of nested <Collapse> elements have fired - before the Scroller
-          related sagas will be allowed to initiate the scrolling.
-        */
-        watchCollapser(collapserId);
-
-        /*
-          setOffsetTop: defines a callback for the saga to call that allows
-          the saga to obtain the offsetTop value of the backing instance of this
-          component and dispatch that to the redux store.  The saga grabs the
-          offsetTop val once the onHeightReady callback has been
-          called for every wrapped <Collapse> element in the Collapser.
-        */
-
-        setOffsetTop(
-          () => this.elem.current.offsetTop,
-          parentScrollerId,
-          collapserId,
-        );
-        allChildItems.forEach((item) => {
-          expandCollapseAll(item, areAllItemsExpanded, item.id);
-        });
-      };
-    }
 
     /*
       allChildItems, areAllItemsExpanded are passed into the expandCollapseAll
@@ -82,7 +45,10 @@ export const collapserWrapper = (WrappedComponent) => {
       watchInitCollapser(collapserId);
     }
 
-    /*
+    shouldComponentUpdate(nextProps) {
+
+      /*
+
       shouldComponentUpdate used to prevent unecessary renders caused
       by the allChildItemsSelector returning an array of item objects.  If any
       item changes one of it's properties a re-render is forced on the entire
@@ -92,27 +58,68 @@ export const collapserWrapper = (WrappedComponent) => {
       an array of ids had a similar problem because the selectors were creating
       arrays with distinct object ids even when equivlent.
 
-      This check could get expensive though.  Ideally we want a selector
-      that can properly memoize the array of item ids - and find some other
-      way to keep the reducers clean.
-    */
-    shouldComponentUpdate(nextProps) {
+      */
+
+
       const { props } = this;
-      const { allChildItems } = props;
-      let shouldUpdate = true;
-      // don't update if the two arrays have the same ids...
-      shouldUpdate = !isEqual(allChildItems.map(item => item.id),
-        nextProps.allChildItems.map(item => item.id));
-      if (!shouldUpdate) {
-        // unless some other prop has changed...
-        Object.keys(props).forEach((prop) => {
-          if (prop !== 'allChildItems' && props[prop] !== nextProps[prop]) {
-            shouldUpdate = true;
-          }
-        });
+
+      return Object.keys(props).some(
+        prop => (prop !== 'allChildItems' && props[prop] !== nextProps[prop])
+      );
+
+      /*
+        Don't update if prev child items were zero.  Prevents a re-render
+        of child items on first mount where collapsers are nested.
+
+      if (!shouldUpdate && allChildItems.length === 0) {
+        return false;
       }
-      return shouldUpdate;
+      */
+
+      /*
+        Only do a full render of the collapser if an item Id has changed.
+
+      return !isEqual(allChildItems.map(item => item.id),
+        nextProps.allChildItems.map(item => item.id));
+      */
     }
+
+    getOffSetTop = () => this.elem.current.offsetTop;
+
+    expandCollapseAll = () => {
+      const {
+        allChildItems,
+        areAllItemsExpanded,
+        collapserId,
+        expandCollapseAll,
+        parentScrollerId,
+        setOffsetTop,
+        watchCollapser,
+      } = this.props;
+      /*
+        This activates a saga that will ensure that all the onHeightReady
+        callbacks of nested <Collapse> elements have fired - before the Scroller
+        related sagas will be allowed to initiate the scrolling.
+      */
+      watchCollapser(collapserId);
+
+      /*
+        setOffsetTop: defines a callback for the saga to call that allows
+        the saga to obtain the offsetTop value of the backing instance of this
+        component and dispatch that to the redux store.  The saga grabs the
+        offsetTop val once the onHeightReady callback has been
+        called for every wrapped <Collapse> element in the Collapser.
+      */
+
+      setOffsetTop(
+        this.getOffSetTop,
+        parentScrollerId,
+        collapserId,
+      );
+      allChildItems.forEach((item) => {
+        expandCollapseAll(item, areAllItemsExpanded, item.id);
+      });
+    };
 
     render() {
       const {
@@ -124,13 +131,12 @@ export const collapserWrapper = (WrappedComponent) => {
         areAllItemsExpanded,
         ...other
       } = this.props;
-      const expandCollapseAllBind = !this.expandCollapseAll ? null
-        : this.expandCollapseAll(allChildItems, areAllItemsExpanded);
+
       return (
         <WrappedComponentRef
           {...other}
           ref={this.elem}
-          expandCollapseAll={expandCollapseAllBind}
+          expandCollapseAll={this.expandCollapseAll}
           areAllItemsExpanded={areAllItemsExpanded}
         />
       );

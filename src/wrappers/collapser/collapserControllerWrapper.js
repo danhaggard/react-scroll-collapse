@@ -12,44 +12,37 @@ export const collapserControllerWrapper = (CollapserController) => {
 
     constructor(props) {
       super(props);
-
-      const { collapserId, parentCollapserId, parentScrollerId } = this.props;
-
-      this.collapserId = collapserId;
-      this.parentCollapserId = parentCollapserId;
-      this.parentScrollerId = parentScrollerId;
-
-      /*
-        create state slice for this collapser in redux store.
-      */
       this.addCollapser();
     }
 
     componentWillUnmount() {
       const { removeCollapserChild, removeScrollerChild, removeCollapser } = this.props;
-      if (this.parentCollapserId >= 0) {
-        removeCollapserChild(this.parentCollapserId, this.collapserId);
+      const { collapserId, parentCollapserId, parentScrollerId } = this.props;
+      if (parentCollapserId >= 0) {
+        removeCollapserChild(parentCollapserId, collapserId);
       }
-      if (this.parentScrollerId >= 0) {
-        removeScrollerChild(this.parentScrollerId, this.collapserId);
+      if (parentScrollerId >= 0) {
+        removeScrollerChild(parentScrollerId, collapserId);
       }
-      removeCollapser(this.parentCollapserId, this.parentScrollerId, this.collapserId);
+      removeCollapser(parentCollapserId, parentScrollerId, collapserId);
     }
 
     addCollapser() {
       const { addCollapser, addScrollerChild, addCollapserChild } = this.props;
-      const collapser = { id: this.collapserId };
-      addCollapser(this.parentScrollerId, this.parentCollapserId, collapser, this.collapserId);
-      if (this.parentScrollerId >= 0) {
-        addScrollerChild(this.parentScrollerId, collapser);
+      const { collapserId, parentCollapserId, parentScrollerId } = this.props;
+      const collapser = { id: collapserId };
+      addCollapser(parentScrollerId, parentCollapserId, collapser, collapserId);
+      if (parentScrollerId >= 0) {
+        addScrollerChild(parentScrollerId, collapser);
       }
-      if (this.parentCollapserId >= 0) {
-        addCollapserChild(this.parentCollapserId, collapser);
+      if (parentCollapserId >= 0) {
+        addCollapserChild(parentCollapserId, collapser);
       }
     }
 
     render() {
-      if (this.collapserId >= 0 && this.parentScrollerId >= 0) {
+      const { collapserId, parentScrollerId } = this.props;
+      if (collapserId >= 0 && parentScrollerId >= 0) {
         return (
           <CollapserController
             {...cleanHoCProps(
@@ -57,9 +50,6 @@ export const collapserControllerWrapper = (CollapserController) => {
               WrappedCollapserController.defaultProps,
               WrappedCollapserController.propTypes // eslint-disable-line
             )}
-            collapserId={this.collapserId}
-            parentCollapserId={this.parentCollapserId}
-            parentScrollerId={this.parentScrollerId}
           />
         );
       }

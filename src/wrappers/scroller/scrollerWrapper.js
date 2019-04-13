@@ -15,25 +15,23 @@ export const scrollerWrapper = (ScrollerComponent) => {
 
     constructor(props, context) {
       super(props, context);
-      const { scrollerId } = this.props;
-      this.scrollerId = scrollerId;
-
       this.addScroller();
     }
 
     componentWillUnmount() {
-      const { removeScroller } = this.props;
-      removeScroller(this.scrollerId);
+      const { removeScroller, scrollerId } = this.props;
+      removeScroller(scrollerId);
     }
 
     addScroller() {
-      const { addScroller } = this.props;
-      const scroller = { id: this.scrollerId };
-      addScroller(scroller, this.scrollerId);
+      const { addScroller, scrollerId } = this.props;
+      const scroller = { id: scrollerId };
+      addScroller(scroller, scrollerId);
     }
 
     render() {
-      if (this.scrollerId >= 0) {
+      const { scrollerId } = this.props;
+      if (scrollerId >= 0) {
         return (
           <ScrollerComponent
             {...cleanHoCProps(
@@ -41,7 +39,7 @@ export const scrollerWrapper = (ScrollerComponent) => {
               WrappedScroller.defaultProps,
               WrappedScroller.propTypes // eslint-disable-line
             )}
-            scrollerId={this.scrollerId}
+            scrollerId={scrollerId}
           />
         );
       }

@@ -57,7 +57,7 @@ class CommentThread extends Component {
       areAllItemsExpanded,
       collapserId,
       collapserRef,
-      expandCollapseAll,
+      expandCollapseAll
     } = this.props;
     const { childThreads, randText } = this.state;
     const idStr = collapserId.toString();

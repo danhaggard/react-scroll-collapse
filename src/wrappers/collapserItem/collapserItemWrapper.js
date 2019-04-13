@@ -61,11 +61,6 @@ export const collapserItemWrapper = (WrappedComponent) => {
       expandCollapseAction(itemId);
     };
 
-    /*
-      Callback to let the collapser know that the height calculated by this
-      Collapse element is ready.  The saga won't initiate the auto scroll
-      unless it sees the HEIGHT_READY action.
-    */
     onHeightReady = () => {
       const { itemId, heightReady, parentCollapserId } = this.props;
       heightReady(parentCollapserId, itemId);
