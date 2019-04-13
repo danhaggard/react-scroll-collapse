@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
-import actions from '../../actions';
+import { scrollerWrapperActions } from '../../actions';
 import cleanHoCProps from '../../utils/cleanHoCProps';
 import providers from '../../contextProviders';
 
@@ -37,7 +37,7 @@ export const scrollerWrapper = (ScrollerComponent) => {
             {...cleanHoCProps(
               this.props,
               WrappedScroller.defaultProps,
-              WrappedScroller.propTypes // eslint-disable-line
+              scrollerWrapperActions
             )}
             scrollerId={scrollerId}
           />
@@ -57,12 +57,7 @@ export const scrollerWrapper = (ScrollerComponent) => {
     removeScroller: PropTypes.func.isRequired,
   };
 
-  const mapDispatchToProps = {
-    addScroller: actions.addScroller,
-    removeScroller: actions.removeScroller,
-  };
-
-  return connect(undefined, mapDispatchToProps)(scrollerProvider(WrappedScroller));
+  return connect(undefined, scrollerWrapperActions)(scrollerProvider(WrappedScroller));
 };
 
 export default scrollerWrapper;

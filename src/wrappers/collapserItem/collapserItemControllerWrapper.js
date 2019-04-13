@@ -4,8 +4,7 @@ import { connect } from 'react-redux';
 
 import { ofBoolTypeOrNothing, ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
 import cleanHoCProps from '../../utils/cleanHoCProps';
-
-import actions from '../../actions';
+import { itemControllerActions } from '../../actions';
 
 
 export const collapserItemControllerWrapper = (CollapserItemController) => {
@@ -51,7 +50,7 @@ export const collapserItemControllerWrapper = (CollapserItemController) => {
             {...cleanHoCProps(
               this.props,
               WrappedCollapserItemController.defaultProps,
-              WrappedCollapserItemController.propTypes // eslint-disable-line
+              itemControllerActions
             )}
           />
         );
@@ -80,12 +79,7 @@ export const collapserItemControllerWrapper = (CollapserItemController) => {
     parentScrollerId: ofNumberTypeOrNothing,
   };
 
-  const mapDispatchToProps = {
-    addItem: actions.addItem,
-    removeItem: actions.removeItem,
-  };
-
-  return connect(undefined, mapDispatchToProps)(WrappedCollapserItemController);
+  return connect(undefined, itemControllerActions)(WrappedCollapserItemController);
 };
 
 export default collapserItemControllerWrapper;

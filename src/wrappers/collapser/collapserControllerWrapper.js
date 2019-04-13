@@ -48,7 +48,7 @@ export const collapserControllerWrapper = (CollapserController) => {
             {...cleanHoCProps(
               this.props,
               WrappedCollapserController.defaultProps,
-              WrappedCollapserController.propTypes // eslint-disable-line
+              collapserControllerActions
             )}
           />
         );
