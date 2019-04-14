@@ -10,22 +10,22 @@ const selector = () => {
   };
 
   expect(
-    selectors.selector(state, 'key1')
+    selectors.selectOrVal(state, 'key1')
   ).toEqual('val');
   expect(
-    selectors.selector(state, 'key2')
+    selectors.selectOrVal(state, 'key2')
   ).toEqual(false);
   expect(
-    selectors.selector(state, 'key3')
+    selectors.selectOrVal(state, 'key3')
   ).toEqual(0);
   expect(
-    selectors.selector(state, 'key4')
+    selectors.selectOrVal(state, 'key4')
   ).toEqual(null);
   expect(
-    selectors.selector(state, 'key5')
+    selectors.selectOrVal(state, 'key5')
   ).toEqual(null);
   expect(
-    selectors.selector(state, 'key6')
+    selectors.selectOrVal(state, 'key6')
   ).toEqual(null);
 };
 
@@ -77,10 +77,10 @@ const entitiesSelector = () => {
       scrollers: [0],
     },
   };
-  const entities = state.reactScrollCollapse.entities;
+  const { entities } = state.reactScrollCollapse;
 
   expect(
-    selectors.entitiesSelector(state)
+    selectors.entitiesSelector()(state)
   ).toEqual(entities);
 };
 

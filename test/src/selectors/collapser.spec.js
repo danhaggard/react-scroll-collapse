@@ -1,4 +1,4 @@
-import * as selectors from '../../../src/selectors/collapser';
+import collapserMain, * as selectors from '../../../src/selectors/collapser';
 
 const state = {
   reactScrollCollapse: {
@@ -52,63 +52,23 @@ const state = {
 
 Object.freeze(state);
 
-const getCollapsers = () => {
-  const { entities } = state.reactScrollCollapse;
-  const { collapsers } = state.reactScrollCollapse.entities;
-  expect(
-    selectors.getCollapsers(entities)
-  ).toEqual(collapsers);
-};
-
-const getChildCollapsers = () => {
-  const collapser = state.reactScrollCollapse.entities.collapsers[0];
-  const { collapsers } = collapser;
-  expect(
-    selectors.getChildCollapsers(collapser)
-  ).toEqual(collapsers);
-};
-
-const getChildItems = () => {
-  const collapser = state.reactScrollCollapse.entities.collapsers[0];
-  const { items } = collapser;
-  expect(
-    selectors.getChildItems(collapser)
-  ).toEqual(items);
-};
-
-const selectCollapserFunc = () => {
-  const { collapsers } = state.reactScrollCollapse.entities;
-  const collapser = state.reactScrollCollapse.entities.collapsers[0];
-
-  expect(
-    selectors.selectCollapserFunc(collapsers)(0)
-  ).toEqual(collapser);
-};
-
-const collapsersSelector = () => {
-  const { collapsers } = state.reactScrollCollapse.entities;
-  expect(
-    selectors.collapsersSelector(state)
-  ).toEqual(collapsers);
-};
-
 const collapserSelector = () => {
   const collapser = state.reactScrollCollapse.entities.collapsers[0];
   expect(
-    selectors.collapserSelector(state)(0)
+    collapserMain.collapsersInstanceSelector()(state)(0)
   ).toEqual(collapser);
 };
 
 const childCollapsersSelector = () => {
   const { collapsers } = state.reactScrollCollapse.entities.collapsers[0];
   expect(
-    selectors.childCollapsersSelector(state)(0)
+    collapserMain.selectors.collapsersSelector()(state)(0)
   ).toEqual(collapsers);
 };
 
 const allNestedCollapsersSelector = () => {
   expect(
-    selectors.allNestedCollapsersSelector(state)(0)
+    selectors.allNestedCollapsersSelector()(state)(0)
   ).toEqual([1, 2]);
 };
 
@@ -117,7 +77,7 @@ const allNestedCollapsersSelector = () => {
 const childItemsSelector = () => {
   const { items } = state.reactScrollCollapse.entities.collapsers[0];
   expect(
-    selectors.childItemsSelector(state)(0)
+    collapserMain.selectors.itemsSelector()(state)(0)
   ).toEqual(items);
 };
 
@@ -265,31 +225,31 @@ const allChildItemsSelector = () => {
   };
 
   expect(
-    selectors.allChildItemsIdSelector(state)(0)
+    selectors.allChildItemsIdSelector()(state)(0)
   ).toEqual([0, 1, 2]);
 
   expect(
-    selectors.allChildItemsIdSelector(newState)(0)
+    selectors.allChildItemsIdSelector()(newState)(0)
   ).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 10, 11, 9, 8]);
 
   expect(
-    selectors.allChildItemsIdSelector(newState)(1)
+    selectors.allChildItemsIdSelector()(newState)(1)
   ).toEqual([1, 6, 7, 10, 11]);
 
   expect(
-    selectors.allChildItemsIdSelector(newState)(2)
+    selectors.allChildItemsIdSelector()(newState)(2)
   ).toEqual([2, 9]);
 };
 
 const itemExpandedArrSelector = () => {
   expect(
-    selectors.itemExpandedArrSelector(state)(0)
+    selectors.itemExpandedArrSelector()(state)(0)
   ).toEqual([false, false, true]);
 };
 
 const itemWaitingForHeightArrSelector = () => {
   expect(
-    selectors.itemWaitingForHeightArrSelector(state)(0)
+    selectors.itemWaitingForHeightArrSelector()(state)(0)
   ).toEqual([false, false, true]);
 };
 
@@ -355,10 +315,10 @@ Object.freeze(stateThird);
 
 const areAllItemsExpandedSelector = () => {
   expect(
-    selectors.areAllItemsExpandedSelector(state)(0)
+    selectors.areAllItemsExpandedSelector()(state)(0)
   ).toEqual(false);
   expect(
-    selectors.areAllItemsExpandedSelector(stateSecond)(0)
+    selectors.areAllItemsExpandedSelector()(stateSecond)(0)
   ).toEqual(false);
   /*
     This test is failing because createSelect calls the getItems function
@@ -376,7 +336,7 @@ const areAllItemsExpandedSelector = () => {
 
 const haveAllItemsReportedHeightSelector = () => {
   expect(
-    selectors.haveAllItemsReportedHeightSelector(state)(0)
+    selectors.haveAllItemsReportedHeightSelector()(state)(0)
   ).toEqual(false);
   /*
   expect(
@@ -395,36 +355,6 @@ const haveAllItemsReportedHeightSelector = () => {
 describe('react-scroll-collapse', () => {
   describe('selectors', () => {
     describe('collapser', () => {
-
-      describe('function: getCollapsers', () => {
-        it('selects', () => {
-          getCollapsers();
-        });
-      });
-
-      describe('function: getChildCollapsers', () => {
-        it('selects', () => {
-          getChildCollapsers();
-        });
-      });
-
-      describe('function: getChildItems', () => {
-        it('selects', () => {
-          getChildItems();
-        });
-      });
-
-      describe('function: selectCollapserFunc', () => {
-        it('selects', () => {
-          selectCollapserFunc();
-        });
-      });
-
-      describe('function: collapsersSelector', () => {
-        it('selects', () => {
-          collapsersSelector();
-        });
-      });
 
       describe('function: collapserSelector', () => {
         it('selects', () => {

@@ -1,9 +1,9 @@
 
 import {
+  arrSelector,
   createEntityTypeSelectors,
   entitiesSelector,
   getAllNested,
-  selectOrVal,
   createAllNestedOfTypeSelector,
   createAllNestedDependentSelector,
   dependentGetterFactory,
@@ -23,7 +23,7 @@ const collapser = createEntityTypeSelectors(
   'collapsers',
   entitiesSelector,
   ['collapsers', 'items'],
-  (state, attr) => selectOrVal(state, attr, [])
+  arrSelector
 );
 
 const { selectors: { collapsersSelector, itemsSelector } } = collapser;

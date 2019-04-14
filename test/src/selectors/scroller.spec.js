@@ -1,4 +1,4 @@
-import * as selectors from '../../../src/selectors/scroller';
+import scrollerMain, * as selectors from '../../../src/selectors/scroller';
 
 const state = {
   reactScrollCollapse: {
@@ -25,43 +25,30 @@ const state = {
 Object.freeze(state);
 
 
-const scrollersSelector = () => {
-  const scrollers = state.reactScrollCollapse.entities.scrollers;
-  expect(
-    selectors.scrollersSelector(state)
-  ).toEqual(scrollers);
-};
-
 const scrollerSelector = () => {
   const scroller = state.reactScrollCollapse.entities.scrollers[0];
   expect(
-    selectors.scrollerSelector(state)(0)
+    scrollerMain.scrollersInstanceSelector()(state)(0)
   ).toEqual(scroller);
 };
 
 const offsetTopSelector = () => {
   const offsetTop = state.reactScrollCollapse.entities.scrollers[0].offsetTop;
   expect(
-    selectors.offsetTopSelector(state)(0)
+    scrollerMain.selectors.offsetTopSelector()(state)(0)
   ).toEqual(offsetTop);
 };
 
 const scrollTopSelector = () => {
   const scrollTop = state.reactScrollCollapse.entities.scrollers[0].scrollTop;
   expect(
-    selectors.scrollTopSelector(state)(0)
+    scrollerMain.selectors.scrollTopSelector()(state)(0)
   ).toEqual(scrollTop);
 };
 
 describe('react-scroll-collapse', () => {
   describe('selectors', () => {
     describe('scroller', () => {
-
-      describe('function: scrollersSelector', () => {
-        it('selects', () => {
-          scrollersSelector();
-        });
-      });
 
       describe('function: scrollerSelector', () => {
         it('selects', () => {

@@ -1,4 +1,4 @@
-import * as selectors from '../../../src/selectors/collapserItem';
+import itemMain, * as selectors from '../../../src/selectors/collapserItem';
 
 const state = {
   reactScrollCollapse: {
@@ -31,75 +31,51 @@ const state = {
 };
 Object.freeze(state);
 
-const getItems = () => {
-  const entities = state.reactScrollCollapse.entities;
-  const items = state.reactScrollCollapse.entities.items;
-  expect(
-    selectors.getItems(entities)
-  ).toEqual(items);
-};
-
 const getItemExpanded = () => {
   const item = state.reactScrollCollapse.entities.items[0];
-  const expanded = item.expanded;
   expect(
-    selectors.getItemExpanded(item)
-  ).toEqual(expanded);
+    itemMain.getters.getExpanded(item)
+  ).toEqual(item.expanded);
 };
 
 const getItemId = () => {
   const item = state.reactScrollCollapse.entities.items[0];
-  const id = item.id;
   expect(
-    selectors.getItemId(item)
-  ).toEqual(id);
+    itemMain.getters.getId(item)
+  ).toEqual(item.id);
 };
 
 const getItemWaitingForHeight = () => {
   const item = state.reactScrollCollapse.entities.items[0];
-  const waitingForHeight = item.waitingForHeight;
   expect(
-    selectors.getItemWaitingForHeight(item)
-  ).toEqual(waitingForHeight);
-};
-
-const itemsSelector = () => {
-  const items = state.reactScrollCollapse.entities.items;
-  expect(
-    selectors.itemsSelector(state)
-  ).toEqual(items);
+    itemMain.getters.getWaitingForHeight(item)
+  ).toEqual(item.waitingForHeight);
 };
 
 const itemSelector = () => {
   const item = state.reactScrollCollapse.entities.items[0];
   expect(
-    selectors.itemSelector(state)(0)
+    itemMain.itemsInstanceSelector()(state)(0)
   ).toEqual(item);
 };
 
 const itemExpandedSelector = () => {
   const expanded = state.reactScrollCollapse.entities.items[0].expanded;
   expect(
-    selectors.itemExpandedSelector(state)(0)
+    itemMain.selectors.expandedSelector()(state)(0)
   ).toEqual(expanded);
 };
 
 const itemWaitingForHeightSelector = () => {
   const waitingForHeight = state.reactScrollCollapse.entities.items[0].waitingForHeight;
   expect(
-    selectors.itemWaitingForHeightSelector(state)(0)
+    itemMain.selectors.waitingForHeightSelector()(state)(0)
   ).toEqual(waitingForHeight);
 };
 
 describe('react-scroll-collapse', () => {
   describe('selectors', () => {
     describe('collapserItem', () => {
-
-      describe('function: getItems', () => {
-        it('selects', () => {
-          getItems();
-        });
-      });
 
       describe('function: getItemExpanded', () => {
         it('selects', () => {
@@ -116,12 +92,6 @@ describe('react-scroll-collapse', () => {
       describe('function: getItemWaitingForHeight', () => {
         it('selects', () => {
           getItemWaitingForHeight();
-        });
-      });
-
-      describe('function: itemsSelector', () => {
-        it('selects', () => {
-          itemsSelector();
         });
       });
 
