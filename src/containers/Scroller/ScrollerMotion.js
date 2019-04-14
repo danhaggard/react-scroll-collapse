@@ -7,9 +7,10 @@ import Scroller from '../../components/Scroller';
 
 import { ofFuncTypeOrNothing, ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
 import actions from '../../actions';
-import selectors from '../../selectors';
 
-const { offsetTopSelector, scrollTopSelector, toggleScrollSelector } = selectors.scroller;
+import { scroller as selectors } from '../../selectors';
+
+const { selectors: { offsetTopSelector, scrollTopSelector, toggleScrollSelector } } = selectors;
 
 const scrollerMotionWrapper = (ScrollerComponent) => {
 
@@ -186,10 +187,10 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
   are passed back to the Scroller by the sagas through redux state after all
   the collapser animation has finised.
 */
-const mapStateToProps = (state, ownProps) => ({
-  offsetTop: offsetTopSelector(state)(ownProps.scrollerId),
-  scrollTop: scrollTopSelector(state)(ownProps.scrollerId),
-  toggleScroll: toggleScrollSelector(state)(ownProps.scrollerId)
+const mapStateToProps = () => (state, ownProps) => ({
+  offsetTop: (offsetTopSelector())(state)(ownProps.scrollerId),
+  scrollTop: (scrollTopSelector())(state)(ownProps.scrollerId),
+  toggleScroll: (toggleScrollSelector())(state)(ownProps.scrollerId)
 });
 
 const mapDispatchToProps = {

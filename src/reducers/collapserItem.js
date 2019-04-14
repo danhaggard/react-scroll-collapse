@@ -14,15 +14,16 @@ import {
   removeFromState
 } from './utils';
 
-import selectors from '../selectors';
+import { item as selectors } from '../selectors';
 
-const { getItemId, getItemExpanded } = selectors.collapserItem;
+const { getters: { getId, getExpanded } } = selectors;
+
 
 export const expandedReducer = (state = true, action) => {
   const { areAllItemsExpanded, item } = checkAttr(action, 'payload');
   switch (action.type) {
     case ADD_ITEM: {
-      const val = getItemExpanded(item);
+      const val = getExpanded(item);
       return val !== null ? val : state;
     }
     case EXPAND_COLLAPSE:
@@ -39,7 +40,7 @@ export const itemIdReducer = (state = null, action) => {
   const { item } = checkAttr(action, 'payload');
   switch (action.type) {
     case ADD_ITEM:
-      return getItemId(item);
+      return getId(item);
     default:
       return state;
   }
@@ -61,7 +62,7 @@ export const waitingForHeightReducer = (state = false, action) => {
         return true.
         note: !(!a && b) === a || !b;
       */
-      return areAllItemsExpanded || !getItemExpanded(item);
+      return areAllItemsExpanded || !getExpanded(item);
     default:
       return state;
   }

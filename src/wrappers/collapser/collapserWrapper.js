@@ -93,7 +93,6 @@ export const collapserWrapper = (WrappedComponent) => {
         areAllItemsExpanded,
         ...other
       } = this.props;
-
       return (
         <WrappedComponentRef
           {...other}
@@ -125,10 +124,15 @@ export const collapserWrapper = (WrappedComponent) => {
     watchInitCollapser: PropTypes.func.isRequired,
   };
 
-  const mapStateToProps = (state, ownProps) => ({
-    allChildItems: allChildItemsSelector(state)(ownProps.collapserId),
-    areAllItemsExpanded: areAllItemsExpandedSelector(state)(ownProps.collapserId),
-  });
+
+  const mapStateToProps = () => (state, ownProps) => {
+    const allExpanded = areAllItemsExpandedSelector();
+    const allChildItems = allChildItemsSelector();
+    return {
+      allChildItems: allChildItems(state)(ownProps.collapserId),
+      areAllItemsExpanded: allExpanded(state)(ownProps.collapserId),
+    };
+  };
 
   const CollapserControllerConnect = connect(
     mapStateToProps,

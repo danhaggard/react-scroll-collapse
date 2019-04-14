@@ -2,7 +2,8 @@ body {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
-  height: 100%;
+  margin-top: -20px;
+  height: 100vh;
   line-height: 1.5rem;
   font-size: 1rem;
   font-family: 'Roboto script=all rev=2', sans-serif;
@@ -16,19 +17,56 @@ body {
 }
 
 :local(.example) {
-  width: 100%;
+  height: 85vh;
   margin-bottom: 1rem;
-  padding: 1rem;
+  padding: 1.5rem;
   padding-top: 0;
   background: #FFF;
   border: 1px solid #AAA;
+  border-bottom: none;
   border-radius: 2px;
+  flex: 1 1 33%;
+
+  &:first-child {
+    margin-right: 1.5em;
+  }
+
+  &:last-child {
+    margin-left: 1.5em;
+  }
 }
 
 :local(.main) {
-  width: 60%;
-  margin: 1rem;
-  padding: 1rem;
+  padding: 1.5rem;
+  margin: 1.5rem auto;
   padding-top: 0;
   background: #FFF;
+}
+
+:local(.container) {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  @media screen and (max-width: 48rem) {
+    flex-direction: column;
+  }
+}
+
+:local(.header) {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+:local(.exampleHeader) {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-around;
+}
+
+:local(.scrollerWrapper) {
+  height: 70vh;
+  overflow: hidden;
 }
