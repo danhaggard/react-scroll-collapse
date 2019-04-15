@@ -2,7 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { presets } from 'react-motion';
-import { UnmountClosed as Collapse } from 'react-collapse';
+import { Collapse } from 'react-collapse';
+
 import CommentBody from '../CommentBody';
 
 import { collapserItemController } from '../../../src';
@@ -11,9 +12,8 @@ import styles from './Comment.scss';
 
 const Comment = (props) => {
   const {
-    addToThread,
+    children,
     collapserItemRef,
-    deleteThread,
     isOpened,
     itemId,
   } = props;
@@ -27,20 +27,19 @@ const Comment = (props) => {
         springConfig={presets.noWobble}
       >
         <CommentBody text={text} />
-        {deleteThread}
-        {addToThread}
+        { children }
       </Collapse>
     </div>
   );
 };
 
 Comment.propTypes = {
-  addToThread: PropTypes.node.isRequired,
+  children: PropTypes.array,
   collapserItemRef: PropTypes.object.isRequired, // provided by collapserItemController
-  deleteThread: PropTypes.node.isRequired,
   isOpened: PropTypes.bool.isRequired, // provided by collapserItemController
   itemId: PropTypes.number.isRequired, // provided by collapserItemController
   text: PropTypes.string.isRequired,
 };
 
-export default collapserItemController(Comment); // wrap and export your component
+const PureComment = React.memo(Comment);
+export default collapserItemController(PureComment); // wrap and export your component

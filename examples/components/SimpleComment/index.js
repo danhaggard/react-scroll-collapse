@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import { presets } from 'react-motion';
 
-import { UnmountClosed as Collapse } from 'react-collapse';
+import { Collapse } from 'react-collapse';
 import CommentBody from '../CommentBody';
 import ExpanderButton from '../ExpandButton';
 

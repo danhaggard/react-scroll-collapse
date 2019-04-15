@@ -1,31 +1,41 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
+import forwardRefWrapper from '../../../src/utils/forwardRef';
 import CommentTitle from '../CommentTitle';
 
 
-const ExpanderButton = ({
+const ExpandButton = ({
+  forwardRef,
   isOpened,
   onClick,
   onKeyDown,
   title
 }) => (
-  <div onClick={onClick} onKeyDown={onKeyDown} role="button" tabIndex={0} type="button">
+  <div
+    ref={forwardRef}
+    onClick={onClick}
+    onKeyDown={onKeyDown}
+    role="button"
+    tabIndex={0}
+    type="button"
+  >
     <CommentTitle title={title} isOpened={isOpened} />
   </div>
 );
 
-ExpanderButton.defaultProps = {
+ExpandButton.defaultProps = {
+  forwardRef: {},
   onClick: () => undefined,
   onKeyDown: () => undefined,
   title: '',
 };
 
-ExpanderButton.propTypes = {
+ExpandButton.propTypes = {
+  forwardRef: PropTypes.object,
   isOpened: PropTypes.bool.isRequired,
   onClick: PropTypes.func,
   onKeyDown: PropTypes.func,
   title: PropTypes.string,
 };
 
-export default ExpanderButton;
+export default forwardRefWrapper(ExpandButton, 'forwardRef');

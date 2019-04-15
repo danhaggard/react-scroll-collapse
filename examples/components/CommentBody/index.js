@@ -16,4 +16,4 @@ CommentBody.propTypes = {
   text: PropTypes.string.isRequired,
 };
 
-export default CommentBody;
+export default React.memo(CommentBody);

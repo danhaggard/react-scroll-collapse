@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
@@ -27,7 +27,7 @@ export const collapserItemWrapper = (WrappedComponent) => {
 
   const WrappedComponentRef = forwardRefWrapper(WrappedComponent, 'collapserItemRef');
 
-  class CollapserItemController extends Component {
+  class CollapserItemController extends PureComponent {
 
     elem = React.createRef();
 

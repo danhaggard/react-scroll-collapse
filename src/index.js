@@ -18,8 +18,12 @@ import Scroller from './containers/Scroller';
 
 */
 export { collapserController } from './wrappers/collapser';
-export { collapserItemController } from './wrappers/collapserItem';
+export { collapserWrapper as collapserProvider } from './wrappers/collapser/collapserWrapper';
+export { collapserIdentity } from './wrappers/collapser';
 
+export { collapserItemController } from './wrappers/collapserItem';
+export { collapserItemWrapper as collapserItemProvider } from './wrappers/collapserItem/collapserItemWrapper';
+export { collapserItemIdentity } from './wrappers/collapserItem';
 /*
   The reducers file is named as the state name space required ('reactScrollCollapse')
   so users can just import and add to their root reducer like so:

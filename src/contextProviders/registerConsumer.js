@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 
 import providerIdStore from './providerCounter';
 import { getIdKey } from './providerKeyManager';
@@ -28,7 +28,7 @@ const registerConsumerFactory = consumerFactory => (
   typeKey
 ) => {
 
-  class Registry extends Component {
+  class Registry extends PureComponent {
 
     state = {
       id: providerIdStore(typeKey),

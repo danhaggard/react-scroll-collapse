@@ -93,8 +93,8 @@ const createTypeKeyGetters = (
 }), {});
 
 
-const createTypeKeySelectors = (typeAttributes, typeInstanceSelector) => {
-  const attributeGetters = createTypeKeyGetters(typeAttributes);
+const createTypeKeySelectors = (typeAttributes, typeInstanceSelector, selector = selectOrVal) => {
+  const attributeGetters = createTypeKeyGetters(typeAttributes, selector);
   const selectors = [...typeAttributes, 'id'].reduce((obj, key) => ({
     ...obj,
     [createSelectorKey(key)]: createTypeInstanceAttributeSelector(
@@ -188,7 +188,7 @@ export const createEntityTypeSelectors = (
     typeEntitiesSelector, selectTypeInstanceFunc
   );
 
-  const typeSelectors = createTypeKeySelectors(typeAttributes, typeInstanceSelector);
+  const typeSelectors = createTypeKeySelectors(typeAttributes, typeInstanceSelector, selector);
   typeSelectors[createTypeInstanceSelectorKey(typeKey)] = typeInstanceSelector;
   return typeSelectors;
 };
