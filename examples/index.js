@@ -10,6 +10,7 @@ import configureStore from './stores';
 // import App from './containers/testing/SingleNestedCollapserScroller';
 import App from './containers/testing/TwoExampleTest';
 
+require('./style/main.scss');
 
 // whyUpdate();
 

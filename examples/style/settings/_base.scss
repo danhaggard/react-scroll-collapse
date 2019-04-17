@@ -1,0 +1,18 @@
+// @import 'colors';
+// @import 'layout';
+@import 'typography';
+
+///*------------------------------------*\
+//    #BASE SETTINGS
+//\*------------------------------------*/
+
+// Base font
+$base-font-family: 'Proza Libre', sans-serif;
+$secondary-font-family: 'Cormorant Garamond', sans-serif;
+$base-font-weight: $font-weight-regular;
+$base-font-size: 100%;
+$base-line-height: 1.5;
+
+
+// Base Layout
+$base-box-sizing: border-box;

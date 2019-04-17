@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import forwardRefWrapper from '../../../src/utils/forwardRef';
 import CommentTitle from '../CommentTitle';
-
+import style from './ExpandButton.scss';
 
 const ExpandButton = ({
   forwardRef,
@@ -12,9 +12,10 @@ const ExpandButton = ({
   title
 }) => (
   <div
-    ref={forwardRef}
+    className={style.expandButton}
     onClick={onClick}
     onKeyDown={onKeyDown}
+    ref={forwardRef}
     role="button"
     tabIndex={0}
     type="button"

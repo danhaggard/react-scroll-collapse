@@ -1,0 +1,46 @@
+//*------------------------------------*\
+//     HTML ELEMENTS
+//\*------------------------------------*/
+
+@import '../settings/index';
+@import '../tools/index';
+
+:root {
+  --baseline: #{$base-line-height};
+
+  box-sizing: $base-box-sizing;
+  color: $color-text;
+  font-family: $base-font-family;
+  font-size: $base-font-size;
+  line-height: var(--baseline);
+  font-weight: $base-font-weight;
+
+  @include respond-to(sm) {
+    font-size: 1rem;
+  }
+
+  @include respond-to(md) {
+    font-size: 1.125rem;
+  }
+
+  @include respond-to(lg) {
+    font-size: 1.25rem;
+  }
+
+  @include respond-to(xl) {
+    font-size: 1.5rem;
+  }
+}
+
+
+p,
+.p {
+  /* Line-height basic vertical rhythm fallback. */
+  line-height: rvr(1);
+  margin-bottom: rvr(0.25);
+  margin-top: 0;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}

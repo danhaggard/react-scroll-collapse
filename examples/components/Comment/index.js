@@ -26,11 +26,17 @@ const Comment = (props) => {
         isOpened={isOpened}
         springConfig={presets.noWobble}
       >
-        <CommentBody text={text} />
-        { children }
+        <div className={styles.commentChildren}>
+          <CommentBody text={text} />
+          { children }
+        </div>
       </Collapse>
     </div>
   );
+};
+
+Comment.defaultProps = {
+  children: [],
 };
 
 Comment.propTypes = {

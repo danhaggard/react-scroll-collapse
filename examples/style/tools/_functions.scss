@@ -1,0 +1,91 @@
+@import '../settings/index';
+
+
+///*------------------------------------*\
+//    #FUNCTIONS
+//\*------------------------------------*/
+
+@function pass-important($important) {
+  @if ($important == 'important') {
+    $important: unquote('!important');
+  } @else {
+    $important: null;
+  }
+  @return $important;
+}
+
+
+// rvr stands for responsive vertical rhythm
+// https://zellwk.com/blog/responsive-vertical-rhythm/
+@function rvr($multiple) {
+  @return calc(var(--baseline) * #{$multiple} * 1rem);
+}
+
+@function vr($multiple) {
+  @return $base-line-height * $multiple * 1rem;
+}
+
+
+// create-svg-image:
+// Returns a string of an image element for use in css declared svg.
+// $width and $height of the image in px (should be the raw image size).
+// $x, $y - are position offsets.
+@function create-svg-image($width, $height, $x, $y, $data) {
+  @return '<image width="#{$width}" height="#{$height}" x="#{$x}" y="#{$y}" xlink:href="#{$data}" />';
+}
+
+// get-tile-positions
+// helper function for: tile-image-svg
+// hacky - TODO: allow arbitrary tiling sizes and no of images.
+@function get-tile-positions($index) {
+
+  @if $index == 1 {
+    @return (0%, 0%);
+  }
+
+  @if $index == 2 {
+    @return (50%, 0%);
+  }
+
+  @if $index == 3 {
+    @return (0%, 50%);
+  }
+
+  @if $index == 4 {
+    @return (50%, 50%);
+  }
+
+}
+
+// tile-image-svg
+//
+// Returns svg as image data uri
+//
+// $width $height - total width and height of the svg
+// $margin-right adds blank space into the svg image.
+// $image-sizes: list of four image sizes in pixels - single value (must be square)
+// $image-data: list of strings - uri data
+//   e.g. 'data:image/jpeg;base64,/9j/4QAYRXhp...' and so on.'
+//
+// NOTE: not very useful yet - can only handle foun square images tiled as a square.
+@function tile-image-svg($width, $height, $margin-right, $image-sizes, $image-data) {
+
+  $no-of-sizes: length($image-sizes);
+  $no-of-data: length($image-data);
+
+  @if $no-of-sizes != $no-of-data {
+    @error 'Error - list of image sizes and image data are not the same length';
+  }
+
+  $image-list: ();
+
+  @for $i from 1 through $no-of-data {
+    $size: nth($image-sizes, $i);
+    $data: nth($image-data, $i);
+    $pos: get-tile-positions($i);
+    $svg-image: create-svg-image($size, $size, nth($pos, 1), nth($pos, 2), $data);
+    $image-list: append($image-list, $svg-image);
+  }
+
+  @return url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="#{$width + $margin-right}" height="#{$height}">#{nth($image-list, 1)}#{nth($image-list, 2)}#{nth($image-list, 3)}#{nth($image-list, 4)}</svg>');
+}
