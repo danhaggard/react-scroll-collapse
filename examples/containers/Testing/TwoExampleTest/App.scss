@@ -17,16 +17,10 @@
 }
 
 :local(.container) {
-  flex-direction: column;
-  display: flex;
-  justify-content: space-between;
 
   @include respond-to(md) {
     height: calc(100vh - (var(--baseline) * 4 * 1rem));
-    flex-direction: row;
   }
-
-
 }
 
 :local(.header) {

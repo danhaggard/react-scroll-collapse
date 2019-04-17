@@ -33,7 +33,7 @@ const App = () => (
         <a href="https://github.com/danhaggard/react-scroll-collapse">View code on Github</a>
       </div>
     </header>
-    <div className={styles.container}>
+    <div className={`${styles.container} two-column-layout`}>
       <Example {...EXAMPLE_COPY[0]}>
         <div className={styles.scrollerWrapper}>
           <Scroller style={scrollerStyle}>

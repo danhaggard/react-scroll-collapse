@@ -1,14 +1,33 @@
-@import 'base';
-@import 'typography';
-
+// @import '../settings/index';
+@import '../tools/index';
 
 ///*------------------------------------*\
 //    #LAYOUT
 //\*------------------------------------*/
 
-$breakpoints: (
-  sm: 30em, // 30 * 16 = 480
-  md: 48em, // 48 * 16 = 768
-  lg: 60em, // 960
-  xl: 75em //1200
-);
+
+:global(.two-column-layout) {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  > * {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+  }
+
+  @include respond-to(md) {
+    flex-direction: row;
+
+    > * {
+      &:first-child {
+        margin-right: 0.75em;
+      }
+
+      &:last-child {
+        margin-left: 0.75em;
+      }
+    }
+  }
+}
