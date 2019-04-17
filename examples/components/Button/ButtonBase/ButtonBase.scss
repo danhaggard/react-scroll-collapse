@@ -2,14 +2,11 @@
 @import '../../../style/tools/index';
 
 :local(.button) {
-  display: inline-block;
-  *display: inline;
   zoom: 1;
   margin: 0;
   cursor: pointer;
   border: 1px solid #bbb;
   overflow: visible;
-  // font: bold 13px arial, helvetica, sans-serif;
   font: bold 0.75em arial, helvetica, sans-serif;
   text-decoration: none;
   white-space: nowrap;
@@ -18,9 +15,9 @@
   background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(255,255,255,1)), to(rgba(255,255,255,0)));
   background-image: linear-gradient(top, rgba(255,255,255,1), rgba(255,255,255,0));
   transition: background-color .2s ease-out;
-  background-clip: padding-box; /* Fix bleeding */
+  background-clip: padding-box;
   border-radius: 3px;
-  box-shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 2px 2px -1px rgba(0, 0, 0, .5), 0 1px 0 rgba(255, 255, 255, .3) inset;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 1px 1px -1px rgba(0, 0, 0, .5), 0 1px 0 rgba(255, 255, 255, .3) inset;
   text-shadow: 0 1px 0 rgba(255,255,255, .9);
   -webkit-touch-callout: none;
   user-select: none;
@@ -38,24 +35,9 @@
     box-shadow: 0 1px 1px rgba(0, 0, 0, .3) inset;
   }
 
-  &[disabled], &[disabled]:hover, &[disabled]:active{
-    border-color: #eaeaea;
-    background: #fafafa;
-    cursor: default;
-    position: static;
-    color: #999;
-    /* Usually, !important should be avoided but here it's really needed :) */
-    box-shadow: none !important;
-    text-shadow: none !important;
-  }
-
-  /* Smaller buttons styles */
-
   &.small{
     padding: 0.5em 1em;
   }
-
-  /* Larger buttons styles */
 
   &.large{
     padding: 0.75em 1.75em;

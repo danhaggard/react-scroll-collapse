@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styles from './SimpleCollapser.scss';
 
-import ButtonGroup from '../Button/ButtonGroup';
+import ButtonGroup from '../Button/ButtonGroup/ButtonGroupSmall';
 import CommentBody from '../CommentBody';
 import { CollapserExpandButton } from '../ExpandButtonWrapped';
 import SimpleComment from '../SimpleComment';

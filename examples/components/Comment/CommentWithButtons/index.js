@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import Comment from '..';
 import ButtonSmall from '../../Button/ButtonSmall';
-import ButtonGroup from '../../Button/ButtonGroup';
+import ButtonGroupSmall from '../../Button/ButtonGroup/ButtonGroupSmall';
 
 
 const DeleteThread = ({ childThreads, deleteThread }) => (
@@ -44,10 +44,10 @@ const CommentWithButtons = ({
     deleteThread={deleteThread}
     text={text}
   >
-    <ButtonGroup>
+    <ButtonGroupSmall>
       <PureDeleteThread childThreads={childThreads} deleteThread={deleteThread} />
       <PureAddToThread addToThread={addToThread} />
-    </ButtonGroup>
+    </ButtonGroupSmall>
   </Comment>
 );
 

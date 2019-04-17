@@ -3,9 +3,6 @@ import PropTypes from 'prop-types';
 import styles from './CommentThread.scss';
 
 import CommentWithButtons from '../Comment/CommentWithButtons';
-import ButtonSmall from '../Button/ButtonSmall';
-import ButtonGroup from '../Button/ButtonGroup';
-
 import { CollapserExpandButton } from '../ExpandButtonWrapped';
 import { collapserIdentity } from '../../../src';
 
