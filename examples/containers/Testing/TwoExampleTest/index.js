@@ -23,8 +23,7 @@ const EXAMPLE_COPY = {
   }
 };
 
-// const scrollerStyle = { height: '100%' };
-const scrollerStyle = { };
+const scrollerStyle = { height: '100%' };
 
 const App = () => (
   <div className={styles.main}>
