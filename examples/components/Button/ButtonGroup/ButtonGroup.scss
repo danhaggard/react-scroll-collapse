@@ -10,10 +10,6 @@
   padding: 0.5em;
   border-radius: 6px;
 
-  > button:active{
-    //box-shadow: 0 0 1px rgba(0, 0, 0, .2) inset, 5px 0 5px -3px rgba(0, 0, 0, .2) inset, -5px 0 5px -3px rgba(0, 0, 0, .2) inset;
-  }
-
   > button {
     &:last-child {
       margin-left: 0.5em;
@@ -22,9 +18,7 @@
     &:first-child {
       margin-left: 0;
     }
-
   }
-
 }
 
 :local(.small) {
@@ -41,5 +35,4 @@
       margin-left: 0;
     }
   }
-
 }

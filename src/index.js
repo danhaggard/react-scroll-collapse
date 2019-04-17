@@ -18,6 +18,11 @@ import Scroller from './containers/Scroller';
 
 */
 export { collapserController } from './wrappers/collapser';
+
+/*
+  If you want to detach the ids from the redux actions then use these two,
+  but remember to pass the id props from collapserIdentity into collapserWrapper
+*/
 export { collapserWrapper as collapserProvider } from './wrappers/collapser/collapserWrapper';
 export { collapserIdentity } from './wrappers/collapser';
 
