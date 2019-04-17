@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
@@ -7,9 +7,42 @@ import Scroller from '../../components/Scroller';
 
 import { ofFuncTypeOrNothing, ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
 import actions from '../../actions';
-import selectors from '../../selectors';
 
-const { offsetTopSelector, scrollTopSelector, toggleScrollSelector } = selectors.scroller;
+import { scroller as selectors } from '../../selectors';
+
+const { selectors: { offsetTopSelector, scrollTopSelector, toggleScrollSelector } } = selectors;
+
+
+const createScrollerChild = (
+  ScrollerComponent,
+  thatArg,
+  {
+    className,
+    scrollerId,
+    style,
+    children
+  },
+) => {
+  const that = thatArg;
+  return (
+    <ScrollerComponent
+      className={className}
+      ref={(child) => {
+        that.child = child;
+      }}
+      scrollerId={scrollerId}
+      style={style}
+    >
+      { children }
+    </ScrollerComponent>
+  );
+};
+
+const createMotionChild = (scroller, child) => (val) => {
+  child.setScrollTop(val.y);
+  return scroller;
+};
+
 
 const scrollerMotionWrapper = (ScrollerComponent) => {
 
@@ -22,7 +55,32 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
     component by initialising a saga for that Scroller and passing the
     getScrollTop method from Scroller to that saga.
   */
-  class ScrollerMotion extends Component {
+  class ScrollerMotion extends PureComponent {
+
+    static getDerivedStateFromProps(nextProps, prevState) {
+      const { springConfig, toggleScroll } = prevState;
+
+      /*
+        springConfig overide default -  when supplied by parent.
+      */
+      if (springConfig !== nextProps.springConfig) {
+        return { springConfig: nextProps.springConfig };
+      }
+
+      /*
+        Ensures that the scrollTop start val for <Motion> is in sync with the UI
+        see:
+        https://github.com/danhaggard/react-scroll-collapse/issues/2#issue-186472122
+      */
+      if (toggleScroll !== nextProps.toggleScroll) {
+        return {
+          motionStyle: { y: nextProps.scrollTop },
+          prevRenderType: 'uiSync',
+          toggleScroll: nextProps.toggleScroll
+        };
+      }
+      return null;
+    }
 
     constructor(props) {
       super(props);
@@ -30,6 +88,7 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
         springConfig: { stiffness: 170, damping: 20 },
         motionStyle: { y: 0 },
         prevRenderType: null,
+        toggleScroll: props.toggleScroll,
       };
     }
 
@@ -39,29 +98,6 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
     componentDidMount() {
       const { scrollerId, watchInitialise } = this.props;
       watchInitialise(scrollerId, this.child.getScrollTop);
-    }
-
-    componentWillReceiveProps(nextProps) {
-      const { springConfig, toggleScroll } = this.props;
-      /*
-        springConfig overide default -  when supplied by parent.
-      */
-      if (springConfig !== nextProps.springConfig) {
-        this.setState({ springConfig: nextProps.springConfig });
-      }
-
-      /*
-        Ensures that the scrollTop start val for <Motion> is in sync with the UI
-        see:
-        https://github.com/danhaggard/react-scroll-collapse/issues/2#issue-186472122
-      */
-      if (toggleScroll !== nextProps.toggleScroll) {
-        this.setState({
-          motionStyle: { y: nextProps.scrollTop },
-          prevRenderType: 'uiSync',
-        });
-      }
-
     }
 
     /*
@@ -98,32 +134,16 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
 
 
     render() {
-      const {
-        children,
-        scrollerId,
-        style,
-        className,
-        onRest
-      } = this.props;
+      const { onRest, ...rest } = this.props;
 
       const { motionStyle } = this.state;
+
       /*
         The use of the ref in ScrollerComponent allows ScrollerMotion
         to access the methods we defined on Scroller using ref.  In this case
         getScrollTop which is now accessible via: this.child.getScrollTop
       */
-      const scroller = (
-        <ScrollerComponent
-          className={className}
-          ref={(child) => {
-            this.child = child;
-          }}
-          scrollerId={scrollerId}
-          style={style}
-        >
-          { children }
-        </ScrollerComponent>
-      );
+      const scroller = createScrollerChild(ScrollerComponent, this, { ...rest });
 
       /*
         I was previously passing val.y into ScrollerComponent - which resulted
@@ -134,15 +154,11 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
 
         Kudos to nktb: https://github.com/chenglou/react-motion/issues/357#issuecomment-237741940
       */
-      const motionChild = this.child ? (val) => {
-        this.child.setScrollTop(val.y);
-        return scroller;
-      } : () => scroller;
       return (
         <Motion
           onRest={onRest}
           style={motionStyle}>
-          {motionChild}
+          {this.child ? createMotionChild(scroller, this.child) : () => scroller}
         </Motion>
       );
     }
@@ -186,10 +202,10 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
   are passed back to the Scroller by the sagas through redux state after all
   the collapser animation has finised.
 */
-const mapStateToProps = (state, ownProps) => ({
-  offsetTop: offsetTopSelector(state)(ownProps.scrollerId),
-  scrollTop: scrollTopSelector(state)(ownProps.scrollerId),
-  toggleScroll: toggleScrollSelector(state)(ownProps.scrollerId)
+const mapStateToProps = () => (state, ownProps) => ({
+  offsetTop: (offsetTopSelector())(state)(ownProps.scrollerId),
+  scrollTop: (scrollTopSelector())(state)(ownProps.scrollerId),
+  toggleScroll: (toggleScrollSelector())(state)(ownProps.scrollerId)
 });
 
 const mapDispatchToProps = {

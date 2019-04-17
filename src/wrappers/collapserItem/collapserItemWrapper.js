@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
@@ -7,10 +7,9 @@ import forwardRefWrapper from '../../utils/forwardRef';
 import { checkForRef } from '../../utils/errorUtils';
 
 import { itemWrapperActions } from '../../actions';
-import selectors from '../../selectors';
+import { item as selectors } from '../../selectors';
 
-const { itemExpandedSelector } = selectors.collapserItem;
-
+const { selectors: { expandedSelector } } = selectors;
 
 /*
   collapserItemWrapper is an HoC that is to be used to wrap components which make use
@@ -28,7 +27,7 @@ export const collapserItemWrapper = (WrappedComponent) => {
 
   const WrappedComponentRef = forwardRefWrapper(WrappedComponent, 'collapserItemRef');
 
-  class CollapserItemController extends Component {
+  class CollapserItemController extends PureComponent {
 
     elem = React.createRef();
 
@@ -88,20 +87,27 @@ export const collapserItemWrapper = (WrappedComponent) => {
     }
   }
 
+  CollapserItemController.defaultProps = {
+    parentScrollerId: null,
+  };
+
   CollapserItemController.propTypes = {
     isOpened: PropTypes.bool.isRequired,
     itemId: PropTypes.number.isRequired,
     parentCollapserId: PropTypes.number.isRequired,
-    parentScrollerId: PropTypes.number.isRequired,
+    parentScrollerId: PropTypes.number,
     heightReady: PropTypes.func.isRequired,
     expandCollapse: PropTypes.func.isRequired,
     setOffsetTop: PropTypes.func.isRequired,
     watchCollapser: PropTypes.func.isRequired,
   };
 
-  const mapStateToProps = (state, ownProps) => ({
-    isOpened: itemExpandedSelector(state)(ownProps.itemId),
-  });
+  const mapStateToProps = () => (state, ownProps) => {
+    const expandedSelectorInstance = expandedSelector();
+    return {
+      isOpened: expandedSelectorInstance(state)(ownProps.itemId),
+    };
+  };
 
   const CollapserItemControllerConnect = connect(
     mapStateToProps,

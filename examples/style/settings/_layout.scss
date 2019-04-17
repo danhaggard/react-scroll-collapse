@@ -1,0 +1,32 @@
+// @import '../settings/index';
+@import '../tools/index';
+
+///*------------------------------------*\
+//    #LAYOUT
+//\*------------------------------------*/
+
+
+:global(.two-column-layout) {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  > * {
+    display: flex;
+    flex-direction: column;
+  }
+
+  @include respond-to(md) {
+    flex-direction: row;
+
+    > * {
+      &:first-child {
+        margin-right: 0.75em;
+      }
+
+      &:last-child {
+        margin-left: 0.75em;
+      }
+    }
+  }
+}

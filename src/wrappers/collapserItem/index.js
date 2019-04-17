@@ -9,4 +9,8 @@ export const collapserItemController = wrappedComponent => itemProvider(
   collapserItemControllerWrapper(collapserItemWrapper(wrappedComponent))
 );
 
+export const collapserItemIdentity = wrappedComponent => itemProvider(
+  collapserItemControllerWrapper(wrappedComponent)
+);
+
 export default collapserItemController;

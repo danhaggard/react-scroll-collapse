@@ -8,4 +8,8 @@ export const collapserController = wrappedComponent => collapserProvider(collaps
   collapserWrapper(wrappedComponent)
 ));
 
+export const collapserIdentity = wrappedComponent => collapserProvider(
+  collapserControllerWrapper(wrappedComponent)
+);
+
 export default collapserController;

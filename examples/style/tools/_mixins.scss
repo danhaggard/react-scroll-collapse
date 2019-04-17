@@ -1,0 +1,40 @@
+@import '../settings/index';
+@import 'functions';
+
+///*------------------------------------*\
+//    MIXINS
+//\*------------------------------------*/
+
+@mixin header($font-size, $important: false) {
+  @include font-vert-space($font-size, $important);
+
+  font-family: $secondary-font-family;
+  font-weight: $font-weight-bold;
+  margin: 0;
+  padding: 0;
+}
+
+@mixin flex-column($align-items) {
+  align-items: $align-items;
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin flex-row($justify-content) {
+  display: flex;
+  justify-content: $justify-content;
+}
+
+// https://www.sitepoint.com/using-sass-maps/
+@mixin respond-to($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    @media (min-width: #{map-get($breakpoints, $breakpoint)}) {
+      @content;
+    }
+  }
+
+  @else {
+    @warn 'Unfortunately, no value could be retrieved from "#{$breakpoint}".'
+      + 'Please make sure it is defined in "$breakpoints" map.';
+  }
+}

@@ -29,6 +29,7 @@ const createProvider = (
   class Provider extends Base {
 
     mapParentIds = (props) => {
+
       const idKey = getIdKey(typeKey);
 
       // Adds its own id as a parent.
@@ -47,7 +48,7 @@ const createProvider = (
     };
 
     /*
-      createChildContext  - create the context to be inserted into the context
+      childContext  - create the context to be inserted into the context
       for children to consume.
 
       ...mapParentIds(props) - maps parentTypeKeys to idKeys and passes vals
@@ -60,15 +61,13 @@ const createProvider = (
       inherited from Base.  Need to revist this.
     */
 
-    createChildContext = props => ({
-      ...this.mapParentIds(props),
+    childContext = {
+      ...this.mapParentIds(this.props),
       ...this.childRegisterMethods,
-    });
-
-    childContext = this.createChildContext(this.props);
+    };
 
     render() {
-      return (
+      return childTypeKeys.length === 0 ? <Comp {...this.props} /> : (
         <Context.Provider value={this.childContext}>
           <Comp {...this.props} />
         </Context.Provider>

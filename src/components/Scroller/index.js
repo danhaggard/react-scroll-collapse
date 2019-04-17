@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 
@@ -24,7 +24,7 @@ import styles from './Scroller.scss';
   the sagas to be called when needed.
 */
 
-class Scroller extends Component {
+class Scroller extends PureComponent {
 
   getClassName(className) {
     const initClassName = {};
