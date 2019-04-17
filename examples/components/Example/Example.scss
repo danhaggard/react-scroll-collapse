@@ -2,10 +2,13 @@
 @import '../../style/tools/index';
 
 :local(.example) {
-  height: 85vh;
-  margin-bottom: 1em;
-  padding: 1.5rem;
-  padding-top: 0;
+  height: calc(100vh - (var(--baseline) * 3 * 1rem));
+
+  justify-content: space-around;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.5em;
+  padding: 0 1.5rem;
   background: #FFF;
   border: 1px solid #AAA;
   border-bottom: none;
@@ -13,8 +16,11 @@
   flex: 1 1 33%;
 
   @include respond-to(md) {
+    height: 100%;
+    margin-bottom: 0;
+
     &:first-child {
-      margin-right: 0.75em
+      margin-right: 0.75em;
     }
 
     &:last-child {

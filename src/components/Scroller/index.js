@@ -48,6 +48,7 @@ class Scroller extends PureComponent {
           this.elem = elemArg;
           this.getScrollTop = () => (this.elem ? this.elem.scrollTop : null);
           this.setScrollTop = (val) => {
+            debugger;
             if (this.elem && val >= 0) {
               this.elem.scrollTop = val;
             }

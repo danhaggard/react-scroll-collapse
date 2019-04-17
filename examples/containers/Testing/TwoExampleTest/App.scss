@@ -2,11 +2,10 @@
 @import '../../../style/tools/index';
 
 :local(.codelink) {
-  // display: inline-block;
   flex: 1 0 50%;
   line-height: rvr(1);
   margin-bottom: rvr(1);
-  margin-left: 1.5em;
+  margin-left: 1em;
   margin-top: rvr(1);
 }
 
@@ -18,13 +17,16 @@
 }
 
 :local(.container) {
+  flex-direction: column;
   display: flex;
-  flex-direction: row;
   justify-content: space-between;
 
-  @media screen and (max-width: 48rem) {
-    flex-direction: column;
+  @include respond-to(md) {
+    height: calc(100vh - (var(--baseline) * 4 * 1rem));
+    flex-direction: row;
   }
+
+
 }
 
 :local(.header) {
@@ -38,6 +40,6 @@
 }
 
 :local(.scrollerWrapper) {
-  height: 70vh;
-  overflow: hidden;
+  height: 100%;
+  overflow: auto;
 }
