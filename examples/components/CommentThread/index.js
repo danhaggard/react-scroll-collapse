@@ -1,11 +1,14 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import styles from './CommentThread.scss';
 
-import Comment from '../Comment';
-import ExpanderButton from '../ExpandButton';
+import CommentWithButtons from '../Comment/CommentWithButtons';
+import ButtonSmall from '../Button/ButtonSmall';
+import ButtonGroup from '../Button/ButtonGroup';
 
-import { collapserController } from '../../../src';
+import { CollapserExpandButton } from '../ExpandButtonWrapped';
+import { collapserIdentity } from '../../../src';
+
 import { genRandText } from '../../utils';
 
 
@@ -20,29 +23,12 @@ const getNested = noOfChildThreads => (
       )
     ));
 
-
-const addToThread = addToThreadFunc => (
-  <button onClick={addToThreadFunc} type="button">
-    Insert Thread
-  </button>
-);
-
-const deleteThread = (childThreads, deleteThreadFunc) => (
-  childThreads === 0 ? <div /> : (
-    <button onClick={deleteThreadFunc} type="button">
-      Delete Thread
-    </button>
-  )
-);
-
-
-class CommentThread extends Component {
+class CommentThread extends PureComponent {
 
   randText = genRandText();
 
   state = {
     childThreads: this.props.childThreads, // eslint-disable-line react/destructuring-assignment
-    randText: genRandText(),
   }
 
   addToThread = () => {
@@ -54,26 +40,28 @@ class CommentThread extends Component {
 
   render() {
     const {
-      areAllItemsExpanded,
       collapserId,
-      collapserRef,
-      expandCollapseAll
+      parentCollapserId,
+      parentScrollerId,
+      style
     } = this.props;
-    const { childThreads, randText } = this.state;
+    const { childThreads } = this.state;
     const idStr = collapserId.toString();
-    const text = `${randText}`;
+    const text = `${this.randText}`;
     const title = ` Collapser ${idStr}`;
     return (
-      <div className={styles.commentThread} ref={collapserRef}>
-        <ExpanderButton
-          isOpened={areAllItemsExpanded}
-          onClick={expandCollapseAll}
+      <div className={styles.commentThread} style={style}>
+        <CollapserExpandButton
+          collapserId={collapserId}
+          parentCollapserId={parentCollapserId}
+          parentScrollerId={parentScrollerId}
           title={title}
         />
-        <Comment
+        <CommentWithButtons
+          addToThread={this.addToThread}
+          childThreads={childThreads}
+          deleteThread={this.deleteThread}
           text={text}
-          deleteThread={deleteThread(childThreads, this.deleteThread)}
-          addToThread={addToThread(this.addToThread)}
         />
         {getNested(childThreads)}
       </div>
@@ -81,13 +69,20 @@ class CommentThread extends Component {
   }
 }
 
-CommentThread.propTypes = {
-  areAllItemsExpanded: PropTypes.bool.isRequired, // provided by collapserController
-  collapserId: PropTypes.number.isRequired, // provided by collapserController
-  collapserRef: PropTypes.object.isRequired, // provided by collapserController
-  expandCollapseAll: PropTypes.func.isRequired, // provided by collapserController
-  childThreads: PropTypes.number.isRequired,
+CommentThread.defaultProps = {
+  childThreads: 1,
+  parentCollapserId: null,
+  parentScrollerId: null,
+  style: {},
 };
 
-const WrappedCommentThread = collapserController(CommentThread);
+CommentThread.propTypes = {
+  childThreads: PropTypes.number,
+  collapserId: PropTypes.number.isRequired,
+  parentCollapserId: PropTypes.number,
+  parentScrollerId: PropTypes.number,
+  style: PropTypes.object,
+};
+
+const WrappedCommentThread = collapserIdentity(CommentThread);
 export default WrappedCommentThread;

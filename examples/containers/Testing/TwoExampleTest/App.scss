@@ -1,14 +1,6 @@
 @import '../../../style/settings/index';
 @import '../../../style/tools/index';
 
-:local(.codelink) {
-  flex: 1 0 50%;
-  line-height: rvr(1);
-  margin-bottom: rvr(1);
-  margin-left: 1em;
-  margin-top: rvr(1);
-}
-
 :local(.main) {
   padding: 1.5em;
   margin: 0 auto;
@@ -17,23 +9,7 @@
 }
 
 :local(.container) {
-
   @include respond-to(md) {
     height: calc(100vh - (var(--baseline) * 4 * 1rem));
   }
-}
-
-:local(.header) {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-:local(.pageTitle) {
-  flex: 1 0 50%;
-}
-
-:local(.scrollerWrapper) {
-  height: 100%;
-  overflow: auto;
 }

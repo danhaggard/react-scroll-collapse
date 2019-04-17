@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styles from './SimpleCollapser.scss';
-import CommentBody from '../CommentBody';
 
-import ExpanderButton from '../ExpandButton';
+import ButtonGroup from '../Button/ButtonGroup';
+import CommentBody from '../CommentBody';
+import { CollapserExpandButton } from '../ExpandButtonWrapped';
 import SimpleComment from '../SimpleComment';
-import { collapserController } from '../../../src';
+import { collapserIdentity } from '../../../src';
 import { genRandText } from '../../utils';
 
 const createComment = key => ({
@@ -13,7 +14,7 @@ const createComment = key => ({
   text: genRandText()
 });
 
-class SimpleCollapser extends Component {
+class SimpleCollapserFixed extends Component {
 
   constructor(props) {
     super(props);
@@ -42,44 +43,48 @@ class SimpleCollapser extends Component {
 
   render() {
     const {
-      expandCollapseAll,
-      areAllItemsExpanded,
       collapserId,
-      collapserRef,
+      parentCollapserId,
+      parentScrollerId,
+      style
     } = this.props;
     const { comments } = this.state;
     const title = ` Collapser ${collapserId.toString()}`;
     return (
-      <div className={styles.simpleCollapser} ref={collapserRef}>
-        <ExpanderButton
-          isOpened={areAllItemsExpanded}
-          onClick={expandCollapseAll}
+      <div className={styles.simpleCollapser} style={style}>
+        <CollapserExpandButton
+          collapserId={collapserId}
+          parentCollapserId={parentCollapserId}
+          parentScrollerId={parentScrollerId}
           title={title}
         />
-        <CommentBody text="Collapser Controls State For All Nest collapserItem children." />
-
+        <CommentBody text="Collapser controls state for all nested collapserItem children." />
         {comments.map(comment => <SimpleComment {...comment} />)}
-        <button onClick={this.addComment} type="button">
-          Add Comment
-        </button>
-        <button onClick={this.removeComment} type="button">
-          Remove Comment
-        </button>
+        <ButtonGroup
+          leftClick={this.addComment}
+          rightClick={this.removeComment}
+          leftText="Add Comment"
+          rightText="Remove Comment"
+          small
+        />
       </div>
     );
   }
 }
 
-SimpleCollapser.defaultProps = {
-  initialComments: 1
+SimpleCollapserFixed.defaultProps = {
+  initialComments: 1,
+  parentScrollerId: null,
+  parentCollapserId: null,
+  style: {},
 };
 
-SimpleCollapser.propTypes = {
-  areAllItemsExpanded: PropTypes.bool.isRequired,
+SimpleCollapserFixed.propTypes = {
   collapserId: PropTypes.number.isRequired,
-  expandCollapseAll: PropTypes.func.isRequired,
-  collapserRef: PropTypes.object.isRequired,
-  initialComments: PropTypes.number
+  initialComments: PropTypes.number,
+  parentCollapserId: PropTypes.number,
+  parentScrollerId: PropTypes.number,
+  style: PropTypes.object,
 };
 
-export default collapserController(SimpleCollapser);
+export default collapserIdentity(SimpleCollapserFixed);

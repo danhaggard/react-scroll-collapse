@@ -87,11 +87,15 @@ export const collapserItemWrapper = (WrappedComponent) => {
     }
   }
 
+  CollapserItemController.defaultProps = {
+    parentScrollerId: null,
+  };
+
   CollapserItemController.propTypes = {
     isOpened: PropTypes.bool.isRequired,
     itemId: PropTypes.number.isRequired,
     parentCollapserId: PropTypes.number.isRequired,
-    parentScrollerId: PropTypes.number.isRequired,
+    parentScrollerId: PropTypes.number,
     heightReady: PropTypes.func.isRequired,
     expandCollapse: PropTypes.func.isRequired,
     setOffsetTop: PropTypes.func.isRequired,

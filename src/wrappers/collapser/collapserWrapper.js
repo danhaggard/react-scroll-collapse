@@ -107,13 +107,14 @@ export const collapserWrapper = (WrappedComponent) => {
   CollapserController.defaultProps = {
     collapserId: null,
     parentCollapserId: null,
+    parentScrollerId: null,
   };
 
   CollapserController.propTypes = {
     /* provided by collapserControllerWrapper */
     collapserId: ofNumberTypeOrNothing,
     parentCollapserId: ofNumberTypeOrNothing,
-    parentScrollerId: PropTypes.number.isRequired,
+    parentScrollerId: PropTypes.number,
 
     /* provided by redux */
     areAllItemsExpanded: PropTypes.bool.isRequired, // includes item children of nested collapsers

@@ -3,12 +3,8 @@ import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import configureStore from './stores';
 // import whyUpdate from '../src/utils/logging';
-// import App from './components/App';
-// import App from './containers/testing/SingleCollapser';
-// import App from './containers/testing/SingleCollapserScroller';
-//
-// import App from './containers/testing/SingleNestedCollapserScroller';
-import App from './containers/testing/TwoExampleTest';
+
+import Main from './components/Main';
 
 require('./style/main.scss');
 
@@ -17,7 +13,7 @@ require('./style/main.scss');
 const store = configureStore();
 render(
   <Provider store={store}>
-    <App />
+    <Main />
   </Provider>,
   document.getElementById('app')
 );

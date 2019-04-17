@@ -2,10 +2,10 @@ import React from 'react';
 import styles from './App.scss';
 
 import Scroller from '../../../../src';
-
-import SimpleCollapserFixed from '../../../components/SimpleCollapserFixed';
-import CommentThread from '../../../components/CommentThreadFixed';
+import SimpleCollapserFixed from '../../../components/SimpleCollapser';
+import CommentThread from '../../../components/CommentThread';
 import Example from '../../../components/Example';
+import PageHeader from '../../../components/PageHeader';
 
 const EXAMPLE_COPY = {
   0: {
@@ -23,31 +23,20 @@ const EXAMPLE_COPY = {
   }
 };
 
-const scrollerStyle = { height: '100%' };
-
 const App = () => (
   <div className={styles.main}>
-    <header className={styles.header}>
-      <h1 className={styles.pageTitle}>react-scroll-collapse - Examples</h1>
-      <div className={styles.codelink}>
-        <a href="https://github.com/danhaggard/react-scroll-collapse">View code on Github</a>
-      </div>
-    </header>
+    <PageHeader />
     <div className={`${styles.container} two-column-layout`}>
       <Example {...EXAMPLE_COPY[0]}>
-        <div className={styles.scrollerWrapper}>
-          <Scroller style={scrollerStyle}>
-            <SimpleCollapserFixed initialComments={10} />
-            <SimpleCollapserFixed initialComments={10} />
-          </Scroller>
-        </div>
+        <Scroller className={styles.scroller}>
+          <SimpleCollapserFixed initialComments={10} />
+          <SimpleCollapserFixed initialComments={10} />
+        </Scroller>
       </Example>
       <Example {...EXAMPLE_COPY[1]}>
-        <div className={styles.scrollerWrapper}>
-          <Scroller style={scrollerStyle}>
-            <CommentThread childThreads={3} />
-          </Scroller>
-        </div>
+        <Scroller className={styles.scroller}>
+          <CommentThread childThreads={3} />
+        </Scroller>
       </Example>
     </div>
   </div>

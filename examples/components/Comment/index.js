@@ -5,6 +5,7 @@ import { presets } from 'react-motion';
 import { Collapse } from 'react-collapse';
 
 import CommentBody from '../CommentBody';
+import { ofChildrenTypeOrNothing } from '../../../src/utils/propTypeHelpers';
 
 import { collapserItemController } from '../../../src';
 import styles from './Comment.scss';
@@ -36,11 +37,11 @@ const Comment = (props) => {
 };
 
 Comment.defaultProps = {
-  children: [],
+  children: null,
 };
 
 Comment.propTypes = {
-  children: PropTypes.array,
+  children: ofChildrenTypeOrNothing,
   collapserItemRef: PropTypes.object.isRequired, // provided by collapserItemController
   isOpened: PropTypes.bool.isRequired, // provided by collapserItemController
   itemId: PropTypes.number.isRequired, // provided by collapserItemController

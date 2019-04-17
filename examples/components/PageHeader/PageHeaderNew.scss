@@ -1,0 +1,31 @@
+@import '../../style/settings/index';
+@import '../../style/tools/index';
+
+:local(.codelink) {
+  flex: 1 0 auto;
+  margin-top: 0;
+  margin-bottom: rvr(1);
+
+  @include respond-to(xl) {
+    line-height: rvr(1);
+    margin-bottom: rvr(1);
+    margin-top: rvr(1);
+  }
+}
+
+:local(.header) {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-bottom: rvr(1);
+
+  @include respond-to(xl) {
+    flex-direction: row;
+    margin-bottom: 0;
+  }
+}
+
+:local(.pageTitle) {
+  flex: 1 0 auto;
+}
