@@ -76,7 +76,7 @@ const examples = {
   1: [example1],
   2: [example2],
   3: [example3],
-  4: [example4(4), example4(5)],
+  4: [example4(4), example4(5)]
 };
 
 export default examples;

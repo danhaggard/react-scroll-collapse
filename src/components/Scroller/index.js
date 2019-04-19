@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 
 import { ofChildrenType } from '../../utils/propTypeHelpers';
+import { targetIsScrollBar } from '../../utils/domUtils';
 import styles from './Scroller.scss';
 
 
@@ -21,12 +22,41 @@ import styles from './Scroller.scss';
 
   Scroller.getScrollTop is a callback defined that returns the
   scrollTop property of the dom element.  It is passed by ScrollerMotion to
-  the sagas to be called when needed.
+  the sagas to be called when needed.str.slice(0, -1);
 */
+
 
 class Scroller extends PureComponent {
 
-  getClassName(className) {
+  callIfAnimating = callback => (...args) => { // eslint-disable-line react/sort-comp
+    if (!this.props.getUserScrollActive()) {
+      callback(...args);
+    }
+  }
+
+  breakScrollAnimation = condition => condition && this.props.breakScrollAnimation();
+
+  /*
+    Break scroll animation on user scroll events:
+
+    keydown (arrow up, arrow down)
+    mouse wheel,
+    handleMouseDown: click on scrollbar.
+
+    Once the scroll animation has been cancelled - there is no point allowing
+    these to be called again until the next animation starts.
+  */
+  handleMouseDown = this.callIfAnimating(
+    e => this.breakScrollAnimation(targetIsScrollBar(e.clientX, this.elem))
+  );
+
+  handleWheel = this.callIfAnimating(() => this.breakScrollAnimation(true));
+
+  handleKeyDown = this.callIfAnimating(
+    e => this.breakScrollAnimation(e.keyCode === 38 || e.keyCode === 40)
+  );
+
+  getClassName = (className) => {
     const initClassName = {};
     initClassName[styles.scroller] = true;
     return classnames({
@@ -34,26 +64,28 @@ class Scroller extends PureComponent {
     }, className);
   }
 
-  /*
-    Defining methods in the ref allows ScrollerMotion to use them when
-    wrapping Scroller.
-  */
+  getScrollTop = () => (this.elem ? this.elem.scrollTop : null);
+
+  setScrollTop = (val) => {
+    if (this.elem && val >= 0) {
+      this.elem.scrollTop = val;
+    }
+    return null;
+  };
+
   render() {
     const { className, children, style } = this.props;
     return (
       <div
         className={this.getClassName(className)}
-        style={style}
+        onKeyDown={this.handleKeyDown}
+        onMouseDown={this.handleMouseDown}
+        onWheel={this.handleWheel}
         ref={(elemArg) => {
           this.elem = elemArg;
-          this.getScrollTop = () => (this.elem ? this.elem.scrollTop : null);
-          this.setScrollTop = (val) => {
-            if (this.elem && val >= 0) {
-              this.elem.scrollTop = val;
-            }
-            return null;
-          };
         }}
+        role="presentation"
+        style={style}
       >
         { children }
       </div>
@@ -70,6 +102,8 @@ Scroller.defaultProps = {
 Scroller.propTypes = {
   children: ofChildrenType,
   className: PropTypes.string,
+  breakScrollAnimation: PropTypes.func.isRequired,
+  getUserScrollActive: PropTypes.func.isRequired,
   style: PropTypes.object,
 };
 

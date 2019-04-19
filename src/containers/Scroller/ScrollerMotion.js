@@ -12,37 +12,19 @@ import { scroller as selectors } from '../../selectors';
 
 const { selectors: { offsetTopSelector, scrollTopSelector, toggleScrollSelector } } = selectors;
 
-
 const createScrollerChild = (
   ScrollerComponent,
   thatArg,
-  {
-    className,
-    scrollerId,
-    style,
-    children
-  },
+  props,
 ) => {
   const that = thatArg;
   return (
     <ScrollerComponent
-      className={className}
-      ref={(child) => {
-        that.child = child;
-      }}
-      scrollerId={scrollerId}
-      style={style}
-    >
-      { children }
-    </ScrollerComponent>
+      {...props}
+      ref={child => (that.child = child)}
+    />
   );
 };
-
-const createMotionChild = (scroller, child) => (val) => {
-  child.setScrollTop(val.y);
-  return scroller;
-};
-
 
 const scrollerMotionWrapper = (ScrollerComponent) => {
 
@@ -82,6 +64,13 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
       return null;
     }
 
+    /*
+      userScrollActive: used to give back scroll control to the user.
+      Set to true so event handlers do not fire until animation starts.
+      Kept outside react state to prevent unecessary renders.
+    */
+    userScrollActive = true;
+
     constructor(props) {
       super(props);
       this.state = {
@@ -109,6 +98,12 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
     componentDidUpdate() {
       const { prevRenderType, springConfig } = this.state;
       if (prevRenderType === 'uiSync') {
+
+        /*
+          userScrollActive tells the child scroller it can fire event handlers
+          to give back scroll control to the user when requested.
+        */
+        this.userScrollActive = false;
         this.setState({ // eslint-disable-line react/no-did-update-set-state
           motionStyle: {
             y: spring(this.getScrollTo(), springConfig)
@@ -132,33 +127,51 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
       return offsetTop + offsetScrollTo;
     }
 
+    /*
+      I was previously passing val.y into ScrollerComponent - which resulted
+      in a render of ScrollerComponent for every val.y passed by <Motion>.
+      Now on every render in <Motion> - it calls the setScrollTop callback
+      which creates the scroll animation - but doesn't re-render ScrollerComponent
+      at all.
+
+      Kudos to nktb: https://github.com/chenglou/react-motion/issues/357#issuecomment-237741940
+
+      Also, by keeping userScrollActive state outside of React - we avoid
+      an unneccesary render of the parent and child components.
+    */
+
+    createMotionChild = (scroller, child) => (val) => {
+      if (!this.userScrollActive) {
+        child.setScrollTop(val.y);
+      }
+      return scroller;
+    };
+
+    breakScrollAnimation = () => (this.userScrollActive = true);
+
+    getUserScrollActive = () => this.userScrollActive;
 
     render() {
       const { onRest, ...rest } = this.props;
-
       const { motionStyle } = this.state;
-
       /*
         The use of the ref in ScrollerComponent allows ScrollerMotion
         to access the methods we defined on Scroller using ref.  In this case
         getScrollTop which is now accessible via: this.child.getScrollTop
       */
-      const scroller = createScrollerChild(ScrollerComponent, this, { ...rest });
+      const scroller = createScrollerChild(ScrollerComponent, this, {
+        ...rest,
+        breakScrollAnimation: this.breakScrollAnimation,
+        getUserScrollActive: this.getUserScrollActive,
+      });
 
-      /*
-        I was previously passing val.y into ScrollerComponent - which resulted
-        in a render of ScrollerComponent for every val.y passed by <Motion>.
-        Now on every render in <Motion> - it calls the setScrollTop callback
-        which creates the scroll animation - but doesn't re-render ScrollerComponent
-        at all.
-
-        Kudos to nktb: https://github.com/chenglou/react-motion/issues/357#issuecomment-237741940
-      */
       return (
         <Motion
           onRest={onRest}
           style={motionStyle}>
-          {this.child ? createMotionChild(scroller, this.child) : () => scroller}
+          {this.child ? this.createMotionChild(
+            scroller, this.child
+          ) : () => scroller}
         </Motion>
       );
     }
