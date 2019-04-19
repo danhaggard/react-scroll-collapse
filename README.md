@@ -89,7 +89,7 @@ Consult both the redux and redux-saga docs for more information about installing
 
 #### Usage
 
-For the auto-scroll functionality to work, components wrapped with collapserController should be nested within the scope of <Scroller>.  collapserControllerItem wrapped components should be nested in the scope of a component wrapped with collapserController.
+For the auto-scroll functionality to work, components wrapped with collapserController should be nested within the scope of \<Scroller>.  collapserControllerItem wrapped components should be nested in the scope of a component wrapped with collapserController.
 
 ```javascript
 import Scroller from 'react-scroll-collapse';
@@ -120,6 +120,10 @@ You can see this component implemented in the examples folder [here](https://git
 
 
 #### \<Scroller> - Props
+
+##### onAnimationCancel : PropTypes.function
+
+This callback will be fired when the user cancels the scroll animation by initiating a scroll event of their own.
 
 ##### onRest : PropTypes.function
 
