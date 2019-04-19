@@ -8,6 +8,7 @@ import {
   createAllNestedDependentSelector,
   dependentGetterFactory,
   createAllSelector,
+  createSomeSelector,
   createNoneSelector,
   concatDependents
 } from './utils';
@@ -51,6 +52,8 @@ export const itemWaitingForHeightArrSelector = createAllNestedDependentSelector(
 )(getterFactory);
 
 export const areAllItemsExpandedSelector = createAllSelector(itemExpandedArrSelector);
+export const areSomeItemsExpandedSelector = createSomeSelector(itemExpandedArrSelector);
+
 export const haveAllItemsReportedHeightSelector = createNoneSelector(
   itemWaitingForHeightArrSelector
 );

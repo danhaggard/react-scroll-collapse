@@ -43,6 +43,7 @@ class SimpleCollapserFixed extends Component {
 
   render() {
     const {
+      animationDelay,
       collapserId,
       parentCollapserId,
       parentScrollerId,
@@ -53,6 +54,7 @@ class SimpleCollapserFixed extends Component {
     return (
       <div className={styles.simpleCollapser} style={style}>
         <CollapserExpandButton
+          animationDelay={animationDelay}
           collapserId={collapserId}
           parentCollapserId={parentCollapserId}
           parentScrollerId={parentScrollerId}
@@ -73,6 +75,7 @@ class SimpleCollapserFixed extends Component {
 }
 
 SimpleCollapserFixed.defaultProps = {
+  animationDelay: 0,
   initialComments: 1,
   parentScrollerId: null,
   parentCollapserId: null,
@@ -80,6 +83,7 @@ SimpleCollapserFixed.defaultProps = {
 };
 
 SimpleCollapserFixed.propTypes = {
+  animationDelay: PropTypes.number,
   collapserId: PropTypes.number.isRequired,
   initialComments: PropTypes.number,
   parentCollapserId: PropTypes.number,

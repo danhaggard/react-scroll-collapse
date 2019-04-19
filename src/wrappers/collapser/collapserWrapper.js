@@ -9,7 +9,11 @@ import { ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
 import { collapserWrapperActions } from '../../actions';
 import selectors from '../../selectors';
 
-const { allChildItemsSelector, areAllItemsExpandedSelector } = selectors.collapser;
+const {
+  allChildItemsSelector,
+  areAllItemsExpandedSelector,
+  areSomeItemsExpandedSelector,
+} = selectors.collapser;
 
 export const collapserWrapper = (WrappedComponent) => {
 
@@ -54,6 +58,7 @@ export const collapserWrapper = (WrappedComponent) => {
     expandCollapseAll = () => {
       const {
         allChildItems,
+        animationDelay,
         areAllItemsExpanded,
         collapserId,
         expandCollapseAll,
@@ -78,9 +83,17 @@ export const collapserWrapper = (WrappedComponent) => {
         parentScrollerId,
         collapserId,
       );
+      console.log('expandCollapseAll', expandCollapseAll);
+      let currentDelay = 0;
+
       allChildItems.forEach((item) => {
-        expandCollapseAll(item, areAllItemsExpanded, item.id);
+        setTimeout(
+          () => expandCollapseAll(item, areAllItemsExpanded, item.id),
+          currentDelay,
+        );
+        currentDelay += animationDelay;
       });
+
     };
 
     render() {
@@ -105,12 +118,16 @@ export const collapserWrapper = (WrappedComponent) => {
   }
 
   CollapserController.defaultProps = {
+    animationDelay: 0,
+    collapseIfSomeExpanded: false,
     collapserId: null,
     parentCollapserId: null,
     parentScrollerId: null,
   };
 
   CollapserController.propTypes = {
+    animationDelay: PropTypes.number,
+    collapseIfSomeExpanded: PropTypes.bool,
     /* provided by collapserControllerWrapper */
     collapserId: ofNumberTypeOrNothing,
     parentCollapserId: ofNumberTypeOrNothing,
@@ -129,9 +146,11 @@ export const collapserWrapper = (WrappedComponent) => {
   const mapStateToProps = () => (state, ownProps) => {
     const allExpanded = areAllItemsExpandedSelector();
     const allChildItems = allChildItemsSelector();
+    const someExpanded = areSomeItemsExpandedSelector();
     return {
       allChildItems: allChildItems(state)(ownProps.collapserId),
       areAllItemsExpanded: allExpanded(state)(ownProps.collapserId),
+      areSomeItemsExpanded: someExpanded(state)(ownProps.collapserId),
     };
   };
 

@@ -31,6 +31,11 @@ const COPY = {
     title: 'Multiple Scrolling Components',
     text: `You can use multiple scrollers as well!
     State is tracked separately for each`
+  },
+  5: {
+    title: 'Animation Delay',
+    text: `You can pass an animationDelay prop
+    (ms) for this fun effect!`
   }
 };
 
@@ -71,12 +76,21 @@ const example4 = key => (
   </Example>
 );
 
+const example5 = (
+  <Example {...COPY[5]} key={0} style={{}}>
+    <Scroller style={{ height: '100%' }}>
+      <SimpleCollapser animationDelay={50} initialComments={20} style={{ margin: 0, overflow: 'auto' }} />
+    </Scroller>
+  </Example>
+);
+
 const examples = {
   0: [example0],
   1: [example1],
   2: [example2],
   3: [example3],
-  4: [example4(4), example4(5)]
+  4: [example4(4), example4(5)],
+  5: [example5]
 };
 
 export default examples;

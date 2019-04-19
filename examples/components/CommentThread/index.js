@@ -37,6 +37,7 @@ class CommentThread extends PureComponent {
 
   render() {
     const {
+      animationDelay,
       collapserId,
       parentCollapserId,
       parentScrollerId,
@@ -49,6 +50,7 @@ class CommentThread extends PureComponent {
     return (
       <div className={styles.commentThread} style={style}>
         <CollapserExpandButton
+          animationDelay={animationDelay}
           collapserId={collapserId}
           parentCollapserId={parentCollapserId}
           parentScrollerId={parentScrollerId}
@@ -67,6 +69,7 @@ class CommentThread extends PureComponent {
 }
 
 CommentThread.defaultProps = {
+  animationDelay: 0,
   childThreads: 1,
   parentCollapserId: null,
   parentScrollerId: null,
@@ -74,6 +77,7 @@ CommentThread.defaultProps = {
 };
 
 CommentThread.propTypes = {
+  animationDelay: PropTypes.number,
   childThreads: PropTypes.number,
   collapserId: PropTypes.number.isRequired,
   parentCollapserId: PropTypes.number,
