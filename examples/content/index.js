@@ -35,20 +35,20 @@ const COPY = {
 };
 
 const example0 = (
-  <Example {...COPY[0]} key={0} style={{ margin: 0 }}>
+  <Example {...COPY[0]} key={0} style={{}}>
     <SimpleCollapser initialComments={6} style={{ margin: 0, overflow: 'auto' }} />
   </Example>
 );
 
 const example1 = (
-  <Example {...COPY[1]} key={0} style={{ margin: 0 }}>
+  <Example {...COPY[1]} key={0} style={{}}>
     <SimpleCollapser initialComments={6} style={{ margin: 0, overflow: 'auto' }} />
     <SimpleCollapser initialComments={6} style={{ margin: 0, overflow: 'auto' }} />
   </Example>
 );
 
 const example2 = (
-  <Example {...COPY[2]} key={0} style={{ margin: 0 }}>
+  <Example {...COPY[2]} key={0} style={{}}>
     <CommentThread childThreads={3} style={{ margin: 0, overflow: 'auto' }} />
   </Example>
 );
@@ -64,7 +64,7 @@ const example3 = (
 
 
 const example4 = key => (
-  <Example {...COPY[4]} key={key}>
+  <Example {...COPY[4]} style={{ marginBottom: '3em' }} key={key}>
     <Scroller style={{ height: '100%' }}>
       <CommentThread childThreads={3} />
     </Scroller>

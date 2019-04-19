@@ -147,7 +147,13 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
       return scroller;
     };
 
-    breakScrollAnimation = () => (this.userScrollActive = true);
+    breakScrollAnimation = () => {
+      const { onAnimationCancel } = this.props;
+      this.userScrollActive = true;
+      if (typeof onAnimationCancel === 'function') {
+        onAnimationCancel();
+      }
+    }
 
     getUserScrollActive = () => this.userScrollActive;
 
@@ -182,6 +188,7 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
     className: '',
     offsetScrollTo: null,
     offsetTop: null,
+    onAnimationCancel: null,
     onRest: null,
     scrollerId: null,
     scrollTo: null,
@@ -197,6 +204,7 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
     className: PropTypes.string,
     offsetScrollTo: ofNumberTypeOrNothing,
     offsetTop: ofNumberTypeOrNothing,
+    onAnimationCancel: ofFuncTypeOrNothing,
     onRest: ofFuncTypeOrNothing,
     scrollerId: ofNumberTypeOrNothing,
     scrollTo: ofNumberTypeOrNothing,

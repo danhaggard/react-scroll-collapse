@@ -1,9 +1,14 @@
 @import '../../style/settings/index';
 @import '../../style/tools/index';
 
+$multiple: -6;
+$multiple-small: 10;
+$multiple-large: 4;
+
 :local(.example) {
-  height: calc(100vh - (var(--baseline) * 10 * 1rem));
-  margin-bottom: 1.5em;
+  max-height: calc(100vh - (var(--baseline) * #{$multiple} * 1rem));
+  min-height: calc(100vh - (var(--baseline) * #{$multiple} * 1rem));
+
   padding: 0 1.5rem;
   background: #FFF;
   border: 1px solid #AAA;
@@ -12,17 +17,13 @@
   flex: 1 1 33%;
 
   @include respond-to(sm) {
-    height: calc(100vh - (var(--baseline) * 10 * 1rem));
-    margin-bottom: 0;
-  }
-
-  @include respond-to(md) {
-    height: calc(100vh - (var(--baseline) * 9 * 1rem));
-    margin-bottom: 0;
+    max-height: calc(100vh - (var(--baseline) * #{$multiple-small} * 1rem));
+    min-height: calc(100vh - (var(--baseline) * #{$multiple-small} * 1rem));
   }
 
   @include respond-to(xl) {
-    height: calc(100vh - (var(--baseline) * 4 * 1rem));
+    max-height: calc(100vh - (var(--baseline) * #{$multiple-large} * 1rem));
+    min-height: calc(100vh - (var(--baseline) * #{$multiple-large} * 1rem));
     margin-bottom: 0;
   }
 }

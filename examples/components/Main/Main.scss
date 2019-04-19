@@ -9,18 +9,5 @@
 }
 
 :local(.container) {
-  @include respond-to(sm) {
-    height: calc(100vh - (var(--baseline) * 10 * 1rem));
-    margin-bottom: 0;
-  }
-
-  @include respond-to(md) {
-    height: calc(100vh - (var(--baseline) * 9 * 1rem));
-    margin-bottom: 0;
-  }
-
-  @include respond-to(xl) {
-    height: calc(100vh - (var(--baseline) * 6 * 1rem));
-    margin-bottom: 0;
-  }
+  height: calc(100vh - (var(--baseline) * 11 * 1rem));
 }
