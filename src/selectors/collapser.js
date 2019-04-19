@@ -52,6 +52,24 @@ export const itemWaitingForHeightArrSelector = createAllNestedDependentSelector(
 )(getterFactory);
 
 export const areAllItemsExpandedSelector = createAllSelector(itemExpandedArrSelector);
+const allExpanded = areAllItemsExpandedSelector();
+export const areAllItemsExpandedSelectorTimerFunc = () => {
+  let total = 0;
+  let value = false;
+  return state => (id, parentAreAllItemsExpanded) => {
+    const t1 = performance.now();
+    value = allExpanded(state)(id);
+    const t2 = performance.now();
+    total += (t2 - t1);
+    //console.log('collapserId, parentAreAllItemsExpanded', id, parentAreAllItemsExpanded);
+    //console.log('areAllItemsExpanded, time, totaltime', value, t2 - t1, total);
+    //console.log('')
+    return value;
+  };
+};
+
+export const areAllItemsExpandedSelectorTimer = areAllItemsExpandedSelectorTimerFunc()
+
 export const areSomeItemsExpandedSelector = createSomeSelector(itemExpandedArrSelector);
 
 export const haveAllItemsReportedHeightSelector = createNoneSelector(

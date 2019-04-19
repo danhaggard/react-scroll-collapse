@@ -13,6 +13,7 @@ const {
   allChildItemsSelector,
   areAllItemsExpandedSelector,
   areSomeItemsExpandedSelector,
+  areAllItemsExpandedSelectorTimer
 } = selectors.collapser;
 
 export const collapserWrapper = (WrappedComponent) => {
@@ -48,8 +49,18 @@ export const collapserWrapper = (WrappedComponent) => {
       const { props } = this;
 
       return Object.keys(props).some(
+        (prop) => {
+            if (prop !== 'allChildItems' && prop !== 'parentAreAllItemsExpanded' && props[prop] !== nextProps[prop]) {
+              // console.log('should Update true: collapserId, prop, prev, next', this.props.collapserId, prop, props[prop], nextProps[prop]);
+            }
+            return (prop !== 'allChildItems' && prop !== 'parentAreAllItemsExpanded' && props[prop] !== nextProps[prop]);
+        }
+      );
+      /*
+      return Object.keys(props).some(
         prop => (prop !== 'allChildItems' && props[prop] !== nextProps[prop])
       );
+      */
 
     }
 
@@ -118,7 +129,7 @@ export const collapserWrapper = (WrappedComponent) => {
         collapseIfSomeExpanded,
         expandCollapseAll
       );
-      allChildItems.forEach(callback);
+      allChildItems(collapserId).forEach(callback);
 
       /*
       let currentDelay = 0;
@@ -150,6 +161,7 @@ export const collapserWrapper = (WrappedComponent) => {
         areSomeItemsExpanded,
         ...other
       } = this.props;
+      // console.log('Collapser Wrapper Render Id, parentAreAllItemsExpanded', this.props.collapserId, this.props.parentAreAllItemsExpanded);
       return (
         <WrappedComponentRef
           {...other}
@@ -187,16 +199,22 @@ export const collapserWrapper = (WrappedComponent) => {
     watchCollapser: PropTypes.func.isRequired,
     watchInitCollapser: PropTypes.func.isRequired,
   };
-
-
-  const mapStateToProps = () => (state, ownProps) => {
-    const allExpanded = areAllItemsExpandedSelector();
-    const allChildItems = allChildItemsSelector();
-    const someExpanded = areSomeItemsExpandedSelector();
+// 1.7, 1.5
+  const areAllItemsExpandedTimer = areAllItemsExpandedSelector();
+  const mapStateToProps = (state, ownProps) => {
+    const { parentAreAllItemsExpanded, collapserId } = ownProps;
+    let itemsSelector;
+    // console.log('mapStateToProps parentAreAllItemsExpanded collapserId', parentAreAllItemsExpanded, collapserId);
+    if (parentAreAllItemsExpanded) {
+      itemsSelector = true;
+    } else {
+      itemsSelector = areAllItemsExpandedTimer(state)(ownProps.collapserId, parentAreAllItemsExpanded);
+    }
     return {
-      allChildItems: allChildItems(state)(ownProps.collapserId),
-      areAllItemsExpanded: allExpanded(state)(ownProps.collapserId),
-      areSomeItemsExpanded: someExpanded(state)(ownProps.collapserId),
+      allChildItems: allChildItemsSelector()(state),
+      // areAllItemsExpanded: areAllItemsExpandedSelectorTimer(state)(ownProps.collapserId, parentAreAllItemsExpanded),
+
+      areAllItemsExpanded: itemsSelector,
     };
   };
 

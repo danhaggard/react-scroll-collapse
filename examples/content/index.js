@@ -3,7 +3,7 @@ import React from 'react';
 import Scroller from '../../src';
 
 import SimpleCollapser from '../components/SimpleCollapser';
-import CommentThread from '../components/CommentThread';
+import CommentThread from '../components/CommentThreadTest';
 import Example from '../components/Example';
 
 const COPY = {
