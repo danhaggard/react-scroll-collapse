@@ -3,12 +3,14 @@ import ExpandButton from '../ExpandButton';
 import { collapserProvider, collapserItemProvider } from '../../../src';
 
 const mapCollapserProps = ({
+  areSomeItemsExpanded,
   areAllItemsExpanded,
+  collapseIfSomeExpanded,
   collapserRef,
   expandCollapseAll,
   ...rest
 }) => ({
-  isOpened: areAllItemsExpanded,
+  isOpened: collapseIfSomeExpanded ? areSomeItemsExpanded : areAllItemsExpanded,
   forwardRef: collapserRef,
   onClick: expandCollapseAll,
   ...rest

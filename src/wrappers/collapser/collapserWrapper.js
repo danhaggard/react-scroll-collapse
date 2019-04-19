@@ -55,12 +55,39 @@ export const collapserWrapper = (WrappedComponent) => {
 
     getOffSetTop = () => this.elem.current.offsetTop;
 
+    getExpandCollapseCallback = (
+      animationDelay,
+      areAllItemsExpanded,
+      areSomeItemsExpanded,
+      collapseIfSomeExpanded,
+      expandCollapseAll
+    ) => {
+      let currentDelay = 0;
+      return (item) => {
+        const innerCallback = () => expandCollapseAll(
+          item,
+          areAllItemsExpanded,
+          item.id,
+          areSomeItemsExpanded,
+          collapseIfSomeExpanded
+        );
+        if (animationDelay) {
+          setTimeout(innerCallback, currentDelay);
+          currentDelay += animationDelay;
+        } else {
+          innerCallback();
+        }
+      };
+    }
+
     expandCollapseAll = () => {
       const {
         allChildItems,
         animationDelay,
         areAllItemsExpanded,
+        areSomeItemsExpanded,
         collapserId,
+        collapseIfSomeExpanded,
         expandCollapseAll,
         parentScrollerId,
         setOffsetTop,
@@ -83,17 +110,33 @@ export const collapserWrapper = (WrappedComponent) => {
         parentScrollerId,
         collapserId,
       );
-      console.log('expandCollapseAll', expandCollapseAll);
+
+      const callback = this.getExpandCollapseCallback(
+        animationDelay,
+        areAllItemsExpanded,
+        areSomeItemsExpanded,
+        collapseIfSomeExpanded,
+        expandCollapseAll
+      );
+      allChildItems.forEach(callback);
+
+      /*
       let currentDelay = 0;
 
       allChildItems.forEach((item) => {
         setTimeout(
-          () => expandCollapseAll(item, areAllItemsExpanded, item.id),
+          () => expandCollapseAll(
+            item,
+            areAllItemsExpanded,
+            item.id,
+            areSomeItemsExpanded,
+            collapseIfSomeExpanded
+          ),
           currentDelay,
         );
         currentDelay += animationDelay;
       });
-
+      */
     };
 
     render() {
@@ -104,6 +147,7 @@ export const collapserWrapper = (WrappedComponent) => {
         watchInitCollapser,
         allChildItems,
         areAllItemsExpanded,
+        areSomeItemsExpanded,
         ...other
       } = this.props;
       return (
@@ -112,6 +156,7 @@ export const collapserWrapper = (WrappedComponent) => {
           ref={this.elem}
           expandCollapseAll={this.expandCollapseAll}
           areAllItemsExpanded={areAllItemsExpanded}
+          areSomeItemsExpanded={areSomeItemsExpanded}
         />
       );
     }
@@ -135,6 +180,7 @@ export const collapserWrapper = (WrappedComponent) => {
 
     /* provided by redux */
     areAllItemsExpanded: PropTypes.bool.isRequired, // includes item children of nested collapsers
+    areSomeItemsExpanded: PropTypes.bool.isRequired,
     allChildItems: PropTypes.array.isRequired, // array of collapserItem ids
     expandCollapseAll: PropTypes.func.isRequired,
     setOffsetTop: PropTypes.func.isRequired,

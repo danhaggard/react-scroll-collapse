@@ -36,6 +36,12 @@ const COPY = {
     title: 'Animation Delay',
     text: `You can pass an animationDelay prop
     (ms) for this fun effect!`
+  },
+  6: {
+    title: 'Collapse All Children If Some Are Expanded',
+    text: `The default behaviour of the expandCollapseAll function is to
+    open any remaining children that are closed.  Use the collapseIfSomeExpanded
+    prop to reverse this behaviour.`
   }
 };
 
@@ -46,14 +52,14 @@ const example0 = (
 );
 
 const example1 = (
-  <Example {...COPY[1]} key={0} style={{}}>
+  <Example {...COPY[1]} key={1} style={{}}>
     <SimpleCollapser initialComments={6} style={{ margin: 0, overflow: 'auto' }} />
     <SimpleCollapser initialComments={6} style={{ margin: 0, overflow: 'auto' }} />
   </Example>
 );
 
 const example2 = (
-  <Example {...COPY[2]} key={0} style={{}}>
+  <Example {...COPY[2]} key={2} style={{}}>
     <CommentThread childThreads={3} style={{ margin: 0, overflow: 'auto' }} />
   </Example>
 );
@@ -77,10 +83,14 @@ const example4 = key => (
 );
 
 const example5 = (
-  <Example {...COPY[5]} key={0} style={{}}>
-    <Scroller style={{ height: '100%' }}>
-      <SimpleCollapser animationDelay={50} initialComments={20} style={{ margin: 0, overflow: 'auto' }} />
-    </Scroller>
+  <Example {...COPY[5]} key={5} style={{}}>
+    <SimpleCollapser animationDelay={50} initialComments={20} style={{ margin: 0, overflow: 'auto' }} />
+  </Example>
+);
+
+const example6 = (
+  <Example {...COPY[6]} key={6} style={{}}>
+    <SimpleCollapser collapseIfSomeExpanded initialComments={5} style={{ margin: 0, overflow: 'auto' }} />
   </Example>
 );
 
@@ -89,8 +99,9 @@ const examples = {
   1: [example1],
   2: [example2],
   3: [example3],
-  4: [example4(4), example4(5)],
-  5: [example5]
+  4: [example4(4), example4(4.1)],
+  5: [example5],
+  6: [example6]
 };
 
 export default examples;

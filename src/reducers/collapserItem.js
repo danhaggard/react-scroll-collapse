@@ -20,7 +20,12 @@ const { getters: { getId, getExpanded } } = selectors;
 
 
 export const expandedReducer = (state = true, action) => {
-  const { areAllItemsExpanded, item } = checkAttr(action, 'payload');
+  const {
+    areAllItemsExpanded,
+    areSomeItemsExpanded,
+    collapseIfSomeExpanded,
+    item
+  } = checkAttr(action, 'payload');
   switch (action.type) {
     case ADD_ITEM: {
       const val = getExpanded(item);
@@ -29,7 +34,7 @@ export const expandedReducer = (state = true, action) => {
     case EXPAND_COLLAPSE:
       return !state;
     case EXPAND_COLLAPSE_ALL:
-      return !areAllItemsExpanded;
+      return collapseIfSomeExpanded ? !areSomeItemsExpanded : !areAllItemsExpanded;
     default:
       return state;
   }

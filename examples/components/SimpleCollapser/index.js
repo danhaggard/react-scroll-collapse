@@ -14,7 +14,7 @@ const createComment = key => ({
   text: genRandText()
 });
 
-class SimpleCollapserFixed extends Component {
+class SimpleCollapser extends Component {
 
   constructor(props) {
     super(props);
@@ -45,17 +45,20 @@ class SimpleCollapserFixed extends Component {
     const {
       animationDelay,
       collapserId,
+      collapseIfSomeExpanded,
       parentCollapserId,
       parentScrollerId,
       style
     } = this.props;
     const { comments } = this.state;
+    console.log('simplecollapser render');
     const title = ` Collapser ${collapserId.toString()}`;
     return (
       <div className={styles.simpleCollapser} style={style}>
         <CollapserExpandButton
           animationDelay={animationDelay}
           collapserId={collapserId}
+          collapseIfSomeExpanded={collapseIfSomeExpanded}
           parentCollapserId={parentCollapserId}
           parentScrollerId={parentScrollerId}
           title={title}
@@ -74,21 +77,23 @@ class SimpleCollapserFixed extends Component {
   }
 }
 
-SimpleCollapserFixed.defaultProps = {
+SimpleCollapser.defaultProps = {
   animationDelay: 0,
+  collapseIfSomeExpanded: false,
   initialComments: 1,
   parentScrollerId: null,
   parentCollapserId: null,
   style: {},
 };
 
-SimpleCollapserFixed.propTypes = {
+SimpleCollapser.propTypes = {
   animationDelay: PropTypes.number,
   collapserId: PropTypes.number.isRequired,
+  collapseIfSomeExpanded: PropTypes.bool,
   initialComments: PropTypes.number,
   parentCollapserId: PropTypes.number,
   parentScrollerId: PropTypes.number,
   style: PropTypes.object,
 };
 
-export default collapserIdentity(SimpleCollapserFixed);
+export default collapserIdentity(SimpleCollapser);
