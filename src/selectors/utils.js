@@ -50,6 +50,7 @@ export const selectFunc = getAttrFunc => innerSelectFunc => (stateId) => {
 */
 
 export const getAllNested = (id, selectorFunc) => {
+  console.log('getAllNested id', id);
   const concatChildren = (arr, i) => {
     /*
       ids of components are generated only as a component is mounting.  So on the
@@ -67,6 +68,27 @@ export const getAllNested = (id, selectorFunc) => {
   };
   return concatChildren(selectorFunc(id), 0);
 };
+
+export const getAllNestedTest = selectorFunc => (id) => {
+  console.log('getAllNestedTest', id);
+  const concatChildren = (arr, i) => {
+    /*
+      ids of components are generated only as a component is mounting.  So on the
+      first render selectorFunc will return null.  null.length will raise an
+      error hence the check for !arr first.
+    */
+    const newArr = !arr ? [] : arr;
+    if (i + 1 > newArr.length) {
+      /* If true then we have iterated through all children */
+      return newArr;
+    }
+    const nextChildren = selectorFunc(newArr[i]);
+    /* recursive call is in tail call position. */
+    return concatChildren([...newArr, ...nextChildren], i + 1);
+  };
+  return concatChildren(selectorFunc(id), 0);
+};
+
 
 /*
   createTypeInstanceAttributeSelector:
