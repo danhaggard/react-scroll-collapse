@@ -57,7 +57,7 @@ export const collapserItemWrapper = (WrappedComponent) => {
         parentScrollerId,
         parentCollapserId,
       );
-      expandCollapseAction(itemId);
+      expandCollapseAction(itemId, parentCollapserId);
     };
 
     onHeightReady = () => {

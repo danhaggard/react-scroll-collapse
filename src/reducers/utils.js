@@ -25,6 +25,11 @@ export const updateState = (state, action, id, reducer) => {
   return newState;
 };
 
+export const updateObjectArray = (objectArray, newObject) => [
+  ...objectArray.filter(obj => obj.id !== newObject.id),
+  newObject
+];
+
 export const removeFromState = (state, id) => {
   const newState = { ...state };
   delete newState[id];

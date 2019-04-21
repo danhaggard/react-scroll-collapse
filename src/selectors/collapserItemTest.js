@@ -3,7 +3,8 @@ import {
   selectOrVal,
   arrSelector,
   getAllNested,
-  getAllNestedTest
+  getAllNestedTest,
+  getAllNestedWithCondition,
 } from './utils';
 
 // export const getReactScrollCollapse = state => selectOrVal(state, 'reactScrollCollapse');
@@ -14,10 +15,7 @@ export const getEntities = state => selectOrVal(state, 'entities');
 
 export const getItemsFunc = state => selectOrVal(state, 'items');
 
-export const getItemsFromRoot = (state) => {
-  console.log('getItemsFromRoot Called');
-  return getItemsFunc(getEntities(state));
-};
+export const getItemsFromRoot = state => getItemsFunc(getEntities(state));
 
 
 export const getItems = entitiesState => selectOrVal(entitiesState, 'items');
@@ -49,13 +47,59 @@ export const getCollapserItems = collapser => arrSelector(collapser, 'items');
 
 export const getChildCollapsers = collapser => arrSelector(collapser, 'collapsers');
 
-export const getChildCollapsersFromRoot = rootState => collapserId => getChildCollapsers(
+export const getChildCollapsersFromRoot = (rootState, { collapserId }) => getChildCollapsers(
   getCollapsersFromRoot(rootState)[collapserId]
 );
 
-export const getCollapserByIdFromRoot = rootState => collapserId => getCollapsersFromRoot(
+export const getChildItemArrFromCollapser = (rootState, { collapserId }) => getCollapserItems(
+  getCollapsersFromRoot(rootState)[collapserId]
+);
+
+export const getChildItemArrFromCollapserId = rootState => collapserId => getCollapserItems(
+  getCollapsersFromRoot(rootState)[collapserId]
+);
+
+export const everyChildItemExpanded = rootState => (childItemIdArr) => {
+  const items = getItemsFromRoot(rootState);
+  return childItemIdArr.every(itemId => items[itemId].expanded);
+};
+
+export const everyChildItemExpandedCondition = rootState => (collapserId) => {
+  const childItemArr = getChildItemArrFromCollapserId(rootState)(collapserId);
+  const isEveryChildExpanded = everyChildItemExpanded(rootState)(childItemArr);
+  // console.log('everyChildItemExpandedCondition: collapserId, childItemArr, isEveryChildExpanded', collapserId, childItemArr, isEveryChildExpanded);
+  return [!isEveryChildExpanded, isEveryChildExpanded];
+};
+
+
+export const getCollapserByIdFromRoot = (rootState, { collapserId }) => getCollapsersFromRoot(
   rootState
 )[collapserId];
+
+
+const getChildCollapsersById = rootState => collapserId => getChildCollapsers(
+  getCollapsersFromRoot(rootState)[collapserId]
+);
+
+const getAllNestWithConditionFromRootProp = (
+  rootState,
+  { collapserId }
+) => (
+  selectorFunc,
+  breakCondition
+) => getAllNestedWithCondition(collapserId, selectorFunc, breakCondition);
+
+
+// THIS ONE!
+export const areAllChildItemsExpandedByIdFromRoot = () => createSelector(
+  [getChildCollapsersById, everyChildItemExpandedCondition, getAllNestWithConditionFromRootProp],
+  (
+    getChildCollapsersArg,
+    everyChildItemExpandedArg,
+    getAllNestedArg
+  ) => getAllNestedArg(getChildCollapsersArg, everyChildItemExpandedArg)
+);
+
 
 export const getCollapsersWithItems = createSelector(
   getCollapsers,
@@ -84,11 +128,7 @@ export const getAllNestedCollapsers = createSelector(
   )
 );
 
-export const childCollapsersSelector = createSelector(
-  getCollapsersFromRoot,
-  collapsers => id => getChildCollapsers(collapsers[id])
-);
-
+/*
 export const getAllNestedCollapsersWithChildSelector = createSelector(
   childCollapsersSelector,
   getChildCollapsersArg => collapserId => getAllNested(
@@ -96,6 +136,7 @@ export const getAllNestedCollapsersWithChildSelector = createSelector(
     getChildCollapsersArg
   )
 );
+*/
 
 export const allNestedCollapsersSelector = createSelector(
   id => selectorFunc => getAllNested(id, selectorFunc)
@@ -111,12 +152,26 @@ export const getAllNestedCollapsersMax = createSelector(
   )
 );
 */
-
+/*
 export const getAllNestedCollapsersMax = createSelector(
   childCollapsersSelector,
   getAllNestedTest
 );
+*/
 
+export const getAllNestedChildCollapsersFromRoot = (rootState, props) => {
+  const selectorFunc = id => getChildCollapsers(
+    getCollapsersFromRoot(rootState)[id]
+  );
+  const { collapserId } = props;
+  return getAllNested(collapserId, selectorFunc);
+};
+/*
+export const getAllNestedCollapsersSelectorProps = createSelector(
+  getAllNestedChildCollapsersFromRoot,
+  arr => arr
+);
+*/
 
 /*
 export const getAllNested = selectorFunc => id => {
@@ -136,4 +191,56 @@ export const getAllNested = selectorFunc => id => {
 
 export const getAllNestedByState = state => selectorFunc => id =>
 
+*/
+
+
+/*
+const state = {
+  entities: {
+    collapsers: {
+      0: {
+        collapsers: [1, 2],
+        id: 0,
+        items: [0],
+      },
+      1: {
+        collapsers: [],
+        id: 1,
+        items: [1, 2],
+      },
+      2: {
+        collapsers: [3],
+        id: 2,
+        items: [3],
+      },
+      3: {
+        collapsers: [],
+        id: 3,
+        items: [],
+      }
+    },
+    items: {
+      0: {
+        expanded: false,
+        id: 0,
+        waitingForHeight: false,
+      },
+      1: {
+        expanded: true,
+        id: 1,
+        waitingForHeight: false,
+      },
+      2: {
+        expanded: true,
+        id: 2,
+        waitingForHeight: false,
+      },
+      3: {
+        expanded: true,
+        id: 3,
+        waitingForHeight: false,
+      },
+    },
+  },
+};
 */

@@ -9,23 +9,18 @@ import {
 } from '../actions/const';
 
 import {
-  checkAttr,
   addToState,
+  checkAttr,
+  updateState,
   removeFromState
 } from './utils';
 
-import { item as selectors } from '../selectors';
-
-const { getters: { getId, getExpanded } } = selectors;
-
 
 export const expandedReducer = (state = true, action) => {
-  const { areAllItemsExpanded, item } = checkAttr(action, 'payload');
+  const { areAllItemsExpanded, expanded } = checkAttr(action, 'payload');
   switch (action.type) {
-    case ADD_ITEM: {
-      const val = getExpanded(item);
-      return val !== null ? val : state;
-    }
+    case ADD_ITEM:
+      return expanded;
     case EXPAND_COLLAPSE:
       return !state;
     case EXPAND_COLLAPSE_ALL:
@@ -37,17 +32,17 @@ export const expandedReducer = (state = true, action) => {
 
 // handles 'id' attr for item entities.
 export const itemIdReducer = (state = null, action) => {
-  const { item } = checkAttr(action, 'payload');
+  const { itemId } = checkAttr(action, 'payload');
   switch (action.type) {
     case ADD_ITEM:
-      return getId(item);
+      return itemId;
     default:
       return state;
   }
 };
 
 export const waitingForHeightReducer = (state = false, action) => {
-  const { item, areAllItemsExpanded } = checkAttr(action, 'payload');
+  // const { item, areAllItemsExpanded } = checkAttr(action, 'payload');
   switch (action.type) {
     case ADD_ITEM:
     case HEIGHT_READY:
@@ -62,14 +57,15 @@ export const waitingForHeightReducer = (state = false, action) => {
         return true.
         note: !(!a && b) === a || !b;
       */
-      return areAllItemsExpanded || !getExpanded(item);
+      return false;
+      // return areAllItemsExpanded || !getExpanded(item);
     default:
       return state;
   }
 };
 
 // handle state for individual items.
-const itemReducer = combineReducers({
+export const itemReducer = combineReducers({
   expanded: expandedReducer,
   id: itemIdReducer,
   waitingForHeight: waitingForHeightReducer,
@@ -82,10 +78,11 @@ export const itemsReducer = (state = {}, action) => {
     case REMOVE_ITEM:
       return removeFromState(state, itemId);
     case ADD_ITEM:
+      return addToState(state, action, itemId, itemReducer);
     case HEIGHT_READY:
     case EXPAND_COLLAPSE:
     case EXPAND_COLLAPSE_ALL:
-      return addToState(state, action, itemId, itemReducer);
+      return updateState(state, action, itemId, itemReducer);
     default:
       return state;
   }

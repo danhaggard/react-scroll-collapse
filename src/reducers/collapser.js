@@ -4,6 +4,9 @@ import {
   ADD_COLLAPSER,
   ADD_COLLAPSER_CHILD,
   ADD_ITEM,
+  EXPAND_COLLAPSE,
+  EXPAND_COLLAPSE_ALL,
+  HEIGHT_READY,
   REMOVE_ITEM,
   REMOVE_COLLAPSER,
   REMOVE_COLLAPSER_CHILD
@@ -13,8 +16,10 @@ import {
   checkAttr,
   addToState,
   removeFromState,
-  updateState
+  updateState,
 } from './utils';
+
+import { itemsReducer } from './collapserItem';
 
 /*
   Some notes regarding state:
@@ -57,10 +62,10 @@ export const collapsersIdArray = (state = [], action) => {
 
 // handles the list of immediate child items nested under a collapser.
 export const itemsIdArray = (state = [], action) => {
-  const { item, itemId } = checkAttr(action, 'payload');
+  const { itemId } = checkAttr(action, 'payload');
   switch (action.type) {
     case ADD_ITEM:
-      return [...state, item.id];
+      return [...state, itemId];
     case REMOVE_ITEM:
       return state.filter(val => val !== itemId);
     default:
@@ -72,6 +77,7 @@ export const collapserReducer = combineReducers({
   collapsers: collapsersIdArray,
   id: collapserIdReducer,
   items: itemsIdArray,
+  itemsObj: itemsReducer,
 });
 
 /* handles reactScrollCollapse.entities.collapsers state */
@@ -87,6 +93,9 @@ export const collapsersReducer = (state = {}, action) => {
       return removeFromState(state, collapserId);
     case ADD_ITEM:
     case REMOVE_ITEM:
+    case EXPAND_COLLAPSE:
+    case EXPAND_COLLAPSE_ALL:
+    case HEIGHT_READY:
       return updateState(state, action, collapserId, collapserReducer);
     default:
       return state;

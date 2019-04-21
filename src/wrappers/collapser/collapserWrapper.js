@@ -8,8 +8,9 @@ import { checkForRef } from '../../utils/errorUtils';
 import { ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
 import { collapserWrapperActions } from '../../actions';
 import selectors from '../../selectors';
+import { areAllChildItemsExpanded, allChildItemIdsSelector } from '../../selectors/selectorTest';
 
-const { allChildItemsSelector, areAllItemsExpandedSelector } = selectors.collapser;
+const { allChildItemsSelector } = selectors.collapser;
 
 export const collapserWrapper = (WrappedComponent) => {
 
@@ -78,9 +79,10 @@ export const collapserWrapper = (WrappedComponent) => {
         parentScrollerId,
         collapserId,
       );
-      allChildItems.forEach((item) => {
-        expandCollapseAll(item, areAllItemsExpanded, item.id);
-      });
+      console.log('allChildItems', allChildItems);
+      allChildItems.forEach(([nextCollapserId, itemIdArray]) => itemIdArray.forEach(
+        itemId => expandCollapseAll(areAllItemsExpanded, itemId, nextCollapserId)
+      ));
     };
 
     render() {
@@ -126,12 +128,11 @@ export const collapserWrapper = (WrappedComponent) => {
   };
 
 
-  const mapStateToProps = () => (state, ownProps) => {
-    const allExpanded = areAllItemsExpandedSelector();
-    const allChildItems = allChildItemsSelector();
+  const mapStateToProps = (state, ownProps) => {
+    // const allChildItems = allChildItemsSelector();
     return {
-      allChildItems: allChildItems(state)(ownProps.collapserId),
-      areAllItemsExpanded: allExpanded(state)(ownProps.collapserId),
+      allChildItems: allChildItemIdsSelector(state, ownProps),
+      areAllItemsExpanded: areAllChildItemsExpanded(state, ownProps),
     };
   };
 

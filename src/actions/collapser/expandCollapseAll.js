@@ -1,11 +1,11 @@
 import { EXPAND_COLLAPSE_ALL } from '../const';
 
-const expandCollapseAll = (item, areAllItemsExpanded, itemId) => ({
+const expandCollapseAll = (areAllItemsExpanded, itemId, collapserId) => ({
   type: EXPAND_COLLAPSE_ALL,
   payload: {
-    item,
     areAllItemsExpanded,
     itemId,
+    collapserId
   },
 });
 

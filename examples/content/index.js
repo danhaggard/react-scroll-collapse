@@ -16,14 +16,24 @@ import {
   getExpandedItemsFromRoot,
   getCollapsersWithItemsFromRoot,
   getCollapsersWithItemsExpanded,
-  getAllNestedCollapsers,
-  getAllNestedCollapsersWithChildSelector,
-  childCollapsersSelector,
-  getAllNestedCollapsersMax,
+  // getAllNestedCollapsers,
+  // getAllNestedCollapsersWithChildSelector,
+  // childCollapsersSelector,
+  // getAllNestedCollapsersMax,
+  // getAllNestedCollapsersSelectorProps,
+  // areAllChildItemsExpandedByIdFromRoot,
 } from '../../src/selectors/collapserItemTest';
+
+import {
+  areAllChildItemsExpanded
+} from '../../src/selectors/selectorTest';
+
+import { getSelectorCache, logAllRecomputations } from '../../src/selectors/selectorCache';
 import expandCollapseActionCreator from '../../src/actions/collapserItem/expandCollapse';
 import { itemsReducer } from '../../src/reducers/collapserItem';
 import { reactScrollCollapse } from '../../src/reducers';
+
+console.log('logAllRecomputations', logAllRecomputations);
 
 const state = {
   entities: {
@@ -32,47 +42,60 @@ const state = {
         collapsers: [1, 2],
         id: 0,
         items: [0],
+        itemsObj: {
+          0: {
+            expanded: true,
+            id: 0,
+            waitingForHeight: false,
+          },
+        },
       },
       1: {
         collapsers: [],
         id: 1,
         items: [1, 2],
+        itemsObj: {
+          1: {
+            expanded: true,
+            id: 1,
+            waitingForHeight: false,
+          },
+          2: {
+            expanded: true,
+            id: 2,
+            waitingForHeight: false,
+          },
+        },
       },
       2: {
         collapsers: [3],
         id: 2,
         items: [3],
+        itemsObj: {
+          3: {
+            expanded: true,
+            id: 3,
+            waitingForHeight: false,
+          },
+        },
       },
       3: {
         collapsers: [],
         id: 3,
-        items: [],
+        items: [4],
+        itemsObj: {
+          4: {
+            expanded: false,
+            id: 4,
+            waitingForHeight: false,
+          },
+        },
       }
-    },
-    items: {
-      0: {
-        expanded: false,
-        id: 0,
-        waitingForHeight: false,
-      },
-      1: {
-        expanded: true,
-        id: 1,
-        waitingForHeight: false,
-      },
-      2: {
-        expanded: false,
-        id: 2,
-        waitingForHeight: false,
-      },
-      3: {
-        expanded: true,
-        id: 3,
-        waitingForHeight: false,
-      },
     },
   },
 };
+
+/*
 const entitiesState = state.entities;
 const expandedItems = getExpandedItems(entitiesState);
 console.log('expandedItems', expandedItems);
@@ -107,7 +130,90 @@ console.log('getCollapsersWithItemsExpanded.recomputations()', getCollapsersWith
 console.log('getCollapsersWithItemsFromRoot.recomputations()', getCollapsersWithItemsFromRoot.recomputations());
 console.log('getExpandedItemsFromRoot.recomputations()', getExpandedItemsFromRoot.recomputations());
 console.log('');
+*/
 
+const props0 = { collapserId: 0 };
+const props1 = { collapserId: 1 };
+/*
+const allNestedCollapsersSelectorProps0 = getAllNestedCollapsersSelectorProps(state, props0);
+console.log('allNestedCollapsersSelectorProps0', allNestedCollapsersSelectorProps0);
+console.log('getAllNestedCollapsersSelectorProps.recomputations()', getAllNestedCollapsersSelectorProps.recomputations());
+
+const allNestedCollapsersSelectorProps0Repeat = getAllNestedCollapsersSelectorProps(state, props0);
+console.log('allNestedCollapsersSelectorProps0Repeat', allNestedCollapsersSelectorProps0Repeat);
+console.log('getAllNestedCollapsersSelectorProps.recomputations()', getAllNestedCollapsersSelectorProps.recomputations());
+
+const allNestedCollapsersSelectorProps1 = getAllNestedCollapsersSelectorProps(state, props1);
+console.log('allNestedCollapsersSelectorProps1', allNestedCollapsersSelectorProps1);
+console.log('getAllNestedCollapsersSelectorProps.recomputations()', getAllNestedCollapsersSelectorProps.recomputations());
+*/
+
+/*
+const areAllExpandedSelectorFactory = (id) => {
+  const instance = areAllChildItemsExpandedByIdFromRoot();
+  return stateArg => instance(
+    stateArg, { collapsersId: id }
+  );
+};
+*/
+
+/*
+function AreAllExpandedSelectorFactory(id) {
+  this.instance = areAllChildItemsExpandedByIdFromRoot();
+  this.select = stateArg => this.instance(
+    stateArg, { collapsersId: id }
+  );
+  this.recomputations = this.instance.recomputations;
+}
+*/
+
+
+// registerFactory(areAllChildItemsExpanded);
+// const areAllChildItemsExpandedByIdFromRootSelector0 = areAllChildItemsExpanded(props0);
+// const areAllChildItemsExpandedByIdFromRootSelector1 = areAllChildItemsExpanded(props1);
+
+/*
+const areAllChildItemsExpandedByIdFromRoot0 = areAllChildItemsExpanded(state, props0);
+console.log('areAllChildItemsExpandedByIdFromRoot0', areAllChildItemsExpandedByIdFromRoot0);
+logAllRecomputations();
+// console.log('areAllChildItemsExpandedByIdFromRootSelector0.recomputations()', areAllChildItemsExpandedByIdFromRootSelector0.recomputations());
+console.log('');
+console.log('');
+console.log('');
+const areAllChildItemsExpandedByIdFromRoot0Repeat = areAllChildItemsExpanded(state, props0);
+console.log('areAllChildItemsExpandedByIdFromRoot0Repeat', areAllChildItemsExpandedByIdFromRoot0Repeat);
+logAllRecomputations();
+// console.log('areAllChildItemsExpandedByIdFromRoot.recomputations()', areAllChildItemsExpandedByIdFromRootSelector0.recomputations());
+console.log('');
+console.log('');
+console.log('');
+const areAllChildItemsExpandedByIdFromRoot1 = areAllChildItemsExpanded(state, props1);
+console.log('areAllChildItemsExpandedByIdFromRoot1', areAllChildItemsExpandedByIdFromRoot1);
+logAllRecomputations();
+
+// console.log('areAllChildItemsExpandedByIdFromRoot.recomputations()', areAllChildItemsExpandedByIdFromRootSelector1.recomputations());
+console.log('');
+console.log('');
+console.log('');
+*/
+/*
+const areAllChildItemsExpandedByIdFromRoot0 = areAllChildItemsExpandedByIdFromRoot(state, props0);
+console.log('areAllChildItemsExpandedByIdFromRoot0', areAllChildItemsExpandedByIdFromRoot0);
+console.log('areAllChildItemsExpandedByIdFromRoot.recomputations()', areAllChildItemsExpandedByIdFromRoot.recomputations());
+
+const areAllChildItemsExpandedByIdFromRoot0Repeat = areAllChildItemsExpandedByIdFromRoot(state, props0);
+console.log('areAllChildItemsExpandedByIdFromRoot0Repeat', areAllChildItemsExpandedByIdFromRoot0Repeat);
+console.log('areAllChildItemsExpandedByIdFromRoot.recomputations()', areAllChildItemsExpandedByIdFromRoot.recomputations());
+
+const areAllChildItemsExpandedByIdFromRoot1 = areAllChildItemsExpandedByIdFromRoot(state, props1);
+console.log('areAllChildItemsExpandedByIdFromRoot1', areAllChildItemsExpandedByIdFromRoot1);
+console.log('areAllChildItemsExpandedByIdFromRoot.recomputations()', areAllChildItemsExpandedByIdFromRoot.recomputations());
+
+const areAllChildItemsExpandedByIdFromRoot1Repeat = areAllChildItemsExpandedByIdFromRoot(state, props1);
+console.log('areAllChildItemsExpandedByIdFromRoot1Repeat', areAllChildItemsExpandedByIdFromRoot1Repeat);
+console.log('areAllChildItemsExpandedByIdFromRoot.recomputations()', areAllChildItemsExpandedByIdFromRoot.recomputations());
+*/
+/*
 const getAllNestedCollapsersById = getAllNestedCollapsers(state);
 console.log('getAllNestedCollapsers.recomputations()', getAllNestedCollapsers.recomputations());
 const allNestedOf0 = getAllNestedCollapsersById(0)
@@ -153,8 +259,8 @@ console.log('');
 const allNestedOf0MaxRepeat = getAllNestedCollapsersMaxById(0)
 console.log('allNestedOf0MaxRepeat', allNestedOf0MaxRepeat);
 console.log('getAllNestedCollapsersMaxById.recomputations()', getAllNestedCollapsersMax.recomputations());
-
-
+*/
+/*
 console.log('');
 console.log('----------------------------------------------');
 console.log('');
@@ -162,10 +268,12 @@ console.log('CREATING NEW STATE ---------------------------');
 console.log('');
 console.log('----------------------------------------------');
 console.log('');
-const expandCollapseAction = expandCollapseActionCreator(1);
+const expandCollapseAction = expandCollapseActionCreator(4, 3);
 const newState = reactScrollCollapse(state, expandCollapseAction);
 console.log('newState', newState);
 console.log('');
+*/
+/*
 const expandedItems2 = getExpandedItems(newState.entities);
 console.log('expandedItems2', expandedItems2);
 console.log('getExpandedItems.recomputations()', getExpandedItems.recomputations());
@@ -189,7 +297,55 @@ console.log('getCollapsersWithItemsFromRoot.recomputations()', getCollapsersWith
 console.log('getExpandedItemsFromRoot.recomputations()', getExpandedItemsFromRoot.recomputations());
 console.log('');
 console.log('');
+*/
 
+/*
+const areAllChildItemsExpandedByIdFromRoot0b = areAllChildItemsExpanded(newState, props0);
+console.log('areAllChildItemsExpandedByIdFromRoot0b', areAllChildItemsExpandedByIdFromRoot0b);
+logAllRecomputations();
+
+// console.log('areAllChildItemsExpandedByIdFromRootSelector0.recomputations()', areAllChildItemsExpandedByIdFromRootSelector0.recomputations());
+console.log('');
+console.log('');
+console.log('');
+
+
+const areAllChildItemsExpandedByIdFromRoot0Repeatb = areAllChildItemsExpanded(newState, props0);
+console.log('areAllChildItemsExpandedByIdFromRoot0Repeatb', areAllChildItemsExpandedByIdFromRoot0Repeatb);
+logAllRecomputations();
+
+// console.log('areAllChildItemsExpandedByIdFromRoot.recomputations()', areAllChildItemsExpandedByIdFromRootSelector0.recomputations());
+console.log('');
+console.log('');
+console.log('');
+
+const areAllChildItemsExpandedByIdFromRoot1b = areAllChildItemsExpanded(newState, props1);
+console.log('areAllChildItemsExpandedByIdFromRoot1b', areAllChildItemsExpandedByIdFromRoot1b);
+logAllRecomputations();
+
+// console.log('areAllChildItemsExpandedByIdFromRoot.recomputations()', areAllChildItemsExpandedByIdFromRootSelector1.recomputations());
+console.log('');
+console.log('');
+console.log('');
+(/)
+/*
+const areAllChildItemsExpandedByIdFromRoot0b = areAllChildItemsExpandedByIdFromRoot(newState, props0);
+console.log('areAllChildItemsExpandedByIdFromRoot0b', areAllChildItemsExpandedByIdFromRoot0b);
+console.log('areAllChildItemsExpandedByIdFromRoot.recomputations()', areAllChildItemsExpandedByIdFromRoot.recomputations());
+
+const areAllChildItemsExpandedByIdFromRoot0Repeatb = areAllChildItemsExpandedByIdFromRoot(newState, props0);
+console.log('areAllChildItemsExpandedByIdFromRoot0Repeatb', areAllChildItemsExpandedByIdFromRoot0Repeatb);
+console.log('areAllChildItemsExpandedByIdFromRoot.recomputations()', areAllChildItemsExpandedByIdFromRoot.recomputations());
+
+const areAllChildItemsExpandedByIdFromRoot1b = areAllChildItemsExpandedByIdFromRoot(newState, props1);
+console.log('areAllChildItemsExpandedByIdFromRoot1b', areAllChildItemsExpandedByIdFromRoot1b);
+console.log('areAllChildItemsExpandedByIdFromRoot.recomputations()', areAllChildItemsExpandedByIdFromRoot.recomputations());
+
+const areAllChildItemsExpandedByIdFromRoot1Repeatb = areAllChildItemsExpandedByIdFromRoot(newState, props1);
+console.log('areAllChildItemsExpandedByIdFromRoot1Repeatb', areAllChildItemsExpandedByIdFromRoot1Repeatb);
+console.log('areAllChildItemsExpandedByIdFromRoot.recomputations()', areAllChildItemsExpandedByIdFromRoot.recomputations());
+*/
+/*
 const getAllNestedCollapsersById2 = getAllNestedCollapsers(newState);
 console.log('getAllNestedCollapsers.recomputations()', getAllNestedCollapsers.recomputations());
 
@@ -218,7 +374,7 @@ const allNestedOf2WithChildSelector2 = getAllNestedCollapsersWithChildSelectorBy
 console.log('allNestedOf2WithChildSelector2', allNestedOf2WithChildSelector2);
 console.log('getAllNestedCollapsersWithChildSelector.recomputations()', getAllNestedCollapsersWithChildSelector.recomputations());
 console.log('');
-
+*/
 
 /*
 const selectInner = (collapsersWithItemsArg, expandedItemsArg) => collapsersWithItemsArg.filter((collapser) => {
@@ -293,7 +449,7 @@ const example3 = (
 const example4 = key => (
   <Example {...COPY[4]} style={{ marginBottom: '3em' }} key={key}>
     <Scroller style={{ height: '100%' }}>
-      <CommentThread childThreads={3} />
+      <CommentThread childThreads={1} />
     </Scroller>
   </Example>
 );
@@ -305,7 +461,7 @@ const example5 = (
       <SimpleComment text={genRandText()} />
     </EvenSimplerCollapser>
     <EvenSimplerCollapser>
-      <SimpleComment isOpenedInit={false} text={genRandText()} />
+      <SimpleComment text={genRandText()} />
       <SimpleComment text={genRandText()} />
     </EvenSimplerCollapser>
   </Example>
@@ -322,6 +478,7 @@ const examples = {
 */
 
 const examples = {
-  0: [],
+  0: [example4(4)],
 };
+
 export default examples;

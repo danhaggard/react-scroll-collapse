@@ -32,11 +32,11 @@ export const collapserItemControllerWrapper = (CollapserItemController) => {
         isOpenedInit,
         parentCollapserId
       } = this.props;
-      const item = {
-        id: itemId,
-        expanded: isOpenedInit,
-      };
-      addItem(parentCollapserId, item, itemId);
+      if (isOpenedInit !== null) {
+        addItem(parentCollapserId, itemId, isOpenedInit);
+      } else {
+        addItem(parentCollapserId, itemId);
+      }
     }
 
     render() {

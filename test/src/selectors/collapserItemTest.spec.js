@@ -44,7 +44,7 @@ describe('collapserItemTest', () => {
             waitingForHeight: false,
           },
           2: {
-            expanded: false,
+            expanded: true,
             id: 2,
             waitingForHeight: false,
           },
