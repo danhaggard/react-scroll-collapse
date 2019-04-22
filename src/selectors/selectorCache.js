@@ -12,20 +12,20 @@ const wrapSelectorFactory = (selectorFactory, propKey) => (id) => {
   return that;
 };
 
-export const registerFactory = (selectorFactory, propKey) => {
-  const { name } = selectorFactory;
-  if (!selectorCache[name]) {
-    selectorCache[name] = {};
-    selectorCache[name].factory = wrapSelectorFactory(selectorFactory, propKey);
-    selectorCache[name].propKey = propKey;
-    selectorCache[name].selectors = {};
-    return name;
+export const registerFactory = (selectorFactory, cacheKey, propKey) => {
+  if (!selectorCache[cacheKey]) {
+    selectorCache[cacheKey] = {};
+    selectorCache[cacheKey].factory = wrapSelectorFactory(selectorFactory, propKey);
+    selectorCache[cacheKey].propKey = propKey;
+    selectorCache[cacheKey].selectors = {};
+    return cacheKey;
   }
-  throw new Error(`Sorry but a selector factory for ${name} has already been registered`);
+  throw new Error(`Sorry but a selector factory for ${cacheKey} has already been registered`);
 };
 
 export const getSelector = cacheKey => (props) => {
   const cache = selectorCache[cacheKey];
+
   const { factory, propKey, selectors } = cache;
   const selectorId = props[propKey];
 
@@ -45,9 +45,9 @@ export const getSelector = cacheKey => (props) => {
 };
 
 
-export const cacheSelector = (selectorFactory, propKey) => {
+export const cacheSelector = (selectorFactory, cacheKey, propKey) => {
 
-  const cacheKey = registerFactory(selectorFactory, propKey);
+  registerFactory(selectorFactory, cacheKey, propKey);
   const selector = getSelector(cacheKey);
   return (state, props) => selector(props).instance(state, props);
   // return (state, props) => selector(props).select(state);

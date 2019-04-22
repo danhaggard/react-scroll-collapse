@@ -25,16 +25,15 @@ export const getCollapsers = entitiesState => arrSelector(entitiesState, 'collap
 
 export const collapsersSelectorRoot = createSelector(entitiesSelector, getCollapsers);
 
-export const getCollapser = (collapsersState, props) => {
-  if (props === undefined) {
-    debugger;
-  }
-  return collapsersState[props.collapserId];
-};
+export const getCollapser = (collapsersState, props) => collapsersState[props.collapserId];
+
 // (collapsersState, { collapserId }) => collapser
-export const collapserSelector = createSelector(
+export const collapserSelectorFactory = () => createSelector(
   getCollapser, collapser => collapser
 );
+
+export const collapserSelector = cacheSelector(collapserSelectorFactory, 'collapserSelectorFactory', 'collapserId');
+
 
 // (rootState, { collapserId }) => collapser
 export const collapserSelectorRoot = createSelector(
@@ -49,16 +48,20 @@ export const collapserSelectorRoot = createSelector(
 export const getChildCollapsersArray = collapserObj => arrSelector(collapserObj, 'collapsers');
 
 // (collapsersState, { collapserId }) => childCollapsersArray
-export const childCollapsersArraySelector = createSelector(
+export const childCollapsersArraySelectorFactory = () => createSelector(
   collapserSelector,
   getChildCollapsersArray
 );
 
+export const childCollapsersArraySelector = cacheSelector(childCollapsersArraySelectorFactory, 'childCollapsersArraySelectorFactory', 'collapserId');
+
+
 // rootState, { collapserId }) => childCollapsersArray
-export const childCollapserArraySelectorRoot = createSelector(
+export const childCollapserArraySelectorRootFactory = () => createSelector(
   [collapsersSelectorRoot, (_, props) => props],
   (collapsersState, props) => childCollapsersArraySelector(collapsersState, props)
 );
+export const childCollapserArraySelectorRoot = cacheSelector(childCollapserArraySelectorRootFactory, 'childCollapserArraySelectorRootFactory', 'collapserId');
 
 
 /*
@@ -81,14 +84,17 @@ export const childItemArraySelectorRoot = createSelector(
 export const getItemsObj = collapserObj => arrSelector(collapserObj, 'itemsObj');
 
 // (collapsersState, { collapserId }) => itemsObj
-export const itemsObjSelector = createSelector(collapserSelector, getItemsObj);
+export const itemsObjSelectorFactory = () => createSelector(collapserSelector, getItemsObj);
+export const itemsObjSelector = cacheSelector(itemsObjSelectorFactory, 'itemsObjSelectorFactory', 'collapserId');
 
 
 // (rootState, { collapserId }) => itemsObj
-export const itemObjSelectorRoot = createSelector(
+export const itemObjSelectorRootFactory = () => createSelector(
   [collapsersSelectorRoot, (_, props) => props],
   (collapsersState, props) => itemsObjSelector(collapsersState, props)
 );
+
+export const itemObjSelectorRoot = cacheSelector(itemObjSelectorRootFactory, 'itemObjSelectorRootFactory', 'collapserId');
 
 
 export const getItem = (itemsState, { itemId }) => itemsState[itemId];
@@ -134,12 +140,14 @@ const getAreAllItemsExpanded = itemsObj => Object.values(itemsObj).every(
 );
 
 // (rootState, { collapserId }) => true/false
-const areAllItemsExpandedSelectorFactory = () => createSelector(
-  itemObjSelectorRoot,
-  getAreAllItemsExpanded
-);
+function areAllItemsExpandedSelectorFactory() {
+  return createSelector(
+    itemObjSelectorRoot,
+    getAreAllItemsExpanded
+  );
+}
 
-export const areAllItemsExpandedSelector = cacheSelector(areAllItemsExpandedSelectorFactory, 'collapserId');
+export const areAllItemsExpandedSelector = cacheSelector(areAllItemsExpandedSelectorFactory, 'areAllItemsExpandedSelectorFactory', 'collapserId');
 
 
 // (rootState, { collapserId }) => [should break recursion loop?, value to return if it does break]
@@ -148,7 +156,7 @@ export const everyChildItemExpandedConditionSelectorFactory = () => createSelect
   areAllItemsExpanded => [!areAllItemsExpanded, areAllItemsExpanded]
 );
 
-export const everyChildItemExpandedConditionSelector = cacheSelector(everyChildItemExpandedConditionSelectorFactory, 'collapserId');
+export const everyChildItemExpandedConditionSelector = cacheSelector(everyChildItemExpandedConditionSelectorFactory, 'everyChildItemExpandedConditionSelectorFactory', 'collapserId');
 
 /*
 const areAllChildItemsExpandedFactory = () => createSelector( //eslint-disable-line
@@ -175,7 +183,7 @@ const areAllChildItemsExpandedFactory = () => createSelector( //eslint-disable-l
   )
 );
 
-export const areAllChildItemsExpanded = cacheSelector(areAllChildItemsExpandedFactory, 'collapserId');
+export const areAllChildItemsExpanded = cacheSelector(areAllChildItemsExpandedFactory, 'areAllChildItemsExpandedFactory', 'collapserId');
 
 
 /*
@@ -188,7 +196,7 @@ export const childItemIdArraySelectorFactory = () => createSelector(
   (itemObj, collapserId) => ([collapserId, Object.keys(itemObj)])
 );
 
-export const childItemIdArraySelector = cacheSelector(childItemIdArraySelectorFactory, 'collapserId');
+export const childItemIdArraySelector = cacheSelector(childItemIdArraySelectorFactory, 'childItemIdArraySelectorFactory', 'collapserId');
 
 
 // (rootState, { collapserId }) => [run till end, concatenate prev values]
@@ -206,7 +214,7 @@ export const concatenateChildItemArraySelectorFactory = () => createSelector(
   }
 );
 
-export const concatenateChildItemArraySelector = cacheSelector(concatenateChildItemArraySelectorFactory, 'collapserId');
+export const concatenateChildItemArraySelector = cacheSelector(concatenateChildItemArraySelectorFactory, 'concatenateChildItemArraySelectorFactory', 'collapserId');
 
 const allChildItemIdsSelectorFactory = () => createSelector( //eslint-disable-line
   (state, props) => ({ state, props }),
@@ -222,7 +230,7 @@ const allChildItemIdsSelectorFactory = () => createSelector( //eslint-disable-li
   )
 );
 
-export const allChildItemIdsSelector = cacheSelector(allChildItemIdsSelectorFactory, 'collapserId');
+export const allChildItemIdsSelector = cacheSelector(allChildItemIdsSelectorFactory, 'allChildItemIdsSelectorFactory', 'collapserId');
 
 /*
 

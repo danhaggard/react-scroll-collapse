@@ -79,7 +79,6 @@ export const collapserWrapper = (WrappedComponent) => {
         parentScrollerId,
         collapserId,
       );
-      console.log('allChildItems', allChildItems);
       allChildItems.forEach(([nextCollapserId, itemIdArray]) => itemIdArray.forEach(
         itemId => expandCollapseAll(areAllItemsExpanded, itemId, nextCollapserId)
       ));
@@ -129,7 +128,6 @@ export const collapserWrapper = (WrappedComponent) => {
 
 
   const mapStateToProps = (state, ownProps) => {
-    // const allChildItems = allChildItemsSelector();
     return {
       allChildItems: allChildItemIdsSelector(state, ownProps),
       areAllItemsExpanded: areAllChildItemsExpanded(state, ownProps),

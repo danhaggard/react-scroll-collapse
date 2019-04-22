@@ -467,7 +467,7 @@ const example5 = (
   </Example>
 );
 
-/*
+
 const examples = {
   0: [example0],
   1: [example1],
@@ -475,10 +475,10 @@ const examples = {
   3: [example3],
   4: [example4(4), example4(5)]
 };
-*/
 
+/*
 const examples = {
   0: [example4(4)],
 };
-
+*/
 export default examples;
