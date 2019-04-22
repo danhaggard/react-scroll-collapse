@@ -94,6 +94,7 @@ export const collapserWrapper = (WrappedComponent) => {
         areAllItemsExpanded,
         ...other
       } = this.props;
+      console.log('collapserWrapper render - collapserId', this.props.collapserId);
       return (
         <WrappedComponentRef
           {...other}
@@ -128,6 +129,7 @@ export const collapserWrapper = (WrappedComponent) => {
 
 
   const mapStateToProps = (state, ownProps) => {
+    console.log('collapserWrapper mapStateToProps - collapserId', ownProps.collapserId);
     return {
       allChildItems: allChildItemIdsSelector(state, ownProps),
       areAllItemsExpanded: areAllChildItemsExpanded(state, ownProps),

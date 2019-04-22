@@ -51,7 +51,7 @@ export const selectFunc = getAttrFunc => innerSelectFunc => (stateId) => {
 */
 
 export const getAllNested = (id, selectorFunc) => {
-  //console.log('getAllNested id', id);
+  // console.log('getAllNested id', id);
   const concatChildren = (arr, i) => {
     /*
       ids of components are generated only as a component is mounting.  So on the
@@ -97,6 +97,7 @@ export const recurseAllChildren = (
   selectorFunc,
   breakCondition // returns [bool (whether to break), and return value]
 ) => {
+  console.log('recurseAllChildren -id:', id);
   const [shouldBreakRoot, returnValueRoot] = breakCondition(id);
   if (shouldBreakRoot) {
     return returnValueRoot;

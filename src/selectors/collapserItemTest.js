@@ -3,10 +3,10 @@ import {
   selectOrVal,
   arrSelector,
   getAllNested,
-  getAllNestedTest,
-  getAllNestedWithCondition,
+  // getAllNestedTest,
+  // getAllNestedWithCondition,
 } from './utils';
-
+/*
 // export const getReactScrollCollapse = state => selectOrVal(state, 'reactScrollCollapse');
 
 export const getEntities = state => selectOrVal(state, 'entities');
@@ -138,6 +138,8 @@ export const getAllNestedCollapsersWithChildSelector = createSelector(
 );
 */
 
+
+/*
 export const allNestedCollapsersSelector = createSelector(
   id => selectorFunc => getAllNested(id, selectorFunc)
 );
@@ -159,6 +161,8 @@ export const getAllNestedCollapsersMax = createSelector(
 );
 */
 
+
+/*
 export const getAllNestedChildCollapsersFromRoot = (rootState, props) => {
   const selectorFunc = id => getChildCollapsers(
     getCollapsersFromRoot(rootState)[id]
