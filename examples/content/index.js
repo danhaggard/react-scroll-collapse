@@ -17,8 +17,8 @@ import { cacheLogger, logAllRecomputations } from '../../src/selectors/selectorC
 // import { itemsReducer } from '../../src/reducers/collapserItem';
 // import { reactScrollCollapse } from '../../src/reducers';
 
-console.log('cacheLogger', cacheLogger);
-console.log('cacheLogger', cacheLogger.getCache());
+//console.log('cacheLogger', cacheLogger);
+//console.log('cacheLogger', cacheLogger.getCache());
 
 const state = {
   entities: {

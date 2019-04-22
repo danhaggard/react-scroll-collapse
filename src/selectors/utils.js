@@ -67,6 +67,7 @@ export const getAllNested = (id, selectorFunc) => {
     /* recursive call is in tail call position. */
     return concatChildren([...newArr, ...nextChildren], i + 1);
   };
+
   return concatChildren(selectorFunc(id), 0);
 };
 
@@ -99,13 +100,24 @@ export const recurseAllChildren = (
 ) => {
   //console.log('recurseAllChildren -id:', id);
   const [shouldBreakRoot, returnValueRoot] = breakCondition(id);
+
+/*
+  if (id === 0) {
+    console.log('shouldBreakRoot, returnValueRoot', shouldBreakRoot, returnValueRoot);
+  }
+*/
   if (shouldBreakRoot) {
     return returnValueRoot;
   }
   const concatChildren = (arr, i, prevReturnValue) => {
     const [shouldBreak, returnValue] = breakCondition(arr[i], prevReturnValue);
+/*
+    if (id === 0) {
+      console.log('shouldBreak, arr.length === 0, prevReturnValue, returnValue', shouldBreak, arr.length === 0, prevReturnValue, returnValue);
+    }
+*/
     if (shouldBreak || arr.length === 0) {
-      return prevReturnValue;
+      return returnValue;
     }
     /*
       ids of components are generated only as a component is mounting.  So on the
@@ -113,6 +125,11 @@ export const recurseAllChildren = (
       error hence the check for !arr first.
     */
     const newArr = !arr ? [] : arr;
+/*
+    if (id === 0) {
+      console.log('i + 1 > newArr.length', i + 1 > newArr.length);
+    }
+*/
     if (i + 1 > newArr.length) {
       /* If true then we have iterated through all children */
       return prevReturnValue;
@@ -121,6 +138,14 @@ export const recurseAllChildren = (
     /* recursive call is in tail call position. */
     return concatChildren([...newArr, ...nextChildren], i + 1, returnValue);
   };
+
+  /*
+  const returnVal = concatChildren(selectorFunc(id), 0, returnValueRoot);
+  if (id === 0) {
+    console.log('collapserId returnVal in concatChildren', id, returnVal);
+  }
+  return returnVal;
+  */
   return concatChildren(selectorFunc(id), 0, returnValueRoot);
 };
 
@@ -339,3 +364,51 @@ export const reactScrollCollapseSelector = state => selectOrVal(state, 'reactScr
 export const entitiesSelector = () => createSelector(
   reactScrollCollapseSelector, reactScrollCollapse => selectOrVal(reactScrollCollapse, 'entities')
 );
+
+
+
+
+/*
+export const recurseAllChildren = (
+  id,
+  state,
+  props,
+  selectorFunc,
+  breakCondition // returns [bool (whether to break), and return value]
+) => {
+  //console.log('recurseAllChildren -id:', id);
+  const [shouldBreakRoot, returnValueRoot] = breakCondition(id);
+
+  if (id === 0) {
+    console.log('shouldBreakRoot, returnValueRoot', shouldBreakRoot, returnValueRoot);
+  }
+
+  if (shouldBreakRoot) {
+    return returnValueRoot;
+  }
+  const concatChildren = (arr, i, prevReturnValue) => {
+    const [shouldBreak, returnValue] = breakCondition(arr[i], prevReturnValue);
+
+    if (id === 0) {
+      console.log('shouldBreak, prevReturnValue, returnValue', shouldBreak, prevReturnValue, returnValue);
+    }
+
+    if (shouldBreak || arr.length === 0) {
+      return prevReturnValue;
+    }
+
+    const newArr = !arr ? [] : arr;
+    if (i + 1 > newArr.length) {
+      return prevReturnValue;
+    }
+    const nextChildren = selectorFunc(newArr[i]);
+    return concatChildren([...newArr, ...nextChildren], i + 1, returnValue);
+  };
+  const returnVal = concatChildren(selectorFunc(id), 0, returnValueRoot);
+  console.log('collapserId returnVal in concatChildren', id, returnVal);
+  return returnVal;
+  // return concatChildren(selectorFunc(id), 0, returnValueRoot);
+};
+
+
+*/

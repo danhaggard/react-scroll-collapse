@@ -9,7 +9,9 @@ import {
   HEIGHT_READY,
   REMOVE_ITEM,
   REMOVE_COLLAPSER,
-  REMOVE_COLLAPSER_CHILD
+  REMOVE_COLLAPSER_CHILD,
+  NOTIFY_PARENT_COLLAPSER,
+  SET_ALL_CHILD_ITEMS_EXPANDED
 } from '../actions/const';
 
 import {
@@ -73,11 +75,33 @@ export const itemsIdArray = (state = [], action) => {
   }
 };
 
+export const allChildItemsExpandedReducer = (state = null, action) => {
+  const { allChildItemsExpanded } = checkAttr(action, 'payload');
+  switch (action.type) {
+    case SET_ALL_CHILD_ITEMS_EXPANDED:
+      return allChildItemsExpanded;
+    default:
+      return state;
+  }
+};
+
+export const notifiedByChildReducer = (state = false, action) => {
+  switch (action.type) {
+    case NOTIFY_PARENT_COLLAPSER:
+      return !state;
+    default:
+      return state;
+  }
+};
+
+
 export const collapserReducer = combineReducers({
+  allChildItemsExpanded: allChildItemsExpandedReducer,
   collapsers: collapsersIdArray,
   id: collapserIdReducer,
   items: itemsIdArray,
   itemsObj: itemsReducer,
+  notifiedByChild: notifiedByChildReducer,
 });
 
 /* handles reactScrollCollapse.entities.collapsers state */
@@ -96,6 +120,8 @@ export const collapsersReducer = (state = {}, action) => {
     case EXPAND_COLLAPSE:
     case EXPAND_COLLAPSE_ALL:
     case HEIGHT_READY:
+    case SET_ALL_CHILD_ITEMS_EXPANDED:
+    case NOTIFY_PARENT_COLLAPSER:
       return updateState(state, action, collapserId, collapserReducer);
     default:
       return state;

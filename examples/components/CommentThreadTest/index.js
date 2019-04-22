@@ -11,14 +11,13 @@ import { collapserController } from '../../../src';
 import { genRandText } from '../../utils';
 
 
-const getNested = (noOfChildThreads, parentAreAllItemsExpanded) => (
+const getNested = noOfChildThreads => (
   noOfChildThreads === 0 ? null
     : [...Array(noOfChildThreads).keys()].map(
       key => (
         <WrappedCommentThread
           key={key}
           childThreads={noOfChildThreads - 1}
-          parentAreAllItemsExpanded={parentAreAllItemsExpanded}
         />
       )
     ));
@@ -65,7 +64,7 @@ class CommentThread extends PureComponent {
           deleteThread={this.deleteThread}
           text={text}
         />
-        {getNested(childThreads, areAllItemsExpanded)}
+        {getNested(childThreads)}
       </div>
     );
   }

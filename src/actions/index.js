@@ -14,6 +14,10 @@ import removeCollapser from './collapser/removeCollapser';
 import removeCollapserChild from './collapser/removeCollapserChild';
 import addCollapser from './collapser/addCollapser';
 import addCollapserChild from './collapser/addCollapserChild';
+
+import notifyParentCollapser from './collapser/notifyParentCollapser';
+import setAllChildItemsExpanded from './collapser/setAllChildItemsExpanded';
+
 import watchCollapser from './collapser/watchCollapser';
 import watchInitCollapser from './collapser/watchInitCollapser';
 
@@ -40,6 +44,7 @@ const actions = {
   addScrollerChild,
   removeScroller,
   removeScrollerChild,
+  setAllChildItemsExpanded,
   setOffsetTop,
   watchInitialise,
   scrollTo,
@@ -56,6 +61,8 @@ export const collapserControllerActions = {
 
 export const collapserWrapperActions = {
   expandCollapseAll,
+  notifyParentCollapser,
+  setAllChildItemsExpanded,
   setOffsetTop,
   watchCollapser,
   watchInitCollapser,

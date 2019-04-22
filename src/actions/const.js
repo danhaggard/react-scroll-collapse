@@ -16,6 +16,8 @@ export const EXPAND_COLLAPSE_ALL = 'react-scroll-collapse/EXPAND_COLLAPSE_ALL';
 export const HEIGHT_READY_ALL = 'react-scroll-collapse/HEIGHT_READY_ALL';
 export const WATCH_INIT_COLLAPSER = 'react-scroll-collapse/WATCH_INIT_COLLAPSER';
 export const WATCH_COLLAPSER = 'react-scroll-collapse/WATCH_COLLAPSER';
+export const SET_ALL_CHILD_ITEMS_EXPANDED = 'react-scroll-collapse/SET_ALL_CHILD_ITEMS_EXPANDED';
+export const NOTIFY_PARENT_COLLAPSER = 'react-scroll-collapse/NOTIFY_PARENT_COLLAPSER';
 
 /* collapserItem action types */
 export const ADD_ITEM = 'react-scroll-collapse/ADD_ITEM';
