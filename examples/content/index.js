@@ -2,38 +2,23 @@ import React from 'react';
 
 import Scroller from '../../src';
 
-import SimpleCollapser from '../components/SimpleCollapser';
+import SimpleCollapser from '../components/SimpleCollapserTest';
 import EvenSimplerCollapser from '../components/EvenSimplerCollapser';
 
 import SimpleComment from '../components/SimpleComment';
-import CommentThread from '../components/CommentThread';
+import CommentThread from '../components/CommentThreadTest';
 import Example from '../components/Example';
 import { genRandText } from '../utils';
 
-import {
-  getExpandedItems,
-  getCollapsersWithItems,
-  getExpandedItemsFromRoot,
-  getCollapsersWithItemsFromRoot,
-  getCollapsersWithItemsExpanded,
-  // getAllNestedCollapsers,
-  // getAllNestedCollapsersWithChildSelector,
-  // childCollapsersSelector,
-  // getAllNestedCollapsersMax,
-  // getAllNestedCollapsersSelectorProps,
-  // areAllChildItemsExpandedByIdFromRoot,
-} from '../../src/selectors/collapserItemTest';
+// import { areAllChildItemsExpanded } from '../../src/selectors/selectorTest';
 
-import {
-  areAllChildItemsExpanded
-} from '../../src/selectors/selectorTest';
+import { cacheLogger, logAllRecomputations } from '../../src/selectors/selectorCache';
+// import expandCollapseActionCreator from '../../src/actions/collapserItem/expandCollapse';
+// import { itemsReducer } from '../../src/reducers/collapserItem';
+// import { reactScrollCollapse } from '../../src/reducers';
 
-import { getSelectorCache, logAllRecomputations } from '../../src/selectors/selectorCache';
-import expandCollapseActionCreator from '../../src/actions/collapserItem/expandCollapse';
-import { itemsReducer } from '../../src/reducers/collapserItem';
-import { reactScrollCollapse } from '../../src/reducers';
-
-console.log('logAllRecomputations', logAllRecomputations);
+console.log('cacheLogger', cacheLogger);
+console.log('cacheLogger', cacheLogger.getCache());
 
 const state = {
   entities: {
@@ -467,7 +452,7 @@ const example5 = (
   </Example>
 );
 
-
+/*
 const examples = {
   0: [example0],
   1: [example1],
@@ -475,10 +460,10 @@ const examples = {
   3: [example3],
   4: [example4(4), example4(5)]
 };
-
-/*
-const examples = {
-  0: [example4(4)],
-};
 */
+
+const examples = {
+  0: [example4(19)],
+};
+
 export default examples;

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
@@ -7,18 +7,29 @@ import forwardRefWrapper from '../../utils/forwardRef';
 import { checkForRef } from '../../utils/errorUtils';
 import { ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
 import { collapserWrapperActions } from '../../actions';
-import selectors from '../../selectors';
+// import selectors from '../../selectors';
 import { areAllChildItemsExpanded, allChildItemIdsSelector } from '../../selectors/selectorTest';
 
-const { allChildItemsSelector } = selectors.collapser;
+// const { allChildItemsSelector } = selectors.collapser;
 
 export const collapserWrapper = (WrappedComponent) => {
 
   const WrappedComponentRef = forwardRefWrapper(WrappedComponent, 'collapserRef');
 
-  class CollapserController extends Component {
+  class CollapserController extends PureComponent {
 
     elem = React.createRef();
+
+    areAllItemsExpanded = this.props.areAllItemsExpanded();
+
+    static getDerivedStateFromProps(nextProps) {
+      const { areAllItemsExpanded } = nextProps;
+      return { areAllItemsExpanded: areAllItemsExpanded() };
+    }
+
+    state = {
+      areAllItemsExpanded: this.props.areAllItemsExpanded()
+    }
 
     componentDidMount() {
       const { collapserId, watchInitCollapser } = this.props;
@@ -26,42 +37,19 @@ export const collapserWrapper = (WrappedComponent) => {
       watchInitCollapser(collapserId);
     }
 
-    shouldComponentUpdate(nextProps) {
-
-      /*
-
-      shouldComponentUpdate used to prevent unecessary renders caused
-      by the allChildItemsSelector returning an array of item objects.  If any
-      item changes one of it's properties a re-render is forced on every item
-      in the collapser.
-
-      Using the entire item object made the reducers cleaner - and using just
-      an array of ids had a similar problem because the selectors were creating
-      arrays with distinct object ids even when equivlent.
-
-      */
-
-
-      const { props } = this;
-
-      return Object.keys(props).some(
-        prop => (prop !== 'allChildItems' && props[prop] !== nextProps[prop])
-      );
-
-    }
-
     getOffSetTop = () => this.elem.current.offsetTop;
 
     expandCollapseAll = () => {
       const {
         allChildItems,
-        areAllItemsExpanded,
         collapserId,
         expandCollapseAll,
         parentScrollerId,
         setOffsetTop,
         watchCollapser,
       } = this.props;
+      const { areAllItemsExpanded } = this.state;
+
       /*
         This activates a saga that will ensure that all the onHeightReady
         callbacks of nested <Collapse> elements have fired - before dispatching
@@ -79,7 +67,7 @@ export const collapserWrapper = (WrappedComponent) => {
         parentScrollerId,
         collapserId,
       );
-      allChildItems.forEach(([nextCollapserId, itemIdArray]) => itemIdArray.forEach(
+      allChildItems().forEach(([nextCollapserId, itemIdArray]) => itemIdArray.forEach(
         itemId => expandCollapseAll(areAllItemsExpanded, itemId, nextCollapserId)
       ));
     };
@@ -91,10 +79,9 @@ export const collapserWrapper = (WrappedComponent) => {
         watchCollapser,
         watchInitCollapser,
         allChildItems,
-        areAllItemsExpanded,
         ...other
       } = this.props;
-      console.log('collapserWrapper render - collapserId', this.props.collapserId);
+      const { areAllItemsExpanded } = this.state;
       return (
         <WrappedComponentRef
           {...other}
@@ -119,8 +106,8 @@ export const collapserWrapper = (WrappedComponent) => {
     parentScrollerId: PropTypes.number,
 
     /* provided by redux */
-    areAllItemsExpanded: PropTypes.bool.isRequired, // includes item children of nested collapsers
-    allChildItems: PropTypes.array.isRequired, // array of collapserItem ids
+    areAllItemsExpanded: PropTypes.func.isRequired, // includes item children of nested collapsers
+    allChildItems: PropTypes.func.isRequired, // array of collapserItem ids
     expandCollapseAll: PropTypes.func.isRequired,
     setOffsetTop: PropTypes.func.isRequired,
     watchCollapser: PropTypes.func.isRequired,
@@ -129,10 +116,13 @@ export const collapserWrapper = (WrappedComponent) => {
 
 
   const mapStateToProps = (state, ownProps) => {
-    console.log('collapserWrapper mapStateToProps - collapserId', ownProps.collapserId);
+    // console.log('collapserWrapper mapStateToProps - collapserId', ownProps.collapserId);
     return {
-      allChildItems: allChildItemIdsSelector(state, ownProps),
-      areAllItemsExpanded: areAllChildItemsExpanded(state, ownProps),
+      allChildItems: () => allChildItemIdsSelector(state, ownProps),
+      areAllItemsExpanded: () => {
+        console.log('calling areAllItemsExpanded - collapserId ', ownProps.collapserId);
+        return areAllChildItemsExpanded(state, ownProps);
+      },
     };
   };
 

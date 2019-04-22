@@ -5,6 +5,7 @@ import {
   recurseAllChildren,
 } from './utils';
 import { cacheSelector } from './selectorCache';
+import logPerformance from '../utils/logPerformance';
 
 
 /*
@@ -216,21 +217,31 @@ export const concatenateChildItemArraySelectorFactory = () => createSelector(
 
 export const concatenateChildItemArraySelector = cacheSelector(concatenateChildItemArraySelectorFactory, 'concatenateChildItemArraySelectorFactory', 'collapserId');
 
-const allChildItemIdsSelectorFactory = () => createSelector( //eslint-disable-line
-  (state, props) => ({ state, props }),
-  ({ state, props }) => recurseAllChildren(
-    props.collapserId,
+export const recursively_GetChildItems = ({ state, props }) => recurseAllChildren(
+  props.collapserId,
+  state,
+  props,
+  collapserId => childCollapserArraySelectorRoot(state, { collapserId }),
+  (collapserId, prevReturnValue) => concatenateChildItemArraySelector(
     state,
-    props,
-    collapserId => childCollapserArraySelectorRoot(state, { collapserId }),
-    (collapserId, prevReturnValue) => concatenateChildItemArraySelector(
-      state,
-      { collapserId, prevReturnValue }
-    )
+    { collapserId, prevReturnValue }
   )
 );
 
-export const allChildItemIdsSelector = cacheSelector(allChildItemIdsSelectorFactory, 'allChildItemIdsSelectorFactory', 'collapserId');
+export const recursivelyGetChildItems = logPerformance(recursively_GetChildItems, 'recursivelyGetChildItems');
+
+
+const allChildItemIdsSelectorFactory = () => createSelector( //eslint-disable-line
+  (state, props) => ({ state, props }),
+  recursivelyGetChildItems
+);
+
+// export const allChildItemIdsSelector = cacheSelector(allChildItemIdsSelectorFactory, 'allChildItemIdsSelectorFactory', 'collapserId');
+
+export const allChildItemIdsSelectorA = cacheSelector(allChildItemIdsSelectorFactory, 'allChildItemIdsSelectorFactory', 'collapserId');
+
+
+export const allChildItemIdsSelector = logPerformance(allChildItemIdsSelectorA, 'allChildItemIdsSelector');
 
 /*
 

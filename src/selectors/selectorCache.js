@@ -53,16 +53,43 @@ export const cacheSelector = (selectorFactory, cacheKey, propKey) => {
   // return (state, props) => selector(props).select(state);
 };
 
-export const getSelectorCache = () => selectorCache;
+export const getCache = () => selectorCache;
 
-export const logAllRecomputations = () => {
+export const logDependencyRecomputations = (dependencies) => {
+  dependencies.forEach((dependency) => {
+    if (typeof dependency.recomputations === 'function') {
+      console.log(`recomputations: ${dependency.recomputations()}`);
+    }
+    if (typeof dependency.resultFunc === 'function') {
+      console.log(`resultFunc: ${dependency.resultFunc.name}`);
+    }
+    if (Array.isArray(dependency.dependencies)) {
+      logDependencyRecomputations(dependency.dependencies);
+    }
+  });
+};
+
+export const logRecomputations = (selectorInstance) => {
+  console.log(`recomputations: ${selectorInstance.recomputations()}`);
+  logDependencyRecomputations(selectorInstance.dependencies);
+};
+
+export const logAllRecomputations = (logDependencies = false) => {
   Object.entries(selectorCache).forEach(([key, selector]) => {
     console.log(key);
     Object.entries(selector.selectors).forEach(([id, obj]) => {
       console.log(`${selector.propKey}_${id} recomputations: ${obj.recomputations()}`);
+      if (logDependencies) {
+        logDependencyRecomputations(obj.instance.dependencies);
+      }
     });
     console.log('');
   });
   console.log('');
   console.log('');
 };
+
+export const cacheLogger = {};
+
+cacheLogger.logAllRecomputations = logAllRecomputations;
+cacheLogger.getCache = getCache;

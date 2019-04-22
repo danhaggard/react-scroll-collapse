@@ -97,7 +97,7 @@ export const recurseAllChildren = (
   selectorFunc,
   breakCondition // returns [bool (whether to break), and return value]
 ) => {
-  console.log('recurseAllChildren -id:', id);
+  //console.log('recurseAllChildren -id:', id);
   const [shouldBreakRoot, returnValueRoot] = breakCondition(id);
   if (shouldBreakRoot) {
     return returnValueRoot;
