@@ -1,5 +1,4 @@
 const selectorCache = {};
-console.log('selectorCache', selectorCache);
 
 const wrapSelectorFactory = (selectorFactory, propKey) => (id) => {
   const that = {};
@@ -61,6 +60,8 @@ export const cacheSelector = (selectorFactory, cacheKey, propKey) => {
 
 export const getCache = () => selectorCache;
 
+
+/* eslint-disable no-console */
 export const logDependencyRecomputations = (dependencies) => {
   dependencies.forEach((dependency) => {
     if (typeof dependency.recomputations === 'function') {

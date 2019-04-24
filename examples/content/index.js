@@ -433,7 +433,6 @@ const example4 = key => (
   </Example>
 );
 
-const text = genRandText();
 const example5 = (
   <Example {...COPY[5]} style={{ marginBottom: '3em' }} key={5}>
     <EvenSimplerCollapser>
