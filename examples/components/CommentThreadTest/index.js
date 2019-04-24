@@ -14,7 +14,8 @@ class GetNested extends PureComponent {
 
   getNextNodeCount = () => { // eslint-disable-line react/sort-comp
     const { childNodes, randomChildNodes } = this.props;
-    return randomChildNodes ? getRandomInt(1, childNodes) : childNodes;
+    const randomVal = getRandomInt(1, childNodes);
+    return randomChildNodes ? randomVal : childNodes;
   }
 
   currentChildNodes = this.getNextNodeCount();
@@ -55,7 +56,7 @@ class GetNested extends PureComponent {
 GetNested.defaultProps = {
   depth: 1,
   childNodes: 1,
-  randomChildNodes: false,
+  randomChildNodes: true,
   rootDepth: null,
 };
 
@@ -113,7 +114,7 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
         <GetNested
           depth={depth}
           childNodes={childNodes}
-          randomChildNodes={randomChildNodes}
+          randomChildNodes={true}
           rootDepth={rootDepth || depth}
         />
       </div>

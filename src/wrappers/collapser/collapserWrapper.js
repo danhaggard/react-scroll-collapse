@@ -5,14 +5,12 @@ import { connect } from 'react-redux';
 
 import forwardRefWrapper from '../../utils/forwardRef';
 import { checkForRef } from '../../utils/errorUtils';
-import { ofBoolTypeOrNothing, ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
+import { ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
 import { collapserWrapperActions } from '../../actions';
 // import selectors from '../../selectors';
 import {
   areAllChildItemsExpanded,
   allChildItemIdsSelector,
-  areAllItemsExpandedStateSelectorRoot,
-  notifiedByChildSelectorSelectorRoot,
   recurseToNodeGetAllChildItemsExpanded,
   recurseNodeTargetSelector,
 } from '../../selectors/selectorTest';
@@ -31,15 +29,9 @@ export const collapserWrapper = (WrappedComponent) => {
 
     static getDerivedStateFromProps(props, state) {
       const {
-        areAllItemsExpanded,
         areAllItemsExpandedTarget,
         collapserId,
-        notifiedByChild,
-        notifyParentCollapser,
-        parentAreAllItemsExpanded,
-        parentCollapserId,
-        setAllChildItemsExpanded,
-        recurseNodeTarget
+        recurseNodeTarget,
       } = props;
       // console.log('getDerivedStateFromProps collapserId, derivedStateFromPropsCount', collapserId, state.derivedStateFromPropsCount);
       // console.log('getDerivedStateFromProps collapaserId, state.notifyClick', collapserId, state.notifyClick);
@@ -54,7 +46,7 @@ export const collapserWrapper = (WrappedComponent) => {
         areAllItemsExpandedUpdate = areAllItemsExpandedTarget(newTarget);
         simpleCache.lockCache();
       } else {
-        areAllItemsExpandedUpdate = areAllItemsExpandedTarget(collapserId) //  !== undefined || true; //TODO - deal with default first render val
+        areAllItemsExpandedUpdate = areAllItemsExpandedTarget(collapserId);
       }
       console.log('getDerivedStateFromProps collapaserId, areAllItemsExpandedUpdate, state.areAllItemsExpanded', collapserId, areAllItemsExpandedUpdate, state.areAllItemsExpanded);
 
@@ -104,7 +96,7 @@ export const collapserWrapper = (WrappedComponent) => {
 
       */
       const { props, state } = this;
-      const condition = prop => (prop !== 'recurseNodeTarget' && prop !== 'notifiedByChild' && prop !== 'areAllItemsExpanded' && prop !== 'allChildItems' && prop !== 'parentAreAllItemsExpanded' && prop !== 'areAllItemsExpandedTarget' && props[prop] !== nextProps[prop]);
+      const condition = prop => (prop !== 'recurseNodeTarget' && prop !== 'notifiedByChild' && prop !== 'areAllItemsExpanded' && prop !== 'allChildItems' && prop !== 'areAllItemsExpandedTarget' && props[prop] !== nextProps[prop]);
       // const condition2 = prop => (prop !== 'areAllItemsExpanded' && prop !== 'allChildItems' && state[prop] !== nextState[prop]);
       const condition3 = prop => (prop !== 'derivedStateFromPropsCount' && prop !== 'notifiedParentFromCallback' && prop !== 'notifiedByChild' && state[prop] !== nextState[prop]);
       let shouldUpdate = false;
@@ -191,19 +183,7 @@ export const collapserWrapper = (WrappedComponent) => {
         itemId => expandCollapseAll(areAllItemsExpanded, itemId, nextCollapserId)
       ));
       setRecurseNodeTarget(collapserId);
-    //   this.setState(() => ({ notifyClick: true }));
-/*
-      if (parentCollapserId !== null) {
-        notifyParentCollapser(parentCollapserId);
-        //console.log('expandCollapseAll - notifying parent props.collapserId', collapserId, parentCollapserId);
-        this.setState(() => ({ notifiedParentFromCallback: true }));
-      }
 
-      if (parentCollapserId === null) {
-        //console.log('expandCollapseAll - notifying SELF props.collapserId', collapserId, parentCollapserId);
-        this.setState(() => ({ notifiedParentFromCallback: null }));
-      }
-*/
     };
 
     render() {
@@ -248,45 +228,25 @@ export const collapserWrapper = (WrappedComponent) => {
     allChildItems: PropTypes.func.isRequired, // array of collapserItem ids
     expandCollapseAll: PropTypes.func.isRequired,
     setOffsetTop: PropTypes.func.isRequired,
+    setRecurseNodeTarget: PropTypes.func.isRequired,
     watchCollapser: PropTypes.func.isRequired,
     watchInitCollapser: PropTypes.func.isRequired,
   };
 
   const mapStateToProps = (state, ownProps) => {
-    //console.log('mapStateToProps collapserId', ownProps.collapserId);
-    const areAllItemsExpanded = () => {
-      // console.log('calling areAllItemsExpanded - collapserId ', ownProps.collapserId);
-      return areAllChildItemsExpanded(state, ownProps);
-    };
+    // console.log('mapStateToProps collapserId', ownProps.collapserId);
+    const areAllItemsExpanded = () => areAllChildItemsExpanded(state, ownProps);
 
     const areAllItemsExpandedTarget = targetNodeId => recurseToNodeGetAllChildItemsExpanded(
-      // state, { ...ownProps, targetNodeId, collapserId: 0 }
       state, { ...ownProps, targetNodeId }
     );
 
-    const parentAreAllItemsExpanded = () => {
-      if (ownProps.collapserId !== null) {
-        return areAllItemsExpandedStateSelectorRoot(
-          state, { collapserId: ownProps.parentCollapserId }
-        );
-      }
-      return () => null;
-    };
 
-    const notifiedByChild = () => notifiedByChildSelectorSelectorRoot(state, ownProps);
     return {
       allChildItems: () => allChildItemIdsSelector(state, ownProps),
       areAllItemsExpanded,
       areAllItemsExpandedTarget,
-      parentAreAllItemsExpanded,
       recurseNodeTarget: recurseNodeTargetSelector(state, ownProps),
-      /*
-      parentAreAllItemsExpandedProp: areAllItemsExpandedStateSelectorRoot(
-        state, { collapserId: ownProps.parentCollapserId }
-      )
-      */
-      notifiedByChild
-
     };
   };
 
