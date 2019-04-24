@@ -49,14 +49,14 @@ export const collapserWrapper = (WrappedComponent) => {
       if (recurseNodeTarget === null || (collapserId === 0 && state.derivedStateFromPropsCount <= 1)) {
         newTarget = -1;
       }
-      if (collapserId === 0 && state.derivedStateFromPropsCount !== 1) {
+      if (collapserId === 0) {
         simpleCache.unlockCache();
         areAllItemsExpandedUpdate = areAllItemsExpandedTarget(newTarget);
         simpleCache.lockCache();
       } else {
-        areAllItemsExpandedUpdate = areAllItemsExpandedTarget(collapserId);
+        areAllItemsExpandedUpdate = areAllItemsExpandedTarget(collapserId) //  !== undefined || true; //TODO - deal with default first render val
       }
-      // console.log('getDerivedStateFromProps collapaserId, areAllItemsExpandedUpdate, state.areAllItemsExpanded', collapserId, areAllItemsExpandedUpdate, state.areAllItemsExpanded);
+      console.log('getDerivedStateFromProps collapaserId, areAllItemsExpandedUpdate, state.areAllItemsExpanded', collapserId, areAllItemsExpandedUpdate, state.areAllItemsExpanded);
 
       // areAllItemsExpandedUpdate = areAllItemsExpanded();
 
@@ -111,7 +111,7 @@ export const collapserWrapper = (WrappedComponent) => {
       Object.keys(props).some(
         (prop) => {
           if (condition(prop)) {
-          console.log('should Update true prop: collapserId, prop, prev, next', props.collapserId, prop, props[prop], nextProps[prop]);
+          // console.log('should Update true prop: collapserId, prop, prev, next', props.collapserId, prop, props[prop], nextProps[prop]);
           shouldUpdate = true;
           }
 
@@ -120,7 +120,7 @@ export const collapserWrapper = (WrappedComponent) => {
       Object.keys(state).some(
         (prop) => {
           if (condition3(prop)) {
-          console.log('should Update true FRPM STATE: props.collapserId, prop, prev, next', props.collapserId, prop, state[prop], nextState[prop]);
+          // console.log('should Update true FRPM STATE: props.collapserId, prop, prev, next', props.collapserId, prop, state[prop], nextState[prop]);
           shouldUpdate = true;
         }
       });
@@ -216,8 +216,8 @@ export const collapserWrapper = (WrappedComponent) => {
         ...other
       } = this.props;
       const { areAllItemsExpanded } = this.state;
-      console.log('render collapserId', this.props.collapserId);
-      console.log('');
+      //console.log('render collapserId', this.props.collapserId);
+      //console.log('');
       this.derivedStateFromPropsCount += 1;
       // console.log('');
       return (
@@ -260,7 +260,8 @@ export const collapserWrapper = (WrappedComponent) => {
     };
 
     const areAllItemsExpandedTarget = targetNodeId => recurseToNodeGetAllChildItemsExpanded(
-      state, { ...ownProps, targetNodeId, collapserId: 0 }
+      // state, { ...ownProps, targetNodeId, collapserId: 0 }
+      state, { ...ownProps, targetNodeId }
     );
 
     const parentAreAllItemsExpanded = () => {

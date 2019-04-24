@@ -228,8 +228,6 @@ export const recurseAllChildrenLog = (
   // return concatChildren(selectorFunc(id), 0, returnValueRoot);
 };
 
-console.log('simpleCache', simpleCache);
-
 
 export const recurseAllChildrenLog2 = (
   id,
@@ -769,6 +767,17 @@ export const getAllNestedlll = (id, selectorFunc) => {
 };
 
 
+const arrayMax = (arr) => {
+  let len = arr.length;
+  let max = -Infinity;
+  while (len--) {
+    if (arr[len] > max) {
+      max = arr[len];
+    }
+  }
+  return max;
+};
+
 export const recurseToNode = (argsObj) => {
 
   const {
@@ -778,24 +787,33 @@ export const recurseToNode = (argsObj) => {
     evaluationFunc, // e.g. [true, [true, false]] - resolves to true or false?
     selectorFunc,
     targetNodeId,
+    reachedTargetNode,
   } = argsObj;
 
   const cachedValue = cache.getResult(currentNodeId);
-  //debugger;
-  if (cachedValue && cache.isCacheLocked()) {
-    console.log('returning cache - currentNodeId, targetNodeId', currentNodeId, targetNodeId);
+
+  if (cachedValue !== null && cache.isCacheLocked()) {
     return cachedValue;
   }
 
   const result = selectorFunc(currentNodeId);
-  //console.log('recurseToNode: currentNodeId, result', currentNodeId, result);
 
   const childArray = childSelectorFunc(currentNodeId);
   if (childArray.length === 0) {
     return cache.addResult(currentNodeId, result);
   }
 
-  if (currentNodeId >= targetNodeId || targetNodeId < 0) {
+  const reachedTargetNodeCheck = reachedTargetNode || currentNodeId === targetNodeId;
+
+  /*
+    Want to avoid entering here if we are below target on the wrong branch.
+
+    but cache will catch em first anyway?
+
+    NO - collapser above the target calls with itself as target and origin so -
+    reaches targetNode.
+  */
+  if (reachedTargetNodeCheck || targetNodeId < 0) {
     /*
       We are either below the targetNode - or on a branch that doesn't care.
       How deal? - cache will have a locking mechanism.
@@ -811,7 +829,8 @@ export const recurseToNode = (argsObj) => {
     */
     const val = evaluationFunc([result, ...childArray.map(nextNodeId => recurseToNode({
       ...argsObj,
-      currentNodeId: nextNodeId
+      currentNodeId: nextNodeId,
+      reachedTargetNode: reachedTargetNodeCheck,
     }))]);
     return cache.addResult(
       currentNodeId,
@@ -819,11 +838,14 @@ export const recurseToNode = (argsObj) => {
     );
   }
 
-  const nextNodeId = Math.max(...childArray.filter(id => (id <= targetNodeId)));
+  const nextNodeId = arrayMax([...childArray.filter(id => (id <= targetNodeId))]);
   const val = evaluationFunc([result, recurseToNode({
     ...argsObj,
     currentNodeId: nextNodeId
   })]);
+  if (currentNodeId >= targetNodeId) {
+    debugger;
+  }
   return cache.addResult(
     currentNodeId,
     val
