@@ -240,7 +240,7 @@ export const recurseAllChildrenLog2 = (
   let concatTotal = -1;
   console.log('recurseAllChildren - id, recurseCount:', id, recurseCount);
 
-  let cachedResult = simpleCache.getResult(id);
+  let cachedResult = simpleCache.getResultValue(id);
   if (cachedResult !== undefined) {
     console.log('recurseAllChildren - returning root cachedResult -  id, arr[i], cachedResult:', id, cachedResult);
     return cachedResult;
@@ -263,7 +263,7 @@ export const recurseAllChildrenLog2 = (
     concatTotal += 1;
     console.log('id, , recurseCount, arr[i], concatTotal:', id, recurseCount, arr[i], concatTotal);
 
-    cachedResult = simpleCache.getResult(arr[i]);
+    cachedResult = simpleCache.getResultValue(arr[i]);
     if (cachedResult !== undefined) {
       console.log('concatChildren - returning cachedResult -  id, arr[i], cachedResult:', id, arr[i], cachedResult);
       return cachedResult;
@@ -303,7 +303,7 @@ export const recurseAllChildrenLog2 = (
     const nextArray = [...newArr, ...nextChildren];
 
     /*
-    cachedResult = simpleCache.getResult(nextArray[i + 1]);
+    cachedResult = simpleCache.getResultValue(nextArray[i + 1]);
     if (cachedResult !== undefined) {
       console.log('concatChildren - returning cachedResult instead of recursing -  id, arr[i], cachedResult:', id, arr[i], cachedResult);
       return cachedResult;
@@ -341,7 +341,7 @@ export const recurseAllChildrenLog3 = (
   let concatTotal = -1;
   console.log('recurseAllChildren - id, recurseCount:', id, recurseCount);
 
-  let cachedResult = simpleCache.getResult(id);
+  let cachedResult = simpleCache.getResultValue(id);
   if (cachedResult !== undefined) {
     console.log('recurseAllChildren - returning root cachedResult -  id, arr[i], cachedResult:', id, cachedResult);
     return cachedResult;
@@ -364,7 +364,7 @@ export const recurseAllChildrenLog3 = (
     concatTotal += 1;
     console.log('id, , recurseCount, arr[i], concatTotal:', id, recurseCount, arr[i], concatTotal);
 
-    cachedResult = simpleCache.getResult(arr[i]);
+    cachedResult = simpleCache.getResultValue(arr[i]);
     if (cachedResult !== undefined) {
       console.log('concatChildren - returning cachedResult -  id, arr[i], cachedResult:', id, arr[i], cachedResult);
       return cachedResult;
@@ -404,7 +404,7 @@ export const recurseAllChildrenLog3 = (
     const nextArray = [...newArr, ...nextChildren];
 
     /*
-    cachedResult = simpleCache.getResult(nextArray[i + 1]);
+    cachedResult = simpleCache.getResultValue(nextArray[i + 1]);
     if (cachedResult !== undefined) {
       console.log('concatChildren - returning cachedResult instead of recursing -  id, arr[i], cachedResult:', id, arr[i], cachedResult);
       return cachedResult;
@@ -438,7 +438,7 @@ export const recurseAllChildrenCached = (
   breakCondition // returns [bool (whether to break), and return value]
 ) => {
 
-  let cachedResult = simpleCache.getResult(id);
+  let cachedResult = simpleCache.getResultValue(id);
   if (cachedResult !== undefined) {
     return cachedResult;
   }
@@ -452,7 +452,7 @@ export const recurseAllChildrenCached = (
 
   const concatChildren = (arr, i, prevReturnValue) => {
 
-    cachedResult = simpleCache.getResult(arr[i]);
+    cachedResult = simpleCache.getResultValue(arr[i]);
     if (cachedResult !== undefined) {
       return cachedResult;
     }
@@ -778,6 +778,24 @@ const arrayMax = (arr) => {
   return max;
 };
 
+
+export const getChildResultValuesAndSources = (childArray, recurseFunc, recurseFuncArgs) => {
+
+  const resultSources = [];
+  const resultValues = [];
+
+  childArray.forEach((nextNodeId) => {
+    const value = recurseFunc({ ...recurseFuncArgs, currentNodeId: nextNodeId });
+    resultValues.push(value);
+    if (value === false) {
+      resultSources.push(nextNodeId);
+    }
+  });
+
+  return [resultSources, resultValues];
+};
+
+
 export const recurseToNode = (argsObj) => {
 
   const {
@@ -790,17 +808,19 @@ export const recurseToNode = (argsObj) => {
     reachedTargetNode,
   } = argsObj;
 
-  const cachedValue = cache.getResult(currentNodeId);
+  const cachedValue = cache.getResultValue(currentNodeId);
+  const cachedSources = cache.getResultSources(currentNodeId);
 
   if (cachedValue !== null && cache.isCacheLocked()) {
     return cachedValue;
   }
 
-  const result = selectorFunc(currentNodeId);
+  const currentValue = selectorFunc(currentNodeId);
 
   const childArray = childSelectorFunc(currentNodeId);
   if (childArray.length === 0) {
-    return cache.addResult(currentNodeId, result);
+    const currentSources = currentValue === false ? [currentNodeId] : [];
+    return cache.addResult(currentNodeId, currentValue, currentSources);
   }
 
   const reachedTargetNodeCheck = reachedTargetNode || currentNodeId === targetNodeId;
@@ -827,28 +847,58 @@ export const recurseToNode = (argsObj) => {
       So since we mnade it past teh cache here - we assume we are below the
       target node.
     */
-    const val = evaluationFunc([result, ...childArray.map(nextNodeId => recurseToNode({
-      ...argsObj,
-      currentNodeId: nextNodeId,
-      reachedTargetNode: reachedTargetNodeCheck,
-    }))]);
+
+    const [resultSources, resultValues] = getChildResultValuesAndSources(
+      childArray,
+      recurseToNode,
+      { ...argsObj, reachedTargetNode: reachedTargetNodeCheck }
+    );
+
+    const val = evaluationFunc([currentValue, ...resultValues]);
     return cache.addResult(
       currentNodeId,
-      val
+      val,
+      resultSources,
     );
   }
 
   const nextNodeId = arrayMax([...childArray.filter(id => (id <= targetNodeId))]);
-  const val = evaluationFunc([result, recurseToNode({
+  const val = evaluationFunc([currentValue, recurseToNode({
     ...argsObj,
     currentNodeId: nextNodeId
   })]);
-  if (currentNodeId >= targetNodeId) {
-    debugger;
+
+  if (
+    cachedValue === false && val === true
+    && cachedSources.length === 1 && cachedSources.includes(nextNodeId)
+  ) {
+    /*
+      We have to check the false value didn't come from another branch.
+      If it did - we can just return.
+    */
+    return cache.addResult(
+      currentNodeId,
+      val,
+      cachedSources.filter(id => id !== nextNodeId)
+    );
   }
+
+  if (cachedValue === false && val === true) {
+    /*
+      We have to check the false value didn't come from another branch.
+      If it did - we can just return.
+    */
+    return cache.addResult(
+      currentNodeId,
+      cachedValue,
+      cachedSources.filter(id => id !== nextNodeId)
+    );
+  }
+
   return cache.addResult(
     currentNodeId,
-    val
+    val,
+    val === false ? [...new Set([...cachedSources, nextNodeId])] : cachedSources
   );
 
 };

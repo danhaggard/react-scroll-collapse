@@ -214,8 +214,6 @@ export const recursivelyGetChildItems = (state, props) => recurseAllChildren(
   )
 );
 
-//export const recursivelyGetChildItems = logPerformance(recursively_GetChildItems, 'recursivelyGetChildItems');
-
 
 const allChildItemIdsSelectorFactory = () => createSelector( //eslint-disable-line
   recursivelyGetChildItems,
@@ -223,59 +221,3 @@ const allChildItemIdsSelectorFactory = () => createSelector( //eslint-disable-li
 );
 
 export const allChildItemIdsSelector = cacheSelector(allChildItemIdsSelectorFactory, 'allChildItemIdsSelectorFactory', 'collapserId');
-
-//export const allChildItemIdsSelectorA = cacheSelector(allChildItemIdsSelectorFactory, 'allChildItemIdsSelectorFactory', 'collapserId');
-
-
-//export const allChildItemIdsSelector = logPerformance(allChildItemIdsSelectorA, 'allChildItemIdsSelector');
-
-/*
-
-// (rootState, { collapserId }) => [should break recursion loop?, value to return if it does break]
-export const everyChildItemExpandedConditionSelectorFactory = () => createSelector(
-  areAllItemsExpandedSelector,
-  areAllItemsExpanded => [!areAllItemsExpanded, areAllItemsExpanded]
-);
-
-// (rootState, { collapserId }) => itemsObj
-export const itemObjSelectorRoot = createSelector(
-  [collapsersSelectorRoot, (_, props) => props],
-  (collapsersState, props) => itemsObjSelector(collapsersState, props)
-);
-*/
-
-/*
-  --- entities.items:
-
-export const getItems = entitiesState => arrSelector(entitiesState, 'items');
-
-export const itemsSelectorRoot = createSelector(getEntities, getItems);
-
-export const getItem = (itemsState, { itemId }) => itemsState[itemId];
-
-// (itemsState, { itemId }) => item
-export const itemSelector = createSelector(
-  getItem, item => item,
-);
-
-// (rootState, { itemId }) => item
-export const itemSelectorRoot = createSelector(
-  [itemsSelectorRoot, (_, props) => props],
-  (itemsState, props) => itemSelector(itemsState, props)
-);
-*/
-
-/*
-  --- item.expanded
-
-export const getItemExpanded = itemObj => selectOrVal(itemObj, 'expanded');
-
-// (itemsState, { itemId }) => item.expanded
-export const itemExpandedSelector = createSelector(itemSelector, getItemExpanded);
-
-// (rootState, { itemId }) => childItemsArray
-export const itemExpandedSelectorRoot = createSelector(
-  [itemsSelectorRoot, (_, props) => props],
-  (itemsState, props) => itemExpandedSelector(itemsState, props)
-);
-*/
