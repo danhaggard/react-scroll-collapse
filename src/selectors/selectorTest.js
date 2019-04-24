@@ -168,7 +168,7 @@ export const areAllItemsExpandedSelector = cacheSelector(areAllItemsExpandedSele
 */
 
 
-export const recurseToNodeGetAllChildItemsExpanded = (state, props) => recurseToNode({
+export const allChildItemsExpandedSelector = (state, props) => recurseToNode({
   cache: simpleCache,
   childSelectorFunc: collapserId => childCollapserArraySelectorRoot(state, { collapserId }),
   currentNodeId: props.collapserId,
