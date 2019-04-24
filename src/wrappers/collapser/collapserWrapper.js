@@ -104,7 +104,7 @@ export const collapserWrapper = (WrappedComponent) => {
 
       */
       const { props, state } = this;
-      const condition = prop => (prop !== 'notifiedByChild' && prop !== 'areAllItemsExpanded' && prop !== 'allChildItems' && prop !== 'parentAreAllItemsExpanded' && prop !== 'areAllItemsExpandedTarget' && props[prop] !== nextProps[prop]);
+      const condition = prop => (prop !== 'recurseNodeTarget' && prop !== 'notifiedByChild' && prop !== 'areAllItemsExpanded' && prop !== 'allChildItems' && prop !== 'parentAreAllItemsExpanded' && prop !== 'areAllItemsExpandedTarget' && props[prop] !== nextProps[prop]);
       // const condition2 = prop => (prop !== 'areAllItemsExpanded' && prop !== 'allChildItems' && state[prop] !== nextState[prop]);
       const condition3 = prop => (prop !== 'derivedStateFromPropsCount' && prop !== 'notifiedParentFromCallback' && prop !== 'notifiedByChild' && state[prop] !== nextState[prop]);
       let shouldUpdate = false;
