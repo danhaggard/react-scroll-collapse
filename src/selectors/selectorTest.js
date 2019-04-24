@@ -6,9 +6,9 @@ import {
   recurseAllChildrenCached,
   recurseAllChildrenLog,
   recurseAllChildrenLog2,
-  recurseToNode,
 
 } from './utils';
+import recurseToNode from './recurseToNode';
 import { cacheSelector } from './selectorCache';
 import simpleCache from './simpleCache';
 
