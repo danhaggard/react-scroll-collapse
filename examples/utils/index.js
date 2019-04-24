@@ -1,3 +1,11 @@
+/*
+  This comes from: https://stackoverflow.com/questions/1527803/generating-random-whole-numbers-in-javascript-in-a-specific-range
+*/
+export const getRandomInt = (minArg, maxArg) => {
+  const min = Math.ceil(minArg);
+  const max = Math.floor(maxArg);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
 
 /*
   This comes from: http://stackoverflow.com/a/8084248/1914452
