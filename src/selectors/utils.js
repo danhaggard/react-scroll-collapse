@@ -1,6 +1,7 @@
 import { createSelector } from 'reselect';
 import { createGetterKey, createSelectorKey, createTypeInstanceSelectorKey } from '../utils/stringUtils';
 import { getSelector } from './selectorCache';
+import simpleCache from './simpleCache';
 
 /* helper funcs used by all components */
 
@@ -91,6 +92,8 @@ export const getAllNestedTest = selectorFunc => (id) => {
   return concatChildren(selectorFunc(id), 0);
 };
 
+let recurseCount = -1;
+
 export const recurseAllChildren = (
   id,
   state,
@@ -98,7 +101,8 @@ export const recurseAllChildren = (
   selectorFunc,
   breakCondition // returns [bool (whether to break), and return value]
 ) => {
-  //console.log('recurseAllChildren -id:', id);
+
+  //console.log('concatTotal - id, concatTotal:', id, concatTotal);
   const [shouldBreakRoot, returnValueRoot] = breakCondition(id);
 
 /*
@@ -109,7 +113,10 @@ export const recurseAllChildren = (
   if (shouldBreakRoot) {
     return returnValueRoot;
   }
+
   const concatChildren = (arr, i, prevReturnValue) => {
+
+
     const [shouldBreak, returnValue] = breakCondition(arr[i], prevReturnValue);
 /*
     if (id === 0) {
@@ -131,23 +138,358 @@ export const recurseAllChildren = (
     }
 */
     if (i + 1 > newArr.length) {
+
       /* If true then we have iterated through all children */
       return prevReturnValue;
     }
     const nextChildren = selectorFunc(newArr[i]);
     /* recursive call is in tail call position. */
+
     return concatChildren([...newArr, ...nextChildren], i + 1, returnValue);
   };
 
-  /*
+
   const returnVal = concatChildren(selectorFunc(id), 0, returnValueRoot);
-  if (id === 0) {
-    console.log('collapserId returnVal in concatChildren', id, returnVal);
-  }
+
   return returnVal;
-  */
-  return concatChildren(selectorFunc(id), 0, returnValueRoot);
+
+
+  // return concatChildren(selectorFunc(id), 0, returnValueRoot);
 };
+
+
+export const recurseAllChildrenLog = (
+  id,
+  state,
+  props,
+  selectorFunc,
+  breakCondition // returns [bool (whether to break), and return value]
+) => {
+  recurseCount += 1
+  let concatTotal = -1;
+  console.log('recurseAllChildren - id, recurseCount:', id, recurseCount);
+  //console.log('concatTotal - id, concatTotal:', id, concatTotal);
+  const [shouldBreakRoot, returnValueRoot] = breakCondition(id);
+
+
+  if (id === 0) {
+    console.log('shouldBreakRoot, returnValueRoot', shouldBreakRoot, returnValueRoot);
+  }
+
+  if (shouldBreakRoot) {
+    return returnValueRoot;
+  }
+
+  const concatChildren = (arr, i, prevReturnValue) => {
+    concatTotal += 1;
+    console.log('id, , recurseCount, arr[i], concatTotal:', id, recurseCount, arr[i], concatTotal);
+
+    const [shouldBreak, returnValue] = breakCondition(arr[i], prevReturnValue);
+/*
+    if (id === 0) {
+      console.log('shouldBreak, arr.length === 0, prevReturnValue, returnValue', shouldBreak, arr.length === 0, prevReturnValue, returnValue);
+    }
+*/
+    if (shouldBreak || arr.length === 0) {
+      console.log('break for: (shouldBreak || arr.length === 0) ---- id, recurseCount, arr[i], concatTotal', id, recurseCount, arr[i], concatTotal);
+      return returnValue;
+    }
+    /*
+      ids of components are generated only as a component is mounting.  So on the
+      first render selectorFunc will return null.  null.length will raise an
+      error hence the check for !arr first.
+    */
+    const newArr = !arr ? [] : arr;
+/*
+    if (id === 0) {
+      console.log('i + 1 > newArr.length', i + 1 > newArr.length);
+    }
+*/
+    if (i + 1 > newArr.length) {
+      console.log('break for: (i + 1 > newArr.length) ---- id, recurseCount, arr[i], concatTotal', id, recurseCount, arr[i], concatTotal);
+
+      /* If true then we have iterated through all children */
+      return prevReturnValue;
+    }
+    const nextChildren = selectorFunc(newArr[i]);
+    /* recursive call is in tail call position. */
+    console.log('Recursing into id: ', [...newArr, ...nextChildren][i + 1], ' ---- id, recurseCount, arr[i], concatTotal', id, recurseCount, arr[i], concatTotal);
+
+    return concatChildren([...newArr, ...nextChildren], i + 1, returnValue);
+  };
+
+
+  const returnVal = concatChildren(selectorFunc(id), 0, returnValueRoot);
+  console.log('');
+
+  return returnVal;
+
+
+  // return concatChildren(selectorFunc(id), 0, returnValueRoot);
+};
+
+console.log('simpleCache', simpleCache);
+
+
+export const recurseAllChildrenLog2 = (
+  id,
+  state,
+  props,
+  selectorFunc,
+  breakCondition // returns [bool (whether to break), and return value]
+) => {
+  recurseCount += 1
+  let concatTotal = -1;
+  console.log('recurseAllChildren - id, recurseCount:', id, recurseCount);
+
+  let cachedResult = simpleCache.getResult(id);
+  if (cachedResult !== undefined) {
+    console.log('recurseAllChildren - returning root cachedResult -  id, arr[i], cachedResult:', id, cachedResult);
+    return cachedResult;
+  }
+
+  const [shouldBreakRoot, returnValueRoot] = breakCondition(id);
+
+/*
+  if (id === 0) {
+    console.log('shouldBreakRoot, returnValueRoot', shouldBreakRoot, returnValueRoot);
+  }
+*/
+  if (shouldBreakRoot) {
+    console.log('recurseAllChildren - shouldBreakRoot - id, recurseCount:', id, recurseCount);
+    simpleCache.addResult(id, returnValueRoot);
+    return returnValueRoot;
+  }
+
+  const concatChildren = (arr, i, prevReturnValue) => {
+    concatTotal += 1;
+    console.log('id, , recurseCount, arr[i], concatTotal:', id, recurseCount, arr[i], concatTotal);
+
+    cachedResult = simpleCache.getResult(arr[i]);
+    if (cachedResult !== undefined) {
+      console.log('concatChildren - returning cachedResult -  id, arr[i], cachedResult:', id, arr[i], cachedResult);
+      return cachedResult;
+    }
+
+    const [shouldBreak, returnValue] = breakCondition(arr[i], prevReturnValue);
+/*
+    if (id === 0) {
+      console.log('shouldBreak, arr.length === 0, prevReturnValue, returnValue', shouldBreak, arr.length === 0, prevReturnValue, returnValue);
+    }
+*/
+    if (shouldBreak || arr.length === 0) {
+      //simpleCache.addResult(arr[i], returnValue);
+      console.log('break for: (shouldBreak || arr.length === 0) ---- id, recurseCount, arr[i], concatTotal', id, recurseCount, arr[i], concatTotal);
+      return returnValue;
+    }
+    /*
+      ids of components are generated only as a component is mounting.  So on the
+      first render selectorFunc will return null.  null.length will raise an
+      error hence the check for !arr first.
+    */
+    const newArr = !arr ? [] : arr;
+/*
+    if (id === 0) {
+      console.log('i + 1 > newArr.length', i + 1 > newArr.length);
+    }
+*/
+    if (i + 1 > newArr.length) {
+      console.log('break for: (i + 1 > newArr.length) ---- id, recurseCount, arr[i], concatTotal', id, recurseCount, arr[i], concatTotal);
+
+      /* If true then we have iterated through all children */
+      //simpleCache.addResult(arr[i], prevReturnValue);
+      return prevReturnValue;
+    }
+    const nextChildren = selectorFunc(newArr[i]);
+    /* recursive call is in tail call position. */
+    const nextArray = [...newArr, ...nextChildren];
+
+    /*
+    cachedResult = simpleCache.getResult(nextArray[i + 1]);
+    if (cachedResult !== undefined) {
+      console.log('concatChildren - returning cachedResult instead of recursing -  id, arr[i], cachedResult:', id, arr[i], cachedResult);
+      return cachedResult;
+    }
+    */
+    console.log('Next Children for newArr[i] ', newArr[i], nextChildren);
+
+    console.log('Recursing into id: ', nextArray[i + 1], ' ---- id, recurseCount, arr[i], concatTotal', id, recurseCount, arr[i], concatTotal);
+    const nextValue = concatChildren([...newArr, ...nextChildren], i + 1, returnValue);
+    simpleCache.addResult(arr[i + 1], nextValue);
+    return nextValue;
+  };
+
+
+  const returnVal = concatChildren(selectorFunc(id), 0, returnValueRoot);
+  console.log('');
+  simpleCache.addResult(id, returnVal);
+  return returnVal;
+
+
+  // return concatChildren(selectorFunc(id), 0, returnValueRoot);
+};
+
+
+
+
+export const recurseAllChildrenLog3 = (
+  id,
+  state,
+  props,
+  selectorFunc,
+  breakCondition // returns [bool (whether to break), and return value]
+) => {
+  recurseCount += 1
+  let concatTotal = -1;
+  console.log('recurseAllChildren - id, recurseCount:', id, recurseCount);
+
+  let cachedResult = simpleCache.getResult(id);
+  if (cachedResult !== undefined) {
+    console.log('recurseAllChildren - returning root cachedResult -  id, arr[i], cachedResult:', id, cachedResult);
+    return cachedResult;
+  }
+
+  const [shouldBreakRoot, returnValueRoot] = breakCondition(id);
+
+/*
+  if (id === 0) {
+    console.log('shouldBreakRoot, returnValueRoot', shouldBreakRoot, returnValueRoot);
+  }
+*/
+  if (shouldBreakRoot) {
+    console.log('recurseAllChildren - shouldBreakRoot - id, recurseCount:', id, recurseCount);
+    simpleCache.addResult(id, returnValueRoot);
+    return returnValueRoot;
+  }
+
+  const concatChildren = (arr, i, prevReturnValue) => {
+    concatTotal += 1;
+    console.log('id, , recurseCount, arr[i], concatTotal:', id, recurseCount, arr[i], concatTotal);
+
+    cachedResult = simpleCache.getResult(arr[i]);
+    if (cachedResult !== undefined) {
+      console.log('concatChildren - returning cachedResult -  id, arr[i], cachedResult:', id, arr[i], cachedResult);
+      return cachedResult;
+    }
+
+    const [shouldBreak, returnValue] = breakCondition(arr[i], prevReturnValue);
+/*
+    if (id === 0) {
+      console.log('shouldBreak, arr.length === 0, prevReturnValue, returnValue', shouldBreak, arr.length === 0, prevReturnValue, returnValue);
+    }
+*/
+    if (shouldBreak || arr.length === 0) {
+      //simpleCache.addResult(arr[i], returnValue);
+      console.log('break for: (shouldBreak || arr.length === 0) ---- id, recurseCount, arr[i], concatTotal', id, recurseCount, arr[i], concatTotal);
+      return returnValue;
+    }
+    /*
+      ids of components are generated only as a component is mounting.  So on the
+      first render selectorFunc will return null.  null.length will raise an
+      error hence the check for !arr first.
+    */
+    const newArr = !arr ? [] : arr;
+/*
+    if (id === 0) {
+      console.log('i + 1 > newArr.length', i + 1 > newArr.length);
+    }
+*/
+    if (i + 1 > newArr.length) {
+      console.log('break for: (i + 1 > newArr.length) ---- id, recurseCount, arr[i], concatTotal', id, recurseCount, arr[i], concatTotal);
+
+      /* If true then we have iterated through all children */
+      //simpleCache.addResult(arr[i], prevReturnValue);
+      return prevReturnValue;
+    }
+    const nextChildren = selectorFunc(newArr[i]);
+    /* recursive call is in tail call position. */
+    const nextArray = [...newArr, ...nextChildren];
+
+    /*
+    cachedResult = simpleCache.getResult(nextArray[i + 1]);
+    if (cachedResult !== undefined) {
+      console.log('concatChildren - returning cachedResult instead of recursing -  id, arr[i], cachedResult:', id, arr[i], cachedResult);
+      return cachedResult;
+    }
+    */
+
+    console.log('Recursing into id: ', nextArray[i + 1], ' ---- id, recurseCount, arr[i], concatTotal', id, recurseCount, arr[i], concatTotal);
+    const nextValue = concatChildren([...newArr, ...nextChildren], i + 1, returnValue);
+    simpleCache.addResult(arr[i + 1], nextValue);
+    return nextValue;
+  };
+
+
+  const returnVal = concatChildren(selectorFunc(id), 0, returnValueRoot);
+  console.log('');
+  simpleCache.addResult(id, returnVal);
+  return returnVal;
+
+
+  // return concatChildren(selectorFunc(id), 0, returnValueRoot);
+};
+
+
+
+
+export const recurseAllChildrenCached = (
+  id,
+  state,
+  props,
+  selectorFunc,
+  breakCondition // returns [bool (whether to break), and return value]
+) => {
+
+  let cachedResult = simpleCache.getResult(id);
+  if (cachedResult !== undefined) {
+    return cachedResult;
+  }
+
+  const [shouldBreakRoot, returnValueRoot] = breakCondition(id);
+
+  if (shouldBreakRoot) {
+    simpleCache.addResult(id, returnValueRoot);
+    return returnValueRoot;
+  }
+
+  const concatChildren = (arr, i, prevReturnValue) => {
+
+    cachedResult = simpleCache.getResult(arr[i]);
+    if (cachedResult !== undefined) {
+      return cachedResult;
+    }
+
+    const [shouldBreak, returnValue] = breakCondition(arr[i], prevReturnValue);
+
+    if (shouldBreak || arr.length === 0) {
+      return returnValue;
+    }
+    /*
+      ids of components are generated only as a component is mounting.  So on the
+      first render selectorFunc will return null.  null.length will raise an
+      error hence the check for !arr first.
+    */
+    const newArr = !arr ? [] : arr;
+
+    if (i + 1 > newArr.length) {
+      /* If true then we have iterated through all children */
+      return prevReturnValue;
+    }
+
+    const nextChildren = selectorFunc(newArr[i]);
+
+    /* recursive call is in tail call position. */
+    const nextValue = concatChildren([...newArr, ...nextChildren], i + 1, returnValue);
+    simpleCache.addResult(arr[i + 1], nextValue);
+    return nextValue;
+  };
+
+  const returnVal = concatChildren(selectorFunc(id), 0, returnValueRoot);
+  simpleCache.addResult(id, returnVal);
+
+  return returnVal;
+};
+
 
 
 /*
@@ -412,3 +754,79 @@ export const recurseAllChildren = (
 
 
 */
+
+export const getAllNestedlll = (id, selectorFunc) => {
+  const concatChildren = (arr, i) => {
+    const newArr = !arr ? [] : arr;
+    if (i + 1 > newArr.length) {
+      return newArr;
+    }
+    const nextChildren = selectorFunc(newArr[i]);
+    return concatChildren([...newArr, ...nextChildren], i + 1);
+  };
+
+  return concatChildren(selectorFunc(id), 0);
+};
+
+
+export const recurseToNode = (argsObj) => {
+
+  const {
+    cache,
+    childSelectorFunc,
+    currentNodeId,
+    evaluationFunc, // e.g. [true, [true, false]] - resolves to true or false?
+    selectorFunc,
+    targetNodeId,
+  } = argsObj;
+
+  const cachedValue = cache.getResult(currentNodeId);
+  //debugger;
+  if (cachedValue && cache.isCacheLocked()) {
+    console.log('returning cache - currentNodeId, targetNodeId', currentNodeId, targetNodeId);
+    return cachedValue;
+  }
+
+  const result = selectorFunc(currentNodeId);
+  //console.log('recurseToNode: currentNodeId, result', currentNodeId, result);
+
+  const childArray = childSelectorFunc(currentNodeId);
+  if (childArray.length === 0) {
+    return cache.addResult(currentNodeId, result);
+  }
+
+  if (currentNodeId >= targetNodeId || targetNodeId < 0) {
+    /*
+      We are either below the targetNode - or on a branch that doesn't care.
+      How deal? - cache will have a locking mechanism.
+
+      When locked it will return the cached value.  When unlocked - any cached
+      value asked for will be turfed WHEN it is asked for it.
+
+      So on first render collapserId 0 will unlock the cache - and then lock
+      again after the first pass.
+
+      So since we mnade it past teh cache here - we assume we are below the
+      target node.
+    */
+    const val = evaluationFunc([result, ...childArray.map(nextNodeId => recurseToNode({
+      ...argsObj,
+      currentNodeId: nextNodeId
+    }))]);
+    return cache.addResult(
+      currentNodeId,
+      val
+    );
+  }
+
+  const nextNodeId = Math.max(...childArray.filter(id => (id <= targetNodeId)));
+  const val = evaluationFunc([result, recurseToNode({
+    ...argsObj,
+    currentNodeId: nextNodeId
+  })]);
+  return cache.addResult(
+    currentNodeId,
+    val
+  );
+
+};

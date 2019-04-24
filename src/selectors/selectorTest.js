@@ -3,8 +3,15 @@ import {
   selectOrVal,
   arrSelector,
   recurseAllChildren,
+  recurseAllChildrenCached,
+  recurseAllChildrenLog,
+  recurseAllChildrenLog2,
+  recurseToNode,
+
 } from './utils';
 import { cacheSelector } from './selectorCache';
+import simpleCache from './simpleCache';
+
 import logPerformance from '../utils/logPerformance';
 
 
@@ -14,6 +21,13 @@ import logPerformance from '../utils/logPerformance';
 export const getReactScrollCollapser = state => selectOrVal(state, 'reactScrollCollapse');
 
 export const getEntities = state => selectOrVal(state, 'entities');
+
+export const getRecurseNodeTarget = state => selectOrVal(state, 'recurseNodeTarget');
+
+export const recurseNodeTargetSelector = createSelector(
+  getReactScrollCollapser,
+  getRecurseNodeTarget
+);
 
 export const entitiesSelector = createSelector(
   getReactScrollCollapser,
@@ -237,15 +251,19 @@ const areAllChildItemsExpandedFactory = () => createSelector( //eslint-disable-l
 );
 */
 
+
+const recursivelyGetAllChildItemsExpanded = (state, props) => recurseAllChildren(
+  props.collapserId,
+  state,
+  props,
+  collapserId => childCollapserArraySelectorRoot(state, { collapserId }),
+  collapserId => everyChildItemExpandedConditionSelector(state, { collapserId })
+);
+
+
 const areAllChildItemsExpandedFactory = () => createSelector( //eslint-disable-line
-  (state, props) => ({ state, props }),
-  ({ state, props }) => recurseAllChildren(
-    props.collapserId,
-    state,
-    props,
-    collapserId => childCollapserArraySelectorRoot(state, { collapserId }),
-    collapserId => everyChildItemExpandedConditionSelector(state, { collapserId })
-  )
+  recursivelyGetAllChildItemsExpanded,
+  val => val
 );
 
 export const areAllChildItemsExpanded = cacheSelector(areAllChildItemsExpandedFactory, 'areAllChildItemsExpandedFactory', 'collapserId');
@@ -254,6 +272,24 @@ export const areAllChildItemsExpanded = cacheSelector(areAllChildItemsExpandedFa
 /*
   -------------------------------- END DONT TOUCH -----------------------------
 */
+
+
+export const recurseToNodeGetAllChildItemsExpanded = (state, props) => recurseToNode({
+  cache: simpleCache,
+  childSelectorFunc: collapserId => childCollapserArraySelectorRoot(state, { collapserId }),
+  currentNodeId: props.collapserId,
+  evaluationFunc: arr => arr.every(a => (a === true)),
+  selectorFunc: collapserId => areAllItemsExpandedSelector(state, { collapserId }),
+  targetNodeId: props.targetNodeId,
+});
+
+
+
+
+
+
+
+
 
 // (rootState, { collapserId }) => { collapserId : []}
 export const childItemIdArraySelectorFactory = () => createSelector(
@@ -281,7 +317,7 @@ export const concatenateChildItemArraySelectorFactory = () => createSelector(
 
 export const concatenateChildItemArraySelector = cacheSelector(concatenateChildItemArraySelectorFactory, 'concatenateChildItemArraySelectorFactory', 'collapserId');
 
-export const recursivelyGetChildItems = ({ state, props }) => recurseAllChildren(
+export const recursivelyGetChildItems = (state, props) => recurseAllChildren(
   props.collapserId,
   state,
   props,
@@ -296,8 +332,8 @@ export const recursivelyGetChildItems = ({ state, props }) => recurseAllChildren
 
 
 const allChildItemIdsSelectorFactory = () => createSelector( //eslint-disable-line
-  (state, props) => ({ state, props }),
-  recursivelyGetChildItems
+  recursivelyGetChildItems,
+  val => val
 );
 
 export const allChildItemIdsSelector = cacheSelector(allChildItemIdsSelectorFactory, 'allChildItemIdsSelectorFactory', 'collapserId');

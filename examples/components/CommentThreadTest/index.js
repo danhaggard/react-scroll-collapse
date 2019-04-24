@@ -11,13 +11,40 @@ import { collapserController } from '../../../src';
 import { genRandText } from '../../utils';
 
 
-const getNested = noOfChildThreads => (
+const getNested = (depth, childNodes) => (
+  depth === 0 ? null
+    : [...Array(childNodes).keys()].map(
+      node => (
+        <WrappedCommentThread
+          key={`row: ${depth + 1} - node: ${node}`}
+          depth={depth - 1}
+          childNodes={childNodes}
+          title={`row: ${depth + 1} - node: ${node}`}
+        >
+          {getNested(depth - 1, childNodes)}
+        </WrappedCommentThread>
+      )
+    ));
+
+const getNestedOld = depth => (
+  depth === 0 ? null
+    : [...Array(depth).keys()].map(
+      node => (
+        <WrappedCommentThread
+          key={`row: ${depth + 1} - node: ${node}`}
+          depth={depth - 1}
+          title={`row: ${depth + 1} - node: ${node}`}
+        />
+      )
+    ));
+
+const getNestedOlder = noOfChildThreads => (
   noOfChildThreads === 0 ? null
     : [...Array(noOfChildThreads).keys()].map(
       key => (
         <WrappedCommentThread
           key={key}
-          childThreads={noOfChildThreads - 1}
+          depth={noOfChildThreads - 1}
         />
       )
     ));
@@ -27,15 +54,15 @@ class CommentThread extends PureComponent {
   randText = genRandText();
 
   state = {
-    childThreads: this.props.childThreads, // eslint-disable-line react/destructuring-assignment
+    depth: this.props.depth, // eslint-disable-line react/destructuring-assignment
   }
 
   addToThread = () => {
-    const { childThreads } = this.state;
-    this.setState({ childThreads: childThreads + 1 });
+    const { depth } = this.state;
+    this.setState({ depth: depth + 1 });
   }
 
-  deleteThread = () => this.setState({ childThreads: 0 });
+  deleteThread = () => this.setState({ depth: 0 });
 
   render() {
     const {
@@ -43,42 +70,51 @@ class CommentThread extends PureComponent {
       expandCollapseAll,
       collapserRef,
       collapserId,
+      childNodes,
+      oldNesting,
       parentCollapserId,
       parentScrollerId,
-      style
+      style,
+      title,
     } = this.props;
-    const { childThreads } = this.state;
+    const { depth } = this.state;
     const idStr = collapserId.toString();
     const text = `${this.randText}`;
-    const title = ` Collapser ${idStr}`;
+    const newTitle = ` Collapser ${idStr} -- ${title || 'row: 0 - node: 0'}`;
     return (
       <div ref={collapserRef} className={styles.commentThread} style={style}>
         <ExpandButton
           isOpened={areAllItemsExpanded}
           onClick={expandCollapseAll}
-          title={title}
+          title={newTitle}
         />
         <CommentWithButtons
           addToThread={this.addToThread}
-          childThreads={childThreads}
+          childThreads={depth}
           deleteThread={this.deleteThread}
           text={text}
         />
-        {getNested(childThreads)}
+        { oldNesting ? getNestedOlder(depth) : getNested(depth, childNodes)}
       </div>
     );
   }
 }
 
 CommentThread.defaultProps = {
-  childThreads: 1,
+  depth: 1,
+  childNodes: 1,
+  oldNesting: false,
   parentCollapserId: null,
   parentScrollerId: null,
   style: {},
+  title: ''
 };
 
 CommentThread.propTypes = {
-  childThreads: PropTypes.number,
+  depth: PropTypes.number,
+  childNodes: PropTypes.number,
+  oldNesting: PropTypes.bool,
+  title: PropTypes.string,
   collapserId: PropTypes.number.isRequired,
   parentCollapserId: PropTypes.number,
   parentScrollerId: PropTypes.number,

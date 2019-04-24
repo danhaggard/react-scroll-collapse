@@ -53,6 +53,7 @@ export const cacheSelector = (selectorFactory, cacheKey, propKey) => {
   // return (state, props) => selector(props).select(state);
 };
 
+
 export const getCache = () => selectorCache;
 
 export const logDependencyRecomputations = (dependencies) => {
@@ -89,7 +90,29 @@ export const logAllRecomputations = (logDependencies = false) => {
   console.log('');
 };
 
+export const logAllRecomputationsFor = (cacheKey, logDependencies = false) => {
+  const selector = selectorCache[cacheKey];
+  console.log(cacheKey);
+  Object.entries(selector.selectors).forEach(([id, obj]) => {
+    console.log(`${selector.propKey}_${id} recomputations: ${obj.recomputations()}`);
+    if (logDependencies) {
+      logDependencyRecomputations(obj.instance.dependencies);
+    }
+  });
+  console.log('');
+  console.log('');
+};
+
 export const cacheLogger = {};
 
 cacheLogger.logAllRecomputations = logAllRecomputations;
+cacheLogger.logAllRecomputationsFor = logAllRecomputationsFor;
+
 cacheLogger.getCache = getCache;
+
+/*
+temp1('areAllChildItemsExpandedFactory', true);
+temp1('childCollapserArraySelectorRootFactory', true);
+temp1('everyChildItemExpandedConditionSelectorFactory', true);
+temp1('areAllItemsExpandedSelectorFactory', true);
+*/

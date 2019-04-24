@@ -18,6 +18,8 @@ export const WATCH_INIT_COLLAPSER = 'react-scroll-collapse/WATCH_INIT_COLLAPSER'
 export const WATCH_COLLAPSER = 'react-scroll-collapse/WATCH_COLLAPSER';
 export const SET_ALL_CHILD_ITEMS_EXPANDED = 'react-scroll-collapse/SET_ALL_CHILD_ITEMS_EXPANDED';
 export const NOTIFY_PARENT_COLLAPSER = 'react-scroll-collapse/NOTIFY_PARENT_COLLAPSER';
+export const SET_RECURSE_NODE_TARGET = 'react-scroll-collapse/SET_RECURSE_NODE_TARGET';
+
 
 /* collapserItem action types */
 export const ADD_ITEM = 'react-scroll-collapse/ADD_ITEM';
