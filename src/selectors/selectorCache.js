@@ -1,4 +1,5 @@
 const selectorCache = {};
+console.log('selectorCache', selectorCache);
 
 const wrapSelectorFactory = (selectorFactory, propKey) => (id) => {
   const that = {};
@@ -44,15 +45,19 @@ export const getSelector = cacheKey => (props) => {
   return factory(selectorId);
 };
 
+export const removeSelector = (selectorId) => {
+  Object.values(selectorCache).forEach((selector) => {
+    const { selectors } = selector;
+    delete selectors[selectorId];
+  });
+};
+
 
 export const cacheSelector = (selectorFactory, cacheKey, propKey) => {
-
   registerFactory(selectorFactory, cacheKey, propKey);
   const selector = getSelector(cacheKey);
   return (state, props) => selector(props).instance(state, props);
-  // return (state, props) => selector(props).select(state);
 };
-
 
 export const getCache = () => selectorCache;
 
@@ -103,16 +108,8 @@ export const logAllRecomputationsFor = (cacheKey, logDependencies = false) => {
   console.log('');
 };
 
+
 export const cacheLogger = {};
 
 cacheLogger.logAllRecomputations = logAllRecomputations;
 cacheLogger.logAllRecomputationsFor = logAllRecomputationsFor;
-
-cacheLogger.getCache = getCache;
-
-/*
-temp1('areAllChildItemsExpandedFactory', true);
-temp1('childCollapserArraySelectorRootFactory', true);
-temp1('everyChildItemExpandedConditionSelectorFactory', true);
-temp1('areAllItemsExpandedSelectorFactory', true);
-*/

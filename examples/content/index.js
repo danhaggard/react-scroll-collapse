@@ -8,20 +8,8 @@ import EvenSimplerCollapser from '../components/EvenSimplerCollapser';
 import SimpleComment from '../components/SimpleComment';
 import CommentThread from '../components/CommentThreadTest';
 
-// import CommentThread from '../components/CommentThread';
-
 import Example from '../components/Example';
 import { genRandText } from '../utils';
-
-// import { areAllChildItemsExpanded } from '../../src/selectors/selectorTest';
-
-import { cacheLogger, logAllRecomputations } from '../../src/selectors/selectorCache';
-// import expandCollapseActionCreator from '../../src/actions/collapserItem/expandCollapse';
-// import { itemsReducer } from '../../src/reducers/collapserItem';
-// import { reactScrollCollapse } from '../../src/reducers';
-
-//console.log('cacheLogger', cacheLogger);
-//console.log('cacheLogger', cacheLogger.getCache());
 
 const state = {
   entities: {
@@ -437,7 +425,10 @@ const example3 = (
 const example4 = key => (
   <Example {...COPY[4]} style={{ marginBottom: '3em' }} key={key}>
     <Scroller style={{ height: '100%' }}>
-      <CommentThread depth={3} childNodes={3} randomChildNodes />
+      <CommentThread depth={3} childNodes={3} randomChildNodes>
+        <SimpleComment text={genRandText()} />
+        <SimpleComment text={genRandText()} />
+      </CommentThread>
     </Scroller>
   </Example>
 );

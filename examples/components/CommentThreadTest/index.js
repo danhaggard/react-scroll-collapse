@@ -6,7 +6,7 @@ import CommentWithButtons from '../Comment/CommentWithButtons';
 import ExpandButton from '../ExpandButton';
 
 import { collapserController } from '../../../src';
-import { ofNumberTypeOrNothing, ofBoolTypeOrNothing } from '../../../src/utils/propTypeHelpers';
+import { ofNumberTypeOrNothing, ofBoolTypeOrNothing, ofChildrenType } from '../../../src/utils/propTypeHelpers';
 import { genRandText, getRandomInt } from '../../utils';
 
 
@@ -24,8 +24,8 @@ class GetNested extends PureComponent {
 
   render() {
     const {
-      depth,
       childNodes,
+      depth,
       randomChildNodes,
       rootDepth
     } = this.props;
@@ -85,6 +85,7 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
   render() {
     const {
       areAllItemsExpanded,
+      children,
       expandCollapseAll,
       collapserRef,
       collapserId,
@@ -111,10 +112,11 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
           deleteThread={this.deleteThread}
           text={text}
         />
+        { children }
         <GetNested
           depth={depth}
           childNodes={childNodes}
-          randomChildNodes={true}
+          randomChildNodes={randomChildNodes}
           rootDepth={rootDepth || depth}
         />
       </div>
@@ -123,6 +125,7 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
 }
 
 CommentThread.defaultProps = {
+  children: [],
   depth: 1,
   childNodes: 1,
   areAllItemsExpanded: null,
@@ -133,6 +136,7 @@ CommentThread.defaultProps = {
 };
 
 CommentThread.propTypes = {
+  children: ofChildrenType,
   depth: PropTypes.number,
   childNodes: PropTypes.number,
   title: PropTypes.string,

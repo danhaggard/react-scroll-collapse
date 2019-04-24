@@ -14,8 +14,6 @@ import removeCollapser from './collapser/removeCollapser';
 import removeCollapserChild from './collapser/removeCollapserChild';
 import addCollapser from './collapser/addCollapser';
 import addCollapserChild from './collapser/addCollapserChild';
-import setRecurseNodeTarget from './collapser/setRecurseNodeTarget';
-
 import watchCollapser from './collapser/watchCollapser';
 import watchInitCollapser from './collapser/watchInitCollapser';
 
@@ -24,6 +22,10 @@ import heightReady from './collapserItem/heightReady';
 import expandCollapse from './collapserItem/expandCollapse';
 import removeItem from './collapserItem/removeItem';
 import addItem from './collapserItem/addItem';
+
+/* shared actions */
+import setRecurseNodeTarget from './collapser/setRecurseNodeTarget';
+
 
 const actions = {
   addCollapser,
@@ -75,6 +77,7 @@ export const itemWrapperActions = {
   heightReady,
   expandCollapse,
   setOffsetTop,
+  setRecurseNodeTarget,
   watchCollapser,
 };
 

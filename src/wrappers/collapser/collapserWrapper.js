@@ -46,7 +46,7 @@ export const collapserWrapper = (WrappedComponent) => {
       } else {
         areAllItemsExpandedUpdate = areAllItemsExpandedSelector(collapserId);
       }
-      console.log('getDerivedStateFromProps collapaserId, areAllItemsExpandedUpdate, state.areAllItemsExpanded', collapserId, areAllItemsExpandedUpdate, state.areAllItemsExpanded);
+      // console.log('getDerivedStateFromProps collapaserId, areAllItemsExpandedUpdate, state.areAllItemsExpanded', collapserId, areAllItemsExpandedUpdate, state.areAllItemsExpanded);
 
       return {
         areAllItemsExpanded: areAllItemsExpandedUpdate,

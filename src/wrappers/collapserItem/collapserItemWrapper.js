@@ -49,6 +49,7 @@ export const collapserItemWrapper = (WrappedComponent) => {
         parentScrollerId,
         parentCollapserId,
         setOffsetTop,
+        setRecurseNodeTarget,
         watchCollapser,
       } = this.props;
       watchCollapser(parentCollapserId);
@@ -58,6 +59,7 @@ export const collapserItemWrapper = (WrappedComponent) => {
         parentCollapserId,
       );
       expandCollapseAction(itemId, parentCollapserId);
+      setRecurseNodeTarget(parentCollapserId);
     };
 
     onHeightReady = () => {
@@ -99,6 +101,7 @@ export const collapserItemWrapper = (WrappedComponent) => {
     heightReady: PropTypes.func.isRequired,
     expandCollapse: PropTypes.func.isRequired,
     setOffsetTop: PropTypes.func.isRequired,
+    setRecurseNodeTarget: PropTypes.func.isRequired,
     watchCollapser: PropTypes.func.isRequired,
   };
 
