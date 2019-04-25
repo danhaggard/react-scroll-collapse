@@ -31,14 +31,10 @@ export const collapserWrapper = (WrappedComponent) => {
         collapserId,
         recurseNodeTarget,
       } = props;
-      // console.log('getDerivedStateFromProps collapserId, derivedStateFromPropsCount', collapserId, state.derivedStateFromPropsCount);
-      // console.log('getDerivedStateFromProps collapaserId, state.notifyClick', collapserId, state.notifyClick);
 
       let areAllItemsExpandedUpdate = state.areAllItemsExpanded;
-      let newTarget = recurseNodeTarget;
-      if (recurseNodeTarget === null || (collapserId === 0 && state.derivedStateFromPropsCount <= 1)) {
-        newTarget = -1;
-      }
+      const newTarget = recurseNodeTarget === null ? -1 : recurseNodeTarget;
+
       if (collapserId === 0) {
         simpleCache.unlockCache();
         areAllItemsExpandedUpdate = areAllItemsExpandedSelector(newTarget);
@@ -46,37 +42,28 @@ export const collapserWrapper = (WrappedComponent) => {
       } else {
         areAllItemsExpandedUpdate = areAllItemsExpandedSelector(collapserId);
       }
-      // console.log('getDerivedStateFromProps collapaserId, areAllItemsExpandedUpdate, state.areAllItemsExpanded', collapserId, areAllItemsExpandedUpdate, state.areAllItemsExpanded);
-
       return {
         areAllItemsExpanded: areAllItemsExpandedUpdate,
-        derivedStateFromPropsCount: state.derivedStateFromPropsCount + 1,
       };
     }
 
     state = {
       areAllItemsExpanded: null,
-      derivedStateFromPropsCount: 0,
     };
 
     componentDidMount() {
       const { collapserId, watchInitCollapser } = this.props;
-      //console.log('componentDidMount collapserId', collapserId);
-
       checkForRef(WrappedComponent, this.elem, 'collapserRef');
       watchInitCollapser(collapserId);
-      //console.log('');
     }
 
     shouldComponentUpdate(nextProps, nextState) {
       const { props, state } = this;
-      const checkAgainstProps = ['recurseNodeTarget', 'recurseNodeTarget', 'allChildItemIds', 'areAllItemsExpandedSelector'];
+      const checkAgainstProps = ['recurseNodeTarget', 'allChildItemIds', 'areAllItemsExpandedSelector'];
       const propsCondition = prop => (
         !checkAgainstProps.includes(prop) && props[prop] !== nextProps[prop]);
 
-      const stateCondition = prop => (
-        prop !== 'derivedStateFromPropsCount'
-        && state[prop] !== nextState[prop]);
+      const stateCondition = prop => (state[prop] !== nextState[prop]);
 
       return Object.keys(props).some(prop => propsCondition(prop))
       || Object.keys(state).some(prop => stateCondition(prop));

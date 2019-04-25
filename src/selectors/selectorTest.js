@@ -2,11 +2,7 @@ import { createSelector } from 'reselect';
 import {
   selectOrVal,
   arrSelector,
-  recurseAllChildren,
-  recurseAllChildrenCached,
-  recurseAllChildrenLog,
-  recurseAllChildrenLog2,
-
+  recurseAllChildren
 } from './utils';
 import recurseToNode from './recurseToNode';
 import { cacheSelector } from './selectorCache';

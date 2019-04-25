@@ -21,6 +21,190 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style type="text/css">
+    @keyframes Rainbow {
+      0% {
+        background-position: 94% 0%;
+      }
+      50% {
+        background-position: 7% 100%;
+      }
+      100% {
+        background-position: 94% 0%;
+      }
+    }
+    @keyframes Bounce {
+    	0% {
+    		transform: translateX(0%);
+    	}
+
+    	2% {
+    		transform: translateX(-0.77%);
+    	}
+
+    	4% {
+    		transform: translateX(-0.33%);
+    	}
+
+    	10% {
+    		transform: translateX(-3%);
+    	}
+
+    	14% {
+    		transform: translateX(-0.98%);
+    	}
+
+    	22% {
+    		transform: translateX(-12.42%);
+    	}
+
+    	32% {
+    		transform: translateX(-1%);
+    	}
+
+    	42% {
+    		transform: translateX(12.32%);
+    	}
+
+    	50% {
+    		transform: translateX(18%);
+    	}
+
+    	58% {
+    		transform: translateX(-38%);
+    	}
+
+    	68% {
+    		transform: translateX(-10.01%);
+    	}
+
+    	78% {
+    		transform: translateX(25%);
+    	}
+
+    	86% {
+    		transform: translateX(-20.02%);
+    	}
+
+    	90% {
+    		transform: translateX(2%);
+    	}
+
+    	96% {
+    		transform: translateX(40%);
+    	}
+
+    	98% {
+    		transform: translateX(-25%);
+    	}
+
+    	100% {
+    		transform: translateX(0%);
+    	}
+
+    }
+
+    @keyframes Opacify {
+	0% {
+		opacity: 1;
+	}
+
+	2% {
+		opacity: 0.99;
+	}
+
+	4% {
+		opacity: 1;
+	}
+
+	10% {
+		opacity: 0.97;
+	}
+
+	14% {
+		opacity: 0.99;
+	}
+
+	22% {
+		opacity: 0.88;
+	}
+
+	32% {
+		opacity: 0.99;
+	}
+
+	42% {
+		opacity: 0.6;
+	}
+
+	50% {
+		opacity: 0.5;
+	}
+
+	58% {
+		opacity: 0.4;
+	}
+
+	68% {
+		opacity: 0.7;
+	}
+
+	78% {
+		opacity: 0.6;
+	}
+
+	86% {
+		opacity: 0.8;
+	}
+
+	90% {
+		opacity: 0.6;
+	}
+
+	96% {
+		opacity: 0.9;
+	}
+
+	98% {
+		opacity: 0.84;
+	}
+
+	100% {
+		opacity: 1;
+	}
+
+}
+
+
+    .animate-linear {
+      background: linear-gradient(225deg, #ffabab, #ffdaab, #ddffab, #abe4ff, #d9abff);
+      animation: Rainbow 1s ease-in infinite;
+    }
+
+    .animate-ease-in {
+      background: linear-gradient(225deg, #ffabab, #ffdaab, #ddffab, #abe4ff, #d9abff);
+      animation: Rainbow 3s ease-out infinite;
+    }
+
+    .animate-ease-out {
+      background: linear-gradient(225deg, #ffabab, #ffdaab, #ddffab, #abe4ff, #d9abff);
+      animation: Rainbow 3s ease-in infinite;
+    }
+
+    .animate-ease {
+      background: linear-gradient(225deg, #ffabab, #ffdaab, #ddffab, #abe4ff, #d9abff);
+      animation: Rainbow 1s ease-out infinite;
+    }
+
+    .opacify {
+      animation: Opacify 10s infinite;
+    }
+
+    .bounce {
+      animation: Bounce 10s infinite;
+    }
+
+  </style>
 </head>
 <body>
   <div id="app">APPLICATION CONTENT</div>
