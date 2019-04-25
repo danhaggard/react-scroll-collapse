@@ -8,43 +8,70 @@ import recurseToNode from './recurseToNode';
 import { cacheSelector } from './selectorCache';
 import simpleCache from './simpleCache';
 
+
 /*
-  -------------------------------- DONT TOUCH -----------------------------
+  -------------------------------- TIER ZERO -----------------------------
+  reactScrollCollapse
 */
-export const getReactScrollCollapser = state => selectOrVal(state, 'reactScrollCollapse');
 
-export const getEntities = state => selectOrVal(state, 'entities');
+const getReactScrollCollapse = state => selectOrVal(state, 'reactScrollCollapse');
 
-export const getRecurseNodeTarget = state => selectOrVal(state, 'recurseNodeTarget');
+/*
+  -------------------------------- TIER ONE -----------------------------
+  entities
+  recurseNodeTarget
+  scrollers ??
+*/
 
-export const recurseNodeTargetSelector = createSelector(
-  getReactScrollCollapser,
+
+const getEntities = state => selectOrVal(state, 'entities');
+
+const getRecurseNodeTarget = state => selectOrVal(state, 'recurseNodeTarget');
+
+// const getScrollers = state => selectOrVal(state, 'scrollers');
+
+/*
+  -------------------------------- TIER TWO (entities)-----------------------------
+  scrollers
+  items
+  collapsers
+*/
+const getCollapsers = entitiesState => arrSelector(entitiesState, 'collapsers');
+
+const getCollapser = (collapsersState, props) => collapsersState[props.collapserId];
+
+
+
+/*
+  -------------------------------- TOUCH -----------------------------
+*/
+
+const recurseNodeTargetSelector = createSelector(
+  getReactScrollCollapse,
   getRecurseNodeTarget
 );
 
-export const entitiesSelector = createSelector(
-  getReactScrollCollapser,
+const entitiesSelector = createSelector(
+  getReactScrollCollapse,
   getEntities
 );
 /*
   --- entities.collapsers:
 */
-export const getCollapsers = entitiesState => arrSelector(entitiesState, 'collapsers');
 
-export const collapsersSelectorRoot = createSelector(entitiesSelector, getCollapsers);
+const collapsersSelectorRoot = createSelector(entitiesSelector, getCollapsers);
 
-export const getCollapser = (collapsersState, props) => collapsersState[props.collapserId];
 
 // (collapsersState, { collapserId }) => collapser
-export const collapserSelectorFactory = () => createSelector(
+const collapserSelectorFactory = () => createSelector(
   getCollapser, collapser => collapser
 );
 
-export const collapserSelector = cacheSelector(collapserSelectorFactory, 'collapserSelectorFactory', 'collapserId');
+const collapserSelector = cacheSelector(collapserSelectorFactory, 'collapserSelectorFactory', 'collapserId');
 
 
 // (rootState, { collapserId }) => collapser
-export const collapserSelectorRoot = createSelector(
+const collapserSelectorRoot = createSelector(
   [collapsersSelectorRoot, (_, props) => props],
   (collapsersState, props) => collapserSelector(collapsersState, props)
 );
@@ -53,35 +80,35 @@ export const collapserSelectorRoot = createSelector(
 /*
   --- collapser.collapsers:
 */
-export const getChildCollapsersArray = collapserObj => arrSelector(collapserObj, 'collapsers');
+const getChildCollapsersArray = collapserObj => arrSelector(collapserObj, 'collapsers');
 
 // (collapsersState, { collapserId }) => childCollapsersArray
-export const childCollapsersArraySelectorFactory = () => createSelector(
+const childCollapsersArraySelectorFactory = () => createSelector(
   collapserSelector,
   getChildCollapsersArray
 );
 
-export const childCollapsersArraySelector = cacheSelector(childCollapsersArraySelectorFactory, 'childCollapsersArraySelectorFactory', 'collapserId');
+const childCollapsersArraySelector = cacheSelector(childCollapsersArraySelectorFactory, 'childCollapsersArraySelectorFactory', 'collapserId');
 
 
 // rootState, { collapserId }) => childCollapsersArray
-export const childCollapserArraySelectorRootFactory = () => createSelector(
+const childCollapserArraySelectorRootFactory = () => createSelector(
   [collapsersSelectorRoot, (_, props) => props],
   (collapsersState, props) => childCollapsersArraySelector(collapsersState, props)
 );
-export const childCollapserArraySelectorRoot = cacheSelector(childCollapserArraySelectorRootFactory, 'childCollapserArraySelectorRootFactory', 'collapserId');
+const childCollapserArraySelectorRoot = cacheSelector(childCollapserArraySelectorRootFactory, 'childCollapserArraySelectorRootFactory', 'collapserId');
 
 
 /*
   --- collapser.items:
 */
-export const getChildItemsArray = collapserObj => arrSelector(collapserObj, 'items');
+const getChildItemsArray = collapserObj => arrSelector(collapserObj, 'items');
 
 // (collapsersState, { collapserId }) => childItemsArray
-export const childItemsArraySelector = createSelector(collapserSelector, getChildItemsArray);
+const childItemsArraySelector = createSelector(collapserSelector, getChildItemsArray);
 
 // (rootState, { collapserId }) => childItemsArray
-export const childItemArraySelectorRoot = createSelector(
+const childItemArraySelectorRoot = createSelector(
   [collapsersSelectorRoot, (_, props) => props],
   (collapsersState, props) => childItemsArraySelector(collapsersState, props)
 );
@@ -90,36 +117,36 @@ export const childItemArraySelectorRoot = createSelector(
 /*
   --- collapser.itemsObj
 */
-export const getItemsObj = collapserObj => arrSelector(collapserObj, 'itemsObj');
+const getItemsObj = collapserObj => arrSelector(collapserObj, 'itemsObj');
 
 // (collapsersState, { collapserId }) => itemsObj
-export const itemsObjSelectorFactory = () => createSelector(collapserSelector, getItemsObj);
-export const itemsObjSelector = cacheSelector(itemsObjSelectorFactory, 'itemsObjSelectorFactory', 'collapserId');
+const itemsObjSelectorFactory = () => createSelector(collapserSelector, getItemsObj);
+const itemsObjSelector = cacheSelector(itemsObjSelectorFactory, 'itemsObjSelectorFactory', 'collapserId');
 
 
 // (rootState, { collapserId }) => itemsObj
-export const itemObjSelectorRootFactory = () => createSelector(
+const itemObjSelectorRootFactory = () => createSelector(
   [collapsersSelectorRoot, (_, props) => props],
   (collapsersState, props) => itemsObjSelector(collapsersState, props)
 );
 
-export const itemObjSelectorRoot = cacheSelector(itemObjSelectorRootFactory, 'itemObjSelectorRootFactory', 'collapserId');
+const itemObjSelectorRoot = cacheSelector(itemObjSelectorRootFactory, 'itemObjSelectorRootFactory', 'collapserId');
 
 
-export const getItem = (itemsState, { itemId }) => itemsState[itemId];
+const getItem = (itemsState, { itemId }) => itemsState[itemId];
 
 // (itemsObjState, { itemId }) => item
-export const itemSelector = createSelector(
+const itemSelector = createSelector(
   getItem, item => item,
 );
 
 // (collapsersState, { collapserId, itemId }) => itemObj
-export const itemFromCollapserSelector = createSelector(
+const itemFromCollapserSelector = createSelector(
   itemsObjSelector, itemSelector
 );
 
 // (rootState, { collapserId, itemId }) => itemObj
-export const itemFromCollapserSelectorRoot = createSelector(
+const itemFromCollapserSelectorRoot = createSelector(
   [collapsersSelectorRoot, (_, props) => props],
   (collapsersState, props) => itemFromCollapserSelector(collapsersState, props)
 );
@@ -127,13 +154,13 @@ export const itemFromCollapserSelectorRoot = createSelector(
 /*
   --- item.expanded
 */
-export const getItemExpanded = itemObj => selectOrVal(itemObj, 'expanded');
+const getItemExpanded = itemObj => selectOrVal(itemObj, 'expanded');
 
 // (itemsObjState, { itemId }) => item.expanded
-export const itemExpandedSelector = createSelector(itemSelector, getItemExpanded);
+const itemExpandedSelector = createSelector(itemSelector, getItemExpanded);
 
 // (rootState, { itemId }) => childItemsArray
-export const itemExpandedSelectorRoot = createSelector(
+const itemExpandedSelectorRoot = createSelector(
   [itemFromCollapserSelectorRoot, (_, props) => props],
   (itemObjState, props) => itemExpandedSelector(itemObjState, props)
 );
@@ -156,7 +183,7 @@ function areAllItemsExpandedSelectorFactory() {
   );
 }
 
-export const areAllItemsExpandedSelector = cacheSelector(areAllItemsExpandedSelectorFactory, 'areAllItemsExpandedSelectorFactory', 'collapserId');
+const areAllItemsExpandedSelector = cacheSelector(areAllItemsExpandedSelectorFactory, 'areAllItemsExpandedSelectorFactory', 'collapserId');
 
 
 /*
@@ -164,7 +191,7 @@ export const areAllItemsExpandedSelector = cacheSelector(areAllItemsExpandedSele
 */
 
 
-export const allChildItemsExpandedSelector = (state, props) => recurseToNode({
+const allChildItemsExpandedSelector = (state, props) => recurseToNode({
   cache: simpleCache,
   childSelectorFunc: collapserId => childCollapserArraySelectorRoot(state, { collapserId }),
   currentNodeId: props.collapserId,
@@ -174,16 +201,16 @@ export const allChildItemsExpandedSelector = (state, props) => recurseToNode({
 });
 
 // (rootState, { collapserId }) => { collapserId : []}
-export const childItemIdArraySelectorFactory = () => createSelector(
+const childItemIdArraySelectorFactory = () => createSelector(
   [itemObjSelectorRoot, (_, { collapserId }) => collapserId],
   (itemObj, collapserId) => ([collapserId, Object.keys(itemObj)])
 );
 
-export const childItemIdArraySelector = cacheSelector(childItemIdArraySelectorFactory, 'childItemIdArraySelectorFactory', 'collapserId');
+const childItemIdArraySelector = cacheSelector(childItemIdArraySelectorFactory, 'childItemIdArraySelectorFactory', 'collapserId');
 
 
 // (rootState, { collapserId }) => [run till end, concatenate prev values]
-export const concatenateChildItemArraySelectorFactory = () => createSelector(
+const concatenateChildItemArraySelectorFactory = () => createSelector(
   [childItemIdArraySelector, (_, props) => props],
   (childItemIdArray, props) => {
     const { prevReturnValue } = props;
@@ -197,9 +224,9 @@ export const concatenateChildItemArraySelectorFactory = () => createSelector(
   }
 );
 
-export const concatenateChildItemArraySelector = cacheSelector(concatenateChildItemArraySelectorFactory, 'concatenateChildItemArraySelectorFactory', 'collapserId');
+const concatenateChildItemArraySelector = cacheSelector(concatenateChildItemArraySelectorFactory, 'concatenateChildItemArraySelectorFactory', 'collapserId');
 
-export const recursivelyGetChildItems = (state, props) => recurseAllChildren(
+const recursivelyGetChildItems = (state, props) => recurseAllChildren(
   props.collapserId,
   state,
   props,
@@ -216,4 +243,4 @@ const allChildItemIdsSelectorFactory = () => createSelector( //eslint-disable-li
   val => val
 );
 
-export const allChildItemIdsSelector = cacheSelector(allChildItemIdsSelectorFactory, 'allChildItemIdsSelectorFactory', 'collapserId');
+const allChildItemIdsSelector = cacheSelector(allChildItemIdsSelectorFactory, 'allChildItemIdsSelectorFactory', 'collapserId');

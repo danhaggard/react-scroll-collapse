@@ -1,12 +1,12 @@
-import {
-  entitiesSelector,
-  createEntityTypeSelectors
-} from './utils';
+import { getOrNull } from './common';
 
-const item = createEntityTypeSelectors(
-  'items',
-  entitiesSelector,
-  ['expanded', 'waitingForHeight', 'visible', 'queued']
-);
 
-export default item;
+/*
+  -------------------------------- item.attr getters -----------------------------
+*/
+
+// --- item.expanded
+export const getItemExpanded = itemObj => getOrNull(itemObj, 'expanded');
+
+// --- item.expanded
+export const getItemWaitingForHeight = itemObj => getOrNull(itemObj, 'waitingForHeight');

@@ -3,6 +3,19 @@ import { createGetterKey, createSelectorKey, createTypeInstanceSelectorKey } fro
 
 /* helper funcs used by all components */
 
+export const isUndefNull = val => val === null || val === undefined;
+
+// ensure state slice and attribute exist - else return null;
+export const selectOrVal = (state, attr, defaultValue = null) => {
+  if (isUndefNull(state)) {
+    // return now to prevent access of state[attr]
+    return defaultValue;
+  }
+  if (!isUndefNull(state[attr])) {
+    return state[attr];
+  }
+  return defaultValue;
+};
 
 export const getNextIdFactory = (initialId = -1) => {
   let currentId = initialId;

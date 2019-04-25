@@ -1,58 +1,34 @@
-
+import { createSelector } from 'reselect';
 import {
-  arrSelector,
-  createEntityTypeSelectors,
-  entitiesSelector,
-  getAllNested,
-  createAllNestedOfTypeSelector,
-  createAllNestedDependentSelector,
-  dependentGetterFactory,
-  createAllSelector,
-  createNoneSelector,
-  concatDependents
-} from './utils';
+  getOrObject,
+  getOrNull
+} from './common';
 
-import itemSelectors from './collapserItem';
 
-const {
-  itemsInstanceSelector,
-  selectors: { waitingForHeightSelector, expandedSelector }
-} = itemSelectors;
+import recurseToNode from './recurseToNode';
 
-const collapser = createEntityTypeSelectors(
-  'collapsers',
-  entitiesSelector,
-  ['collapsers', 'items'],
-  arrSelector
-);
+const getCollapsers = entitiesState => getOrObject(entitiesState, 'collapsers');
 
-const { selectors: { collapsersSelector, itemsSelector } } = collapser;
+const getCollapser = (collapsersState, props) => collapsersState[props.collapserId];
 
-export const allNestedCollapsersSelector = createAllNestedOfTypeSelector(
-  collapsersSelector, getAllNested
-);
 
-// state => id => { all nested item ids of scrollerCollapser.entities.collapsers[id] }
-export const allChildItemsIdSelector = createAllNestedDependentSelector(
-  allNestedCollapsersSelector, itemsSelector
-)(dependentGetterFactory(concatDependents));
+/*
+  -------------------------------- collapser.attr getters -----------------------------
+*/
 
-const getterFactory = dependentGetterFactory();
-export const allChildItemsSelector = createAllNestedDependentSelector(
-  allChildItemsIdSelector, itemsInstanceSelector
-)(getterFactory);
+// --- collapser.collapsers:
+const getCollapserCollapsers = collapserObj => getOrNull(collapserObj, 'collapsers');
 
-export const itemExpandedArrSelector = createAllNestedDependentSelector(
-  allChildItemsIdSelector, expandedSelector
-)(getterFactory);
+const getCollapserItems = collapserObj => getOrNull(collapserObj, 'items');
 
-export const itemWaitingForHeightArrSelector = createAllNestedDependentSelector(
-  allChildItemsIdSelector, waitingForHeightSelector
-)(getterFactory);
 
-export const areAllItemsExpandedSelector = createAllSelector(itemExpandedArrSelector);
-export const haveAllItemsReportedHeightSelector = createNoneSelector(
-  itemWaitingForHeightArrSelector
-);
 
-export default collapser;
+
+export const getCollapserItemsExpandedEvery = (state, props) => recurseToNode({
+  cache: simpleCache,
+  childSelectorFunc: collapserId => childCollapserArraySelectorRoot(state, { collapserId }),
+  currentNodeId: props.collapserId,
+  evaluationFunc: arr => arr.every(a => (a === true)),
+  selectorFunc: collapserId => areAllItemsExpandedSelector(state, { collapserId }),
+  targetNodeId: props.targetNodeId,
+});
