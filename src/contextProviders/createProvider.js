@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import registerConsumer from './registerConsumer';
 import { getIdKey, getParentIdKey } from './providerKeyManager';
-import { isUndefNull } from '../selectors/utils';
+import { isUndefNull } from '../utils/selectorUtils';
 /*
   createProvider
 
@@ -47,6 +47,10 @@ const createProvider = (
       return parentIdObj;
     };
 
+
+    checkIfRoot = () => {
+
+    }
     /*
       childContext  - create the context to be inserted into the context
       for children to consume.

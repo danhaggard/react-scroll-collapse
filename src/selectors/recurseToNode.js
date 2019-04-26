@@ -32,16 +32,22 @@ export const getChildResultValuesAndSources = (childArray, recurseFunc, recurseF
   return [resultSources, resultValues];
 };
 
+/*
+  recurseToNode - find fastest path to a specific node - then recurse through
+    all children after that point if necessary (
+      currently an ALL condition - TODO: make this condition an argument.
+  )
+*/
 const recurseToNode = (argsObj) => {
 
   const {
     cache,
-    childSelectorFunc,
-    currentNodeId,
-    evaluationFunc, // e.g. [true, [true, false]] - resolves to true or false?
-    selectorFunc,
-    targetNodeId,
-    reachedTargetNode,
+    getNodeChildren, // Returns an array of ids of the children of the current node
+    currentNodeId, // id of the node we are currently at.
+    resultReducer, // takes an array - and returns a single value
+    getNodeValue, // Func that takes an id and returns the value for that node.
+    targetNodeId, // id of the target node.
+    reachedTargetNode, // boolean
   } = argsObj;
 
   /*
@@ -69,9 +75,9 @@ const recurseToNode = (argsObj) => {
   }
 
   // the value returned by this node in isolation of it's children.
-  const currentValue = selectorFunc(currentNodeId);
+  const currentValue = getNodeValue(currentNodeId);
 
-  const childArray = childSelectorFunc(currentNodeId);
+  const childArray = getNodeChildren(currentNodeId);
 
   // no children- just return.
   if (childArray.length === 0) {
@@ -102,7 +108,7 @@ const recurseToNode = (argsObj) => {
       { ...argsObj, reachedTargetNode: reachedTargetNodeCheck }
     );
 
-    const val = evaluationFunc([currentValue, ...resultValues]);
+    const val = resultReducer([currentValue, ...resultValues]);
     return cache.addResult(
       currentNodeId,
       val,
@@ -137,7 +143,7 @@ const recurseToNode = (argsObj) => {
   const nextNodeId = arrayMax([...childArray.filter(id => (id <= targetNodeId))]);
   // babel is choking on Math.max atm.
 
-  const val = evaluationFunc([currentValue, recurseToNode({
+  const val = resultReducer([currentValue, recurseToNode({
     ...argsObj,
     currentNodeId: nextNodeId
   })]);
@@ -193,7 +199,7 @@ const recurseToNode = (argsObj) => {
 
     1) Let an injected func determine on what value to automatically invalidate
       as opposed to just false.
-    2) Apply the evaluationFunc to cached value plus child value where
+    2) Apply the resultReducer to cached value plus child value where
       appropriate.
   */
 

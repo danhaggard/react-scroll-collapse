@@ -4,22 +4,18 @@ import {
   ADD_COLLAPSER,
   ADD_COLLAPSER_CHILD,
   ADD_ITEM,
-  EXPAND_COLLAPSE,
-  EXPAND_COLLAPSE_ALL,
-  HEIGHT_READY,
   REMOVE_ITEM,
   REMOVE_COLLAPSER,
   REMOVE_COLLAPSER_CHILD,
 } from '../actions/const';
 
+import { getOrObject } from '../utils/selectorUtils';
+
 import {
-  checkAttr,
   addToState,
   removeFromState,
   updateState,
 } from './utils';
-
-import { itemsReducer } from './collapserItem';
 
 /*
   Some notes regarding state:
@@ -38,7 +34,7 @@ import { itemsReducer } from './collapserItem';
 
 // handles the id attr for collapsers.
 export const collapserIdReducer = (state = null, action) => {
-  const { collapser } = checkAttr(action, 'payload');
+  const { collapser } = getOrObject(action, 'payload');
   switch (action.type) {
     case ADD_COLLAPSER:
       return collapser.id;
@@ -49,7 +45,7 @@ export const collapserIdReducer = (state = null, action) => {
 
 //  handles the collapsers attr in collapsers entities.
 export const collapsersIdArray = (state = [], action) => {
-  const { collapser, collapserId } = checkAttr(action, 'payload');
+  const { collapser, collapserId } = getOrObject(action, 'payload');
   switch (action.type) {
     case ADD_COLLAPSER_CHILD:
       return [...state, collapser.id];
@@ -62,7 +58,7 @@ export const collapsersIdArray = (state = [], action) => {
 
 // handles the list of immediate child items nested under a collapser.
 export const itemsIdArray = (state = [], action) => {
-  const { itemId } = checkAttr(action, 'payload');
+  const { itemId } = getOrObject(action, 'payload');
   switch (action.type) {
     case ADD_ITEM:
       return [...state, itemId];
@@ -77,12 +73,11 @@ export const collapserReducer = combineReducers({
   collapsers: collapsersIdArray,
   id: collapserIdReducer,
   items: itemsIdArray,
-  itemsObj: itemsReducer,
 });
 
 /* handles reactScrollCollapse.entities.collapsers state */
 export const collapsersReducer = (state = {}, action) => {
-  const { collapserId, parentCollapserId } = checkAttr(action, 'payload');
+  const { collapserId, parentCollapserId } = getOrObject(action, 'payload');
   switch (action.type) {
     case ADD_COLLAPSER:
       return addToState(state, action, collapserId, collapserReducer);
@@ -93,9 +88,6 @@ export const collapsersReducer = (state = {}, action) => {
       return removeFromState(state, collapserId);
     case ADD_ITEM:
     case REMOVE_ITEM:
-    case EXPAND_COLLAPSE:
-    case EXPAND_COLLAPSE_ALL:
-    case HEIGHT_READY:
       return updateState(state, action, collapserId, collapserReducer);
     default:
       return state;

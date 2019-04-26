@@ -8,9 +8,12 @@ import Scroller from '../../components/Scroller';
 import { ofFuncTypeOrNothing, ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
 import actions from '../../actions';
 
-import { scroller as selectors } from '../../selectors';
+import {
+  getOffsetTopRoot,
+  getScrollTopRoot,
+  getToggleScrollRoot
+} from '../../selectors/scroller';
 
-const { selectors: { offsetTopSelector, scrollTopSelector, toggleScrollSelector } } = selectors;
 
 const createScrollerChild = (
   ScrollerComponent,
@@ -224,9 +227,9 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
   the collapser animation has finised.
 */
 const mapStateToProps = () => (state, ownProps) => ({
-  offsetTop: (offsetTopSelector())(state)(ownProps.scrollerId),
-  scrollTop: (scrollTopSelector())(state)(ownProps.scrollerId),
-  toggleScroll: (toggleScrollSelector())(state)(ownProps.scrollerId)
+  offsetTop: getOffsetTopRoot(state)(ownProps.scrollerId),
+  scrollTop: getScrollTopRoot(state)(ownProps.scrollerId),
+  toggleScroll: getToggleScrollRoot(state)(ownProps.scrollerId)
 });
 
 const mapDispatchToProps = {

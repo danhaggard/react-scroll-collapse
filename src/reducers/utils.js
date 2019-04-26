@@ -1,6 +1,3 @@
-export const isUndefNull = val => val === null || val === undefined;
-
-export const checkAttr = (obj, attr) => (!isUndefNull(obj[attr]) ? obj[attr] : {});
 
 // find the maximum of the array and add one to it.
 // zero index.

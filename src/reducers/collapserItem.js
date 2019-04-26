@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux';
+import { getOrObject } from '../utils/selectorUtils';
 
 import {
   ADD_ITEM,
@@ -10,14 +11,13 @@ import {
 
 import {
   addToState,
-  checkAttr,
   updateState,
   removeFromState
 } from './utils';
 
 
 export const expandedReducer = (state = true, action) => {
-  const { areAllItemsExpanded, expanded } = checkAttr(action, 'payload');
+  const { areAllItemsExpanded, expanded } = getOrObject(action, 'payload');
   switch (action.type) {
     case ADD_ITEM:
       return expanded;
@@ -32,7 +32,7 @@ export const expandedReducer = (state = true, action) => {
 
 // handles 'id' attr for item entities.
 export const itemIdReducer = (state = null, action) => {
-  const { itemId } = checkAttr(action, 'payload');
+  const { itemId } = getOrObject(action, 'payload');
   switch (action.type) {
     case ADD_ITEM:
       return itemId;
@@ -42,7 +42,7 @@ export const itemIdReducer = (state = null, action) => {
 };
 
 export const waitingForHeightReducer = (state = false, action) => {
-  // const { item, areAllItemsExpanded } = checkAttr(action, 'payload');
+  // const { item, areAllItemsExpanded } = getOrObject(action, 'payload');
   switch (action.type) {
     case ADD_ITEM:
     case HEIGHT_READY:
@@ -73,7 +73,7 @@ export const itemReducer = combineReducers({
 
 // handles items state
 export const itemsReducer = (state = {}, action) => {
-  const { itemId } = checkAttr(action, 'payload');
+  const { itemId } = getOrObject(action, 'payload');
   switch (action.type) {
     case REMOVE_ITEM:
       return removeFromState(state, itemId);

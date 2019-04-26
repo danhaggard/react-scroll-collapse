@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux';
+import { getOrObject } from '../utils/selectorUtils';
 
 import {
   ADD_SCROLLER,
@@ -9,7 +10,6 @@ import {
 } from '../actions/const';
 
 import {
-  checkAttr,
   getNextIdFromArr,
   addToState,
   removeFromState,
@@ -18,7 +18,7 @@ import {
 
 //  handles the collapsers attr in scroller entities.
 export const scrollerCollapsersIdArrayReducer = (state = [], action) => {
-  const { collapser, collapserId } = checkAttr(action, 'payload');
+  const { collapser, collapserId } = getOrObject(action, 'payload');
   switch (action.type) {
     case ADD_SCROLLER_CHILD:
       return [...state, collapser.id];
@@ -30,7 +30,7 @@ export const scrollerCollapsersIdArrayReducer = (state = [], action) => {
 };
 
 export const scrollerIdReducer = (state = null, action) => {
-  const { scroller } = checkAttr(action, 'payload');
+  const { scroller } = getOrObject(action, 'payload');
   switch (action.type) {
     case ADD_SCROLLER:
       return scroller.id;
@@ -40,7 +40,7 @@ export const scrollerIdReducer = (state = null, action) => {
 };
 
 export const offsetTopReducer = (state = 0, action) => {
-  const { scroller, offsetTop } = checkAttr(action, 'payload');
+  const { scroller, offsetTop } = getOrObject(action, 'payload');
   switch (action.type) {
     case ADD_SCROLLER:
       return scroller.offsetTop ? scroller.offsetTop : state;
@@ -52,7 +52,7 @@ export const offsetTopReducer = (state = 0, action) => {
 };
 
 export const scrollTopReducer = (state = 0, action) => {
-  const { scroller, scrollTop } = checkAttr(action, 'payload');
+  const { scroller, scrollTop } = getOrObject(action, 'payload');
   switch (action.type) {
     case ADD_SCROLLER:
       return scroller.scrollTop ? scroller.scrollTop : state;
@@ -81,7 +81,7 @@ const scrollerReducer = combineReducers({
 });
 
 export const scrollersReducer = (state = {}, action) => {
-  const { scrollerId } = checkAttr(action, 'payload');
+  const { scrollerId } = getOrObject(action, 'payload');
   switch (action.type) {
     case ADD_SCROLLER:
       return addToState(state, action, scrollerId, scrollerReducer);
@@ -97,7 +97,7 @@ export const scrollersReducer = (state = {}, action) => {
 };
 
 export const scrollers = (state = [], action) => {
-  const { scrollerId } = checkAttr(action, 'payload');
+  const { scrollerId } = getOrObject(action, 'payload');
   switch (action.type) {
     case ADD_SCROLLER:
       return [...state, getNextIdFromArr(state)];

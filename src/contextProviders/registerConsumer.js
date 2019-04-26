@@ -50,6 +50,7 @@ const registerConsumerFactory = consumerFactory => (
 
     render() {
       const { id } = this.state;
+      console.log('register, props', this.props);
       const newProps = { ...this.props, [getIdKey(typeKey)]: id };
       return <Comp {...newProps} />;
     }

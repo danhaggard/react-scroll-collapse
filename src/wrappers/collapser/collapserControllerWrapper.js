@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
 import { collapserControllerActions } from '../../actions';
 import cleanHoCProps from '../../utils/cleanHoCProps';
-import { removeSelector } from '../../selectors/selectorCache';
+
 
 export const collapserControllerWrapper = (CollapserController) => {
 
@@ -18,7 +18,6 @@ export const collapserControllerWrapper = (CollapserController) => {
 
     componentWillUnmount() {
       const {
-        cleanUpCache,
         removeCollapserChild,
         removeScrollerChild,
         removeCollapser
@@ -31,11 +30,6 @@ export const collapserControllerWrapper = (CollapserController) => {
         removeScrollerChild(parentScrollerId, collapserId);
       }
       removeCollapser(parentCollapserId, parentScrollerId, collapserId);
-
-      /*
-        Cleans up any external caching used for this collapser instance.
-      */
-      cleanUpCache(collapserId);
     }
 
     addCollapser() {
@@ -69,7 +63,6 @@ export const collapserControllerWrapper = (CollapserController) => {
   }
 
   WrappedCollapserController.defaultProps = {
-    cleanUpCache: collapserId => removeSelector(collapserId),
     collapserId: null,
     parentCollapserId: null,
     parentScrollerId: null,
@@ -78,7 +71,6 @@ export const collapserControllerWrapper = (CollapserController) => {
   WrappedCollapserController.propTypes = {
     addCollapser: PropTypes.func.isRequired,
     addCollapserChild: PropTypes.func.isRequired,
-    cleanUpCache: PropTypes.func,
     removeCollapser: PropTypes.func.isRequired,
     removeCollapserChild: PropTypes.func.isRequired,
     addScrollerChild: PropTypes.func.isRequired,

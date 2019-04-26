@@ -8,14 +8,14 @@ import { checkForRef } from '../../utils/errorUtils';
 import { ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
 import { collapserWrapperActions } from '../../actions';
 
+import recursionCacheFactory from '../../caching/recursionCache';
+import { getRecurseNodeTargetRoot } from '../../selectors/common';
 import {
-  allChildItemIdsSelector,
-  allChildItemsExpandedSelector,
-  recurseNodeTargetSelector,
-} from '../../selectors/selectorTest';
+  nestedCollapserItemsRoot,
+  nestedCollapserItemsExpandedRootEvery,
+} from '../../selectors/collapser';
 
-import simpleCache from '../../selectors/simpleCache';
-
+const cache = recursionCacheFactory();
 
 export const collapserWrapper = (WrappedComponent) => {
 
@@ -35,10 +35,10 @@ export const collapserWrapper = (WrappedComponent) => {
       let areAllItemsExpandedUpdate = state.areAllItemsExpanded;
       const newTarget = recurseNodeTarget === null ? -1 : recurseNodeTarget;
 
-      if (collapserId === 0) {
-        simpleCache.unlockCache();
+      if (collapserId === 1) {
+        cache.unlockCache();
         areAllItemsExpandedUpdate = areAllItemsExpandedSelector(newTarget);
-        simpleCache.lockCache();
+        cache.lockCache();
       } else {
         areAllItemsExpandedUpdate = areAllItemsExpandedSelector(collapserId);
       }
@@ -99,9 +99,7 @@ export const collapserWrapper = (WrappedComponent) => {
         parentScrollerId,
         collapserId,
       );
-      allChildItemIds().forEach(([nextCollapserId, itemIdArray]) => itemIdArray.forEach(
-        itemId => expandCollapseAll(areAllItemsExpanded, itemId, nextCollapserId)
-      ));
+      allChildItemIds().forEach(itemId => expandCollapseAll(areAllItemsExpanded, itemId));
       setRecurseNodeTarget(collapserId);
     };
 
@@ -140,7 +138,7 @@ export const collapserWrapper = (WrappedComponent) => {
     parentScrollerId: PropTypes.number,
 
     /* provided by redux */
-    areAllItemsExpanded: PropTypes.func.isRequired, // includes item children of nested collapsers
+    areAllItemsExpandedSelector: PropTypes.func.isRequired, // includes nested
     allChildItemIds: PropTypes.func.isRequired, // array of collapserItem ids
     expandCollapseAll: PropTypes.func.isRequired,
     setOffsetTop: PropTypes.func.isRequired,
@@ -151,14 +149,14 @@ export const collapserWrapper = (WrappedComponent) => {
 
   const mapStateToProps = (state, ownProps) => {
 
-    const areAllItemsExpandedSelector = targetNodeId => allChildItemsExpandedSelector(
-      state, { ...ownProps, targetNodeId }
+    const areAllItemsExpandedSelector = targetNodeId => nestedCollapserItemsExpandedRootEvery(
+      state, { ...ownProps, targetNodeId }, cache
     );
 
     return {
-      allChildItemIds: () => allChildItemIdsSelector(state, ownProps),
+      allChildItemIds: () => nestedCollapserItemsRoot(state, ownProps),
       areAllItemsExpandedSelector,
-      recurseNodeTarget: recurseNodeTargetSelector(state, ownProps),
+      recurseNodeTarget: getRecurseNodeTargetRoot(state, ownProps),
     };
   };
 

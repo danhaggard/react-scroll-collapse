@@ -7,9 +7,8 @@ import forwardRefWrapper from '../../utils/forwardRef';
 import { checkForRef } from '../../utils/errorUtils';
 
 import { itemWrapperActions } from '../../actions';
-import { item as selectors } from '../../selectors';
+import { getItemExpandedRoot } from '../../selectors/collapserItem';
 
-const { selectors: { expandedSelector } } = selectors;
 
 /*
   collapserItemWrapper is an HoC that is to be used to wrap components which make use
@@ -105,12 +104,9 @@ export const collapserItemWrapper = (WrappedComponent) => {
     watchCollapser: PropTypes.func.isRequired,
   };
 
-  const mapStateToProps = () => (state, ownProps) => {
-    const expandedSelectorInstance = expandedSelector();
-    return {
-      isOpened: expandedSelectorInstance(state)(ownProps.itemId),
-    };
-  };
+  const mapStateToProps = (state, ownProps) => ({
+    isOpened: getItemExpandedRoot(state)(ownProps.itemId),
+  });
 
   const CollapserItemControllerConnect = connect(
     mapStateToProps,
