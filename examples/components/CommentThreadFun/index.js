@@ -34,7 +34,7 @@ class GetNested extends PureComponent {
         : [...Array(childNodes).keys()].map(
           node => (
             <WrappedCommentThread
-              key={`row: ${depth + 1} - node: ${node}`}
+              key={node}
               childNodes={this.currentChildNodes}
               depth={depth - 1}
               rootDepth={rootDepth}
@@ -84,7 +84,7 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
   state = {
     className: styles.commentThread,
     depth: this.props.depth,
-    animation: 0,
+    animation: 2,
   }
 
   addToThread = () => {
@@ -95,12 +95,13 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
   deleteThread = () => this.setState({ depth: 0 });
 
   componentDidMount() {
-    setTimeout(this.addToThread, 30);
+    //setTimeout(this.addToThread, 30);
   }
 
   render() {
     const {
       areAllItemsExpanded,
+      isRootNode,
       children,
       expandCollapseAll,
       collapserRef,
@@ -121,13 +122,14 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
     const text = `${this.randText}`;
     const newTitle = ` Collapser ${idStr} -- ${title || 'row: 0 - node: 0'}`;
     return (
-      <div ref={collapserRef} className={`${className} ${this.animations[animation]}`} style={{ ...style }}>
+      <div ref={collapserRef} className={`${className} ${this.animations[animation]} ${!isRootNode && styles.hover}`} style={{ ...style }}>
         <ExpandButton
           isOpened={areAllItemsExpanded}
           onClick={expandCollapseAll}
           title={newTitle}
         />
         <CommentWithButtons
+          isOpenedInit={false}
           addToThread={this.addToThread}
           childThreads={depth}
           deleteThread={this.deleteThread}
@@ -135,7 +137,7 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
         />
         { children }
         {
-          collapserId < 50 && (
+          collapserId < 1500 && (
             <GetNested
               depth={depth}
               childNodes={childNodes}

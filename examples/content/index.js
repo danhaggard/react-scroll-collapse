@@ -6,7 +6,7 @@ import SimpleCollapser from '../components/SimpleCollapserTest';
 import EvenSimplerCollapser from '../components/EvenSimplerCollapser';
 
 import SimpleComment from '../components/SimpleComment';
-import CommentThread from '../components/CommentThreadTest';
+import CommentThread from '../components/CommentThreadFun';
 
 import Example from '../components/Example';
 import { genRandText } from '../utils';
@@ -76,7 +76,7 @@ const example3 = (
 const example4 = key => (
   <Example {...COPY[4]} style={{ marginBottom: '3em' }} key={key}>
     <Scroller style={{ height: '100%' }}>
-      <CommentThread depth={1} childNodes={1} randomChildNodes />
+      <CommentThread depth={3} childNodes={2} />
     </Scroller>
   </Example>
 );
@@ -93,7 +93,7 @@ const example5 = (
   </Example>
 );
 
-
+/*
 const examples = {
   0: [example0],
   1: [example1],
@@ -101,10 +101,11 @@ const examples = {
   3: [example3],
   4: [example4(4), example4(5)]
 };
-
-/*
-const examples = {
-  0: [example4(35)],
-};
 */
+
+
+const examples = {
+  0: example4(19),
+};
+
 export default examples;

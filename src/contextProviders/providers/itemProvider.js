@@ -1,9 +1,9 @@
-import { ITEMS } from '../constants';
+import { COLLAPSERS, SCROLLERS, ITEMS } from '../constants';
 import createProvider from '../createProvider';
 
 const itemProvider = createProvider(
   ITEMS,
-  [],
+  [COLLAPSERS, SCROLLERS],
   [],
 );
 

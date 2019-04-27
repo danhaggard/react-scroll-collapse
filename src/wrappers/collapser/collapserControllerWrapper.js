@@ -11,9 +11,20 @@ export const collapserControllerWrapper = (CollapserController) => {
 
   class WrappedCollapserController extends Component {
 
+    getRootNodeId = () => { // eslint-disable-line react/sort-comp
+      const {
+        isRootNode,
+        collapserId,
+        rootNodes,
+        providerType
+      } = this.props;
+      return isRootNode ? collapserId : rootNodes[providerType];
+    }
+
     constructor(props) {
       super(props);
       this.addCollapser();
+      this.addRootNode();
     }
 
     componentWillUnmount() {
@@ -30,6 +41,7 @@ export const collapserControllerWrapper = (CollapserController) => {
         removeScrollerChild(parentScrollerId, collapserId);
       }
       removeCollapser(parentCollapserId, parentScrollerId, collapserId);
+      this.removeRootNode();
     }
 
     addCollapser() {
@@ -45,11 +57,26 @@ export const collapserControllerWrapper = (CollapserController) => {
       }
     }
 
+    addRootNode() {
+      const { addRootNode, isRootNode } = this.props;
+      if (isRootNode) {
+        addRootNode(this.getRootNodeId());
+      }
+    }
+
+    removeRootNode() {
+      const { removeRootNode, isRootNode } = this.props;
+      if (isRootNode) {
+        removeRootNode(this.getRootNodeId());
+      }
+    }
+
     render() {
       const { collapserId, parentScrollerId } = this.props;
       if (collapserId >= 0 && parentScrollerId >= 0) {
         return (
           <CollapserController
+            rootNodeId={this.getRootNodeId()}
             {...cleanHoCProps(
               this.props,
               WrappedCollapserController.defaultProps,
@@ -66,11 +93,17 @@ export const collapserControllerWrapper = (CollapserController) => {
     collapserId: null,
     parentCollapserId: null,
     parentScrollerId: null,
+    rootNodes: {},
   };
 
   WrappedCollapserController.propTypes = {
     addCollapser: PropTypes.func.isRequired,
     addCollapserChild: PropTypes.func.isRequired,
+    addRootNode: PropTypes.func.isRequired,
+    isRootNode: PropTypes.bool.isRequired,
+    rootNodes: PropTypes.object,
+    providerType: PropTypes.string.isRequired,
+    removeRootNode: PropTypes.func.isRequired,
     removeCollapser: PropTypes.func.isRequired,
     removeCollapserChild: PropTypes.func.isRequired,
     addScrollerChild: PropTypes.func.isRequired,

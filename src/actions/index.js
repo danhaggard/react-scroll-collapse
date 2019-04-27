@@ -14,6 +14,9 @@ import removeCollapser from './collapser/removeCollapser';
 import removeCollapserChild from './collapser/removeCollapserChild';
 import addCollapser from './collapser/addCollapser';
 import addCollapserChild from './collapser/addCollapserChild';
+import addRootNode from './collapser/addRootNode';
+import removeRootNode from './collapser/removeRootNode';
+
 import watchCollapser from './collapser/watchCollapser';
 import watchInitCollapser from './collapser/watchInitCollapser';
 
@@ -30,6 +33,8 @@ import setRecurseNodeTarget from './collapser/setRecurseNodeTarget';
 const actions = {
   addCollapser,
   addCollapserChild,
+  addRootNode,
+  removeRootNode,
   removeCollapser,
   removeCollapserChild,
   expandCollapseAll,
@@ -53,6 +58,8 @@ const actions = {
 export const collapserControllerActions = {
   addCollapser,
   addCollapserChild,
+  addRootNode,
+  removeRootNode,
   removeCollapser,
   removeCollapserChild,
   addScrollerChild,

@@ -3,6 +3,18 @@
   padding-top: 0.5em;
   border-top: 1px solid #AAA;
   border-left: 1px solid #AAA;
-  border-radius: 2px;
+  border-radius: 6px;
   background-size: 300% 300%;
 }
+/*
+:local(.hover) {
+  transition: transform .2s ease, box-shadow .2s ease, padding .2s ease, -webkit-transform .2s ease, -webkit-box-shadow .2s ease;
+  will-change: transform, box-shadow;
+
+  &:hover {
+    box-shadow: 0 16px 32px 0 rgba(10,16,34,.2), 0 0 0 transparent;
+    padding: 4em;
+    transform: translateY(-5px) translateZ(0);
+  }
+}
+*/

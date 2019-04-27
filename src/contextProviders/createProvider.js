@@ -22,20 +22,27 @@ import { isUndefNull } from '../utils/selectorUtils';
 
 const createProvider = (
   typeKey,
-  parentTypeKeys,
-  childTypeKeys,
+  parentTypeKeys = [],
+  childTypeKeys = [],
   Base = PureComponent
 ) => (Context, Comp) => {
   class Provider extends Base {
 
+    idKey = getIdKey(typeKey);
+
+    parentIdKey = getParentIdKey(typeKey)
+
+    id = this.props[this.idKey];
+
+
     mapParentIds = (props) => {
 
-      const idKey = getIdKey(typeKey);
+      const parentIdObj = {};
 
       // Adds its own id as a parent.
-      const parentIdObj = {
-        [getParentIdKey(typeKey)]: props[idKey]
-      };
+      if (childTypeKeys.length > 0) {
+        parentIdObj[this.parentIdKey] = this.id;
+      }
 
       // Adds the other parent ids as asked for the be provider.
       parentTypeKeys.forEach((key) => {
@@ -47,9 +54,21 @@ const createProvider = (
       return parentIdObj;
     };
 
+    /*
+      If it can't find it's own type as parent in props,
+      but is a parent of something - then it is a root node.
+    */
+    checkIfRoot = () => !Object.keys(this.props).includes(this.parentIdKey)
+      && childTypeKeys.length > 0;
 
-    checkIfRoot = () => {
-
+    getRootNodes = () => {
+      const rootNodes = {
+        ...this.props.rootNodes,
+      };
+      if (this.checkIfRoot()) {
+        rootNodes[typeKey] = this.id;
+      }
+      return rootNodes;
     }
     /*
       childContext  - create the context to be inserted into the context
@@ -68,12 +87,17 @@ const createProvider = (
     childContext = {
       ...this.mapParentIds(this.props),
       ...this.childRegisterMethods,
-    };
+      rootNodes: this.getRootNodes(),
+    }
 
     render() {
       return childTypeKeys.length === 0 ? <Comp {...this.props} /> : (
         <Context.Provider value={this.childContext}>
-          <Comp {...this.props} />
+          <Comp
+            isRootNode={this.checkIfRoot()}
+            providerType={typeKey}
+            {...this.props}
+            />
         </Context.Provider>
       );
     }

@@ -8,14 +8,15 @@ import { checkForRef } from '../../utils/errorUtils';
 import { ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
 import { collapserWrapperActions } from '../../actions';
 
-import recursionCacheFactory from '../../caching/recursionCache';
-import { getRecurseNodeTargetRoot } from '../../selectors/common';
+import createCache from '../../caching/recursionCache';
+import providerCaches from '../../caching/providerCaches';
+
+import { getRootNodeRoot } from '../../selectors/rootNode';
 import {
   nestedCollapserItemsRoot,
   nestedCollapserItemsExpandedRootEvery,
 } from '../../selectors/collapser';
 
-const cache = recursionCacheFactory();
 
 export const collapserWrapper = (WrappedComponent) => {
 
@@ -29,26 +30,48 @@ export const collapserWrapper = (WrappedComponent) => {
       const {
         areAllItemsExpandedSelector,
         collapserId,
-        recurseNodeTarget,
+        isRootNode,
+        rootNodeState,
       } = props;
-
       let areAllItemsExpandedUpdate = state.areAllItemsExpanded;
+      const { recurseNodeTarget } = rootNodeState;
       const newTarget = recurseNodeTarget === null ? -1 : recurseNodeTarget;
 
-      if (collapserId === 1) {
-        cache.unlockCache();
-        areAllItemsExpandedUpdate = areAllItemsExpandedSelector(newTarget);
-        cache.lockCache();
+      if (isRootNode) {
+        state.cache.unlockCache();
+        areAllItemsExpandedUpdate = areAllItemsExpandedSelector(newTarget, state.cache);
+        state.cache.lockCache();
       } else {
-        areAllItemsExpandedUpdate = areAllItemsExpandedSelector(collapserId);
+        areAllItemsExpandedUpdate = areAllItemsExpandedSelector(collapserId, state.cache);
       }
       return {
         areAllItemsExpanded: areAllItemsExpandedUpdate,
       };
     }
 
+    getRootNodeId = () => { // eslint-disable-line react/sort-comp
+      const {
+        isRootNode,
+        collapserId,
+        rootNodes,
+        providerType
+      } = this.props;
+      return isRootNode ? collapserId : rootNodes[providerType];
+    }
+
+    getCache = () => { // eslint-disable-line react/sort-comp
+      const { isRootNode, providerType } = this.props;
+      const rootNodeId = this.getRootNodeId();
+      const providerCache = providerCaches[providerType];
+      if (isRootNode) {
+        providerCache[rootNodeId] = createCache();
+      }
+      return providerCache[rootNodeId];
+    }
+
     state = {
       areAllItemsExpanded: null,
+      cache: this.getCache(),
     };
 
     componentDidMount() {
@@ -62,11 +85,9 @@ export const collapserWrapper = (WrappedComponent) => {
       const checkAgainstProps = ['recurseNodeTarget', 'allChildItemIds', 'areAllItemsExpandedSelector'];
       const propsCondition = prop => (
         !checkAgainstProps.includes(prop) && props[prop] !== nextProps[prop]);
-
       const stateCondition = prop => (state[prop] !== nextState[prop]);
-
       return Object.keys(props).some(prop => propsCondition(prop))
-      || Object.keys(state).some(prop => stateCondition(prop));
+       || Object.keys(state).some(prop => stateCondition(prop));
     }
 
     getOffSetTop = () => this.elem.current.offsetTop;
@@ -100,7 +121,7 @@ export const collapserWrapper = (WrappedComponent) => {
         collapserId,
       );
       allChildItemIds().forEach(itemId => expandCollapseAll(areAllItemsExpanded, itemId));
-      setRecurseNodeTarget(collapserId);
+      setRecurseNodeTarget(collapserId, this.getRootNodeId());
     };
 
     render() {
@@ -129,6 +150,7 @@ export const collapserWrapper = (WrappedComponent) => {
     collapserId: null,
     parentCollapserId: null,
     parentScrollerId: null,
+    rootNodes: {},
   };
 
   CollapserController.propTypes = {
@@ -136,6 +158,9 @@ export const collapserWrapper = (WrappedComponent) => {
     collapserId: ofNumberTypeOrNothing,
     parentCollapserId: ofNumberTypeOrNothing,
     parentScrollerId: PropTypes.number,
+    isRootNode: PropTypes.bool.isRequired,
+    providerType: PropTypes.string.isRequired,
+    rootNodes: PropTypes.object,
 
     /* provided by redux */
     areAllItemsExpandedSelector: PropTypes.func.isRequired, // includes nested
@@ -149,14 +174,17 @@ export const collapserWrapper = (WrappedComponent) => {
 
   const mapStateToProps = (state, ownProps) => {
 
-    const areAllItemsExpandedSelector = targetNodeId => nestedCollapserItemsExpandedRootEvery(
-      state, { ...ownProps, targetNodeId }, cache
+    const areAllItemsExpandedSelector = (
+      targetNodeId,
+      collapserCache
+    ) => nestedCollapserItemsExpandedRootEvery(
+      state, { ...ownProps, targetNodeId }, collapserCache
     );
 
     return {
       allChildItemIds: () => nestedCollapserItemsRoot(state, ownProps),
       areAllItemsExpandedSelector,
-      recurseNodeTarget: getRecurseNodeTargetRoot(state, ownProps),
+      rootNodeState: getRootNodeRoot(state)(ownProps.rootNodeId)
     };
   };
 

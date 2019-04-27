@@ -36,12 +36,14 @@ const CommentWithButtons = ({
   addToThread,
   childThreads,
   deleteThread,
+  isOpenedInit,
   text
 }) => (
   <Comment
     addToThread={addToThread}
     childThreads={childThreads}
     deleteThread={deleteThread}
+    isOpenedInit={isOpenedInit}
     text={text}
   >
     <ButtonGroupSmall>
@@ -53,12 +55,14 @@ const CommentWithButtons = ({
 
 CommentWithButtons.defaultProps = {
   childThreads: 0,
+  isOpenedInit: true,
 };
 
 CommentWithButtons.propTypes = {
   childThreads: PropTypes.number,
   addToThread: PropTypes.func.isRequired,
   deleteThread: PropTypes.func.isRequired,
+  isOpenedInit: PropTypes.bool,
   text: PropTypes.string.isRequired,
 };
 

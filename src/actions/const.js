@@ -16,6 +16,9 @@ export const EXPAND_COLLAPSE_ALL = 'react-scroll-collapse/EXPAND_COLLAPSE_ALL';
 export const HEIGHT_READY_ALL = 'react-scroll-collapse/HEIGHT_READY_ALL';
 export const WATCH_INIT_COLLAPSER = 'react-scroll-collapse/WATCH_INIT_COLLAPSER';
 export const WATCH_COLLAPSER = 'react-scroll-collapse/WATCH_COLLAPSER';
+
+export const ADD_ROOT_NODE = 'react-scroll-collapse/ADD_ROOT_NODE';
+export const REMOVE_ROOT_NODE = 'react-scroll-collapse/REMOVE_ROOT_NODE';
 export const SET_RECURSE_NODE_TARGET = 'react-scroll-collapse/SET_RECURSE_NODE_TARGET';
 
 

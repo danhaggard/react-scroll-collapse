@@ -18,7 +18,3 @@ export const getReactScrollCollapse = rootState => getOrNull(rootState, 'reactSc
 export const getEntities = reactScrollCollapseObject => getOrNull(reactScrollCollapseObject, 'entities');
 
 export const getEntitiesRoot = compose(getEntities, getReactScrollCollapse);
-
-export const getRecurseNodeTarget = reactScrollCollapseObject => getOrNull(reactScrollCollapseObject, 'recurseNodeTarget');
-
-export const getRecurseNodeTargetRoot = compose(getRecurseNodeTarget, getReactScrollCollapse);
