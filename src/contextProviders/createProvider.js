@@ -97,6 +97,7 @@ const createProvider = (
             isRootNode={this.checkIfRoot()}
             providerType={typeKey}
             {...this.props}
+            key={this.idKey}
             />
         </Context.Provider>
       );
