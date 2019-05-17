@@ -118,7 +118,8 @@ const example7 = (
 
 const example8 = (
   <Example {...COPY[5]} style={{ marginBottom: '3em' }} key={5}>
-    <CommentThread depth={3} childNodes={2} randomChildNodes />
+    <CommentThread depth={1} childNodes={2} randomChildNodes />
+
   </Example>
 );
 
