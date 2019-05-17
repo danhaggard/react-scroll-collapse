@@ -11,6 +11,29 @@ export const collapserControllerWrapper = (CollapserController) => {
 
   class WrappedCollapserController extends Component {
 
+    static getDerivedStateFromProps(props, state) {
+      console.log('getDerivedStateFromProps - WrappedCollapserController - collapserId, props, state', props.collapserId, props, state);
+      return state;
+    }
+
+    componentDidMount() {
+      const { props, state } = this;
+      console.log('componentDidMount - WrappedCollapserController - collapserId, props, state', props.collapserId, props, state);
+      // console.log('');
+
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+      const { props, state } = this;
+      console.log('shouldComponentUpdate - WrappedCollapserController - collapserId, props, state', props.collapserId, props, state);
+      return true;
+    }
+
+    componentDidUpdate() {
+      const { props, state } = this;
+      console.log('componentDidUpdate - WrappedCollapserController - collapserId, props, state', props.collapserId, props, state);
+    }
+
     getRootNodeId = () => { // eslint-disable-line react/sort-comp
       const {
         isRootNode,
@@ -21,13 +44,18 @@ export const collapserControllerWrapper = (CollapserController) => {
       return isRootNode ? collapserId : rootNodes[providerType];
     }
 
-    constructor(props) {
+    constructor(props) { // eslint-disable-line react/sort-comp
       super(props);
+      console.log('WrappedCollapserController this constructor', this);
+      console.log('constructor - WrappedCollapserController - collapserId, props', props.collapserId, props);
       this.addCollapser();
       this.addRootNode();
+      this.state = {};
     }
 
     componentWillUnmount() {
+      const { props, state } = this;
+      console.log('componentWillUnmount - WrappedCollapserController - collapserId, props, state', props.collapserId, props, state);
       const {
         removeCollapserChild,
         removeScrollerChild,
@@ -72,6 +100,10 @@ export const collapserControllerWrapper = (CollapserController) => {
     }
 
     render() {
+      const { props, state } = this;
+      console.log('render - WrappedCollapserController - collapserId, props, state', props.collapserId, props, state);
+      console.log('');
+
       const { collapserId, parentScrollerId } = this.props;
       if (collapserId >= 0 && parentScrollerId >= 0) {
         return (

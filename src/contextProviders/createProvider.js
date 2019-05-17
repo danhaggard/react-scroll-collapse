@@ -1,4 +1,6 @@
-import React, { PureComponent } from 'react';
+/* eslint-disable max-len */
+
+import React, { Component } from 'react';
 import registerConsumer from './registerConsumer';
 import { getIdKey, getParentIdKey } from './providerKeyManager';
 import { isUndefNull } from '../utils/selectorUtils';
@@ -20,17 +22,69 @@ import { isUndefNull } from '../utils/selectorUtils';
     ChildrenManager is an alternative that tracks child state.
 */
 
+const shouldLog = (props, state, id, log) => {
+  if (!Object.keys(props).includes('isOpenedInit')) {
+    console.log(log, id, props, state);
+  }
+};
+
 const createProvider = (
   typeKey,
   parentTypeKeys = [],
   childTypeKeys = [],
-  Base = PureComponent
+  Base = Component
 ) => (Context, Comp) => {
   class Provider extends Base {
 
+    static getDerivedStateFromProps(props, state) {
+      shouldLog(props, state, props.collapserId, 'getDerivedStateFromProps - Provider - id, props, state');
+      // console.log('getDerivedStateFromProps - Provider - collapserId, props, state', props.collapserId, props, state);
+      return state;
+    }
+
+    state = {
+      id: this.props[getParentIdKey(typeKey)],
+    }
+
+    constructor(props) {
+      super(props);
+      console.log('Provider this constructor', this);
+
+      shouldLog(props, this.state, props.collapserId, 'constructor - Provider - id, props, state');
+      // console.log('constructor - Provider - collapserId, props, state', props.collapserId, props);
+    }
+
+    componentDidMount() {
+      const { props, state } = this;
+      shouldLog(props, this.state, props.collapserId, 'componentDidMount - Provider - id, props, state');
+      // console.log('componentDidMount - Provider - collapserId, props, state', props.collapserId, props, state);
+      // console.log('');
+
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+      const { props, state } = this;
+      shouldLog(props, this.state, props.collapserId, 'shouldComponentUpdate - Provider - id, props, state');
+      // console.log('shouldComponentUpdate - Provider - collapserId, props, state', props.collapserId, props, state);
+      return true;
+    }
+
+    componentDidUpdate() {
+      const { props, state } = this;
+      shouldLog(props, this.state, props.collapserId, 'componentDidUpdate - Provider - id, props, state');
+      // console.log('componentDidUpdate - Provider - collapserId, props, state', props.collapserId, props, state);
+    }
+
+    componentWillUnmount() {
+      const { props, state } = this;
+      shouldLog(props, this.state, props.collapserId, 'componentWillUnmount - Provider - id, props, state');
+      // console.log('componentWillUnmount - Provider - collapserId, props, state', props.collapserId, props, state);
+      // this.registerSelf(this.props, this.state);
+    }
+
     idKey = getIdKey(typeKey);
 
-    parentIdKey = getParentIdKey(typeKey)
+    parentIdKey = getParentIdKey(typeKey);
 
     id = this.props[this.idKey];
 
@@ -91,12 +145,23 @@ const createProvider = (
     }
 
     render() {
+      const { props, state } = this;
+      shouldLog(props, this.state, props.collapserId, 'render - Provider - id, props, state');
+      // console.log('render - Provider - collapserId, props, state', props.collapserId, props, state);
+
+      const newContext = props.collapserId === 0
+        ? { ...this.childContext, mounted: this.props.mounted } : this.childContext;
+      const newProps = { ...props };
+      delete newProps.mounted;
+      console.log('render - Provider - collapserId, newContext, newProps', props.collapserId, newContext, newProps);
+      console.log('');
+
       return childTypeKeys.length === 0 ? <Comp {...this.props} /> : (
-        <Context.Provider value={this.childContext}>
+        <Context.Provider value={newContext}>
           <Comp
             isRootNode={this.checkIfRoot()}
             providerType={typeKey}
-            {...this.props}
+            {...newProps}
             key={this.idKey}
             />
         </Context.Provider>

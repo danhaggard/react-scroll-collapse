@@ -76,7 +76,7 @@ const example3 = (
 const example4 = key => (
   <Example {...COPY[4]} style={{ marginBottom: '3em' }} key={key}>
     <Scroller style={{ height: '100%' }}>
-      <CommentThread depth={3} childNodes={2} />
+      <CommentThread depth={0} childNodes={1} />
     </Scroller>
   </Example>
 );
@@ -93,6 +93,35 @@ const example5 = (
   </Example>
 );
 
+const example6 = (
+  <Example {...COPY[5]} style={{ marginBottom: '3em' }} key={5}>
+    <Scroller style={{ height: '100%' }}>
+      <CommentThread depth={0} childNodes={1} randomChildNodes />
+
+    </Scroller>
+  </Example>
+);
+const example7 = (
+  <Example {...COPY[5]} style={{ marginBottom: '3em' }} key={5}>
+    <CommentThread depth={0} childNodes={2}>
+      <EvenSimplerCollapser>
+      <EvenSimplerCollapser>
+      </EvenSimplerCollapser>
+      </EvenSimplerCollapser>
+
+      <EvenSimplerCollapser>
+
+      </EvenSimplerCollapser>
+    </CommentThread>
+  </Example>
+);
+
+const example8 = (
+  <Example {...COPY[5]} style={{ marginBottom: '3em' }} key={5}>
+    <CommentThread depth={3} childNodes={2} randomChildNodes />
+  </Example>
+);
+
 /*
 const examples = {
   0: [example0],
@@ -105,7 +134,7 @@ const examples = {
 
 
 const examples = {
-  0: example4(19),
+  0: example8,
 };
 
 export default examples;

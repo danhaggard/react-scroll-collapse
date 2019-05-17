@@ -15,6 +15,8 @@ import { getRootNodeRoot } from '../../selectors/rootNode';
 import {
   nestedCollapserItemsRoot,
   nestedCollapserItemsExpandedRootEvery,
+  getCollapserCollapsersRoot,
+  setTreeIdsRecursively,
 } from '../../selectors/collapser';
 
 
@@ -27,11 +29,14 @@ export const collapserWrapper = (WrappedComponent) => {
     elem = React.createRef();
 
     static getDerivedStateFromProps(props, state) {
+      console.log('getDerivedStateFromProps - CollapserController - collapserId, props, state', props.collapserId, props, state);
       const {
         areAllItemsExpandedSelector,
         collapserId,
         isRootNode,
         rootNodeState,
+        setTreeIdsSelector,
+        setTreeId,
       } = props;
       let areAllItemsExpandedUpdate = state.areAllItemsExpanded;
       const { recurseNodeTarget } = rootNodeState;
@@ -47,6 +52,13 @@ export const collapserWrapper = (WrappedComponent) => {
       return {
         areAllItemsExpanded: areAllItemsExpandedUpdate,
       };
+    }
+
+    constructor(props) {
+      super(props);
+      console.log('CollapserController this constructor', this);
+
+      console.log('constructor - CollapserController - collapserId, props', props.collapserId, props);
     }
 
     getRootNodeId = () => { // eslint-disable-line react/sort-comp
@@ -75,19 +87,50 @@ export const collapserWrapper = (WrappedComponent) => {
     };
 
     componentDidMount() {
-      const { collapserId, watchInitCollapser } = this.props;
+      const { collapserId, setRecurseNodeTarget, watchInitCollapser } = this.props;
+      const { props, state } = this;
+      console.log('componentDidMount - CollapserController - collapserId, props, state', props.collapserId, props, state);
+
       checkForRef(WrappedComponent, this.elem, 'collapserRef');
       watchInitCollapser(collapserId);
+
+      /*
+        On insertion of new node - we shouldn't check unrelated branches - so set this.
+      */
+      setRecurseNodeTarget(collapserId, this.getRootNodeId());
+      props.setTreeIdsSelector(props.setTreeId);
+    }
+
+    whyUpdate = (state, nextState, component, id) => {
+      Object.keys(state).forEach((key) => {
+        if (state[key] !== nextState[key]) {
+          console.log(`shouldUpdate ${component} - id: ${id}, key: ${key}`);
+        }
+      });
     }
 
     shouldComponentUpdate(nextProps, nextState) {
       const { props, state } = this;
-      const checkAgainstProps = ['recurseNodeTarget', 'allChildItemIds', 'areAllItemsExpandedSelector'];
+      console.log('shouldComponentUpdate - CollapserController - collapserId, props, state', props.collapserId, props, state);
+      this.whyUpdate(props, nextProps, 'CollapserController - props', props.collapserId);
+      this.whyUpdate(state, nextState, 'CollapserController - state', props.collapserId);
+
+      const checkAgainstProps = ['rootNodeId', 'setTreeIds', 'rootNodeState', 'recurseNodeTarget', 'allChildItemIds', 'areAllItemsExpandedSelector'];
       const propsCondition = prop => (
         !checkAgainstProps.includes(prop) && props[prop] !== nextProps[prop]);
       const stateCondition = prop => (state[prop] !== nextState[prop]);
       return Object.keys(props).some(prop => propsCondition(prop))
        || Object.keys(state).some(prop => stateCondition(prop));
+    }
+
+    componentDidUpdate() {
+      const { props, state } = this;
+      console.log('componentDidUpdate - CollapserController - collapserId, props, state', props.collapserId, props, state);
+    }
+
+    componentWillUnmount() {
+      const { props, state } = this;
+      console.log('componentWillUnmount - CollapserController - collapserId, props, state', props.collapserId, props, state);
     }
 
     getOffSetTop = () => this.elem.current.offsetTop;
@@ -125,6 +168,10 @@ export const collapserWrapper = (WrappedComponent) => {
     };
 
     render() {
+      const { props, state } = this;
+      console.log('render - CollapserController - collapserId, props, state', props.collapserId, props, state);
+      console.log('');
+
       const {
         expandCollapseAll,
         setOffsetTop,
@@ -181,9 +228,13 @@ export const collapserWrapper = (WrappedComponent) => {
       state, { ...ownProps, targetNodeId }, collapserCache
     );
 
+    //const childCollapsers = getCollapserCollapsersRoot(state)(ownProps.collapserId);
+    //console.log('%c CollapserController - mapStateToProps, collapserId, childCollapsers!', 'color: green; font-weight: bold;', ownProps.collapserId, childCollapsers);
+    //console.log('CollapserController - mapStateToProps, collapserId, childCollapsers', ownProps.collapserId, childCollapsers);
     return {
       allChildItemIds: () => nestedCollapserItemsRoot(state, ownProps),
       areAllItemsExpandedSelector,
+      setTreeIdsSelector: action => setTreeIdsRecursively(state, ownProps.rootNodeId, action),
       rootNodeState: getRootNodeRoot(state)(ownProps.rootNodeId)
     };
   };

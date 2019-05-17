@@ -1,9 +1,31 @@
+const createArrayGetter = getter => (arr, i) => {
+  let value = arr[i];
+  if (getter) {
+    value = getter(value);
+  }
+  return value;
+};
+
+const arrayMax = (arr, getter = createArrayGetter()) => {
+  let len = arr.length;
+  let max = -Infinity;
+  while (len) {
+    len -= 1;
+    const val = getter(arr, len);
+    if (val > max) {
+      max = val;
+    }
+  }
+  return max;
+};
+
 /*
   babel choking on Math.max
 
   Credit for this to: https://stackoverflow.com/a/13440842
-*/
+
 const arrayMax = (arr) => {
+
   let len = arr.length;
   let max = -Infinity;
   while (len) {
@@ -14,7 +36,7 @@ const arrayMax = (arr) => {
   }
   return max;
 };
-
+*/
 // Helper func.
 export const getChildResultValuesAndSources = (childArray, recurseFunc, recurseFuncArgs) => {
 
@@ -46,6 +68,7 @@ const recurseToNode = (argsObj) => {
     currentNodeId, // id of the node we are currently at.
     resultReducer, // takes an array - and returns a single value
     getNodeValue, // Func that takes an id and returns the value for that node.
+    getTreeId, // Func that takes an id and returns the treeId for that node.
     targetNodeId, // id of the target node.
     reachedTargetNode, // boolean
   } = argsObj;
@@ -66,7 +89,7 @@ const recurseToNode = (argsObj) => {
       collapser locks it when it is finished so subsequent nodes are given
       cached vals.
   */
-
+  debugger;
   const cachedValue = cache.getResultValue(currentNodeId);
   const cachedSources = cache.getResultSources(currentNodeId);
 
@@ -74,9 +97,17 @@ const recurseToNode = (argsObj) => {
     return cachedValue;
   }
 
+  /*
+    treeIds represent the physical position in the tree.  This might change
+    render to render.  nodeId should never change for each node.
+  */
+  const currentNodeTreeId = getTreeId(currentNodeId);
+  const targetNodeTreeId = getTreeId(targetNodeId);
+
   // the value returned by this node in isolation of it's children.
   const currentValue = getNodeValue(currentNodeId);
 
+  // Arrays of child nodeIds we are going to recurse into.
   const childArray = getNodeChildren(currentNodeId);
 
   // no children- just return.
@@ -92,7 +123,11 @@ const recurseToNode = (argsObj) => {
     return cache.addResult(currentNodeId, currentValue, []);
   }
 
-  const reachedTargetNodeCheck = reachedTargetNode || currentNodeId === targetNodeId;
+  // const reachedTargetNodeCheck = reachedTargetNode || currentNodeId === targetNodeId;
+  const reachedTargetNodeCheck = reachedTargetNode
+    || targetNodeTreeId === null // will occur when previous targetnode has been removed. (not sure if this will handle all cases yet)
+    || currentNodeTreeId === targetNodeTreeId;
+
 
   if (reachedTargetNodeCheck || targetNodeId < 0) {
     /*
@@ -119,29 +154,36 @@ const recurseToNode = (argsObj) => {
   /*
     We are still above the target node.  Get the next node.
 
-    Nodes are ordered by depth and to the right. e.g.
+    Nodes are ordered by depth and to the left. e.g.
 
     Exclude nodes > targetnode then choose the maximum of any remaining.
 
     e.g.
 
-    0
-    | \
-    9  1
+      0
+     / \
+    1   2
       / | \
-     8  5   2
-      /  \  |  \
-     7    6 4    3
+     3  4  7
+      / \  | \
+     5   6 8  9
 
-    6 is the target.
+     6 is the target.
 
-    Start at 0.
-    9 > 6 - so exclude and choose 1.
-    8 > 6 - so exclude - and 5 > 2 but < 6 so choose 5.
-    Now choose the target.
+     Start at 0.
+     1 & 2 both < 6 so choose max = 2
+     7 > 6 - so exclude.  Choose max of (4, 3) = 4
+     Now choose the target.
   */
-  const nextNodeId = arrayMax([...childArray.filter(id => (id <= targetNodeId))]);
+
+  // const nextNodeId = arrayMax([...childArray.filter(id => (id <= targetNodeId))]);
   // babel is choking on Math.max atm.
+
+  // TODO: rather than map child ids to {id, treeId} here - replace the getNodeChildren
+  // selector with one that does this at the start.
+  const nextNodeId = arrayMax([...childArray.map(id => ({ id, treeId: getTreeId(id) }))
+    .filter(({ treeId }) => (treeId <= targetNodeTreeId))], createArrayGetter(obj => obj.id));
+
 
   const val = resultReducer([currentValue, recurseToNode({
     ...argsObj,

@@ -7,6 +7,7 @@ import {
   REMOVE_ITEM,
   REMOVE_COLLAPSER,
   REMOVE_COLLAPSER_CHILD,
+  SET_TREE_ID,
 } from '../actions/const';
 
 import { getOrObject } from '../utils/selectorUtils';
@@ -43,6 +44,18 @@ export const collapserIdReducer = (state = null, action) => {
   }
 };
 
+export const collapserTreeIdReducer = (state = null, action) => {
+  const { collapser, treeId } = getOrObject(action, 'payload');
+  switch (action.type) {
+    case ADD_COLLAPSER:
+      return collapser.id;
+    case SET_TREE_ID:
+      return treeId;
+    default:
+      return state;
+  }
+};
+
 //  handles the collapsers attr in collapsers entities.
 export const collapsersIdArray = (state = [], action) => {
   const { collapser, collapserId } = getOrObject(action, 'payload');
@@ -73,6 +86,7 @@ export const collapserReducer = combineReducers({
   collapsers: collapsersIdArray,
   id: collapserIdReducer,
   items: itemsIdArray,
+  treeId: collapserTreeIdReducer,
 });
 
 /* handles reactScrollCollapse.entities.collapsers state */
@@ -88,6 +102,7 @@ export const collapsersReducer = (state = {}, action) => {
       return removeFromState(state, collapserId);
     case ADD_ITEM:
     case REMOVE_ITEM:
+    case SET_TREE_ID:
       return updateState(state, action, collapserId, collapserReducer);
     default:
       return state;

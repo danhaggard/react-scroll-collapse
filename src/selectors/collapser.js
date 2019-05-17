@@ -12,6 +12,7 @@ import { getItemExpanded, getItemRoot } from './collapserItem';
 
 import recurseToNode from './recurseToNode';
 import recurseAllChildren from './recurseAllChildren';
+import recurseTreeIds from './recurseTreeIds';
 
 
 const getCollapsers = entitiesObject => getOrNull(entitiesObject, 'collapsers');
@@ -32,7 +33,7 @@ const getCollapserRoot = compose(getCollapser, getCollapsersRoot);
 // --- collapser.collapsers:
 const getCollapserCollapsers = collapserObject => getOrArray(collapserObject, 'collapsers');
 
-const getCollapserCollapsersRoot = curryCompose(getCollapserCollapsers, getCollapserRoot);
+export const getCollapserCollapsersRoot = curryCompose(getCollapserCollapsers, getCollapserRoot);
 
 // --- collapser.items: => array
 const getCollapserItems = collapserObject => getOrArray(collapserObject, 'items');
@@ -40,6 +41,11 @@ const getCollapserItems = collapserObject => getOrArray(collapserObject, 'items'
 
 // rootState => id => collapserItemsArray
 const getCollapserItemsRoot = curryCompose(getCollapserItems, getCollapserRoot);
+
+// --- collapser.treeId:
+const getCollapserTreeId = collapserObject => getOrNull(collapserObject, 'treeId');
+
+export const getCollapserTreeIdRoot = curryCompose(getCollapserTreeId, getCollapserRoot);
 
 // rootState => id => true / false
 const collapserItemsExpandedRootEvery = passArgsToIteratorEvery(
@@ -55,10 +61,16 @@ export const nestedCollapserItemsExpandedRootEvery = (
   cache,
 ) => recurseToNode({
   cache,
+  /*
+  getNodeChildren: id => getCollapserCollapsersRoot(state)(id).map(
+    childId => getCollapserTreeIdRoot(state)(childId)
+  ),
+  */
   getNodeChildren: id => getCollapserCollapsersRoot(state)(id),
   currentNodeId: collapserId,
   resultReducer: everyReducer(true),
   getNodeValue: id => collapserItemsExpandedRootEvery(state)(id),
+  getTreeId: getCollapserTreeIdRoot(state),
   targetNodeId,
 });
 
@@ -67,5 +79,12 @@ export const nestedCollapserItemsRoot = (state, { collapserId }) => recurseAllCh
   id => getCollapserCollapsersRoot(state)(id),
   id => getCollapserItemsRoot(state)(id),
   (result, nextResult) => [...result, ...nextResult],
+  collapserId,
+);
+
+export const setTreeIdsRecursively = (state, collapserId, action) => recurseTreeIds(
+  id => getCollapserCollapsersRoot(state)(id),
+  id => getCollapserTreeIdRoot(state)(id),
+  action,
   collapserId,
 );

@@ -25,7 +25,7 @@ export const getRandString = () => {
 */
 export const genRandText = () => {
   let randText = '';
-  const noOfWords = Math.floor((Math.random() * 50) + 10);
+  const noOfWords = Math.floor((Math.random() * 100) + 50);
   [...Array(noOfWords).keys()].forEach(() => {
     randText += ` ${getRandString()}`;
   });

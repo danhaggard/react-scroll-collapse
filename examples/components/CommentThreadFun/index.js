@@ -137,7 +137,7 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
         />
         { children }
         {
-          collapserId < 1500 && (
+          collapserId <= 500 && (
             <GetNested
               depth={depth}
               childNodes={childNodes}

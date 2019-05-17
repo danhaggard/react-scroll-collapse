@@ -16,6 +16,7 @@ import addCollapser from './collapser/addCollapser';
 import addCollapserChild from './collapser/addCollapserChild';
 import addRootNode from './collapser/addRootNode';
 import removeRootNode from './collapser/removeRootNode';
+import setTreeId from './collapser/setTreeId';
 
 import watchCollapser from './collapser/watchCollapser';
 import watchInitCollapser from './collapser/watchInitCollapser';
@@ -37,6 +38,7 @@ const actions = {
   removeRootNode,
   removeCollapser,
   removeCollapserChild,
+  setTreeId,
   expandCollapseAll,
   heightReadyAll,
   watchCollapser,
@@ -70,6 +72,7 @@ export const collapserWrapperActions = {
   expandCollapseAll,
   setOffsetTop,
   setRecurseNodeTarget,
+  setTreeId,
   watchCollapser,
   watchInitCollapser,
 };
