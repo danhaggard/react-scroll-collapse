@@ -11,7 +11,7 @@ import { collapserWrapperActions } from '../../actions';
 import createCache from '../../caching/recursionCache';
 import providerCaches from '../../caching/providerCaches';
 
-import { getRootNodeRoot } from '../../selectors/rootNode';
+import { getRootNodeRoot, getRootNodeRecurseNodeTargetRoot, getNodeTargetArrayRoot } from '../../selectors/rootNode';
 import {
   nestedCollapserItemsRoot,
   nestedCollapserItemsExpandedRootEvery,
@@ -33,21 +33,27 @@ export const collapserWrapper = (WrappedComponent) => {
       const {
         areAllItemsExpandedSelector,
         collapserId,
+        getNodeTargetArray,
+        recurseNodeTarget,
         isRootNode,
-        rootNodeState,
+        // rootNodeState,
         setTreeIdsSelector,
         setTreeId,
       } = props;
       let areAllItemsExpandedUpdate = state.areAllItemsExpanded;
-      const { recurseNodeTarget } = rootNodeState;
-      const newTarget = recurseNodeTarget === null ? -1 : recurseNodeTarget;
+      // const { recurseNodeTarget } = rootNodeState;
 
       if (isRootNode) {
+        let newTarget = recurseNodeTarget === null ? [-1] : [recurseNodeTarget];
+        const nodeTargetArray = getNodeTargetArray();
+        if (nodeTargetArray.length > 0) {
+          newTarget = nodeTargetArray
+        }
         state.cache.unlockCache();
         areAllItemsExpandedUpdate = areAllItemsExpandedSelector(newTarget, state.cache);
         state.cache.lockCache();
       } else {
-        areAllItemsExpandedUpdate = areAllItemsExpandedSelector(collapserId, state.cache);
+        areAllItemsExpandedUpdate = areAllItemsExpandedSelector([collapserId], state.cache);
       }
       return {
         areAllItemsExpanded: areAllItemsExpandedUpdate,
@@ -87,7 +93,12 @@ export const collapserWrapper = (WrappedComponent) => {
     };
 
     componentDidMount() {
-      const { collapserId, setRecurseNodeTarget, watchInitCollapser } = this.props;
+      const {
+        addToNodeTargetArray,
+        collapserId,
+        isRootNode,
+        watchInitCollapser
+      } = this.props;
       const { props, state } = this;
       console.log('componentDidMount - CollapserController - collapserId, props, state', props.collapserId, props, state);
 
@@ -97,14 +108,15 @@ export const collapserWrapper = (WrappedComponent) => {
       /*
         On insertion of new node - we shouldn't check unrelated branches - so set this.
       */
-      setRecurseNodeTarget(collapserId, this.getRootNodeId());
+      const addNodeValue = isRootNode ? null : collapserId;
+      addToNodeTargetArray(addNodeValue, this.getRootNodeId());
       props.setTreeIdsSelector(props.setTreeId);
     }
 
-    whyUpdate = (state, nextState, component, id) => {
+    whyUpdate = (state, nextState, component, id, checkAgainst = []) => {
       Object.keys(state).forEach((key) => {
-        if (state[key] !== nextState[key]) {
-          console.log(`shouldUpdate ${component} - id: ${id}, key: ${key}`);
+        if (!checkAgainst.includes(key) && state[key] !== nextState[key]) {
+          console.log(`whyUpdate:  ${component} - id: ${id}, key: ${key}, value: ${state[key]}, nextValue: ${nextState[key]}`);
         }
       });
     }
@@ -112,10 +124,10 @@ export const collapserWrapper = (WrappedComponent) => {
     shouldComponentUpdate(nextProps, nextState) {
       const { props, state } = this;
       console.log('shouldComponentUpdate - CollapserController - collapserId, props, state', props.collapserId, props, state);
-      this.whyUpdate(props, nextProps, 'CollapserController - props', props.collapserId);
+      const checkAgainstProps = ['rootNodeId', 'setTreeIds', 'rootNodeState', 'recurseNodeTarget', 'getNodeTargetArray', 'allChildItemIds', 'areAllItemsExpandedSelector', 'setTreeIdsSelector'];
+      this.whyUpdate(props, nextProps, 'CollapserController - props', props.collapserId, checkAgainstProps);
       this.whyUpdate(state, nextState, 'CollapserController - state', props.collapserId);
 
-      const checkAgainstProps = ['rootNodeId', 'setTreeIds', 'rootNodeState', 'recurseNodeTarget', 'allChildItemIds', 'areAllItemsExpandedSelector'];
       const propsCondition = prop => (
         !checkAgainstProps.includes(prop) && props[prop] !== nextProps[prop]);
       const stateCondition = prop => (state[prop] !== nextState[prop]);
@@ -124,8 +136,17 @@ export const collapserWrapper = (WrappedComponent) => {
     }
 
     componentDidUpdate() {
+      const {
+        addToNodeTargetArray,
+        collapserId,
+        isRootNode,
+      } = this.props;
       const { props, state } = this;
       console.log('componentDidUpdate - CollapserController - collapserId, props, state', props.collapserId, props, state);
+
+      if (isRootNode) {
+        addToNodeTargetArray(null, this.getRootNodeId());
+      }
     }
 
     componentWillUnmount() {
@@ -222,12 +243,20 @@ export const collapserWrapper = (WrappedComponent) => {
   const mapStateToProps = (state, ownProps) => {
 
     const areAllItemsExpandedSelector = (
+      targetNodeArray,
+      collapserCache
+    ) => nestedCollapserItemsExpandedRootEvery(
+      state, { ...ownProps, targetNodeArray }, collapserCache
+    );
+
+    /*
+    const areAllItemsExpandedSelector = (
       targetNodeId,
       collapserCache
     ) => nestedCollapserItemsExpandedRootEvery(
       state, { ...ownProps, targetNodeId }, collapserCache
     );
-
+    */
     //const childCollapsers = getCollapserCollapsersRoot(state)(ownProps.collapserId);
     //console.log('%c CollapserController - mapStateToProps, collapserId, childCollapsers!', 'color: green; font-weight: bold;', ownProps.collapserId, childCollapsers);
     //console.log('CollapserController - mapStateToProps, collapserId, childCollapsers', ownProps.collapserId, childCollapsers);
@@ -235,7 +264,9 @@ export const collapserWrapper = (WrappedComponent) => {
       allChildItemIds: () => nestedCollapserItemsRoot(state, ownProps),
       areAllItemsExpandedSelector,
       setTreeIdsSelector: action => setTreeIdsRecursively(state, ownProps.rootNodeId, action),
-      rootNodeState: getRootNodeRoot(state)(ownProps.rootNodeId)
+      getNodeTargetArray: () => getNodeTargetArrayRoot(state)(ownProps.rootNodeId),
+      recurseNodeTarget: getRootNodeRecurseNodeTargetRoot(state)(ownProps.rootNodeId),
+      // rootNodeState: getRootNodeRoot(state)(ownProps.rootNodeId)
     };
   };
 

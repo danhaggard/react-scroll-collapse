@@ -19,6 +19,7 @@ export const WATCH_COLLAPSER = 'react-scroll-collapse/WATCH_COLLAPSER';
 
 export const ADD_ROOT_NODE = 'react-scroll-collapse/ADD_ROOT_NODE';
 export const REMOVE_ROOT_NODE = 'react-scroll-collapse/REMOVE_ROOT_NODE';
+export const ADD_TO_NODE_TARGET_ARRAY = 'react-scroll-collapse/ADD_TO_NODE_TARGET_ARRAY';
 export const SET_RECURSE_NODE_TARGET = 'react-scroll-collapse/SET_RECURSE_NODE_TARGET';
 export const SET_TREE_ID = 'react-scroll-collapse/SET_TREE_ID';
 

@@ -28,12 +28,14 @@ import removeItem from './collapserItem/removeItem';
 import addItem from './collapserItem/addItem';
 
 /* shared actions */
+import addToNodeTargetArray from './collapser/addToNodeTargetArray';
 import setRecurseNodeTarget from './collapser/setRecurseNodeTarget';
 
 
 const actions = {
   addCollapser,
   addCollapserChild,
+  addToNodeTargetArray,
   addRootNode,
   removeRootNode,
   removeCollapser,
@@ -69,6 +71,7 @@ export const collapserControllerActions = {
 };
 
 export const collapserWrapperActions = {
+  addToNodeTargetArray,
   expandCollapseAll,
   setOffsetTop,
   setRecurseNodeTarget,

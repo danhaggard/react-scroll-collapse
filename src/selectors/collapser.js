@@ -54,18 +54,35 @@ const collapserItemsExpandedRootEvery = passArgsToIteratorEvery(
   getItemRoot
 );
 
+export const nestedCollapserItemsExpandedRootEvery = (
+  state,
+  { collapserId, targetNodeArray },
+  cache,
+) => everyReducer(true)(
+  targetNodeArray.map(targetNodeId => recurseToNode({
+    cache,
+    /*
+    getNodeChildren: id => getCollapserCollapsersRoot(state)(id).map(
+      childId => getCollapserTreeIdRoot(state)(childId)
+    ),
+    */
+    getNodeChildren: id => getCollapserCollapsersRoot(state)(id),
+    currentNodeId: collapserId,
+    resultReducer: everyReducer(true),
+    getNodeValue: id => collapserItemsExpandedRootEvery(state)(id),
+    getTreeId: getCollapserTreeIdRoot(state),
+    targetNodeId,
+  }))
+);
 
+
+/*
 export const nestedCollapserItemsExpandedRootEvery = (
   state,
   { collapserId, targetNodeId },
   cache,
 ) => recurseToNode({
   cache,
-  /*
-  getNodeChildren: id => getCollapserCollapsersRoot(state)(id).map(
-    childId => getCollapserTreeIdRoot(state)(childId)
-  ),
-  */
   getNodeChildren: id => getCollapserCollapsersRoot(state)(id),
   currentNodeId: collapserId,
   resultReducer: everyReducer(true),
@@ -73,7 +90,7 @@ export const nestedCollapserItemsExpandedRootEvery = (
   getTreeId: getCollapserTreeIdRoot(state),
   targetNodeId,
 });
-
+*/
 
 export const nestedCollapserItemsRoot = (state, { collapserId }) => recurseAllChildren(
   id => getCollapserCollapsersRoot(state)(id),

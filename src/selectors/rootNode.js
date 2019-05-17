@@ -24,3 +24,15 @@ export const getRootNodeRecurseNodeTargetRoot = curryCompose(
   getRootNodeRecurseNodeTarget,
   getRootNodeRoot
 );
+
+// --- rootNode.nodeTargetArray
+export const getRootNodeTargetArray = rootNodeObject => getOrNull(
+  rootNodeObject,
+  'nodeTargetArray'
+);
+
+// rootState => id = [3, 4, etc...]
+export const getNodeTargetArrayRoot = curryCompose(
+  getRootNodeTargetArray,
+  getRootNodeRoot
+);
