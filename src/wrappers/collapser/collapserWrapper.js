@@ -8,9 +8,6 @@ import { checkForRef } from '../../utils/errorUtils';
 import { ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
 import { collapserWrapperActions } from '../../actions';
 
-import createCache from '../../caching/recursionCache';
-import providerCaches from '../../caching/providerCaches';
-
 import { getNodeTargetArrayRoot } from '../../selectors/rootNode';
 import {
   nestedCollapserItemsRoot,
@@ -20,20 +17,9 @@ import {
 
 import {
   compareIntArrays,
+  getCache,
   getRootNodeId,
 } from '../utils';
-
-
-const getCache = (props) => { // eslint-disable-line react/sort-comp
-  const { isRootNode, providerType } = props;
-  const rootNodeId = getRootNodeId(props);
-  const providerCache = providerCaches[providerType];
-  if (isRootNode) {
-    providerCache[rootNodeId] = createCache();
-  }
-  return providerCache[rootNodeId];
-};
-
 
 export const collapserWrapper = (WrappedComponent) => {
 

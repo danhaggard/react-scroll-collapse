@@ -84,6 +84,7 @@ export const itemControllerActions = {
 
 
 export const itemWrapperActions = {
+  addToNodeTargetArray,
   heightReady,
   expandCollapse,
   setOffsetTop,

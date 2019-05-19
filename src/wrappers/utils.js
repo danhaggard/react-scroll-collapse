@@ -1,3 +1,6 @@
+import createCache from '../caching/recursionCache';
+import providerCaches from '../caching/providerCaches';
+
 export const getRootNodeId = ({
   isRootNode,
   collapserId,
@@ -11,7 +14,7 @@ export const whyUpdate = (state, nextState, component, id, checkAgainst = []) =>
       if (id === 1) {
         // debugger;
       }
-      console.log(`whyUpdate:  ${component} - id: ${id}, key: ${key}, value: ${state[key]}, nextValue: ${nextState[key]}`);
+      console.log(`whyUpdate:  ${component} - id: ${id}, key: ${key}, value: ${state[key]}, nextValue: ${nextState[key]}`); // eslint-disable-line
     }
   });
 };
@@ -28,4 +31,20 @@ export const compareIntArrays = (arr1, arr2) => {
     }
   }
   return true;
+};
+
+export const getCache = (props) => {
+  const { isRootNode, providerType } = props;
+  const rootNodeId = getRootNodeId(props);
+  const providerCache = providerCaches[providerType];
+  if (isRootNode) {
+    providerCache[rootNodeId] = createCache();
+  }
+  return providerCache[rootNodeId];
+};
+
+export const shouldLogProvider = (props, state, id, log) => {
+  if (!Object.keys(props).includes('isOpenedInit')) {
+    console.log(log, id, props, state);
+  }
 };
