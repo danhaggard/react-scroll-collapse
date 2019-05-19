@@ -5,57 +5,19 @@ import { connect } from 'react-redux';
 import { ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
 import { collapserControllerActions } from '../../actions';
 import cleanHoCProps from '../../utils/cleanHoCProps';
-
+import { getRootNodeId } from '../utils';
 
 export const collapserControllerWrapper = (CollapserController) => {
 
   class WrappedCollapserController extends Component {
 
-    static getDerivedStateFromProps(props, state) {
-      console.log('getDerivedStateFromProps - WrappedCollapserController - collapserId, props, state', props.collapserId, props, state);
-      return state;
-    }
-
-    componentDidMount() {
-      const { props, state } = this;
-      console.log('componentDidMount - WrappedCollapserController - collapserId, props, state', props.collapserId, props, state);
-      // console.log('');
-
-    }
-
-    shouldComponentUpdate(nextProps, nextState) {
-      const { props, state } = this;
-      console.log('shouldComponentUpdate - WrappedCollapserController - collapserId, props, state', props.collapserId, props, state);
-      return true;
-    }
-
-    componentDidUpdate() {
-      const { props, state } = this;
-      console.log('componentDidUpdate - WrappedCollapserController - collapserId, props, state', props.collapserId, props, state);
-    }
-
-    getRootNodeId = () => { // eslint-disable-line react/sort-comp
-      const {
-        isRootNode,
-        collapserId,
-        rootNodes,
-        providerType
-      } = this.props;
-      return isRootNode ? collapserId : rootNodes[providerType];
-    }
-
-    constructor(props) { // eslint-disable-line react/sort-comp
+    constructor(props) {
       super(props);
-      console.log('WrappedCollapserController this constructor', this);
-      console.log('constructor - WrappedCollapserController - collapserId, props', props.collapserId, props);
       this.addCollapser();
       this.addRootNode();
-      this.state = {};
     }
 
     componentWillUnmount() {
-      const { props, state } = this;
-      console.log('componentWillUnmount - WrappedCollapserController - collapserId, props, state', props.collapserId, props, state);
       const {
         removeCollapserChild,
         removeScrollerChild,
@@ -88,27 +50,23 @@ export const collapserControllerWrapper = (CollapserController) => {
     addRootNode() {
       const { addRootNode, isRootNode } = this.props;
       if (isRootNode) {
-        addRootNode(this.getRootNodeId());
+        addRootNode(getRootNodeId(this.props));
       }
     }
 
     removeRootNode() {
       const { removeRootNode, isRootNode } = this.props;
       if (isRootNode) {
-        removeRootNode(this.getRootNodeId());
+        removeRootNode(getRootNodeId(this.props));
       }
     }
 
     render() {
-      const { props, state } = this;
-      console.log('render -  - collapserId, props, state', props.collapserId, props, state);
-      console.log('');
-
       const { collapserId, parentScrollerId } = this.props;
       if (collapserId >= 0 && parentScrollerId >= 0) {
         return (
           <CollapserController
-            rootNodeId={this.getRootNodeId()}
+            rootNodeId={getRootNodeId(this.props)}
             {...cleanHoCProps(
               this.props,
               WrappedCollapserController.defaultProps,
