@@ -45,6 +45,6 @@ export const getCache = (props) => {
 
 export const shouldLogProvider = (props, state, id, log) => {
   if (!Object.keys(props).includes('isOpenedInit')) {
-    console.log(log, id, props, state);
+    console.log(log, id, props, state); // eslint-disable-line
   }
 };

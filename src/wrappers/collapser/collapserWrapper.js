@@ -30,7 +30,6 @@ export const collapserWrapper = (WrappedComponent) => {
     elem = React.createRef();
 
     static getDerivedStateFromProps(props, state) {
-      console.log('getDerivedStateFromProps - CollapserController - collapserId, props, state', props.collapserId, props, state);
       const {
         areAllItemsExpandedSelector,
         collapserId,
@@ -54,12 +53,6 @@ export const collapserWrapper = (WrappedComponent) => {
       };
     }
 
-    constructor(props) {
-      super(props);
-      console.log('CollapserController this constructor', this);
-      console.log('constructor - CollapserController - collapserId, props', props.collapserId, props);
-    }
-
     state = {
       areAllItemsExpanded: null,
       cache: getCache(this.props),
@@ -70,11 +63,11 @@ export const collapserWrapper = (WrappedComponent) => {
         addToNodeTargetArray,
         collapserId,
         isRootNode,
+        setTreeId,
+        setTreeIdsSelector,
         watchInitCollapser
       } = this.props;
-      const { props, state } = this;
-      console.log('componentDidMount - CollapserController - collapserId, props, state', props.collapserId, props, state);
-
+      const { props } = this;
       checkForRef(WrappedComponent, this.elem, 'collapserRef');
       watchInitCollapser(collapserId);
 
@@ -83,55 +76,25 @@ export const collapserWrapper = (WrappedComponent) => {
       */
       const addNodeValue = isRootNode ? null : collapserId;
       addToNodeTargetArray(addNodeValue, getRootNodeId(this.props));
-      props.setTreeIdsSelector(props.setTreeId);
+      setTreeIdsSelector(setTreeId);
     }
 
     shouldComponentUpdate(nextProps, nextState) {
       const { props, state } = this;
-      console.log('shouldComponentUpdate - CollapserController - collapserId, props, state', props.collapserId, props, state);
-      const checkAgainstProps = ['rootNodeId', 'setTreeIds', 'allChildItemIds', 'nodeTargetArray',
+      const checkAgainstProps = ['rootNodeId', 'setTreeIds', 'setTreeId', 'allChildItemIds', 'nodeTargetArray',
         'areAllItemsExpandedSelector', 'setTreeIdsSelector'];
 
       const propsCondition = (prop, stateCheckValue) => {
-        /*
-        if (props.collapserId === 0 && prop === 'nodeTargetArray') {
-          debugger;
-        }
-        */
         const left = !checkAgainstProps.includes(prop) && props[prop] !== nextProps[prop];
         const right = prop === 'nodeTargetArray' && !compareIntArrays(props[prop], nextProps[prop]) && stateCheckValue;
-        const final = left || right;
-        return final;
+        return left || right;
       };
 
       const stateCondition = prop => (state[prop] !== nextState[prop]);
       const stateCheckValue = Object.keys(state).some(prop => stateCondition(prop));
 
-      /*
-      const shouldUpdate = Object.keys(props).some(prop => propsCondition(prop, stateCheckValue))
-       || stateCheckValue;
-
-      if (shouldUpdate) {
-        whyUpdate(props, nextProps, 'CollapserController - props',
-          props.collapserId, checkAgainstProps);
-        whyUpdate(state, nextState, 'CollapserController - state', props.collapserId);
-      }
-      return shouldUpdate;
-      */
-
       return Object.keys(props).some(prop => propsCondition(prop, stateCheckValue))
        || stateCheckValue;
-    }
-
-    componentDidUpdate() {
-      const { props, state } = this;
-      console.log('componentDidUpdate - CollapserController - collapserId, props, state', props.collapserId, props, state);
-
-    }
-
-    componentWillUnmount() {
-      const { props, state } = this;
-      console.log('componentWillUnmount - CollapserController - collapserId, props, state', props.collapserId, props, state);
     }
 
     getOffSetTop = () => this.elem.current.offsetTop;
@@ -173,8 +136,8 @@ export const collapserWrapper = (WrappedComponent) => {
 
     render() {
       const { props, state } = this;
-      console.log('render - CollapserController - collapserId, props, state', props.collapserId, props, state);
-      console.log('');
+      // console.log('render - CollapserController - collapserId, props, state', props.collapserId, props, state);
+      // console.log('');
 
       const {
         expandCollapseAll,
