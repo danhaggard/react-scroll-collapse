@@ -14,14 +14,14 @@ export const REMOVE_COLLAPSER = 'react-scroll-collapse/REMOVE_COLLAPSER';
 export const REMOVE_COLLAPSER_CHILD = 'react-scroll-collapse/REMOVE_COLLAPSER_CHILD';
 export const EXPAND_COLLAPSE_ALL = 'react-scroll-collapse/EXPAND_COLLAPSE_ALL';
 export const HEIGHT_READY_ALL = 'react-scroll-collapse/HEIGHT_READY_ALL';
+export const SET_TREE_ID = 'react-scroll-collapse/SET_TREE_ID';
 export const WATCH_INIT_COLLAPSER = 'react-scroll-collapse/WATCH_INIT_COLLAPSER';
 export const WATCH_COLLAPSER = 'react-scroll-collapse/WATCH_COLLAPSER';
 
+/* rootNodes action types */
 export const ADD_ROOT_NODE = 'react-scroll-collapse/ADD_ROOT_NODE';
 export const REMOVE_ROOT_NODE = 'react-scroll-collapse/REMOVE_ROOT_NODE';
 export const ADD_TO_NODE_TARGET_ARRAY = 'react-scroll-collapse/ADD_TO_NODE_TARGET_ARRAY';
-export const SET_RECURSE_NODE_TARGET = 'react-scroll-collapse/SET_RECURSE_NODE_TARGET';
-export const SET_TREE_ID = 'react-scroll-collapse/SET_TREE_ID';
 
 
 /* collapserItem action types */

@@ -11,11 +11,10 @@ import { collapserWrapperActions } from '../../actions';
 import createCache from '../../caching/recursionCache';
 import providerCaches from '../../caching/providerCaches';
 
-import { getRootNodeRoot, getRootNodeRecurseNodeTargetRoot, getNodeTargetArrayRoot } from '../../selectors/rootNode';
+import { getNodeTargetArrayRoot } from '../../selectors/rootNode';
 import {
   nestedCollapserItemsRoot,
   nestedCollapserItemsExpandedRootEvery,
-  getCollapserCollapsersRoot,
   setTreeIdsRecursively,
 } from '../../selectors/collapser';
 
@@ -34,15 +33,34 @@ const compareIntArrays = (arr1, arr2) => {
   return true;
 };
 
-const getRootNodeId = (props) => { // eslint-disable-line react/sort-comp
-  const {
-    isRootNode,
-    collapserId,
-    rootNodes,
-    providerType
-  } = props;
-  return isRootNode ? collapserId : rootNodes[providerType];
+const whyUpdate = (state, nextState, component, id, checkAgainst = []) => {
+  Object.keys(state).forEach((key) => {
+    if (!checkAgainst.includes(key) && state[key] !== nextState[key]) {
+      if (id === 1) {
+        // debugger;
+      }
+      console.log(`whyUpdate:  ${component} - id: ${id}, key: ${key}, value: ${state[key]}, nextValue: ${nextState[key]}`);
+    }
+  });
 };
+
+const getRootNodeId = ({
+  isRootNode,
+  collapserId,
+  rootNodes,
+  providerType
+}) => (isRootNode ? collapserId : rootNodes[providerType]);
+
+const getCache = (props) => { // eslint-disable-line react/sort-comp
+  const { isRootNode, providerType } = props;
+  const rootNodeId = getRootNodeId(props);
+  const providerCache = providerCaches[providerType];
+  if (isRootNode) {
+    providerCache[rootNodeId] = createCache();
+  }
+  return providerCache[rootNodeId];
+};
+
 
 export const collapserWrapper = (WrappedComponent) => {
 
@@ -58,26 +76,11 @@ export const collapserWrapper = (WrappedComponent) => {
         areAllItemsExpandedSelector,
         collapserId,
         nodeTargetArray,
-        // recurseNodeTarget,
         isRootNode,
-        // rootNodeState,
         addToNodeTargetArray,
-        setTreeIdsSelector,
-        setTreeId,
       } = props;
       let areAllItemsExpandedUpdate = state.areAllItemsExpanded;
-      // const { recurseNodeTarget } = rootNodeState;
-      debugger;
       if (isRootNode) {
-        /*
-        let newTarget = recurseNodeTarget === null ? [-1] : [recurseNodeTarget];
-        const nodeTargetArray = getNodeTargetArray();
-        if (nodeTargetArray.length > 0) {
-          newTarget = nodeTargetArray
-        }
-        */
-
-
         state.cache.unlockCache();
         areAllItemsExpandedUpdate = areAllItemsExpandedSelector(nodeTargetArray, state.cache);
         state.cache.lockCache();
@@ -95,33 +98,12 @@ export const collapserWrapper = (WrappedComponent) => {
     constructor(props) {
       super(props);
       console.log('CollapserController this constructor', this);
-
       console.log('constructor - CollapserController - collapserId, props', props.collapserId, props);
-    }
-
-    getRootNodeId = () => { // eslint-disable-line react/sort-comp
-      const {
-        isRootNode,
-        collapserId,
-        rootNodes,
-        providerType
-      } = this.props;
-      return isRootNode ? collapserId : rootNodes[providerType];
-    }
-
-    getCache = () => { // eslint-disable-line react/sort-comp
-      const { isRootNode, providerType } = this.props;
-      const rootNodeId = this.getRootNodeId();
-      const providerCache = providerCaches[providerType];
-      if (isRootNode) {
-        providerCache[rootNodeId] = createCache();
-      }
-      return providerCache[rootNodeId];
     }
 
     state = {
       areAllItemsExpanded: null,
-      cache: this.getCache(),
+      cache: getCache(this.props),
     };
 
     componentDidMount() {
@@ -141,19 +123,8 @@ export const collapserWrapper = (WrappedComponent) => {
         On insertion of new node - we shouldn't check unrelated branches - so set this.
       */
       const addNodeValue = isRootNode ? null : collapserId;
-      addToNodeTargetArray(addNodeValue, this.getRootNodeId());
+      addToNodeTargetArray(addNodeValue, getRootNodeId(this.props));
       props.setTreeIdsSelector(props.setTreeId);
-    }
-
-    whyUpdate = (state, nextState, component, id, checkAgainst = []) => {
-      Object.keys(state).forEach((key) => {
-        if (!checkAgainst.includes(key) && state[key] !== nextState[key]) {
-          if (id === 1) {
-            // debugger;
-          }
-          console.log(`whyUpdate:  ${component} - id: ${id}, key: ${key}, value: ${state[key]}, nextValue: ${nextState[key]}`);
-        }
-      });
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -161,57 +132,42 @@ export const collapserWrapper = (WrappedComponent) => {
       console.log('shouldComponentUpdate - CollapserController - collapserId, props, state', props.collapserId, props, state);
       const checkAgainstProps = ['rootNodeId', 'setTreeIds', 'allChildItemIds', 'nodeTargetArray',
         'areAllItemsExpandedSelector', 'setTreeIdsSelector'];
-      // this.whyUpdate(props, nextProps, 'CollapserController - props', props.collapserId, checkAgainstProps);
-      // this.whyUpdate(state, nextState, 'CollapserController - state', props.collapserId);
 
-      const propsCondition = (prop, stateCheckValue, state, nextState) => {
+      const propsCondition = (prop, stateCheckValue) => {
+        /*
         if (props.collapserId === 0 && prop === 'nodeTargetArray') {
           debugger;
         }
+        */
         const left = !checkAgainstProps.includes(prop) && props[prop] !== nextProps[prop];
-        const right = prop === 'nodeTargetArray' && !compareIntArrays(props[prop], nextProps[prop]) && state.areAllItemsExpanded !== nextState.areAllItemsExpanded;
+        const right = prop === 'nodeTargetArray' && !compareIntArrays(props[prop], nextProps[prop]) && stateCheckValue;
         const final = left || right;
-        if (final) {
-          debugger;
-        }
         return final;
       };
 
-      /*
-      const propsCondition = prop => (
-        (!checkAgainstProps.includes(prop) && props[prop] !== nextProps[prop]) || (prop === 'nodeTargetArray' && props[prop].length !== 0 && nextProps[prop].length !== 0));
-      */
       const stateCondition = prop => (state[prop] !== nextState[prop]);
       const stateCheckValue = Object.keys(state).some(prop => stateCondition(prop));
-      const shouldUpdate = Object.keys(props).some(prop => propsCondition(prop, stateCheckValue, state, nextState))
-       || stateCheckValue;
+
       /*
-      const shouldUpdate = Object.keys(props).some(prop => propsCondition(prop, state, nextState))
-       || Object.keys(state).some(prop => stateCondition(prop));
-      */
+      const shouldUpdate = Object.keys(props).some(prop => propsCondition(prop, stateCheckValue))
+       || stateCheckValue;
+
       if (shouldUpdate) {
-        this.whyUpdate(props, nextProps, 'CollapserController - props', props.collapserId, checkAgainstProps);
-        this.whyUpdate(state, nextState, 'CollapserController - state', props.collapserId);
+        whyUpdate(props, nextProps, 'CollapserController - props',
+          props.collapserId, checkAgainstProps);
+        whyUpdate(state, nextState, 'CollapserController - state', props.collapserId);
       }
       return shouldUpdate;
-      /*
-      return Object.keys(props).some(prop => propsCondition(prop))
-       || Object.keys(state).some(prop => stateCondition(prop));
-       */
+      */
+
+      return Object.keys(props).some(prop => propsCondition(prop, stateCheckValue))
+       || stateCheckValue;
     }
 
     componentDidUpdate() {
-      const {
-        addToNodeTargetArray,
-        collapserId,
-        isRootNode,
-        nodeTargetArray
-      } = this.props;
       const { props, state } = this;
       console.log('componentDidUpdate - CollapserController - collapserId, props, state', props.collapserId, props, state);
-      if (isRootNode && nodeTargetArray.length !== 0) {
-        // addToNodeTargetArray(null, this.getRootNodeId());
-      }
+
     }
 
     componentWillUnmount() {
@@ -252,7 +208,7 @@ export const collapserWrapper = (WrappedComponent) => {
       );
       allChildItemIds().forEach(itemId => expandCollapseAll(areAllItemsExpanded, itemId));
       if (!isRootNode) {
-        addToNodeTargetArray(collapserId, this.getRootNodeId());
+        addToNodeTargetArray(collapserId, getRootNodeId(this.props));
       }
     };
 
@@ -317,27 +273,11 @@ export const collapserWrapper = (WrappedComponent) => {
       state, { ...ownProps, targetNodeArray }, collapserCache
     );
 
-    /*
-    const areAllItemsExpandedSelector = (
-      targetNodeId,
-      collapserCache
-    ) => nestedCollapserItemsExpandedRootEvery(
-      state, { ...ownProps, targetNodeId }, collapserCache
-    );
-    */
-    // const childCollapsers = getCollapserCollapsersRoot(state)(ownProps.collapserId);
-    // console.log('%c CollapserController - mapStateToProps, collapserId, childCollapsers!',
-    //   'color: green; font-weight: bold;', ownProps.collapserId, childCollapsers);
-
-    // console.log('CollapserController - mapStateToProps, collapserId, childCollapsers',
-    //   ownProps.collapserId, childCollapsers);
     return {
       allChildItemIds: () => nestedCollapserItemsRoot(state, ownProps),
       areAllItemsExpandedSelector,
       setTreeIdsSelector: action => setTreeIdsRecursively(state, ownProps.rootNodeId, action),
       nodeTargetArray: getNodeTargetArrayRoot(state)(ownProps.rootNodeId),
-      // recurseNodeTarget: getRootNodeRecurseNodeTargetRoot(state)(ownProps.rootNodeId),
-      // rootNodeState: getRootNodeRoot(state)(ownProps.rootNodeId)
     };
   };
 

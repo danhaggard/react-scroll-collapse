@@ -9,10 +9,7 @@ import {
 import { getEntitiesRoot } from './common';
 
 import { getItemExpanded, getItemRoot } from './collapserItem';
-
-import recurseToNode from './recurseToNode';
 import recurseToNodeArray from './recurseToNodeArray';
-
 import recurseAllChildren from './recurseAllChildren';
 import recurseTreeIds from './recurseTreeIds';
 
@@ -55,44 +52,6 @@ const collapserItemsExpandedRootEvery = passArgsToIteratorEvery(
   getItemExpanded,
   getItemRoot
 );
-
-/*
-export const nestedCollapserItemsExpandedRootEvery = (
-  state,
-  { collapserId, targetNodeArray },
-  cache,
-) => everyReducer(true)(
-  targetNodeArray.map(targetNodeId => recurseToNode({
-    cache,
-    /*
-    getNodeChildren: id => getCollapserCollapsersRoot(state)(id).map(
-      childId => getCollapserTreeIdRoot(state)(childId)
-    ),
-    getNodeChildren: id => getCollapserCollapsersRoot(state)(id),
-    currentNodeId: collapserId,
-    resultReducer: everyReducer(true),
-    getNodeValue: id => collapserItemsExpandedRootEvery(state)(id),
-    getTreeId: getCollapserTreeIdRoot(state),
-    targetNodeId,
-  }))
-);
-*/
-
-/*
-export const nestedCollapserItemsExpandedRootEvery = (
-  state,
-  { collapserId, targetNodeId },
-  cache,
-) => recurseToNode({
-  cache,
-  getNodeChildren: id => getCollapserCollapsersRoot(state)(id),
-  currentNodeId: collapserId,
-  resultReducer: everyReducer(true),
-  getNodeValue: id => collapserItemsExpandedRootEvery(state)(id),
-  getTreeId: getCollapserTreeIdRoot(state),
-  targetNodeId,
-});
-*/
 
 export const nestedCollapserItemsExpandedRootEvery = (
   state,

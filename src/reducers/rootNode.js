@@ -4,7 +4,6 @@ import {
   ADD_ROOT_NODE,
   ADD_TO_NODE_TARGET_ARRAY,
   REMOVE_ROOT_NODE,
-  SET_RECURSE_NODE_TARGET
 } from '../actions/const';
 import { getOrObject } from '../utils/selectorUtils';
 import {
@@ -36,20 +35,9 @@ export const nodeTargetArrayReducer = (state = [], action) => {
   }
 };
 
-export const recurseNodeTargetReducer = (state = null, action) => {
-  const { collapserId } = getOrObject(action, 'payload');
-  switch (action.type) {
-    case SET_RECURSE_NODE_TARGET:
-      return collapserId;
-    default:
-      return state;
-  }
-};
-
 export const rootNodeReducer = combineReducers({
   id: rootNodeIdReducer,
   nodeTargetArray: nodeTargetArrayReducer,
-  recurseNodeTarget: recurseNodeTargetReducer,
 });
 
 export const rootNodesReducer = (state = {}, action) => {
@@ -60,7 +48,6 @@ export const rootNodesReducer = (state = {}, action) => {
     case ADD_ROOT_NODE:
       return addToState(state, action, rootNodeId, rootNodeReducer);
     case ADD_TO_NODE_TARGET_ARRAY:
-    case SET_RECURSE_NODE_TARGET:
       return updateState(state, action, rootNodeId, rootNodeReducer);
     default:
       return state;

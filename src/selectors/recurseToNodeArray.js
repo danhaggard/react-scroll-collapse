@@ -1,24 +1,3 @@
-const createArrayGetter = getter => (arr, i) => {
-  let value = arr[i];
-  if (getter) {
-    value = getter(value);
-  }
-  return value;
-};
-
-const arrayMax = (arr, getter = createArrayGetter()) => {
-  let len = arr.length;
-  let max = -Infinity;
-  while (len) {
-    len -= 1;
-    const val = getter(arr, len);
-    if (val > max) {
-      max = val;
-    }
-  }
-  return max;
-};
-
 const isInArray = (toCheck, arr, toCheckGetter, arrItemGetter) => {
   let len = arr.length;
   let found = false;
@@ -67,24 +46,6 @@ const getChildTargetMapping = (childArray, targetNodeArray) => {
   return targetNodeArrayChildMapping;
 };
 
-/*
-  babel choking on Math.max
-
-  Credit for this to: https://stackoverflow.com/a/13440842
-
-const arrayMax = (arr) => {
-
-  let len = arr.length;
-  let max = -Infinity;
-  while (len) {
-    len -= 1;
-    if (arr[len] > max) {
-      max = arr[len];
-    }
-  }
-  return max;
-};
-*/
 // Helper func.
 export const getChildResultValuesAndSources = (childArray, recurseFunc, recurseFuncArgs) => {
 
@@ -116,9 +77,7 @@ const recurseToNodeArray = (argsObj) => {
     currentNodeIdObj, // obj with id  and treeId of the node we are currently at.
     resultReducer, // takes an array - and returns a single value
     getNodeValue, // Func that takes an id and returns the value for that node.
-    // getTreeId, // Func that takes an id and returns the treeId for that node.
     targetNodeArray, // id objs of the target nodes.
-    // reachedTargetNode, // boolean
   } = argsObj;
 
   /*
@@ -138,7 +97,6 @@ const recurseToNodeArray = (argsObj) => {
       cached vals.
   */
   const currentNodeId = currentNodeIdObj.id;
-  // const currentNodeTreeId = currentNodeIdObj.treeId;
 
   const cachedValue = cache.getResultValue(currentNodeId);
   const cachedSources = cache.getResultSources(currentNodeId);
@@ -147,12 +105,6 @@ const recurseToNodeArray = (argsObj) => {
     return cachedValue;
   }
 
-  /*
-    treeIds represent the physical position in the tree.  This might change
-    render to render.  nodeId should never change for each node.
-  */
-  // const currentNodeTreeId = getTreeId(currentNodeId);
-  // const targetNodeTreeId = getTreeId(targetNodeId);
 
   // the value returned by this node in isolation of it's children.
   const currentValue = getNodeValue(currentNodeId);
@@ -216,19 +168,6 @@ const recurseToNodeArray = (argsObj) => {
       / \  | \
      5   6 8  9
 
-     6 is the target.
-
-     Start at 0.
-     1 & 2 both < 6 so choose max = 2
-     7 > 6 - so exclude.  Choose max of (4, 3) = 4
-     Now choose the target.
-  */
-
-  // const nextNodeId = arrayMax([...childArray.filter(id => (id <= targetNodeId))]);
-  // babel is choking on Math.max atm.
-
-  // TODO: rather than map child ids to {id, treeId} here - replace the getNodeChildren
-  // selector with one that does this at the start.
 
   /*
     Create targetNodeArray for each child.
@@ -263,22 +202,6 @@ const recurseToNodeArray = (argsObj) => {
     Then we don't gotta worry.  Just return and replace the cache,
     removing the nodes we just checked from  the sources.
 
-  */
-
-  /*
-  const cachedSourceInChildren = (cachedIdObj) => {
-    let len = childTargetMapping.length;
-    let found = false;
-    while (len) {
-      len -= 1;
-      const child = childTargetMapping[len];
-      if (child.id === cachedIdObj.id) {
-        found = true;
-        break;
-      }
-    }
-    return found;
-  };
   */
 
   const cachedSourceInChildren = cachedIdObj => isInArray(

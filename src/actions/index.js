@@ -29,7 +29,6 @@ import addItem from './collapserItem/addItem';
 
 /* shared actions */
 import addToNodeTargetArray from './collapser/addToNodeTargetArray';
-import setRecurseNodeTarget from './collapser/setRecurseNodeTarget';
 
 
 const actions = {
@@ -56,7 +55,6 @@ const actions = {
   setOffsetTop,
   watchInitialise,
   scrollTo,
-  setRecurseNodeTarget,
 };
 
 export const collapserControllerActions = {
@@ -74,7 +72,6 @@ export const collapserWrapperActions = {
   addToNodeTargetArray,
   expandCollapseAll,
   setOffsetTop,
-  setRecurseNodeTarget,
   setTreeId,
   watchCollapser,
   watchInitCollapser,
@@ -90,7 +87,6 @@ export const itemWrapperActions = {
   heightReady,
   expandCollapse,
   setOffsetTop,
-  setRecurseNodeTarget,
   watchCollapser,
 };
 
