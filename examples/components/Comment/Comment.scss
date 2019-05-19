@@ -1,5 +1,7 @@
 :local(.comment) {
   padding-bottom: 0.5em;
+  min-width: -webkit-fill-available;
+  min-width: fill-available;
 }
 
 :local(.commentChildren) {

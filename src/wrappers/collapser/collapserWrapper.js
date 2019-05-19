@@ -77,7 +77,7 @@ export const collapserWrapper = (WrappedComponent) => {
         }
         */
 
-        // TODO:  check if can prevent root recursion call when nodeTargetArray changes from [...something] to []''
+
         state.cache.unlockCache();
         areAllItemsExpandedUpdate = areAllItemsExpandedSelector(nodeTargetArray, state.cache);
         state.cache.lockCache();
@@ -169,7 +169,7 @@ export const collapserWrapper = (WrappedComponent) => {
           debugger;
         }
         const left = !checkAgainstProps.includes(prop) && props[prop] !== nextProps[prop];
-        const right = prop === 'nodeTargetArray' && nextProps[prop].length !== 0 && !compareIntArrays(props[prop], nextProps[prop]) && state.areAllItemsExpanded !== nextState.areAllItemsExpanded;
+        const right = prop === 'nodeTargetArray' && !compareIntArrays(props[prop], nextProps[prop]) && state.areAllItemsExpanded !== nextState.areAllItemsExpanded;
         const final = left || right;
         if (final) {
           debugger;
