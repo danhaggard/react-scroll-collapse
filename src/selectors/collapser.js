@@ -11,6 +11,8 @@ import { getEntitiesRoot } from './common';
 import { getItemExpanded, getItemRoot } from './collapserItem';
 
 import recurseToNode from './recurseToNode';
+import recurseToNodeArray from './recurseToNodeArray';
+
 import recurseAllChildren from './recurseAllChildren';
 import recurseTreeIds from './recurseTreeIds';
 
@@ -54,6 +56,7 @@ const collapserItemsExpandedRootEvery = passArgsToIteratorEvery(
   getItemRoot
 );
 
+/*
 export const nestedCollapserItemsExpandedRootEvery = (
   state,
   { collapserId, targetNodeArray },
@@ -65,7 +68,6 @@ export const nestedCollapserItemsExpandedRootEvery = (
     getNodeChildren: id => getCollapserCollapsersRoot(state)(id).map(
       childId => getCollapserTreeIdRoot(state)(childId)
     ),
-    */
     getNodeChildren: id => getCollapserCollapsersRoot(state)(id),
     currentNodeId: collapserId,
     resultReducer: everyReducer(true),
@@ -74,7 +76,7 @@ export const nestedCollapserItemsExpandedRootEvery = (
     targetNodeId,
   }))
 );
-
+*/
 
 /*
 export const nestedCollapserItemsExpandedRootEvery = (
@@ -91,6 +93,27 @@ export const nestedCollapserItemsExpandedRootEvery = (
   targetNodeId,
 });
 */
+
+export const nestedCollapserItemsExpandedRootEvery = (
+  state,
+  { collapserId, targetNodeArray },
+  cache,
+) => {
+  const getTreeId = getCollapserTreeIdRoot(state);
+  const mapIdToTreeId = id => ({ id, treeId: getTreeId(id) });
+  const targetNodeTreeIdArray = targetNodeArray.map(mapIdToTreeId);
+  const getNodeChildren = id => getCollapserCollapsersRoot(state)(id).map(mapIdToTreeId);
+
+  return recurseToNodeArray({
+    cache,
+    getNodeChildren,
+    currentNodeIdObj: mapIdToTreeId(collapserId),
+    resultReducer: everyReducer(true),
+    getNodeValue: id => collapserItemsExpandedRootEvery(state)(id),
+    getTreeId: getCollapserTreeIdRoot(state),
+    targetNodeArray: targetNodeTreeIdArray,
+  });
+};
 
 export const nestedCollapserItemsRoot = (state, { collapserId }) => recurseAllChildren(
   id => getCollapserCollapsersRoot(state)(id),

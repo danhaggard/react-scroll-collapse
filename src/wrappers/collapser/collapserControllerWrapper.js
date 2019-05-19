@@ -101,7 +101,7 @@ export const collapserControllerWrapper = (CollapserController) => {
 
     render() {
       const { props, state } = this;
-      console.log('render - WrappedCollapserController - collapserId, props, state', props.collapserId, props, state);
+      console.log('render -  - collapserId, props, state', props.collapserId, props, state);
       console.log('');
 
       const { collapserId, parentScrollerId } = this.props;

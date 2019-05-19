@@ -8,7 +8,6 @@ const recurseAllChildren = (
 ) => {
 
   const concatChildren = (currentNodeId, counter) => {
-    debugger;
 
     // const nodeValue = getNodeValue(arr[i]);
     resultReducer(currentNodeId, counter());
