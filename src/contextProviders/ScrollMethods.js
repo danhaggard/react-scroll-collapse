@@ -1,12 +1,5 @@
+/* eslint-disable react/no-unused-state */
 import React, { PureComponent } from 'react';
-import { connect } from 'react-redux';
-import { spring } from 'react-motion';
-
-import {
-  getOffsetTopRoot,
-  getScrollTopRoot,
-  getToggleScrollRoot
-} from '../selectors/scroller';
 
 class ScrollMethods extends PureComponent {
 
@@ -14,99 +7,64 @@ class ScrollMethods extends PureComponent {
 
   ref = React.createRef();
 
-  /*
-  constructor(props, context) {
-    super(props, context);
-    this.contextMethods = {
-      getCurrentChildDistance: this.getCurrentChildDistance,
-      setCurrentChildDistance: this.setCurrentChildDistance,
-      getElem: this.getElem,
-      getRef: this.getRef,
-      getRectTop: this.getRectTop,
-      getScrollTop: this.getScrollTop,
-      setScrollTop: this.setScrollTop,
-      getChildDistanceToTop: this.getChildDistanceToTop,
-      scrollChildToTop: this.scrollChildToTop,
-    };
-  }
-  */
-
   constructor(props, context) {
     super(props, context);
     this.contextMethods = {
       ...this
     };
     this.state = {
-      // childDistanceToTop: -1,
-      motionStyle: { y: 0 },
+      providerMotionStyle: {
+        needsReset: true,
+        y: 0
+      },
     };
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate() {
     if (this.currentChildElem) {
-      this.setState({
-        motionStyle: this.getMotionStyle(),
+      this.setState({  // eslint-disable-line
+        providerMotionStyle: this.getMotionStyle(),
       });
       this.currentChildElem = null;
     }
   }
 
-  getRectTopElem = elem => elem.getBoundingClientRect().top;
-
   getRef = () => this.ref;
 
   getElem = () => this.getRef().current;
 
-  getRectTop = () => {
-    const elem = this.getElem();
-    return elem ? this.getRectTopElem(elem) : null;
-  }
+  getRectTop = el => (el ? el.getBoundingClientRect().top : null);
 
-  getScrollTop = () => {
-    const elem = this.getElem();
-    return elem ? elem.scrollTop : null;
-  }
+  getScrollTop = el => (el ? el.scrollTop : null);
 
   setScrollTop = (val) => {
-    const elem = this.getElem();
-    if (elem && val >= 0) {
-      elem.scrollTop = val;
+    const el = this.getElem();
+    if (el && val >= 0) {
+      el.scrollTop = val;
     }
-    return null;
   };
 
-  getChildDistanceToTop = (childElem) => {
-    const childRectTop = this.getRectTopElem(childElem);
-    const rectTop = this.getRectTop();
-    const scrollTop = this.getScrollTop();
-    return childRectTop - rectTop + scrollTop;
-  }
+  getChildDistanceToTop = (childEl) => {
+    const el = this.getElem();
+    return this.getRectTop(childEl) - this.getRectTop(el) + this.getScrollTop(el);
+  };
 
   setChildDistanceToTop = (childElem) => {
     this.currentChildElem = childElem;
     this.resetMotionStyle();
-  }
+  };
 
-  /*
   getMotionStyle = () => ({
-    y: spring(
-      this.getScrollTo(),
-      this.getSpringConfig(this.props)
-    )
-  });
-  */
-  getMotionStyle = () => ({
-    y: spring(
-      this.getChildDistanceToTop(this.currentChildElem),
-      { stiffness: 170, damping: 20 }
-    )
+    needsReset: false,
+    y: this.getChildDistanceToTop(this.currentChildElem),
   });
 
-  resetMotionStyle = () => this.setState({ motionStyle: { y: this.getScrollTop() } });
-
-  scrollChildToTop = (childRef) => {
-    this.setScrollTop(this.getChildDistanceToTop(childRef));
-  }
+  resetMotionStyle = () => this.setState({
+    providerMotionStyle: {
+      needsReset: true,
+      y: this.getScrollTop(this.getElem()),
+    }
+  });
 
 }
 

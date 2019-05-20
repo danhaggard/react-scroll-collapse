@@ -93,13 +93,7 @@ class Scroller extends PureComponent {
     return newProps;
   };
 
-  render() {
-    // debugger;
-    const newProps = this.getProps(this.props);
-    return (
-      <div {...newProps} />
-    );
-  }
+  render = () => <div {...this.getProps(this.props)} />;
 }
 
 Scroller.defaultProps = {

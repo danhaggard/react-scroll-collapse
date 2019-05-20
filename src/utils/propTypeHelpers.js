@@ -26,6 +26,7 @@ export const ofChildrenTypeOrString = PropTypes.oneOfType([
 
 export const ofBoolTypeOrNothing = ofTypeOrNothing(PropTypes.bool);
 export const ofFuncTypeOrNothing = ofTypeOrNothing(PropTypes.func);
+export const ofObjectTypeOrNothing = ofTypeOrNothing(PropTypes.object);
 export const ofNumberTypeOrNothing = ofTypeOrNothing(PropTypes.number);
 export const ofNumberStringTypeOrNothing = ofTypeOrNothing(
   undefined, [PropTypes.number, PropTypes.string]
