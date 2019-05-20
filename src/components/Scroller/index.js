@@ -2,8 +2,9 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 
-import { ofChildrenType } from '../../utils/propTypeHelpers';
+import { ofChildrenType, ofNumberStringTypeOrNothing } from '../../utils/propTypeHelpers';
 import { targetIsScrollBar } from '../../utils/domUtils';
+import { isUndefNull } from '../../utils/selectorUtils';
 import styles from './Scroller.scss';
 
 
@@ -73,20 +74,26 @@ class Scroller extends PureComponent {
     return null;
   };
 
+  getProps = ({ className, style }) => ({
+    className: this.getClassName(className),
+    onKeyDown: this.handleKeyDown,
+    onMouseDown: this.handleMouseDown,
+    onWheel: this.handleWheel,
+    ref: (elemArg) => {
+      this.elem = elemArg;
+    },
+    role: 'presentation',
+    style,
+  });
+
   render() {
-    const { className, children, style } = this.props;
+    const { children, id } = this.props;
+    const newProps = this.getProps(this.props);
+    if (!isUndefNull(id)) {
+      newProps.id = id;
+    }
     return (
-      <div
-        className={this.getClassName(className)}
-        onKeyDown={this.handleKeyDown}
-        onMouseDown={this.handleMouseDown}
-        onWheel={this.handleWheel}
-        ref={(elemArg) => {
-          this.elem = elemArg;
-        }}
-        role="presentation"
-        style={style}
-      >
+      <div {...newProps}>
         { children }
       </div>
     );
@@ -96,6 +103,7 @@ class Scroller extends PureComponent {
 Scroller.defaultProps = {
   children: [],
   className: '',
+  id: null,
   style: {},
 };
 
@@ -104,6 +112,7 @@ Scroller.propTypes = {
   className: PropTypes.string,
   breakScrollAnimation: PropTypes.func.isRequired,
   getUserScrollActive: PropTypes.func.isRequired,
+  id: ofNumberStringTypeOrNothing,
   style: PropTypes.object,
 };
 
