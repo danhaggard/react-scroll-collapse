@@ -154,13 +154,14 @@ const createProvider = (
     }
 
     render() {
-      return childTypeKeys.length === 0 ? <Comp {...this.props} /> : (
+      return childTypeKeys.length === 0 ? <Comp {...this.props} {...this.state} /> : (
         <Context.Provider value={this.childContext}>
           <Comp
             contextMethods={this.mergedContextMethods}
             isRootNode={this.checkIfRoot()}
             providerType={typeKey}
             {...this.props}
+            {...this.state}
             key={this.idKey}
             />
         </Context.Provider>

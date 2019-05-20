@@ -75,9 +75,9 @@ export const toggleScrollReducer = (state = false, action) => {
 const scrollerReducer = combineReducers({
   collapsers: scrollerCollapsersIdArrayReducer,
   id: scrollerIdReducer,
-  offsetTop: offsetTopReducer,
-  scrollTop: scrollTopReducer,
-  toggleScroll: toggleScrollReducer,
+  // offsetTop: offsetTopReducer,
+  // scrollTop: scrollTopReducer,
+  // toggleScroll: toggleScrollReducer,
 });
 
 export const scrollersReducer = (state = {}, action) => {

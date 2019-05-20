@@ -28,12 +28,13 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
   */
   class ScrollerMotion extends PureComponent {
 
+    /*
     static getDerivedStateFromProps(nextProps, prevState) {
       const { springConfig, toggleScroll } = prevState;
 
       /*
         springConfig overide default -  when supplied by parent.
-      */
+
       if (springConfig !== nextProps.springConfig) {
         return { springConfig: nextProps.springConfig };
       }
@@ -42,7 +43,7 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
         Ensures that the scrollTop start val for <Motion> is in sync with the UI
         see:
         https://github.com/danhaggard/react-scroll-collapse/issues/2#issue-186472122
-      */
+
       if (toggleScroll !== nextProps.toggleScroll) {
         return {
           motionStyle: { y: nextProps.scrollTop },
@@ -52,6 +53,7 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
       }
       return null;
     }
+    */
 
     /*
       userScrollActive: used to give back scroll control to the user.
@@ -60,6 +62,7 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
     */
     userScrollActive = true;
 
+    /*
     constructor(props) {
       super(props);
       this.state = {
@@ -69,6 +72,7 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
         toggleScroll: props.toggleScroll,
       };
     }
+    */
 
     /*
       Initiate a saga to watch this Scroller for ExpandCollapse/All actions.
@@ -88,6 +92,8 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
      setState here to do so - but only conditional on the previous render being
      a scrollTop ui sync so we don't get infinite loop.
      */
+
+    /*
     componentDidUpdate() {
       const { prevRenderType, springConfig } = this.state;
       if (prevRenderType === 'uiSync') {
@@ -95,7 +101,7 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
         /*
           userScrollActive tells the child scroller it can fire event handlers
           to give back scroll control to the user when requested.
-        */
+
         this.userScrollActive = false;
         this.setState({ // eslint-disable-line react/no-did-update-set-state
           motionStyle: {
@@ -104,6 +110,11 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
           prevRenderType: 'autoScroll',
         });
       }
+    }
+    */
+
+    componentDidUpdate(prevProps, prevState) {
+      this.userScrollActive = false;
     }
 
     /*
@@ -130,10 +141,31 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
 
     getUserScrollActive = () => this.userScrollActive;
 
+    getSpringConfig = ({ springConfig }) => springConfig || { stiffness: 170, damping: 20 };
+
+    /*
+    getMotionStyle = () => ({
+      y: spring(
+        this.getScrollTo(),
+        this.getSpringConfig(this.props)
+      )
+    });
+    */
+    resetMotionStyle = () => ({ y: this.props.scrollTop });
+
+    getOnRest = (args) => {
+      const { onRest } = this.props;
+      console.log('getOnRest', args);
+      if (typeof onRest === 'function') {
+        onRest(args);
+      }
+    }
+
+
     render() {
-      const { onRest, ...rest } = this.props;
+      const { onRest, motionStyle, ...rest } = this.props;
       const { contextMethods: { setScrollTop } } = this.props;
-      const { motionStyle } = this.state;
+      // const motionStyle = getMotionStyle();
 
       const scrollerProps = {
         ...rest,
@@ -142,7 +174,7 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
       };
       return (
         <Motion
-          onRest={onRest}
+          onRest={this.getOnRest}
           style={motionStyle}>
           {
             /*

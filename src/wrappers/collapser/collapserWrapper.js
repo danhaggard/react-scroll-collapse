@@ -107,7 +107,7 @@ export const collapserWrapper = (WrappedComponent) => {
         addToNodeTargetArray,
         watchCollapser,
         isRootNode,
-        contextMethods: { getChildDistanceToTop }
+        contextMethods: { setChildDistanceToTop }
       } = this.props;
       const { areAllItemsExpanded } = this.state;
       /*
@@ -122,11 +122,14 @@ export const collapserWrapper = (WrappedComponent) => {
         the saga to obtain the offsetTop value of the backing instance of this
         component and dispatch that to the redux store.
       */
+      /*
       setOffsetTop(
-        () => getChildDistanceToTop(this.elem.current),
+        () => setChildDistanceToTop(this.elem.current),
         parentScrollerId,
         collapserId,
       );
+      */
+      setChildDistanceToTop(this.elem.current);
       allChildItemIds().forEach(itemId => expandCollapseAll(areAllItemsExpanded, itemId));
       if (!isRootNode) {
         addToNodeTargetArray(collapserId, getRootNodeId(this.props));

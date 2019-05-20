@@ -70,9 +70,9 @@ export function* waitForSetOffsetTop(scrollerIdInit, getScrollTop) {
     if (setOffsetTop) {
       const { payload: { getOffsetTop, scrollerId } } = setOffsetTop;
       if (scrollerId === scrollerIdInit) {
-        const scrollTop = yield call(getScrollTop);
-        const offsetTop = yield call(getOffsetTop);
-        yield put(scrollTo(scrollerId, offsetTop, scrollTop));
+        // const scrollTop = yield call(getScrollTop);
+        // const offsetTop = yield call(getOffsetTop);
+        // yield put(scrollTo(scrollerId, offsetTop, scrollTop));
       }
     } else {
       const { payload: { scrollerId } } = removeScroller;
