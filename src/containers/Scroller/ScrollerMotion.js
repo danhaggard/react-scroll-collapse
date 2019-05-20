@@ -15,20 +15,6 @@ import {
 } from '../../selectors/scroller';
 
 
-const createScrollerChild = (
-  ScrollerComponent,
-  thatArg,
-  props,
-) => {
-  const that = thatArg;
-  return (
-    <ScrollerComponent
-      {...props}
-      ref={child => (that.child = child)}
-    />
-  );
-};
-
 const scrollerMotionWrapper = (ScrollerComponent) => {
 
   /*
@@ -88,8 +74,12 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
       Initiate a saga to watch this Scroller for ExpandCollapse/All actions.
     */
     componentDidMount() {
-      const { scrollerId, watchInitialise } = this.props;
-      watchInitialise(scrollerId, this.child.getScrollTop);
+      const {
+        contextMethods: { getScrollTop },
+        scrollerId,
+        watchInitialise,
+      } = this.props;
+      watchInitialise(scrollerId, getScrollTop);
     }
 
     /*
@@ -130,26 +120,6 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
       return offsetTop + offsetScrollTo;
     }
 
-    /*
-      I was previously passing val.y into ScrollerComponent - which resulted
-      in a render of ScrollerComponent for every val.y passed by <Motion>.
-      Now on every render in <Motion> - it calls the setScrollTop callback
-      which creates the scroll animation - but doesn't re-render ScrollerComponent
-      at all.
-
-      Kudos to nktb: https://github.com/chenglou/react-motion/issues/357#issuecomment-237741940
-
-      Also, by keeping userScrollActive state outside of React - we avoid
-      an unneccesary render of the parent and child components.
-    */
-
-    createMotionChild = (scroller, child) => (val) => {
-      if (!this.userScrollActive) {
-        child.setScrollTop(val.y);
-      }
-      return scroller;
-    };
-
     breakScrollAnimation = () => {
       const { onAnimationCancel } = this.props;
       this.userScrollActive = true;
@@ -162,25 +132,42 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
 
     render() {
       const { onRest, ...rest } = this.props;
+      const { contextMethods: { setScrollTop } } = this.props;
       const { motionStyle } = this.state;
-      /*
-        The use of the ref in ScrollerComponent allows ScrollerMotion
-        to access the methods we defined on Scroller using ref.  In this case
-        getScrollTop which is now accessible via: this.child.getScrollTop
-      */
-      const scroller = createScrollerChild(ScrollerComponent, this, {
+
+      const scrollerProps = {
         ...rest,
         breakScrollAnimation: this.breakScrollAnimation,
-        getUserScrollActive: this.getUserScrollActive,
-      });
-
+        getUserScrollActive: this.getUserScrollActive
+      };
       return (
         <Motion
           onRest={onRest}
           style={motionStyle}>
-          {this.child ? this.createMotionChild(
-            scroller, this.child
-          ) : () => scroller}
+          {
+            /*
+              I was previously passing val.y into ScrollerComponent - which resulted
+              in a render of ScrollerComponent for every val.y passed by <Motion>.
+              Now on every render in <Motion> - it calls the setScrollTop callback
+              which creates the scroll animation - but doesn't re-render ScrollerComponent
+              at all.
+
+              Kudos to nktb: https://github.com/chenglou/react-motion/issues/357#issuecomment-237741940
+
+              Also, by keeping userScrollActive state outside of React - we avoid
+              an unneccesary render of the parent and child components.
+            */
+            (val) => {
+              if (!this.userScrollActive) {
+                setScrollTop(val.y);
+              }
+              return (
+                <ScrollerComponent
+                  {...scrollerProps}
+                />
+              );
+            }
+          }
         </Motion>
       );
     }
@@ -216,6 +203,9 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
     style: PropTypes.object,
     toggleScroll: PropTypes.bool,
     watchInitialise: PropTypes.func.isRequired,
+
+    /* provided by scrollerProvider via context */
+    contextMethods: PropTypes.object.isRequired,
   };
 
   return ScrollerMotion;

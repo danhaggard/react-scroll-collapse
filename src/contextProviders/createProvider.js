@@ -30,6 +30,64 @@ const createProvider = (
 ) => (Context, Comp) => {
   class Provider extends Base {
 
+    /*
+      To ensure all nodes get access to parent context while getting an
+      opportunity to modify this context - without having to manually
+      specify consumers, the following strategy is employed.
+
+      By calling: createProvider(Component)
+
+      props => Consumer(Registry(Provider((Component({ ...props, ...context})))))
+
+      You end up roughly with:
+
+      props => Consumer(Registry(Provider((Component({ ...props, ...context})))))
+
+      Or:
+
+      props => (
+        <Consumer>
+          {
+            childContext => (
+              <Registry>
+                <Provider>
+                  <Component {...childContext} {...props}>
+                </Provider>
+              <Registry>
+            )
+          }
+        </Consumer>
+      )
+
+      (Leaving out the React Context object for clarity - but its in their too)
+
+      So all providers are automatically consuming context as
+      props from their parent.
+
+      So if you want to add context that all nested consumers get:
+        make sure each provider is looking for the same context as a prop
+        from above and merges that with it's own contribution.
+
+      Then pass that merged value into the childContext attr:  this
+      is what gets passed as a prop to the nested child PROVIDERS and they can
+      then use it to pass to their wrapped component.
+
+      But you MUST ALSO - as the provider instance pass your modified context
+      as a prop to the component you are immediately wrapping!
+
+      Another way to view it - you wrap <Component> and place it as a child of
+      Parent:
+
+       (parentContext)::<Parent>
+        -> <Consumer {...parentContext, ...propsFromParent} />
+          -> <Provider {...propsFromParentMergedWithParentContext, ...childContext }>::(childContext)
+            -> <Component {...allParentStuffMergedWithChildContext} >
+                 Back to Top --> -->:
+                   (childContext -> parentContext)::<Parent {...propsFromComponent} />
+               </Component>
+       <Parent />
+    */
+
     idKey = getIdKey(typeKey);
 
     parentIdKey = getParentIdKey(typeKey);
@@ -70,6 +128,11 @@ const createProvider = (
       }
       return rootNodes;
     }
+
+    mergedContextMethods = this.props.contextMethods
+      ? { ...this.props.contextMethods, ...this.contextMethods }
+      : this.contextMethods;
+
     /*
       childContext  - create the context to be inserted into the context
       for children to consume.
@@ -86,7 +149,7 @@ const createProvider = (
 
     childContext = {
       ...this.mapParentIds(this.props),
-      ...this.childRegisterMethods,
+      contextMethods: this.mergedContextMethods,
       rootNodes: this.getRootNodes(),
     }
 
@@ -94,6 +157,7 @@ const createProvider = (
       return childTypeKeys.length === 0 ? <Comp {...this.props} /> : (
         <Context.Provider value={this.childContext}>
           <Comp
+            contextMethods={this.mergedContextMethods}
             isRootNode={this.checkIfRoot()}
             providerType={typeKey}
             {...this.props}

@@ -48,7 +48,7 @@ class Scroller extends PureComponent {
     these to be called again until the next animation starts.
   */
   handleMouseDown = this.callIfAnimating(
-    e => this.breakScrollAnimation(targetIsScrollBar(e.clientX, this.elem))
+    e => this.breakScrollAnimation(targetIsScrollBar(e.clientX, this.getElem()))
   );
 
   handleWheel = this.callIfAnimating(() => this.breakScrollAnimation(true));
@@ -56,6 +56,12 @@ class Scroller extends PureComponent {
   handleKeyDown = this.callIfAnimating(
     e => this.breakScrollAnimation(e.keyCode === 38 || e.keyCode === 40)
   );
+
+  context = this.props.contextMethods;
+
+  getElem = this.context.getElem;
+
+  getRef = this.context.getRef;
 
   getClassName = (className) => {
     const initClassName = {};
@@ -65,37 +71,33 @@ class Scroller extends PureComponent {
     }, className);
   }
 
-  getScrollTop = () => (this.elem ? this.elem.scrollTop : null);
-
-  setScrollTop = (val) => {
-    if (this.elem && val >= 0) {
-      this.elem.scrollTop = val;
-    }
-    return null;
-  };
-
-  getProps = ({ className, style }) => ({
-    className: this.getClassName(className),
-    onKeyDown: this.handleKeyDown,
-    onMouseDown: this.handleMouseDown,
-    onWheel: this.handleWheel,
-    ref: (elemArg) => {
-      this.elem = elemArg;
-    },
-    role: 'presentation',
-    style,
-  });
-
-  render() {
-    const { children, id } = this.props;
-    const newProps = this.getProps(this.props);
+  getProps = ({
+    children,
+    className,
+    id,
+    style
+  }) => {
+    const newProps = {
+      children,
+      className: this.getClassName(className),
+      onKeyDown: this.handleKeyDown,
+      onMouseDown: this.handleMouseDown,
+      onWheel: this.handleWheel,
+      ref: this.getRef(),
+      role: 'presentation',
+      style,
+    };
     if (!isUndefNull(id)) {
       newProps.id = id;
     }
+    return newProps;
+  };
+
+  render() {
+    // debugger;
+    const newProps = this.getProps(this.props);
     return (
-      <div {...newProps}>
-        { children }
-      </div>
+      <div {...newProps} />
     );
   }
 }
@@ -108,9 +110,10 @@ Scroller.defaultProps = {
 };
 
 Scroller.propTypes = {
-  children: ofChildrenType,
-  className: PropTypes.string,
   breakScrollAnimation: PropTypes.func.isRequired,
+  children: ofChildrenType,
+  contextMethods: PropTypes.object.isRequired,
+  className: PropTypes.string,
   getUserScrollActive: PropTypes.func.isRequired,
   id: ofNumberStringTypeOrNothing,
   style: PropTypes.object,

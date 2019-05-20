@@ -97,8 +97,6 @@ export const collapserWrapper = (WrappedComponent) => {
        || stateCheckValue;
     }
 
-    getOffSetTop = () => this.elem.current.offsetTop;
-
     expandCollapseAll = () => {
       const {
         allChildItemIds,
@@ -109,6 +107,7 @@ export const collapserWrapper = (WrappedComponent) => {
         addToNodeTargetArray,
         watchCollapser,
         isRootNode,
+        contextMethods: { getChildDistanceToTop }
       } = this.props;
       const { areAllItemsExpanded } = this.state;
       /*
@@ -124,7 +123,7 @@ export const collapserWrapper = (WrappedComponent) => {
         component and dispatch that to the redux store.
       */
       setOffsetTop(
-        this.getOffSetTop,
+        () => getChildDistanceToTop(this.elem.current),
         parentScrollerId,
         collapserId,
       );
@@ -138,7 +137,6 @@ export const collapserWrapper = (WrappedComponent) => {
       const { props, state } = this;
       // console.log('render - CollapserController - collapserId, props, state', props.collapserId, props, state);
       // console.log('');
-
       const {
         expandCollapseAll,
         setOffsetTop,
@@ -148,7 +146,6 @@ export const collapserWrapper = (WrappedComponent) => {
         ...other
       } = this.props;
       const { areAllItemsExpanded } = this.state;
-
       return (
         <WrappedComponentRef
           {...other}
@@ -184,6 +181,9 @@ export const collapserWrapper = (WrappedComponent) => {
     setOffsetTop: PropTypes.func.isRequired,
     watchCollapser: PropTypes.func.isRequired,
     watchInitCollapser: PropTypes.func.isRequired,
+
+    /* provided by scrollerProvider via context */
+    contextMethods: PropTypes.object.isRequired,
   };
 
   const mapStateToProps = (state, ownProps) => {

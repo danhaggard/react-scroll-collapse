@@ -6,7 +6,7 @@ export const arrayOfStrings = arrayOfType(PropTypes.string);
 export const ofTypeOrNothing = (ofType, ofTypeArray = []) => {
   const concatArgs = ofType ? [ofType, ...ofTypeArray] : ofTypeArray;
   return PropTypes.oneOfType([
-    concatArgs,
+    ...concatArgs,
     PropTypes.instanceOf(null),
     PropTypes.instanceOf(undefined),
   ]);
