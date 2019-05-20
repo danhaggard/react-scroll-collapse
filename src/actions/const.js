@@ -3,9 +3,6 @@ export const ADD_SCROLLER = 'react-scroll-collapse/ADD_SCROLLER';
 export const ADD_SCROLLER_CHILD = 'react-scroll-collapse/ADD_SCROLLER_CHILD';
 export const REMOVE_SCROLLER = 'react-scroll-collapse/REMOVE_SCROLLER';
 export const REMOVE_SCROLLER_CHILD = 'react-scroll-collapse/REMOVE_SCROLLER_CHILD';
-export const SET_OFFSET_TOP = 'react-scroll-collapse/SET_OFFSET_TOP';
-export const WATCH_INITIALISE = 'react-scroll-collapse/WATCH_INITIALISE';
-export const SCROLL_TO = 'react-scroll-collapse/SCROLL_TO';
 
 /* collapser action types */
 export const ADD_COLLAPSER = 'react-scroll-collapse/ADD_COLLAPSER';

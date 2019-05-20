@@ -1,7 +1,4 @@
 /* Scroller Actions */
-import scrollTo from './scroller/scrollTo';
-import watchInitialise from './scroller/watchInitialise';
-import setOffsetTop from './scroller/setOffsetTop';
 import removeScroller from './scroller/removeScroller';
 import addScroller from './scroller/addScroller';
 import addScrollerChild from './scroller/addScrollerChild';
@@ -52,9 +49,6 @@ const actions = {
   addScrollerChild,
   removeScroller,
   removeScrollerChild,
-  setOffsetTop,
-  watchInitialise,
-  scrollTo,
 };
 
 export const collapserControllerActions = {
@@ -71,7 +65,6 @@ export const collapserControllerActions = {
 export const collapserWrapperActions = {
   addToNodeTargetArray,
   expandCollapseAll,
-  setOffsetTop,
   setTreeId,
   watchCollapser,
   watchInitCollapser,
@@ -87,7 +80,6 @@ export const itemWrapperActions = {
   addToNodeTargetArray,
   heightReady,
   expandCollapse,
-  setOffsetTop,
   watchCollapser,
 };
 

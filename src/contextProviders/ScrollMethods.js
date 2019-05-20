@@ -49,7 +49,7 @@ class ScrollMethods extends PureComponent {
     return this.getRectTop(childEl) - this.getRectTop(el) + this.getScrollTop(el);
   };
 
-  setChildDistanceToTop = (childElem) => {
+  scrollToTop = (childElem) => {
     this.currentChildElem = childElem;
     this.resetMotionStyle();
   };

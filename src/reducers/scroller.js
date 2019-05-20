@@ -6,7 +6,6 @@ import {
   ADD_SCROLLER_CHILD,
   REMOVE_SCROLLER,
   REMOVE_SCROLLER_CHILD,
-  SCROLL_TO
 } from '../actions/const';
 
 import {
@@ -39,45 +38,9 @@ export const scrollerIdReducer = (state = null, action) => {
   }
 };
 
-export const offsetTopReducer = (state = 0, action) => {
-  const { scroller, offsetTop } = getOrObject(action, 'payload');
-  switch (action.type) {
-    case ADD_SCROLLER:
-      return scroller.offsetTop ? scroller.offsetTop : state;
-    case SCROLL_TO:
-      return offsetTop;
-    default:
-      return state;
-  }
-};
-
-export const scrollTopReducer = (state = 0, action) => {
-  const { scroller, scrollTop } = getOrObject(action, 'payload');
-  switch (action.type) {
-    case ADD_SCROLLER:
-      return scroller.scrollTop ? scroller.scrollTop : state;
-    case SCROLL_TO:
-      return scrollTop;
-    default:
-      return state;
-  }
-};
-
-export const toggleScrollReducer = (state = false, action) => {
-  switch (action.type) {
-    case SCROLL_TO:
-      return !state;
-    default:
-      return state;
-  }
-};
-
 const scrollerReducer = combineReducers({
   collapsers: scrollerCollapsersIdArrayReducer,
   id: scrollerIdReducer,
-  // offsetTop: offsetTopReducer,
-  // scrollTop: scrollTopReducer,
-  // toggleScroll: toggleScrollReducer,
 });
 
 export const scrollersReducer = (state = {}, action) => {
@@ -89,7 +52,6 @@ export const scrollersReducer = (state = {}, action) => {
       return removeFromState(state, scrollerId);
     case REMOVE_SCROLLER_CHILD:
     case ADD_SCROLLER_CHILD:
-    case SCROLL_TO:
       return updateState(state, action, scrollerId, scrollerReducer);
     default:
       return state;

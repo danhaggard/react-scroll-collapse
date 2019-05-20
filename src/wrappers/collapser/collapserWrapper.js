@@ -67,7 +67,6 @@ export const collapserWrapper = (WrappedComponent) => {
         setTreeIdsSelector,
         watchInitCollapser
       } = this.props;
-      const { props } = this;
       checkForRef(WrappedComponent, this.elem, 'collapserRef');
       watchInitCollapser(collapserId);
 
@@ -102,12 +101,10 @@ export const collapserWrapper = (WrappedComponent) => {
         allChildItemIds,
         collapserId,
         expandCollapseAll,
-        parentScrollerId,
-        setOffsetTop,
         addToNodeTargetArray,
         watchCollapser,
         isRootNode,
-        contextMethods: { setChildDistanceToTop }
+        contextMethods: { scrollToTop }
       } = this.props;
       const { areAllItemsExpanded } = this.state;
       /*
@@ -116,20 +113,7 @@ export const collapserWrapper = (WrappedComponent) => {
         a HEIGHT_READY action.  Previously scroller would wait for this.
       */
       watchCollapser(collapserId);
-
-      /*
-        setOffsetTop: defines a callback for the saga to call that allows
-        the saga to obtain the offsetTop value of the backing instance of this
-        component and dispatch that to the redux store.
-      */
-      /*
-      setOffsetTop(
-        () => setChildDistanceToTop(this.elem.current),
-        parentScrollerId,
-        collapserId,
-      );
-      */
-      setChildDistanceToTop(this.elem.current);
+      scrollToTop(this.elem.current);
       allChildItemIds().forEach(itemId => expandCollapseAll(areAllItemsExpanded, itemId));
       if (!isRootNode) {
         addToNodeTargetArray(collapserId, getRootNodeId(this.props));
@@ -137,12 +121,8 @@ export const collapserWrapper = (WrappedComponent) => {
     };
 
     render() {
-      const { props, state } = this;
-      // console.log('render - CollapserController - collapserId, props, state', props.collapserId, props, state);
-      // console.log('');
       const {
         expandCollapseAll,
-        setOffsetTop,
         watchCollapser,
         watchInitCollapser,
         allChildItemIds,
@@ -181,7 +161,8 @@ export const collapserWrapper = (WrappedComponent) => {
     areAllItemsExpandedSelector: PropTypes.func.isRequired, // includes nested
     allChildItemIds: PropTypes.func.isRequired, // array of collapserItem ids
     expandCollapseAll: PropTypes.func.isRequired,
-    setOffsetTop: PropTypes.func.isRequired,
+    setTreeId: PropTypes.func.isRequired,
+    setTreeIdsSelector: PropTypes.func.isRequired,
     watchCollapser: PropTypes.func.isRequired,
     watchInitCollapser: PropTypes.func.isRequired,
 
