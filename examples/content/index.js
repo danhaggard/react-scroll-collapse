@@ -119,7 +119,7 @@ const example7 = (
 const example8 = (
   <Example {...COPY[5]} style={{ marginBottom: '3em' }} key={5}>
     <Scroller style={{ height: '100%' }}>
-      <CommentThread depth={3} childNodes={3} />
+      <CommentThread depth={3} childNodes={5} randomChildNodes />
     </Scroller>
   </Example>
 );

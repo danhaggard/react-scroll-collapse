@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 
 import forwardRefWrapper from '../../utils/forwardRef';
 import { checkForRef } from '../../utils/errorUtils';
-import { ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
+import { ofNumberTypeOrNothing, ofObjectTypeOrNothing } from '../../utils/propTypeHelpers';
 import { collapserWrapperActions } from '../../actions';
 
 import { getNodeTargetArrayRoot } from '../../selectors/rootNode';
@@ -74,7 +74,7 @@ export const collapserWrapper = (WrappedComponent) => {
         On insertion of new node - we shouldn't check unrelated branches - so set this.
       */
       const addNodeValue = isRootNode ? null : collapserId;
-      addToNodeTargetArray(addNodeValue, getRootNodeId(this.props));
+      addToNodeTargetArray(addNodeValue, getRootNodeId(collapserId, this.props));
       setTreeIdsSelector(setTreeId);
     }
 
@@ -104,7 +104,7 @@ export const collapserWrapper = (WrappedComponent) => {
         addToNodeTargetArray,
         watchCollapser,
         isRootNode,
-        contextMethods: { scrollToTop }
+        contextMethods,
       } = this.props;
       const { areAllItemsExpanded } = this.state;
       /*
@@ -113,10 +113,12 @@ export const collapserWrapper = (WrappedComponent) => {
         a HEIGHT_READY action.  Previously scroller would wait for this.
       */
       watchCollapser(collapserId);
-      scrollToTop(this.elem.current);
+      if (contextMethods) {
+        contextMethods.scrollToTop(this.elem.current);
+      }
       allChildItemIds().forEach(itemId => expandCollapseAll(areAllItemsExpanded, itemId));
       if (!isRootNode) {
-        addToNodeTargetArray(collapserId, getRootNodeId(this.props));
+        addToNodeTargetArray(collapserId, getRootNodeId(collapserId, this.props));
       }
     };
 
@@ -142,6 +144,7 @@ export const collapserWrapper = (WrappedComponent) => {
 
   CollapserController.defaultProps = {
     collapserId: null,
+    contextMethods: null,
     parentCollapserId: null,
     parentScrollerId: null,
     rootNodes: {},
@@ -167,7 +170,7 @@ export const collapserWrapper = (WrappedComponent) => {
     watchInitCollapser: PropTypes.func.isRequired,
 
     /* provided by scrollerProvider via context */
-    contextMethods: PropTypes.object.isRequired,
+    contextMethods: ofObjectTypeOrNothing,
   };
 
   const mapStateToProps = (state, ownProps) => {

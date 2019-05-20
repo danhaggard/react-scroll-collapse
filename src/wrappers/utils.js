@@ -1,12 +1,11 @@
 import createCache from '../caching/recursionCache';
 import providerCaches from '../caching/providerCaches';
 
-export const getRootNodeId = ({
+export const getRootNodeId = (ownId, {
   isRootNode,
-  collapserId,
   rootNodes,
   providerType
-}) => (isRootNode ? collapserId : rootNodes[providerType]);
+}) => (isRootNode ? ownId : rootNodes[providerType]);
 
 export const whyUpdate = (state, nextState, component, id, checkAgainst = []) => {
   Object.keys(state).forEach((key) => {
@@ -34,8 +33,8 @@ export const compareIntArrays = (arr1, arr2) => {
 };
 
 export const getCache = (props) => {
-  const { isRootNode, providerType } = props;
-  const rootNodeId = getRootNodeId(props);
+  const { collapserId, isRootNode, providerType } = props;
+  const rootNodeId = getRootNodeId(collapserId, props);
   const providerCache = providerCaches[providerType];
   if (isRootNode) {
     providerCache[rootNodeId] = createCache();

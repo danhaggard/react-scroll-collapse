@@ -48,16 +48,16 @@ export const collapserControllerWrapper = (CollapserController) => {
     }
 
     addRootNode() {
-      const { addRootNode, isRootNode } = this.props;
+      const { addRootNode, collapserId, isRootNode } = this.props;
       if (isRootNode) {
-        addRootNode(getRootNodeId(this.props));
+        addRootNode(collapserId);
       }
     }
 
     removeRootNode() {
-      const { removeRootNode, isRootNode } = this.props;
+      const { removeRootNode, collapserId, isRootNode } = this.props;
       if (isRootNode) {
-        removeRootNode(getRootNodeId(this.props));
+        removeRootNode(collapserId);
       }
     }
 
@@ -66,7 +66,7 @@ export const collapserControllerWrapper = (CollapserController) => {
       if (collapserId >= 0 && parentScrollerId >= 0) {
         return (
           <CollapserController
-            rootNodeId={getRootNodeId(this.props)}
+            rootNodeId={getRootNodeId(collapserId, this.props)}
             {...cleanHoCProps(
               this.props,
               WrappedCollapserController.defaultProps,

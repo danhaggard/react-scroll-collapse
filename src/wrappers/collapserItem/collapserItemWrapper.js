@@ -5,10 +5,10 @@ import { connect } from 'react-redux';
 
 import forwardRefWrapper from '../../utils/forwardRef';
 import { checkForRef } from '../../utils/errorUtils';
+import { ofObjectTypeOrNothing } from '../../utils/propTypeHelpers';
 
 import { itemWrapperActions } from '../../actions';
 import { getItemExpandedRoot } from '../../selectors/collapserItem';
-
 
 /*
   collapserItemWrapper is an HoC that is to be used to wrap components which make use
@@ -34,31 +34,22 @@ export const collapserItemWrapper = (WrappedComponent) => {
       checkForRef(WrappedComponent, this.elem, 'collapserItemRef');
     }
 
-    /*
-      this.setOffsetTop: defines a callback for the saga to call that allows
-        the saga to obtain the offsetTop value of the backing instance of this
-        component and dispatch that to the redux store.  The saga grabs the
-        offsetTop val once the onHeightReady callback has been
-        called for every wrapped <Collapse> element in the Collapser.
-    */
     expandCollapse = () => {
       const {
+        addToNodeTargetArray,
+        contextMethods,
         itemId,
         expandCollapse: expandCollapseAction,
-        parentScrollerId,
         parentCollapserId,
-        setOffsetTop,
-        setRecurseNodeTarget,
+        rootNodes,
         watchCollapser,
       } = this.props;
       watchCollapser(parentCollapserId);
-      setOffsetTop(
-        () => this.elem.current.offsetTop,
-        parentScrollerId,
-        parentCollapserId,
-      );
+      if (contextMethods) {
+        contextMethods.scrollToTop(this.elem.current);
+      }
       expandCollapseAction(itemId, parentCollapserId);
-      setRecurseNodeTarget(parentCollapserId);
+      addToNodeTargetArray(parentCollapserId, rootNodes.collapser);
     };
 
     onHeightReady = () => {
@@ -66,13 +57,12 @@ export const collapserItemWrapper = (WrappedComponent) => {
       heightReady(parentCollapserId, itemId);
     };
 
-
     render() {
       const {
+        contextMethods,
         isOpened,
         heightReady,
         expandCollapse,
-        setOffsetTop,
         watchCollapser,
         ...other
       } = this.props;
@@ -89,19 +79,24 @@ export const collapserItemWrapper = (WrappedComponent) => {
   }
 
   CollapserItemController.defaultProps = {
+    contextMethods: null,
     parentScrollerId: null,
+    rootNodes: {},
   };
 
   CollapserItemController.propTypes = {
+    addToNodeTargetArray: PropTypes.func.isRequired,
     isOpened: PropTypes.bool.isRequired,
     itemId: PropTypes.number.isRequired,
     parentCollapserId: PropTypes.number.isRequired,
     parentScrollerId: PropTypes.number,
     heightReady: PropTypes.func.isRequired,
     expandCollapse: PropTypes.func.isRequired,
-    setOffsetTop: PropTypes.func.isRequired,
-    setRecurseNodeTarget: PropTypes.func.isRequired,
+    rootNodes: PropTypes.object,
     watchCollapser: PropTypes.func.isRequired,
+
+    /* provided by scrollerProvider via context */
+    contextMethods: ofObjectTypeOrNothing,
   };
 
   const mapStateToProps = (state, ownProps) => ({

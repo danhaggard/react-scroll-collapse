@@ -1,11 +1,9 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import classnames from 'classnames';
 
 import { ofChildrenType, ofNumberStringTypeOrNothing } from '../../utils/propTypeHelpers';
 import { targetIsScrollBar } from '../../utils/domUtils';
 import { isUndefNull } from '../../utils/selectorUtils';
-import styles from './Scroller.scss';
 
 
 /*
@@ -25,7 +23,6 @@ import styles from './Scroller.scss';
   scrollTop property of the dom element.  It is passed by ScrollerMotion to
   the sagas to be called when needed.str.slice(0, -1);
 */
-
 
 class Scroller extends PureComponent {
 
@@ -63,14 +60,6 @@ class Scroller extends PureComponent {
 
   getRef = this.context.getRef;
 
-  getClassName = (className) => {
-    const initClassName = {};
-    initClassName[styles.scroller] = true;
-    return classnames({
-      ...initClassName,
-    }, className);
-  }
-
   getProps = ({
     children,
     className,
@@ -79,13 +68,17 @@ class Scroller extends PureComponent {
   }) => {
     const newProps = {
       children,
-      className: this.getClassName(className),
+      className,
       onKeyDown: this.handleKeyDown,
       onMouseDown: this.handleMouseDown,
       onWheel: this.handleWheel,
       ref: this.getRef(),
       role: 'presentation',
-      style,
+      style: {
+        overflow: 'auto',
+        postion: 'relative',
+        ...style
+      },
     };
     if (!isUndefNull(id)) {
       newProps.id = id;
