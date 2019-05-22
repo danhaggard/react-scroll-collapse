@@ -79,6 +79,11 @@ export const collapserItemControllerWrapper = (CollapserItemController) => {
     parentScrollerId: ofNumberTypeOrNothing,
   };
 
+  WrappedCollapserItemController.whyDidYouRender = {
+    logOnDifferentValues: false,
+    customName: 'WrappedCollapserItemController'
+  };
+
   return connect(undefined, itemControllerActions)(WrappedCollapserItemController);
 };
 

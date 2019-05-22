@@ -66,8 +66,10 @@ export const everyObjectKey = callback => object => Object.keys(object).every(
 
 export const getNextIdFactory = (initialId = -1) => {
   let currentId = initialId;
-  return () => {
+  const counter = () => {
     currentId += 1;
     return currentId;
   };
+  counter.getCurrent = () => currentId;
+  return counter;
 };

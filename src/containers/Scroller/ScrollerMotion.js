@@ -165,6 +165,11 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
     providerMotionStyle: PropTypes.object.isRequired,
   };
 
+  ScrollerMotion.whyDidYouRender = {
+    logOnDifferentValues: false,
+    customName: 'ScrollerMotion'
+  };
+
   return ScrollerMotion;
 };
 

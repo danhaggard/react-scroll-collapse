@@ -57,6 +57,11 @@ export const scrollerWrapper = (ScrollerComponent) => {
     removeScroller: PropTypes.func.isRequired,
   };
 
+  WrappedScroller.whyDidYouRender = {
+    logOnDifferentValues: false,
+    customName: 'WrappedScroller'
+  };
+
   return connect(undefined, scrollerWrapperActions)(scrollerProvider(WrappedScroller));
 };
 

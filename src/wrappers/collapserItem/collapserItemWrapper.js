@@ -99,6 +99,11 @@ export const collapserItemWrapper = (WrappedComponent) => {
     contextMethods: ofObjectTypeOrNothing,
   };
 
+  CollapserItemController.whyDidYouRender = {
+    logOnDifferentValues: false,
+    customName: 'CollapserItemController'
+  };
+
   const mapStateToProps = (state, ownProps) => ({
     isOpened: getItemExpandedRoot(state)(ownProps.itemId),
   });

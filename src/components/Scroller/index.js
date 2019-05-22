@@ -106,4 +106,9 @@ Scroller.propTypes = {
   style: PropTypes.object,
 };
 
+Scroller.whyDidYouRender = {
+  logOnDifferentValues: false,
+  customName: 'Scroller'
+};
+
 export default Scroller;

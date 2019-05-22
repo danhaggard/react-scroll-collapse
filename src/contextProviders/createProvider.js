@@ -174,6 +174,11 @@ const createProvider = (
 
   }
 
+  Provider.whyDidYouRender = {
+    logOnDifferentValues: false,
+    customName: 'Provider'
+  };
+
   /*
     This provider might itself be a child - so we must register it.
   */

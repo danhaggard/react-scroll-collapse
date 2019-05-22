@@ -47,6 +47,12 @@ const registerConsumerFactory = consumerFactory => (
 
     consumerFactory is passed in a dep - so logic can be changed.
   */
+
+  Registry.whyDidYouRender = {
+    logOnDifferentValues: false,
+    customName: 'Registry'
+  };
+
   return consumerFactory(Context, Registry);
 };
 

@@ -21,6 +21,8 @@ import {
   getRootNodeId,
 } from '../utils';
 
+import addLoggingDefaultsToComponent from '../../utils/logging/utils';
+
 export const collapserWrapper = (WrappedComponent) => {
 
   const WrappedComponentRef = forwardRefWrapper(WrappedComponent, 'collapserRef');
@@ -124,10 +126,13 @@ export const collapserWrapper = (WrappedComponent) => {
 
     render() {
       const {
+        allChildItemIds,
         expandCollapseAll,
         watchCollapser,
         watchInitCollapser,
-        allChildItemIds,
+        areAllItemsExpandedSelector,
+        setTreeIdsSelector,
+        nodeTargetArray,
         ...other
       } = this.props;
       const { areAllItemsExpanded } = this.state;
@@ -172,6 +177,17 @@ export const collapserWrapper = (WrappedComponent) => {
     /* provided by scrollerProvider via context */
     contextMethods: ofObjectTypeOrNothing,
   };
+
+  addLoggingDefaultsToComponent(
+    CollapserController,
+    'CollapserController',
+    [
+      ['nodeTargetArray', 'deepEquals'],
+      ['areAllItemsExpandedSelector', 'function'],
+      ['setTreeIdsSelector', 'function'],
+      ['allChildItemIds', 'function'],
+    ]
+  );
 
   const mapStateToProps = (state, ownProps) => {
 

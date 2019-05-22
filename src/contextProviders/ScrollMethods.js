@@ -68,4 +68,9 @@ class ScrollMethods extends PureComponent {
 
 }
 
+ScrollMethods.whyDidYouRender = {
+  logOnDifferentValues: false,
+  customName: 'ScrollMethods'
+};
+
 export default ScrollMethods;
