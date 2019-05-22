@@ -19,7 +19,7 @@ const getChildTargetMapping = (childArray, targetNodeArray) => {
   let currentChildTargetArray = [];
   let foundChildTarget = true;
   let targetNode;
-  while (targetNodeArray.length > 0 || targetNode) {
+  while (targetNodeArray.length > 0 || (targetNode && currentChildIdObj !== undefined)) {
     if (foundChildTarget) {
       targetNode = targetNodeArray.shift();
     }

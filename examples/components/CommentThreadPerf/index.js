@@ -8,49 +8,67 @@ import ExpandButton from '../ExpandButton';
 import { collapserController } from '../../../src';
 import { ofNumberTypeOrNothing, ofBoolTypeOrNothing, ofChildrenType } from '../../../src/utils/propTypeHelpers';
 
+import { generateCommentThreadData } from '../../utils';
+
+
+const mapNodeDataToThread = dataNode => (
+  <WrappedCommentThread key={dataNode.key} nodeData={dataNode}>
+    {
+      dataNode.children.map((childDataNode) => {
+        console.log('count Reached: ', childDataNode.countReached);
+        if (childDataNode.countReached < 500) {
+          return mapNodeDataToThread(childDataNode);
+        }
+        return <WrappedCommentThread key={childDataNode.key} nodeData={childDataNode} />;
+      })
+    }
+  </WrappedCommentThread>
+);
+
+/*
+const mapNodeDataToThread = (dataNode) => {
+  return (
+    <WrappedCommentThread key={dataNode.key} nodeData={dataNode}>
+      {
+        dataNode.children.map((childDataNode) => {
+          console.log('count Reached: ', childDataNode.countReached);
+          if (childDataNode.countReached < 500) {
+            return mapNodeDataToThread(childDataNode);
+          }
+          return <WrappedCommentThread key={childDataNode.key} nodeData={childDataNode} />;
+        })
+      }
+    </WrappedCommentThread>
+  );
+};
+*/
 
 class CommentThread extends PureComponent { // eslint-disable-line react/no-multi-comp
 
-  animations = {
-    // 0: 'animate-linear',
-    0: 'animate-ease',
-    1: 'animate-ease-in',
-    2: 'animate-ease-out',
-    3: 'animate-ease-out',
-  }
-
   state = {
-    // animation: 2,
-    // className: styles.commentThread,
-    // threadData: this.props.threadData ? this.props.threadData : passThreadProps(this.props)(-1)
-  }
+    localChildren: []
+  };
 
-  /*
-  addToThread = (props) => {
-    const stateUpdater = (state) => {
-      const { threadData: { children, countReached } } = state;
-      return {
-        ...this.state.threadData,
-        children: [...children, ...passThreadProps(props)(countReached).children]
-      };
-    };
+  generateChildData = () => generateCommentThreadData(1, 2, 1, 2);
 
-    this.setState(stateUpdater);
-  }
-  */
-
-  // deleteThread = () => this.setState({ depth: 0 });
-
-  /*
-  const getNodeObj = (count, depth, index) => ({
-    comment: genRandText(),
-    key: `comment-${count}`,
-    title: `depth: ${depth} - branch: ${index}`,
+  addChild = child => state => ({
+    ...state,
+    localChildren: [...state.localChildren, child],
   });
-  */
+
+  removeChild = state => ({
+    ...state,
+    localChildren: state.localChildren.slice(0, -1),
+  });
+
+  insertThread = () => {
+    const child = this.generateChildData();
+    this.setState(this.addChild(child));
+  };
+
+  removeThread = () => this.setState(this.removeChild);
 
   render() {
-
     const {
       areAllItemsExpanded,
       children,
@@ -60,14 +78,13 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
       nodeData,
       style,
     } = this.props;
-
+    const { localChildren } = this.state;
     const { comment, title } = nodeData;
-
     const idStr = collapserId.toString();
     const newTitle = ` Collapser ${idStr} -- ${title || 'row: 0 - node: 0'}`;
     return (
       <div
-        className={`${styles.commentThread} ${this.animations[2]} ${styles.hover}`}
+        className={`${styles.commentThread} ${styles.hover}`}
         ref={collapserRef}
         style={{ ...style }}
       >
@@ -78,12 +95,13 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
         />
         <CommentWithButtons
           isOpenedInit={false}
-          addToThread={this.addToThread}
-          childThreads={children.length}
-          deleteThread={this.deleteThread}
+          addToThread={this.insertThread}
+          childThreads={localChildren.length}
+          deleteThread={this.removeThread}
           text={comment}
         />
         { children }
+        { localChildren.map(child => mapNodeDataToThread(child)) }
       </div>
     );
   }
@@ -112,5 +130,8 @@ CommentThread.whyDidYouRender = {
 
 const WrappedCommentThread = collapserController(CommentThread);
 
+function getWrappedCommentThread() {
+  return WrappedCommentThread;
+}
 
 export default WrappedCommentThread;
