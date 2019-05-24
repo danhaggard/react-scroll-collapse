@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import styles from './CommentThread.scss';
+// import styles from './Simple.scss';
 
 import CommentWithButtons from '../Comment/CommentWithButtons';
 import ExpandButton from '../ExpandButton';
@@ -11,45 +12,18 @@ import { ofNumberTypeOrNothing, ofBoolTypeOrNothing, ofChildrenType } from '../.
 import { generateCommentThreadData } from '../../utils';
 
 
-const mapNodeDataToThread = dataNode => (
-  <WrappedCommentThread key={dataNode.key} nodeData={dataNode}>
-    {
-      dataNode.children.map((childDataNode) => {
-        console.log('count Reached: ', childDataNode.countReached);
-        if (childDataNode.countReached < 500) {
-          return mapNodeDataToThread(childDataNode);
-        }
-        return <WrappedCommentThread key={childDataNode.key} nodeData={childDataNode} />;
-      })
-    }
-  </WrappedCommentThread>
-);
-
-/*
-const mapNodeDataToThread = (dataNode) => {
-  return (
-    <WrappedCommentThread key={dataNode.key} nodeData={dataNode}>
-      {
-        dataNode.children.map((childDataNode) => {
-          console.log('count Reached: ', childDataNode.countReached);
-          if (childDataNode.countReached < 500) {
-            return mapNodeDataToThread(childDataNode);
-          }
-          return <WrappedCommentThread key={childDataNode.key} nodeData={childDataNode} />;
-        })
-      }
-    </WrappedCommentThread>
-  );
-};
-*/
-
 class CommentThread extends PureComponent { // eslint-disable-line react/no-multi-comp
 
-  state = {
-    localChildren: []
-  };
+  state = (() => {
+    const { children, comment, title } = this.props.nodeData;
+    return {
+      comment,
+      title,
+      localChildren: children,
+    };
+  })();
 
-  generateChildData = () => generateCommentThreadData(1, 2, 1, 2);
+  generateChildData = () => generateCommentThreadData(1, 1, 1, 1);
 
   addChild = child => state => ({
     ...state,
@@ -75,11 +49,9 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
       expandCollapseAll,
       collapserRef,
       collapserId,
-      nodeData,
       style,
     } = this.props;
-    const { localChildren } = this.state;
-    const { comment, title } = nodeData;
+    const { comment, localChildren, title } = this.state;
     const idStr = collapserId.toString();
     const newTitle = ` Collapser ${idStr} -- ${title || 'row: 0 - node: 0'}`;
     return (
@@ -101,7 +73,11 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
           text={comment}
         />
         { children }
-        { localChildren.map(child => mapNodeDataToThread(child)) }
+        {
+          localChildren.map(childNodeData => (
+            <WrappedCommentThread key={childNodeData.key} nodeData={childNodeData} />
+          ))
+        }
       </div>
     );
   }
@@ -128,10 +104,17 @@ CommentThread.whyDidYouRender = {
   customName: 'CommentThreadPerf'
 };
 
-const WrappedCommentThread = collapserController(CommentThread);
+const trickReact = (Comp) => {
+  class WrappedComp extends PureComponent { // eslint-disable-line
+    render = () => <Comp {...this.props} />;
+  }
+  return WrappedComp;
+};
 
-function getWrappedCommentThread() {
-  return WrappedCommentThread;
-}
+const CommentThreadClone = trickReact(CommentThread);
+
+const WrappedCommentThreadClone = collapserController(CommentThreadClone);
+
+const WrappedCommentThread = collapserController(CommentThread);
 
 export default WrappedCommentThread;

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import { presets } from 'react-motion';
 import { Collapse } from 'react-collapse';
+// import { UnmountClosed as Collapse } from 'react-collapse';
 
 import CommentBody from '../CommentBody';
 import { ofChildrenTypeOrNothing } from '../../../src/utils/propTypeHelpers';

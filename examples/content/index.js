@@ -8,6 +8,7 @@ import EvenSimplerCollapser from '../components/EvenSimplerCollapser';
 import SimpleComment from '../components/SimpleComment';
 import CommentThread from '../components/CommentThreadFun';
 import CommentThreadPerf from '../components/CommentThreadPerf';
+import CommentThreadOrig from '../components/CommentThread';
 
 import Example from '../components/Example';
 
@@ -130,7 +131,6 @@ const example8 = (
 );
 
 
-
 /*
 export const generateCommentThreadData = (
   minChildrenArg,
@@ -143,17 +143,16 @@ export const generateCommentThreadData = (
 
 const someData = generateCommentThreadData(
   1,
+  49,
   1,
-  1,
-  1
+  49
 );
 console.log('someData', someData);
-
+/*
 const mapNodeDataToThread = dataNode => (
   <CommentThreadPerf key={dataNode.key} nodeData={dataNode}>
     {
       dataNode.children.map((childDataNode) => {
-        console.log('count Reached: ', childDataNode.countReached);
         if (childDataNode.countReached < 500) {
           return mapNodeDataToThread(childDataNode);
         }
@@ -162,15 +161,22 @@ const mapNodeDataToThread = dataNode => (
     }
   </CommentThreadPerf>
 );
-
+*/
 const example9 = (
   <Example {...COPY[6]} style={{ marginBottom: '3em' }} key={5}>
     <Scroller style={{ height: '100%' }}>
-      { mapNodeDataToThread(someData)}
+      <CommentThreadPerf key={someData.key} nodeData={someData} />
     </Scroller>
   </Example>
 );
 
+const example10 = (
+  <Example {...COPY[6]} style={{ marginBottom: '3em' }} key={5}>
+    <Scroller style={{ height: '100%' }}>
+      <CommentThreadOrig childThreads={2} />
+    </Scroller>
+  </Example>
+);
 /*
 const examples = {
   0: [example0],
