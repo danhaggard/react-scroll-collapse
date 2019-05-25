@@ -8,7 +8,7 @@ import { checkForRef } from '../../utils/errorUtils';
 import { ofNumberTypeOrNothing, ofObjectTypeOrNothing } from '../../utils/propTypeHelpers';
 import { collapserWrapperActions } from '../../actions';
 
-import { getNodeTargetArrayRoot, getCheckTreeStateRoot } from '../../selectors/rootNode';
+import { getNodeTargetArrayRoot } from '../../selectors/rootNode';
 import {
   nestedCollapserItemsRoot,
   nestedCollapserItemsExpandedRootEvery,
@@ -23,8 +23,6 @@ import {
 
 import addLoggingDefaultsToComponent from '../../utils/logging/utils';
 
-let renderCount = 0;
-
 export const collapserWrapper = (WrappedComponent) => {
 
   const WrappedComponentRef = forwardRefWrapper(WrappedComponent, 'collapserRef');
@@ -32,8 +30,6 @@ export const collapserWrapper = (WrappedComponent) => {
   class CollapserController extends Component {
 
     elem = React.createRef();
-
-    /*
 
     static getDerivedStateFromProps(props, state) {
       const {
@@ -64,7 +60,11 @@ export const collapserWrapper = (WrappedComponent) => {
         areAllItemsExpanded: areAllItemsExpandedUpdate,
       };
     }
-    */
+
+    state = {
+      areAllItemsExpanded: null,
+      cache: getCache(this.props),
+    };
 
     componentDidMount() {
       const {
@@ -73,7 +73,6 @@ export const collapserWrapper = (WrappedComponent) => {
         isRootNode,
         setTreeId,
         setTreeIdsSelector,
-        toggleCheckTreeState,
         watchInitCollapser
       } = this.props;
       checkForRef(WrappedComponent, this.elem, 'collapserRef');
@@ -83,15 +82,10 @@ export const collapserWrapper = (WrappedComponent) => {
         On insertion of new node - we shouldn't check unrelated branches - so set this.
       */
       const addNodeValue = isRootNode ? null : collapserId;
-      const rootNodeId = getRootNodeId(collapserId, this.props);
-      addToNodeTargetArray(addNodeValue, rootNodeId);
+      addToNodeTargetArray(addNodeValue, getRootNodeId(collapserId, this.props));
       setTreeIdsSelector.selector(setTreeId);
-      if (isRootNode) {
-        toggleCheckTreeState(rootNodeId);
-      }
     }
 
-    /*
     shouldComponentUpdate(nextProps, nextState) {
       const { props, state } = this;
       const checkAgainstProps = ['rootNodeId', 'setTreeIds', 'setTreeId', 'allChildItemIds', 'nodeTargetArray',
@@ -109,31 +103,10 @@ export const collapserWrapper = (WrappedComponent) => {
       return Object.keys(props).some(prop => propsCondition(prop, stateCheckValue))
        || stateCheckValue;
     }
-    */
-
-    componentDidUpdate() {
-      const { addToNodeTargetArray, collapserId, isRootNode, nodeTargetArray, toggleCheckTreeState } = this.props;
-      const targetArray = nodeTargetArray.selector();
-      const rootNodeId = getRootNodeId(collapserId, this.props);
-      if (targetArray.includes(collapserId)) {
-        addToNodeTargetArray(null, rootNodeId);
-        toggleCheckTreeState(rootNodeId);
-
-        // debugger;
-      }
-    }
-
-    componentWillUnmount() {
-      const { addToNodeTargetArray, collapserId, nodeTargetArray } = this.props;
-      if (nodeTargetArray.selector().includes(collapserId)) {
-        // addToNodeTargetArray(null, getRootNodeId(collapserId, this.props));
-      }
-    }
 
     expandCollapseAll = () => {
       const {
         allChildItemIds,
-        areAllItemsExpanded,
         collapserId,
         expandCollapseAll,
         addToNodeTargetArray,
@@ -141,7 +114,7 @@ export const collapserWrapper = (WrappedComponent) => {
         isRootNode,
         contextMethods,
       } = this.props;
-      // const { areAllItemsExpanded } = this.state;
+      const { areAllItemsExpanded } = this.state;
       /*
         This activates a saga that will ensure that all the onHeightReady
         callbacks of nested <Collapse> elements have fired - before dispatching
@@ -151,20 +124,13 @@ export const collapserWrapper = (WrappedComponent) => {
       if (contextMethods) {
         contextMethods.scrollToTop(this.elem.current);
       }
-      // allChildItemIds.selector().forEach(itemId => expandCollapseAll(areAllItemsExpanded, itemId));
-      const rootNodeId = getRootNodeId(collapserId, this.props);
-      expandCollapseAll(areAllItemsExpanded, allChildItemIds.selector(), rootNodeId);
-      if (!isRootNode) {
-        addToNodeTargetArray(collapserId, getRootNodeId(collapserId, this.props), true);
-      } else {
-        addToNodeTargetArray(null, getRootNodeId(collapserId, this.props));
-      }
+      allChildItemIds.selector().forEach(itemId => expandCollapseAll(areAllItemsExpanded, itemId));
+      addToNodeTargetArray(collapserId, getRootNodeId(collapserId, this.props));
     };
 
     render() {
       const {
         allChildItemIds,
-        areAllItemsExpanded,
         expandCollapseAll,
         watchCollapser,
         watchInitCollapser,
@@ -173,13 +139,7 @@ export const collapserWrapper = (WrappedComponent) => {
         nodeTargetArray,
         ...other
       } = this.props;
-      /*
-      console.log('collapserRender', this.props.collapserId);
-      if (this.props.collapserId === 0) {
-        renderCount += 1;
-        console.log('root rendercount:', renderCount);
-      }
-      */
+      const { areAllItemsExpanded } = this.state;
       return (
         <WrappedComponentRef
           {...other}
@@ -233,6 +193,12 @@ export const collapserWrapper = (WrappedComponent) => {
     ]
   );
 
+  const areAllItemsExpandedSelector = (state, ownProps) => (
+    targetNodeArray,
+    collapserCache
+  ) => nestedCollapserItemsExpandedRootEvery(
+    state, { ...ownProps, targetNodeArray }, collapserCache
+  );
 
   /*
     Overall strategy is to prevent mapStateToProps from calling the selectors
@@ -267,66 +233,26 @@ export const collapserWrapper = (WrappedComponent) => {
     hits the setState limit.
   */
 
-  const countCache = {};
-  // console.log('countCache', countCache);
 
   const mapStateToPropsFactory = () => {
 
+    const areAllItemsExpandedDummy = {};
     const setTreeIdsDummy = {};
     const allChildItemsDummy = {};
-    const nodeTargetArrayDummy = {};
-    let checkTreeStateCurrent = null;
-    let checkTreeStateNext = null;
+
     return (state, ownProps) => {
-      const cache = ownProps.contextMethods.collapser.getCache(ownProps);
-      const {
-        collapserId,
-        isRootNode,
-      } = ownProps;
-      let areAllItemsExpanded;
-      const nodeTargetArray = getNodeTargetArrayRoot(state)(ownProps.rootNodeId);
-
-      if (isRootNode) {
-        checkTreeStateNext = getCheckTreeStateRoot(state)(ownProps.rootNodeId);
-      }
-
-      /*
-      if (isRootNode && checkTreeStateNext !== checkTreeStateCurrent) {
-        if (!countCache[collapserId]) {
-          countCache[collapserId] = {};
-        }
-        if (!countCache[collapserId][renderCount]) {
-          countCache[collapserId][renderCount] = 1;
-        } else {
-          countCache[collapserId][renderCount] += 1;
-        }
-      }
-      */
-      if (isRootNode && checkTreeStateNext !== checkTreeStateCurrent) {
-        cache.unlockCache();
-        areAllItemsExpanded = nestedCollapserItemsExpandedRootEvery(
-          state, { ...ownProps, nodeTargetArray }, cache
-        );
-        cache.lockCache();
-        checkTreeStateCurrent = checkTreeStateNext;
-      } else {
-        areAllItemsExpanded = nestedCollapserItemsExpandedRootEvery(
-          state, { ...ownProps, nodeTargetArray: [collapserId] }, cache
-        );
-      }
-
+      areAllItemsExpandedDummy.selector = areAllItemsExpandedSelector(state, ownProps);
       setTreeIdsDummy.selector = action => setTreeIdsRecursively(
         state,
         ownProps.rootNodeId,
         action
       );
-      nodeTargetArrayDummy.selector = () => getNodeTargetArrayRoot(state)(ownProps.rootNodeId);
       allChildItemsDummy.selector = () => nestedCollapserItemsRoot(state, ownProps);
       return {
         allChildItemIds: allChildItemsDummy,
-        areAllItemsExpanded,
-        nodeTargetArray: nodeTargetArrayDummy,
+        areAllItemsExpandedSelector: areAllItemsExpandedDummy,
         setTreeIdsSelector: setTreeIdsDummy,
+        nodeTargetArray: getNodeTargetArrayRoot(state)(ownProps.rootNodeId),
       };
     };
   };

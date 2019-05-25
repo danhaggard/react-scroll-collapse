@@ -11,8 +11,9 @@ import {
 
 import {
   addToState,
+  removeFromState,
   updateState,
-  removeFromState
+  updateStateArray,
 } from './utils';
 
 
@@ -81,8 +82,9 @@ export const itemsReducer = (state = {}, action) => {
       return addToState(state, action, itemId, itemReducer);
     case HEIGHT_READY:
     case EXPAND_COLLAPSE:
-    case EXPAND_COLLAPSE_ALL:
       return updateState(state, action, itemId, itemReducer);
+    case EXPAND_COLLAPSE_ALL:
+      return updateStateArray(state, action, itemId, itemReducer);
     default:
       return state;
   }

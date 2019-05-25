@@ -1,10 +1,12 @@
 import { COLLAPSERS, ITEMS, SCROLLERS } from '../constants';
 import createProvider from '../createProvider';
+import CollapserManager from '../CollapserManager';
 
 const collapserProvider = createProvider(
   COLLAPSERS, // your provider type
   [SCROLLERS], // parent provider types
   [COLLAPSERS, ITEMS], // child provider types
+  CollapserManager
 );
 
 export default collapserProvider;

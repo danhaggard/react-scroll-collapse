@@ -19,7 +19,7 @@ export const WATCH_COLLAPSER = 'react-scroll-collapse/WATCH_COLLAPSER';
 export const ADD_ROOT_NODE = 'react-scroll-collapse/ADD_ROOT_NODE';
 export const REMOVE_ROOT_NODE = 'react-scroll-collapse/REMOVE_ROOT_NODE';
 export const ADD_TO_NODE_TARGET_ARRAY = 'react-scroll-collapse/ADD_TO_NODE_TARGET_ARRAY';
-
+export const TOGGLE_CHECK_TREE_STATE = 'react-scroll-collapse/TOGGLE_CHECK_TREE_STATE';
 
 /* collapserItem action types */
 export const ADD_ITEM = 'react-scroll-collapse/ADD_ITEM';

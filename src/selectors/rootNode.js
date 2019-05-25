@@ -23,3 +23,16 @@ export const getNodeTargetArrayRoot = curryCompose(
   getRootNodeTargetArray,
   getRootNodeRoot
 );
+
+
+// --- rootNode.checkTreeState
+export const getRootNodeCheckTreeState = rootNodeObject => getOrNull(
+  rootNodeObject,
+  'checkTreeState'
+);
+
+// rootState => id => [3, 4, etc...]
+export const getCheckTreeStateRoot = curryCompose(
+  getRootNodeCheckTreeState,
+  getRootNodeRoot
+);

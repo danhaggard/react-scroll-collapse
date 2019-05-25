@@ -22,6 +22,16 @@ export const updateState = (state, action, id, reducer) => {
   return newState;
 };
 
+export const updateStateArray = (state, action, idArray, reducer) => {
+  const newState = { ...state };
+  idArray.forEach((id) => {
+    if (id in newState) {
+      newState[id] = reducer(state[id], action);
+    }
+  });
+  return newState;
+};
+
 export const updateObjectArray = (objectArray, newObject) => [
   ...objectArray.filter(obj => obj.id !== newObject.id),
   newObject

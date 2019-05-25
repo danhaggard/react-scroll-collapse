@@ -142,10 +142,10 @@ export const generateCommentThreadData = (
 */
 
 const someData = generateCommentThreadData(
-  1,
-  50,
-  1,
-  50
+  2,
+  3,
+  4,
+  6
 );
 console.log('someData', someData);
 

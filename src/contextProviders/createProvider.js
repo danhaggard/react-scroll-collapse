@@ -154,11 +154,11 @@ const createProvider = (
     }
 
     getProps = () => ({
-      contextMethods: this.mergedContextMethods,
       isRootNode: this.checkIfRoot(),
       providerType: typeKey,
       ...this.props,
       ...this.state,
+      contextMethods: this.mergedContextMethods,
     })
 
     render() {

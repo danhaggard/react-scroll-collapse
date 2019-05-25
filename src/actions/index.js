@@ -14,6 +14,7 @@ import addCollapserChild from './collapser/addCollapserChild';
 import addRootNode from './collapser/addRootNode';
 import removeRootNode from './collapser/removeRootNode';
 import setTreeId from './collapser/setTreeId';
+import toggleCheckTreeState from './collapser/toggleCheckTreeState';
 
 import watchCollapser from './collapser/watchCollapser';
 import watchInitCollapser from './collapser/watchInitCollapser';
@@ -49,6 +50,7 @@ const actions = {
   addScrollerChild,
   removeScroller,
   removeScrollerChild,
+  toggleCheckTreeState
 };
 
 export const collapserControllerActions = {
@@ -66,6 +68,7 @@ export const collapserWrapperActions = {
   addToNodeTargetArray,
   expandCollapseAll,
   setTreeId,
+  toggleCheckTreeState,
   watchCollapser,
   watchInitCollapser,
 };
