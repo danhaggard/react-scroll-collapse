@@ -7,10 +7,9 @@ import CommentWithButtons from '../Comment/CommentWithButtons';
 import ExpandButton from '../ExpandButton';
 
 import { collapserController } from '../../../src';
-import { ofNumberTypeOrNothing, ofBoolTypeOrNothing, ofChildrenType } from '../../../src/utils/propTypeHelpers';
+import { ofBoolTypeOrNothing, ofChildrenType } from '../../../src/utils/propTypeHelpers';
 
 import { generateCommentThreadData } from '../../utils';
-
 
 class CommentThread extends PureComponent { // eslint-disable-line react/no-multi-comp
 
@@ -23,7 +22,7 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
     };
   })();
 
-  generateChildData = () => generateCommentThreadData(1, 1, 1, 1);
+  generateChildData = () => generateCommentThreadData(1, 3, 1, 5);
 
   addChild = child => state => ({
     ...state,
@@ -103,17 +102,6 @@ CommentThread.whyDidYouRender = {
   logOnDifferentValues: true,
   customName: 'CommentThreadPerf'
 };
-
-const trickReact = (Comp) => {
-  class WrappedComp extends PureComponent { // eslint-disable-line
-    render = () => <Comp {...this.props} />;
-  }
-  return WrappedComp;
-};
-
-const CommentThreadClone = trickReact(CommentThread);
-
-const WrappedCommentThreadClone = collapserController(CommentThreadClone);
 
 const WrappedCommentThread = collapserController(CommentThread);
 

@@ -102,11 +102,8 @@ export const generateCommentThreadData = (
   minDepth,
   maxChildren,
   maxDepth,
-  allowRandom = true,
   initCount = -1,
 ) => {
-  // const minChildren = allowRandom ? minChildrenArg : maxChildren;
-  // const minDepth = allowRandom ? minDepthArg : maxDepth;
   const recurseFunc = (
     allowedDepth,
     currentNodeIndex,

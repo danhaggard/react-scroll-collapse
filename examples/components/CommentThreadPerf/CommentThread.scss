@@ -9,7 +9,7 @@
   flex-direction: row;
   flex: 1 1 30%;
   flex-wrap: wrap;
-  justify-content: space-around;
+  justify-content: flex-start;
   margin-bottom: 1em;
   margin-right: 1em;
   padding: 1em;
@@ -26,6 +26,19 @@
 
   &:hover {
     box-shadow: 0 0.5em 1em 0 rgba(10,16,34,.2), 0 0 0 transparent;
-    transform: translateY(0px) translateX(0px) translateZ(0px);
+    transform: translateY(1px) translateX(1px) translateZ(0px);
   }
+}
+
+
+:local(.wrapper) {
+  display: flex;
+  flex-direction: row;
+  flex: 1 1 30%;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+:local(.blah) {
+  width: calc(100% - 1em);
 }

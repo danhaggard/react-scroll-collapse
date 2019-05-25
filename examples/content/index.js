@@ -143,25 +143,12 @@ export const generateCommentThreadData = (
 
 const someData = generateCommentThreadData(
   1,
-  49,
+  50,
   1,
-  49
+  50
 );
 console.log('someData', someData);
-/*
-const mapNodeDataToThread = dataNode => (
-  <CommentThreadPerf key={dataNode.key} nodeData={dataNode}>
-    {
-      dataNode.children.map((childDataNode) => {
-        if (childDataNode.countReached < 500) {
-          return mapNodeDataToThread(childDataNode);
-        }
-        return <CommentThreadPerf key={childDataNode.key} nodeData={childDataNode} />;
-      })
-    }
-  </CommentThreadPerf>
-);
-*/
+
 const example9 = (
   <Example {...COPY[6]} style={{ marginBottom: '3em' }} key={5}>
     <Scroller style={{ height: '100%' }}>
