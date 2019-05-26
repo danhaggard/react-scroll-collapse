@@ -12,32 +12,6 @@ export const getRandomInt = (minArg, maxArg) => {
 
 /*
   This comes from: http://stackoverflow.com/a/8084248/1914452
-
-export const getRandString = () => {
-  const letters = 'abcdefghijklmnopqrstuvwxyz';
-  const N = Math.floor((Math.random() * 10) + 1);
-  const selection = [...Array(N).keys()].map(
-    () => letters.charAt(Math.floor(Math.random() * letters.length))
-  ).join('');
-  return selection;
-};
-
-/*
-  The Array.apply trick used here I learnt from:
-    http://stackoverflow.com/a/20066663/1914452
-
-export const genRandText = () => {
-  let randText = '';
-  const noOfWords = Math.floor((Math.random() * 30) + 10);
-  [...Array(noOfWords).keys()].forEach(() => {
-    randText += ` ${getRandString()}`;
-  });
-  return randText;
-};
-*/
-
-/*
-  This comes from: http://stackoverflow.com/a/8084248/1914452
 */
 export const getRandString = (minSize = 1, maxSize = 10) => {
   const letters = 'abcdefghijklmnopqrstuvwxyz';
@@ -93,17 +67,20 @@ const getNodeChildren = (
 
 const getNodeObj = (count, depth, index) => ({
   comment: genRandText(),
+  count,
+  depth,
   key: `comment-${count}`,
   title: `depth: ${depth} - branch: ${index}`,
 });
 
-export const generateCommentThreadData = (
+export const generateCommentThreadData = ({
   minChildren,
   minDepth,
   maxChildren,
   maxDepth,
-  initCount = -1,
-) => {
+},
+initCount = -1,
+initialDepthCount = 0) => {
   const recurseFunc = (
     allowedDepth,
     currentNodeIndex,
@@ -112,8 +89,13 @@ export const generateCommentThreadData = (
     counter
   ) => {
     const count = counter(initCount);
+    const countModifier = initCount === -1 ? 0 : initCount;
     const nodeData = {
-      ...getNodeObj(count, currentDepth, currentNodeIndex),
+      ...getNodeObj(
+        count + countModifier,
+        currentDepth + initialDepthCount,
+        currentNodeIndex + countModifier,
+      ),
       children: getNodeChildren(
         allowedDepth,
         counter,

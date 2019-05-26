@@ -9,24 +9,37 @@ import ExpandButton from '../ExpandButton';
 import { collapserController } from '../../../src';
 import { ofBoolTypeOrNothing, ofChildrenType } from '../../../src/utils/propTypeHelpers';
 
-import { generateCommentThreadData } from '../../utils';
+import { generateCommentThreadData, getRandomInt } from '../../utils';
 
 class CommentThread extends PureComponent { // eslint-disable-line react/no-multi-comp
 
   state = (() => {
-    const { children, comment, title } = this.props.nodeData;
+    const {
+      children,
+      comment,
+      count,
+      depth,
+      title
+    } = this.props.nodeData;
     return {
       comment,
+      count,
+      depth,
       title,
       localChildren: children,
     };
   })();
 
-  generateChildData = () => generateCommentThreadData(1, 3, 1, 5);
+  generateChildData = (count, depth) => generateCommentThreadData(
+    this.props,
+    count,
+    depth,
+  );
 
-  addChild = child => state => ({
+  addChildren = children => state => ({
     ...state,
-    localChildren: [...state.localChildren, child],
+    count: state.count + children.length,
+    localChildren: [...state.localChildren, ...children],
   });
 
   removeChild = state => ({
@@ -35,8 +48,13 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
   });
 
   insertThread = () => {
-    const child = this.generateChildData();
-    this.setState(this.addChild(child));
+    const { minChildren, maxChildren } = this.props;
+    const { count, depth } = this.state;
+    const numNewChildren = getRandomInt(minChildren, maxChildren);
+    const newChildren = [...Array(numNewChildren).keys()].map(
+      i => this.generateChildData(count + i, depth + 1)
+    );
+    this.setState(this.addChildren(newChildren));
   };
 
   removeThread = () => this.setState(this.removeChild);
@@ -48,6 +66,10 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
       expandCollapseAll,
       collapserRef,
       collapserId,
+      minChildren,
+      minDepth,
+      maxChildren,
+      maxDepth,
       style,
     } = this.props;
     const { comment, localChildren, title } = this.state;
@@ -74,7 +96,16 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
         { children }
         {
           localChildren.map(childNodeData => (
-            <WrappedCommentThread key={childNodeData.key} nodeData={childNodeData} />
+            <WrappedCommentThread
+              key={childNodeData.key}
+              nodeData={childNodeData}
+              {...{
+                minChildren,
+                minDepth,
+                maxChildren,
+                maxDepth,
+              }}
+            />
           ))
         }
       </div>
@@ -83,8 +114,12 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
 }
 
 CommentThread.defaultProps = {
-  children: [],
   areAllItemsExpanded: null,
+  children: [],
+  maxChildren: 1,
+  maxDepth: 1,
+  minChildren: 1,
+  minDepth: 1,
   style: {},
 };
 
@@ -95,6 +130,10 @@ CommentThread.propTypes = {
   expandCollapseAll: PropTypes.func.isRequired,
   collapserRef: PropTypes.object.isRequired,
   nodeData: PropTypes.object.isRequired,
+  maxChildren: PropTypes.number,
+  maxDepth: PropTypes.number,
+  minChildren: PropTypes.number,
+  minDepth: PropTypes.number,
   style: PropTypes.object,
 };
 

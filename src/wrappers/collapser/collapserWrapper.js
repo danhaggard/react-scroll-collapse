@@ -10,20 +10,13 @@ import { collapserWrapperActions } from '../../actions';
 
 import { getNodeTargetArrayRoot, getCheckTreeStateRoot } from '../../selectors/rootNode';
 import {
+  createAreAllItemsExpandedSelector,
   nestedCollapserItemsRoot,
-  nestedCollapserItemsExpandedRootEvery,
   setTreeIdsRecursively,
 } from '../../selectors/collapser';
 
-import {
-  compareIntArrays,
-  getCache,
-  getRootNodeId,
-} from '../utils';
-
 import addLoggingDefaultsToComponent from '../../utils/logging/utils';
 
-let renderCount = 0;
 
 export const collapserWrapper = (WrappedComponent) => {
 
@@ -33,46 +26,14 @@ export const collapserWrapper = (WrappedComponent) => {
 
     elem = React.createRef();
 
-    /*
-
-    static getDerivedStateFromProps(props, state) {
-      const {
-        areAllItemsExpandedSelector,
-        collapserId,
-        nodeTargetArray,
-        isRootNode,
-        addToNodeTargetArray,
-      } = props;
-      let areAllItemsExpandedUpdate = state.areAllItemsExpanded;
-      if (isRootNode) {
-        state.cache.unlockCache();
-        areAllItemsExpandedUpdate = areAllItemsExpandedSelector.selector(
-          nodeTargetArray,
-          state.cache
-        );
-        state.cache.lockCache();
-        if (nodeTargetArray.length > 0) {
-          addToNodeTargetArray(null, collapserId);
-        }
-      } else {
-        areAllItemsExpandedUpdate = areAllItemsExpandedSelector.selector(
-          [collapserId],
-          state.cache
-        );
-      }
-      return {
-        areAllItemsExpanded: areAllItemsExpandedUpdate,
-      };
-    }
-    */
-
     componentDidMount() {
       const {
         addToNodeTargetArray,
         collapserId,
         isRootNode,
+        rootNodeId,
         setTreeId,
-        setTreeIdsSelector,
+        selectors,
         toggleCheckTreeState,
         watchInitCollapser
       } = this.props;
@@ -83,98 +44,69 @@ export const collapserWrapper = (WrappedComponent) => {
         On insertion of new node - we shouldn't check unrelated branches - so set this.
       */
       const addNodeValue = isRootNode ? null : collapserId;
-      const rootNodeId = getRootNodeId(collapserId, this.props);
       addToNodeTargetArray(addNodeValue, rootNodeId);
-      setTreeIdsSelector.selector(setTreeId);
+      selectors.setTreeIds(setTreeId);
       if (isRootNode) {
         toggleCheckTreeState(rootNodeId);
       }
     }
 
-    /*
-    shouldComponentUpdate(nextProps, nextState) {
-      const { props, state } = this;
-      const checkAgainstProps = ['rootNodeId', 'setTreeIds', 'setTreeId', 'allChildItemIds', 'nodeTargetArray',
-        'areAllItemsExpandedSelector', 'setTreeIdsSelector'];
-
-      const propsCondition = (prop, stateCheckValue) => {
-        const left = !checkAgainstProps.includes(prop) && props[prop] !== nextProps[prop];
-        const right = prop === 'nodeTargetArray' && !compareIntArrays(props[prop], nextProps[prop]) && stateCheckValue;
-        return left || right;
-      };
-
-      const stateCondition = prop => (state[prop] !== nextState[prop]);
-      const stateCheckValue = Object.keys(state).some(prop => stateCondition(prop));
-
-      return Object.keys(props).some(prop => propsCondition(prop, stateCheckValue))
-       || stateCheckValue;
-    }
-    */
-
     componentDidUpdate() {
-      const { addToNodeTargetArray, collapserId, isRootNode, nodeTargetArray, toggleCheckTreeState } = this.props;
-      const targetArray = nodeTargetArray.selector();
-      const rootNodeId = getRootNodeId(collapserId, this.props);
+      const {
+        addToNodeTargetArray,
+        collapserId,
+        rootNodeId,
+        selectors,
+        toggleCheckTreeState
+      } = this.props;
+      const targetArray = selectors.nodeTargetArray();
       if (targetArray.includes(collapserId)) {
-        addToNodeTargetArray(null, rootNodeId);
         toggleCheckTreeState(rootNodeId);
-
-        // debugger;
-      }
-    }
-
-    componentWillUnmount() {
-      const { addToNodeTargetArray, collapserId, nodeTargetArray } = this.props;
-      if (nodeTargetArray.selector().includes(collapserId)) {
-        // addToNodeTargetArray(null, getRootNodeId(collapserId, this.props));
+        addToNodeTargetArray(null, rootNodeId);
       }
     }
 
     expandCollapseAll = () => {
       const {
-        allChildItemIds,
+        addToNodeTargetArray,
         areAllItemsExpanded,
         collapserId,
-        expandCollapseAll,
-        addToNodeTargetArray,
-        watchCollapser,
-        isRootNode,
         contextMethods,
+        expandCollapseAll,
+        isRootNode,
+        rootNodeId,
+        selectors,
+        watchCollapser,
       } = this.props;
-      // const { areAllItemsExpanded } = this.state;
       /*
         This activates a saga that will ensure that all the onHeightReady
         callbacks of nested <Collapse> elements have fired - before dispatching
         a HEIGHT_READY action.  Previously scroller would wait for this.
       */
       watchCollapser(collapserId);
-      if (contextMethods) {
-        contextMethods.scrollToTop(this.elem.current);
+      if (contextMethods.scroller) {
+        contextMethods.scroller.scrollToTop(this.elem.current);
       }
-      // allChildItemIds.selector().forEach(itemId => expandCollapseAll(areAllItemsExpanded, itemId));
-      const rootNodeId = getRootNodeId(collapserId, this.props);
-      expandCollapseAll(areAllItemsExpanded, allChildItemIds.selector(), rootNodeId);
+      expandCollapseAll(areAllItemsExpanded, selectors.allChildItemIds(), rootNodeId);
       if (!isRootNode) {
-        addToNodeTargetArray(collapserId, getRootNodeId(collapserId, this.props), true);
+        addToNodeTargetArray(collapserId, rootNodeId, true);
       } else {
-        addToNodeTargetArray(null, getRootNodeId(collapserId, this.props));
+        addToNodeTargetArray(null, rootNodeId);
       }
     };
 
     render() {
       const {
-        allChildItemIds,
         areAllItemsExpanded,
         expandCollapseAll,
+        rootNodeId,
+        selectors,
         watchCollapser,
         watchInitCollapser,
-        areAllItemsExpandedSelector,
-        setTreeIdsSelector,
-        nodeTargetArray,
         ...other
       } = this.props;
-      /*
       console.log('collapserRender', this.props.collapserId);
+      /*
       if (this.props.collapserId === 0) {
         renderCount += 1;
         console.log('root rendercount:', renderCount);
@@ -205,21 +137,21 @@ export const collapserWrapper = (WrappedComponent) => {
     parentCollapserId: ofNumberTypeOrNothing,
     parentScrollerId: PropTypes.number,
     isRootNode: PropTypes.bool.isRequired,
-    providerType: PropTypes.string.isRequired,
     rootNodes: PropTypes.object,
 
     /* provided by redux */
     addToNodeTargetArray: PropTypes.func.isRequired,
-    areAllItemsExpandedSelector: PropTypes.func.isRequired, // includes nested
-    allChildItemIds: PropTypes.func.isRequired, // array of collapserItem ids
+    areAllItemsExpanded: PropTypes.bool.isRequired,
     expandCollapseAll: PropTypes.func.isRequired,
+    selectors: PropTypes.object.isRequired, // includes nested
     setTreeId: PropTypes.func.isRequired,
-    setTreeIdsSelector: PropTypes.func.isRequired,
+    toggleCheckTreeState: PropTypes.func.isRequired,
     watchCollapser: PropTypes.func.isRequired,
     watchInitCollapser: PropTypes.func.isRequired,
 
     /* provided by scrollerProvider via context */
     contextMethods: ofObjectTypeOrNothing,
+    rootNodeId: PropTypes.number.isRequired,
   };
 
   addLoggingDefaultsToComponent(
@@ -235,98 +167,59 @@ export const collapserWrapper = (WrappedComponent) => {
 
 
   /*
-    Overall strategy is to prevent mapStateToProps from calling the selectors
-    directly - because we only want the root node to check state at the
-    beginning of each cycle.  So we pass in selector functions which then
-    get called inside the component when required.
+    Overall strategy is to prevent mapStateToProps from calling most selectors
+    directly because they are expensive calls - and we want to maintain tight
+    control over how they are called.  So they are passed in as functions to props
+    and the component calls them when required.  On each call of mapStateToProps
+    - new selector functions are generated with fresh props and state injected
+    into them.
 
-    However - the functions must be generated anew with each state change
-    otherwise they will return stale values.  And if you pass in a
-    new function then connect() will force an update to the component - using
-    setState (I think in a componentDidUpdate method) - because the functions
-    will always fail an identity check.
+    These functions would ordinarily cause redux to see a change in value,
+    and thus trigger an update to the component on every dispatch -
+    because they are new functions every time mapStateToProps is called.
 
-    This was mostly fine because I was preventing rendering with componentShouldUpdate
+    So we created a selectors object with a closure - which is mutated with
+    the new selector functions.  The identity of this object never changes
+    and never causes unecesary component updates.
 
-    BUT - turns out that you have a budget of 50 setStates in componentDidUpdate
-    in a single render cycle.  If you use this component to nest to a depth
-    of fifty - then one more call to setState in componentDidUpdate And
-    react thinks you're in an infinite loop and hard fails.
+    areAllItemsExpanded is different.  Previously I was passing in this as a
+    selector function as well and actually relying on the selector functions
+    failing the identity check to force the component update on every call of
+    mapStateToProps.  I would then use a combination of getDerivedStateFromProps
+    and shouldComponentUpdate, to determine when component updates would happen.
 
-    Part Solution is to use an object in which to store the selector functions.  We
-    can update the functions with new state every time, but the object itself stays
-    the same.  This prevents unecessary forced updates.
+    This was bad because redux is calling setState on every component instance,
+    on every change of redux state - but in many cases WITHOUT causing a render
+    in the Collapser instance because renders were being blocked by
+    componentShouldUpdate.  On a tree with a nesting depth > 50 - the redux
+    calls to setState would exceed 50 in a single render cycle and so react
+    would think it was in a infinite setState loop and terminate.
 
-    But - if we do this for all values - then redux never thinks a change has
-    happened at all - and the component is never updated.  Also child subscribers
-    are never called either.
-
-    Basically don't think this approach can work - it relied on being able to
-    check state at each level of the tree inside the component -
-    but that's a setState call by redux for every node all the way down, which
-    hits the setState limit.
+    Now - areAllItemsExpanded simply passes a true false value - and is responsible
+    for triggering component updates.  Because checking this state is the most
+    expensive - a new strategy had to be employed to ensure it is called
+    only when necessary.  See comments on: createAreAllItemsExpandedSelector
+    for details.
   */
 
-  const countCache = {};
-  // console.log('countCache', countCache);
-
   const mapStateToPropsFactory = () => {
-
-    const setTreeIdsDummy = {};
-    const allChildItemsDummy = {};
-    const nodeTargetArrayDummy = {};
-    let checkTreeStateCurrent = null;
-    let checkTreeStateNext = null;
-    return (state, ownProps) => {
-      const cache = ownProps.contextMethods.collapser.getCache(ownProps);
-      const {
-        collapserId,
-        isRootNode,
-      } = ownProps;
-      let areAllItemsExpanded;
-      const nodeTargetArray = getNodeTargetArrayRoot(state)(ownProps.rootNodeId);
-
-      if (isRootNode) {
-        checkTreeStateNext = getCheckTreeStateRoot(state)(ownProps.rootNodeId);
-      }
-
-      /*
-      if (isRootNode && checkTreeStateNext !== checkTreeStateCurrent) {
-        if (!countCache[collapserId]) {
-          countCache[collapserId] = {};
-        }
-        if (!countCache[collapserId][renderCount]) {
-          countCache[collapserId][renderCount] = 1;
-        } else {
-          countCache[collapserId][renderCount] += 1;
-        }
-      }
-      */
-      if (isRootNode && checkTreeStateNext !== checkTreeStateCurrent) {
-        cache.unlockCache();
-        areAllItemsExpanded = nestedCollapserItemsExpandedRootEvery(
-          state, { ...ownProps, nodeTargetArray }, cache
-        );
-        cache.lockCache();
-        checkTreeStateCurrent = checkTreeStateNext;
-      } else {
-        areAllItemsExpanded = nestedCollapserItemsExpandedRootEvery(
-          state, { ...ownProps, nodeTargetArray: [collapserId] }, cache
-        );
-      }
-
-      setTreeIdsDummy.selector = action => setTreeIdsRecursively(
+    const selectors = {};
+    const areAllItemsExpandedSelector = createAreAllItemsExpandedSelector(
+      getCheckTreeStateRoot,
+      getNodeTargetArrayRoot
+    );
+    return (state, props) => {
+      const { rootNodeId } = props;
+      selectors.allChildItemIds = () => nestedCollapserItemsRoot(state, props);
+      selectors.nodeTargetArray = () => getNodeTargetArrayRoot(state)(rootNodeId);
+      selectors.setTreeIds = action => setTreeIdsRecursively(
         state,
-        ownProps.rootNodeId,
+        rootNodeId,
         action
       );
-      nodeTargetArrayDummy.selector = () => getNodeTargetArrayRoot(state)(ownProps.rootNodeId);
-      allChildItemsDummy.selector = () => nestedCollapserItemsRoot(state, ownProps);
       return {
-        allChildItemIds: allChildItemsDummy,
-        areAllItemsExpanded,
-        nodeTargetArray: nodeTargetArrayDummy,
-        setTreeIdsSelector: setTreeIdsDummy,
+        areAllItemsExpanded: areAllItemsExpandedSelector(state, props),
+        selectors,
       };
     };
   };

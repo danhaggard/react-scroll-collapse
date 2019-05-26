@@ -35,11 +35,12 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
       this.userScrollActive = false;
     }
 
+    setScrollTop = this.props.contextMethods.scroller.setScrollTop;
+
     /*
       If scrollTo prop passed a value - use that.  Otherwise use the current
       offsetTop value added to any supplied offset.
     */
-
     modifyMotionStyle = () => {
       const {
         autoScrollDisabled,
@@ -93,7 +94,6 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
 
     render() {
       const { onRest, ...rest } = this.props;
-      const { contextMethods: { setScrollTop } } = this.props;
       const motionStyle = this.modifyMotionStyle();
       const scrollerProps = {
         ...rest,
@@ -119,7 +119,7 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
             */
             (val) => {
               if (!this.userScrollActive) {
-                setScrollTop(val.y);
+                this.setScrollTop(val.y);
               }
               return (
                 <ScrollerComponent

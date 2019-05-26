@@ -12,7 +12,7 @@ import CommentThreadOrig from '../components/CommentThread';
 
 import Example from '../components/Example';
 
-import { generateCommentThreadData, genRandText, getRandomInt } from '../utils';
+import { generateCommentThreadData, genRandText } from '../utils';
 
 const COPY = {
   0: {
@@ -141,18 +141,31 @@ export const generateCommentThreadData = (
 )
 */
 
-const someData = generateCommentThreadData(
-  2,
-  3,
-  4,
-  6
-);
+const generateThreadConfig = {
+  minChildren: 1,
+  minDepth: 1,
+  maxChildren: 1,
+  maxDepth: 1,
+};
+
+const generateThreadConfigChild = {
+  minChildren: 2,
+  minDepth: 2,
+  maxChildren: 2,
+  maxDepth: 2,
+};
+
+const someData = generateCommentThreadData(generateThreadConfig);
 console.log('someData', someData);
 
 const example9 = (
   <Example {...COPY[6]} style={{ marginBottom: '3em' }} key={5}>
     <Scroller style={{ height: '100%' }}>
-      <CommentThreadPerf key={someData.key} nodeData={someData} />
+      <CommentThreadPerf
+        key={someData.key}
+        nodeData={someData}
+        {...generateThreadConfigChild}
+        />
     </Scroller>
   </Example>
 );

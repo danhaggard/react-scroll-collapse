@@ -6,6 +6,7 @@ const collapserProvider = createProvider(
   COLLAPSERS, // your provider type
   [SCROLLERS], // parent provider types
   [COLLAPSERS, ITEMS], // child provider types
+  undefined,
   CollapserManager
 );
 

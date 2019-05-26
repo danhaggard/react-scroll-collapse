@@ -1,47 +1,51 @@
-import { PureComponent } from 'react';
+import React, { PureComponent } from 'react';
 import createCache from '../caching/recursionCache';
 import providerCaches from '../caching/providerCaches';
 
-export const getRootNodeId = (ownId, {
+const getRootNodeId = ({
+  collapserId,
   isRootNode,
+  providerType,
   rootNodes,
-  providerType
-}) => (isRootNode ? ownId : rootNodes[providerType]);
+}) => (isRootNode ? collapserId : rootNodes[providerType]);
 
+const collapserManager = (Comp) => {
+  class CollapserManager extends PureComponent {
 
-class CollapserManager extends PureComponent {
-
-  constructor(props, context) {
-    super(props, context);
-    this.contextMethods = {
-      collapser: {
-        ...this,
-      },
-    };
-  }
-
-  getCreateCache = (props) => {
-    const { collapserId, isRootNode, providerType } = props;
-    const rootNodeId = getRootNodeId(collapserId, props);
-    const providerCache = providerCaches[providerType];
-    if (isRootNode) {
-      providerCache[rootNodeId] = createCache();
+    getCreateCache = (props, rootNodeId) => {
+      const { isRootNode, providerType } = props;
+      const providerCache = providerCaches[providerType];
+      if (isRootNode) {
+        providerCache[rootNodeId] = createCache();
+      }
+      return providerCache[rootNodeId];
     }
-    return providerCache[rootNodeId];
-  }
 
-  getCache = (props) => {
-    if (!this.cache) {
-      this.cache = this.getCreateCache(props);
+    getCache = (props, rootNodeId) => {
+      if (!this.cache) {
+        this.cache = this.getCreateCache(props, rootNodeId);
+      }
+      return this.cache;
     }
-    return this.cache;
+
+    render() {
+      const rootNodeId = getRootNodeId(this.props);
+      return (
+        <Comp
+          {...this.props}
+          cache={this.getCache(this.props, rootNodeId)}
+          rootNodeId={rootNodeId}
+        />
+      );
+    }
   }
 
-}
+  CollapserManager.whyDidYouRender = {
+    logOnDifferentValues: false,
+    customName: 'CollapserManager'
+  };
 
-CollapserManager.whyDidYouRender = {
-  logOnDifferentValues: false,
-  customName: 'CollapserManager'
+  return CollapserManager;
 };
 
-export default CollapserManager;
+export default collapserManager;

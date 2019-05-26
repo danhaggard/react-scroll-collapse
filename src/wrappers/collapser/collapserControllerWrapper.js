@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 import { ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
 import { collapserControllerActions } from '../../actions';
 import cleanHoCProps from '../../utils/cleanHoCProps';
-import { getRootNodeId } from '../utils';
 
 export const collapserControllerWrapper = (CollapserController) => {
 
@@ -66,7 +65,6 @@ export const collapserControllerWrapper = (CollapserController) => {
       if (collapserId >= 0 && parentScrollerId >= 0) {
         return (
           <CollapserController
-            rootNodeId={getRootNodeId(collapserId, this.props)}
             {...cleanHoCProps(
               this.props,
               WrappedCollapserController.defaultProps,
@@ -92,6 +90,7 @@ export const collapserControllerWrapper = (CollapserController) => {
     addRootNode: PropTypes.func.isRequired,
     isRootNode: PropTypes.bool.isRequired,
     rootNodes: PropTypes.object,
+    rootNodeId: PropTypes.number.isRequired,
     providerType: PropTypes.string.isRequired,
     removeRootNode: PropTypes.func.isRequired,
     removeCollapser: PropTypes.func.isRequired,

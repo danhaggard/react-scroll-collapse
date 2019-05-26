@@ -18,16 +18,25 @@ import { isUndefNull } from '../utils/selectorUtils';
 
   typeKey: str key of  the type of provider THIS provider is.
 
-  Base = the Base React class this factory will use to create the provider.
-    ChildrenManager is an alternative that tracks child state.
+  Base the Base React class this factory will use to create the provider.
+    Use this if you need to need to pass methods through the context
+    to other provider types.  Define a contextMethods property on your base
+    class to do this.  State will be injected as props to the immediate child
+    but not passed into the context.
+
+  wrapper: a HoC function that will wrap the passed Comp with additional logic
+   specific to your provider.  Use this if you only need to inject props to the
+   wrapped component - but don't need anything passed deeper into the content.
 */
 
 const createProvider = (
   typeKey,
   parentTypeKeys = [],
   childTypeKeys = [],
-  Base = PureComponent
+  Base = PureComponent,
+  wrapper = null,
 ) => (Context, Comp) => {
+  const Wrapped = wrapper ? wrapper(Comp) : Comp;
   class Provider extends Base {
 
     /*
@@ -164,7 +173,7 @@ const createProvider = (
     render() {
       return childTypeKeys.length === 0 ? <Comp {...this.getProps()} /> : (
         <Context.Provider value={this.childContext}>
-          <Comp
+          <Wrapped
             {...this.getProps()}
             key={this.idKey}
             />

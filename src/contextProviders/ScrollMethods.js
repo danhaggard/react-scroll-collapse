@@ -10,7 +10,12 @@ class ScrollMethods extends PureComponent {
   constructor(props, context) {
     super(props, context);
     this.contextMethods = {
-      ...this
+      scroller: {
+        getElem: this.getElem,
+        getRef: this.getRef,
+        scrollToTop: this.scrollToTop,
+        setScrollTop: this.setScrollTop,
+      }
     };
     this.state = {
       providerMotionStyle: {

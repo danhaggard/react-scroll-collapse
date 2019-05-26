@@ -54,7 +54,7 @@ class Scroller extends PureComponent {
     e => this.breakScrollAnimation(e.keyCode === 38 || e.keyCode === 40)
   );
 
-  context = this.props.contextMethods;
+  context = this.props.contextMethods.scroller;
 
   getElem = this.context.getElem;
 

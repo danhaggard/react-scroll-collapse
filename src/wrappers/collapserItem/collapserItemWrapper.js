@@ -45,8 +45,8 @@ export const collapserItemWrapper = (WrappedComponent) => {
         watchCollapser,
       } = this.props;
       watchCollapser(parentCollapserId);
-      if (contextMethods) {
-        contextMethods.scrollToTop(this.elem.current);
+      if (contextMethods.scroller) {
+        contextMethods.scroller.scrollToTop(this.elem.current);
       }
       expandCollapseAction(itemId, parentCollapserId);
       addToNodeTargetArray(parentCollapserId, rootNodes.collapser);

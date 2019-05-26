@@ -87,3 +87,57 @@ export const setTreeIdsRecursively = (state, collapserId, action) => recurseTree
   action,
   collapserId,
 );
+
+
+export const createAreAllItemsExpandedSelector = (
+  checkTreeStateSelector,
+  nodeTargetArraySelector,
+  loggingConfig = { logging: false, renderCount: 0 }
+) => {
+  let checkTreeStateCurrent = null;
+  let checkTreeStateNext = null;
+  let countCache;
+  const { logging, renderCount } = loggingConfig;
+  if (logging) {
+    countCache = {};
+    console.log('countCache', countCache);
+  }
+  return (state, props) => {
+    const {
+      cache,
+      collapserId,
+      isRootNode,
+      rootNodeId
+    } = props;
+    let areAllItemsExpanded;
+    const nodeTargetArray = nodeTargetArraySelector(state)(rootNodeId);
+
+    if (isRootNode) {
+      checkTreeStateNext = checkTreeStateSelector(state)(rootNodeId);
+    }
+    if (isRootNode && checkTreeStateNext !== checkTreeStateCurrent) {
+      cache.unlockCache();
+      areAllItemsExpanded = nestedCollapserItemsExpandedRootEvery(
+        state, { ...props, nodeTargetArray }, cache
+      );
+      cache.lockCache();
+      checkTreeStateCurrent = checkTreeStateNext;
+
+      if (logging) {
+        if (!countCache[collapserId]) {
+          countCache[collapserId] = {};
+        }
+        if (!countCache[collapserId][renderCount]) {
+          countCache[collapserId][renderCount] = 1;
+        } else {
+          countCache[collapserId][renderCount] += 1;
+        }
+      }
+    } else {
+      areAllItemsExpanded = nestedCollapserItemsExpandedRootEvery(
+        state, { ...props, nodeTargetArray: [collapserId] }, cache
+      );
+    }
+    return areAllItemsExpanded;
+  };
+};
