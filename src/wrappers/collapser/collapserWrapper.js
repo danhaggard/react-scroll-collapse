@@ -35,11 +35,8 @@ export const collapserWrapper = (WrappedComponent) => {
         setTreeId,
         selectors,
         toggleCheckTreeState,
-        watchInitCollapser
       } = this.props;
       checkForRef(WrappedComponent, this.elem, 'collapserRef');
-      watchInitCollapser(collapserId);
-
       /*
         On insertion of new node - we shouldn't check unrelated branches - so set this.
       */
@@ -66,6 +63,10 @@ export const collapserWrapper = (WrappedComponent) => {
       }
     }
 
+    componentWillUnmount() {
+      debugger;
+    }
+
     expandCollapseAll = () => {
       const {
         addToNodeTargetArray,
@@ -76,14 +77,8 @@ export const collapserWrapper = (WrappedComponent) => {
         isRootNode,
         rootNodeId,
         selectors,
-        watchCollapser,
       } = this.props;
-      /*
-        This activates a saga that will ensure that all the onHeightReady
-        callbacks of nested <Collapse> elements have fired - before dispatching
-        a HEIGHT_READY action.  Previously scroller would wait for this.
-      */
-      watchCollapser(collapserId);
+
       if (contextMethods.scroller) {
         contextMethods.scroller.scrollToTop(this.elem.current);
       }
@@ -146,8 +141,6 @@ export const collapserWrapper = (WrappedComponent) => {
     selectors: PropTypes.object.isRequired, // includes nested
     setTreeId: PropTypes.func.isRequired,
     toggleCheckTreeState: PropTypes.func.isRequired,
-    watchCollapser: PropTypes.func.isRequired,
-    watchInitCollapser: PropTypes.func.isRequired,
 
     /* provided by scrollerProvider via context */
     contextMethods: ofObjectTypeOrNothing,

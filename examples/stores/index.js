@@ -1,25 +1,18 @@
 import { createStore, applyMiddleware, compose } from 'redux';
-import createSagaMiddleware from 'redux-saga';
 
 import reducers from '../reducers';
-import sagas from '../sagas';
 
 
 function reduxStore(initialState) {
-  const sagaMiddleware = createSagaMiddleware();
 
-  const middleware = applyMiddleware(sagaMiddleware);
   let enhancer;
 
   if (process.env.NODE_ENV !== 'production' && window.devToolsExtension) {
     enhancer = compose(
-      middleware,
-      window.devToolsExtension && window.devToolsExtension(),
+      window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(), // eslint-disable-line
     );
   } else {
-    enhancer = compose(
-      middleware,
-    );
+    enhancer = compose();
   }
 
   const store = createStore(reducers, initialState, enhancer);
@@ -31,7 +24,6 @@ function reduxStore(initialState) {
     });
   }
 
-  sagaMiddleware.run(sagas);
   return store;
 }
 

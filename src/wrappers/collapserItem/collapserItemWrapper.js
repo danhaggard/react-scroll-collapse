@@ -42,9 +42,7 @@ export const collapserItemWrapper = (WrappedComponent) => {
         expandCollapse: expandCollapseAction,
         parentCollapserId,
         rootNodes,
-        watchCollapser,
       } = this.props;
-      watchCollapser(parentCollapserId);
       if (contextMethods.scroller) {
         contextMethods.scroller.scrollToTop(this.elem.current);
       }
@@ -63,7 +61,6 @@ export const collapserItemWrapper = (WrappedComponent) => {
         isOpened,
         heightReady,
         expandCollapse,
-        watchCollapser,
         ...other
       } = this.props;
       return (
@@ -93,7 +90,6 @@ export const collapserItemWrapper = (WrappedComponent) => {
     heightReady: PropTypes.func.isRequired,
     expandCollapse: PropTypes.func.isRequired,
     rootNodes: PropTypes.object,
-    watchCollapser: PropTypes.func.isRequired,
 
     /* provided by scrollerProvider via context */
     contextMethods: ofObjectTypeOrNothing,

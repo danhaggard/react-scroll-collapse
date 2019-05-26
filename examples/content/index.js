@@ -150,16 +150,16 @@ const generateThreadConfig = {
 
 const generateThreadConfigChild = {
   minChildren: 2,
-  minDepth: 2,
+  minDepth: 1,
   maxChildren: 2,
-  maxDepth: 2,
+  maxDepth: 1,
 };
 
 const someData = generateCommentThreadData(generateThreadConfig);
 console.log('someData', someData);
 
 const example9 = (
-  <Example {...COPY[6]} style={{ marginBottom: '3em' }} key={5}>
+  <Example {...COPY[6]} style={{}} key={5}>
     <Scroller style={{ height: '100%' }}>
       <CommentThreadPerf
         key={someData.key}

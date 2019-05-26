@@ -44,7 +44,7 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
 
   removeChild = state => ({
     ...state,
-    localChildren: state.localChildren.slice(0, -1),
+    localChildren: state.localChildren.slice(0, -2),
   });
 
   insertThread = () => {
@@ -70,6 +70,7 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
       minDepth,
       maxChildren,
       maxDepth,
+      isRootNode,
       style,
     } = this.props;
     const { comment, localChildren, title } = this.state;
@@ -77,7 +78,7 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
     const newTitle = ` Collapser ${idStr} -- ${title || 'row: 0 - node: 0'}`;
     return (
       <div
-        className={`${styles.commentThread} ${styles.hover}`}
+        className={`${styles.commentThread} ${!isRootNode && styles.hover}`}
         ref={collapserRef}
         style={{ ...style }}
       >
@@ -134,6 +135,7 @@ CommentThread.propTypes = {
   maxDepth: PropTypes.number,
   minChildren: PropTypes.number,
   minDepth: PropTypes.number,
+  isRootNode: PropTypes.bool.isRequired,
   style: PropTypes.object,
 };
 

@@ -39,6 +39,4 @@ export { collapserItemIdentity } from './wrappers/collapserItem';
 */
 export { reactScrollCollapse } from './reducers';
 
-/* root sagas func name: reactScrollCollapseSagas */
-export { reactScrollCollapseSagas } from './sagas';
 export default Scroller;
