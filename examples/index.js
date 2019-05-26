@@ -1,6 +1,5 @@
 import React from 'react';
-import Dom, { render } from 'react-dom';
-console.log('dom', Dom);
+import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import configureStore from './stores';
 // import whyUpdate from '../src/utils/logging/index';
