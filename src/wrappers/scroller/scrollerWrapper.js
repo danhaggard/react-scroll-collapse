@@ -25,8 +25,7 @@ export const scrollerWrapper = (ScrollerComponent) => {
 
     addScroller() {
       const { addScroller, scrollerId } = this.props;
-      const scroller = { id: scrollerId };
-      addScroller(scroller, scrollerId);
+      addScroller(scrollerId);
     }
 
     render() {

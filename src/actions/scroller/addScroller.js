@@ -1,9 +1,8 @@
 import { ADD_SCROLLER } from '../const';
 
-const addScroller = (scroller, scrollerId) => ({
+const addScroller = scrollerId => ({
   type: ADD_SCROLLER,
   payload: {
-    scroller,
     scrollerId,
   },
 });

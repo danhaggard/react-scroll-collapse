@@ -50,16 +50,10 @@ export const collapserItemWrapper = (WrappedComponent) => {
       addToNodeTargetArray(parentCollapserId, rootNodes.collapser);
     };
 
-    onHeightReady = () => {
-      const { itemId, heightReady, parentCollapserId } = this.props;
-      heightReady(parentCollapserId, itemId);
-    };
-
     render() {
       const {
         contextMethods,
         isOpened,
-        heightReady,
         expandCollapse,
         ...other
       } = this.props;
@@ -68,7 +62,6 @@ export const collapserItemWrapper = (WrappedComponent) => {
           {...other}
           isOpened={isOpened}
           expandCollapse={this.expandCollapse}
-          onHeightReady={this.onHeightReady}
           ref={this.elem}
         />
       );
@@ -87,7 +80,6 @@ export const collapserItemWrapper = (WrappedComponent) => {
     itemId: PropTypes.number.isRequired,
     parentCollapserId: PropTypes.number.isRequired,
     parentScrollerId: PropTypes.number,
-    heightReady: PropTypes.func.isRequired,
     expandCollapse: PropTypes.func.isRequired,
     rootNodes: PropTypes.object,
 

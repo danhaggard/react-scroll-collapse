@@ -10,13 +10,15 @@ import {
   SET_TREE_ID,
 } from '../actions/const';
 
-import { getOrObject } from '../utils/selectorUtils';
+import { getOrObject, isUndefNull } from '../utils/selectorUtils';
 
 import {
   addToState,
+  injectPayload,
   removeFromState,
   updateState,
 } from './utils';
+
 
 /*
   Some notes regarding state:
@@ -35,20 +37,20 @@ import {
 
 // handles the id attr for collapsers.
 export const collapserIdReducer = (state = null, action) => {
-  const { collapser } = getOrObject(action, 'payload');
+  const { collapserId } = getOrObject(action, 'payload');
   switch (action.type) {
     case ADD_COLLAPSER:
-      return collapser.id;
+      return collapserId;
     default:
       return state;
   }
 };
 
 export const collapserTreeIdReducer = (state = null, action) => {
-  const { collapser, treeId } = getOrObject(action, 'payload');
+  const { collapserId, treeId } = getOrObject(action, 'payload');
   switch (action.type) {
     case ADD_COLLAPSER:
-      return collapser.id;
+      return collapserId;
     case SET_TREE_ID:
       return treeId;
     default:
@@ -58,11 +60,11 @@ export const collapserTreeIdReducer = (state = null, action) => {
 
 //  handles the collapsers attr in collapsers entities.
 export const collapsersIdArray = (state = [], action) => {
-  const { collapser, collapserId } = getOrObject(action, 'payload');
+  const { collapserId, childCollapserId } = getOrObject(action, 'payload');
   switch (action.type) {
-    case ADD_COLLAPSER_CHILD:
-      return [...state, collapser.id];
-    case REMOVE_COLLAPSER_CHILD:
+    case ADD_COLLAPSER:
+      return !isUndefNull(childCollapserId) ? [...state, childCollapserId] : state;
+    case REMOVE_COLLAPSER:
       return state.filter(val => val !== collapserId);
     default:
       return state;
@@ -93,13 +95,18 @@ export const collapserReducer = combineReducers({
 export const collapsersReducer = (state = {}, action) => {
   const { collapserId, parentCollapserId } = getOrObject(action, 'payload');
   switch (action.type) {
-    case ADD_COLLAPSER:
-      return addToState(state, action, collapserId, collapserReducer);
-    case ADD_COLLAPSER_CHILD:
-    case REMOVE_COLLAPSER_CHILD:
-      return updateState(state, action, parentCollapserId, collapserReducer);
-    case REMOVE_COLLAPSER:
-      return removeFromState(state, collapserId);
+    case ADD_COLLAPSER: {
+      let newState = addToState(state, action, collapserId, collapserReducer);
+      if (!isUndefNull(parentCollapserId)) {
+        const newAction = injectPayload(action, { childCollapserId: collapserId });
+        newState = updateState(newState, newAction, parentCollapserId, collapserReducer);
+      }
+      return newState;
+    }
+    case REMOVE_COLLAPSER: {
+      const newState = updateState(state, action, parentCollapserId, collapserReducer);
+      return removeFromState(newState, collapserId);
+    }
     case ADD_ITEM:
     case REMOVE_ITEM:
     case SET_TREE_ID:

@@ -5,7 +5,6 @@ import {
   ADD_ITEM,
   EXPAND_COLLAPSE,
   EXPAND_COLLAPSE_ALL,
-  HEIGHT_READY,
   REMOVE_ITEM
 } from '../actions/const';
 
@@ -42,34 +41,10 @@ export const itemIdReducer = (state = null, action) => {
   }
 };
 
-export const waitingForHeightReducer = (state = false, action) => {
-  // const { item, areAllItemsExpanded } = getOrObject(action, 'payload');
-  switch (action.type) {
-    case ADD_ITEM:
-    case HEIGHT_READY:
-      return false;
-    case EXPAND_COLLAPSE:
-      return true;
-    case EXPAND_COLLAPSE_ALL:
-      /*
-        If the parent collapser is expanding, but this indivdual
-        collapserItem is already expanded, then it is not waiting
-        for the onHeightReady callback to fire - return false. Otherwise
-        return true.
-        note: !(!a && b) === a || !b;
-      */
-      return false;
-      // return areAllItemsExpanded || !getExpanded(item);
-    default:
-      return state;
-  }
-};
-
 // handle state for individual items.
 export const itemReducer = combineReducers({
   expanded: expandedReducer,
   id: itemIdReducer,
-  waitingForHeight: waitingForHeightReducer,
 });
 
 // handles items state
@@ -80,7 +55,6 @@ export const itemsReducer = (state = {}, action) => {
       return removeFromState(state, itemId);
     case ADD_ITEM:
       return addToState(state, action, itemId, itemReducer);
-    case HEIGHT_READY:
     case EXPAND_COLLAPSE:
       return updateState(state, action, itemId, itemReducer);
     case EXPAND_COLLAPSE_ALL:

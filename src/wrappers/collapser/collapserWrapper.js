@@ -96,8 +96,6 @@ export const collapserWrapper = (WrappedComponent) => {
         expandCollapseAll,
         rootNodeId,
         selectors,
-        watchCollapser,
-        watchInitCollapser,
         ...other
       } = this.props;
       console.log('collapserRender', this.props.collapserId);

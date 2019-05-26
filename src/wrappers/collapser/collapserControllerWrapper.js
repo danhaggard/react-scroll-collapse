@@ -13,51 +13,18 @@ export const collapserControllerWrapper = (CollapserController) => {
     constructor(props) {
       super(props);
       this.addCollapser();
-      this.addRootNode();
     }
 
     componentWillUnmount() {
-      const {
-        removeCollapserChild,
-        removeScrollerChild,
-        removeCollapser
-      } = this.props;
+      const { removeCollapser } = this.props;
       const { collapserId, parentCollapserId, parentScrollerId } = this.props;
-      if (parentCollapserId >= 0) {
-        removeCollapserChild(parentCollapserId, collapserId);
-      }
-      if (parentScrollerId >= 0) {
-        removeScrollerChild(parentScrollerId, collapserId);
-      }
-      removeCollapser(parentCollapserId, parentScrollerId, collapserId);
-      this.removeRootNode();
+      removeCollapser(parentScrollerId, parentCollapserId, collapserId);
     }
 
     addCollapser() {
-      const { addCollapser, addScrollerChild, addCollapserChild } = this.props;
+      const { addCollapser, isRootNode } = this.props;
       const { collapserId, parentCollapserId, parentScrollerId } = this.props;
-      const collapser = { id: collapserId };
-      addCollapser(parentScrollerId, parentCollapserId, collapser, collapserId);
-      if (parentScrollerId >= 0) {
-        addScrollerChild(parentScrollerId, collapser);
-      }
-      if (parentCollapserId >= 0) {
-        addCollapserChild(parentCollapserId, collapser);
-      }
-    }
-
-    addRootNode() {
-      const { addRootNode, collapserId, isRootNode } = this.props;
-      if (isRootNode) {
-        addRootNode(collapserId);
-      }
-    }
-
-    removeRootNode() {
-      const { removeRootNode, collapserId, isRootNode } = this.props;
-      if (isRootNode) {
-        removeRootNode(collapserId);
-      }
+      addCollapser(parentScrollerId, parentCollapserId, collapserId, isRootNode);
     }
 
     render() {
@@ -86,17 +53,11 @@ export const collapserControllerWrapper = (CollapserController) => {
 
   WrappedCollapserController.propTypes = {
     addCollapser: PropTypes.func.isRequired,
-    addCollapserChild: PropTypes.func.isRequired,
-    addRootNode: PropTypes.func.isRequired,
     isRootNode: PropTypes.bool.isRequired,
     rootNodes: PropTypes.object,
     rootNodeId: PropTypes.number.isRequired,
     providerType: PropTypes.string.isRequired,
-    removeRootNode: PropTypes.func.isRequired,
     removeCollapser: PropTypes.func.isRequired,
-    removeCollapserChild: PropTypes.func.isRequired,
-    addScrollerChild: PropTypes.func.isRequired,
-    removeScrollerChild: PropTypes.func.isRequired,
 
     collapserId: ofNumberTypeOrNothing,
     parentCollapserId: ofNumberTypeOrNothing,

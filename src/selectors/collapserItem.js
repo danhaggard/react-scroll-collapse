@@ -22,6 +22,3 @@ export const getItemExpanded = itemObj => getOrNull(itemObj, 'expanded');
 
 // rootState => id = true / false
 export const getItemExpandedRoot = curryCompose(getItemExpanded, getItemRoot);
-
-// --- item.waitingForHeight
-export const getItemWaitingForHeight = itemObj => getOrNull(itemObj, 'waitingForHeight');

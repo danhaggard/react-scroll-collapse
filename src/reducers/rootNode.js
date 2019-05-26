@@ -1,11 +1,11 @@
 import { combineReducers } from 'redux';
 
 import {
-  ADD_ROOT_NODE,
+  ADD_COLLAPSER,
   ADD_TO_NODE_TARGET_ARRAY,
   EXPAND_COLLAPSE_ALL,
   EXPAND_COLLAPSE,
-  REMOVE_ROOT_NODE,
+  REMOVE_COLLAPSER,
   TOGGLE_CHECK_TREE_STATE
 } from '../actions/const';
 import { getOrObject } from '../utils/selectorUtils';
@@ -16,10 +16,10 @@ import {
 } from './utils';
 
 export const rootNodeIdReducer = (state = null, action) => {
-  const { rootNodeId } = getOrObject(action, 'payload');
+  const { collapserId } = getOrObject(action, 'payload');
   switch (action.type) {
-    case ADD_ROOT_NODE:
-      return rootNodeId;
+    case ADD_COLLAPSER:
+      return collapserId;
     default:
       return state;
   }
@@ -59,12 +59,18 @@ export const rootNodeReducer = combineReducers({
 });
 
 export const rootNodesReducer = (state = {}, action) => {
-  const { rootNodeId } = getOrObject(action, 'payload');
+  const { collapserId, isRootNode, rootNodeId } = getOrObject(action, 'payload');
   switch (action.type) {
-    case REMOVE_ROOT_NODE:
-      return removeFromState(state, rootNodeId);
-    case ADD_ROOT_NODE:
-      return addToState(state, action, rootNodeId, rootNodeReducer);
+    case REMOVE_COLLAPSER:
+      if (isRootNode) {
+        return removeFromState(state, collapserId);
+      }
+      return state;
+    case ADD_COLLAPSER:
+      if (isRootNode) {
+        return addToState(state, action, collapserId, rootNodeReducer);
+      }
+      return state;
     case ADD_TO_NODE_TARGET_ARRAY:
     case EXPAND_COLLAPSE_ALL:
     case EXPAND_COLLAPSE:

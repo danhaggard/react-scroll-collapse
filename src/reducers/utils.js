@@ -42,3 +42,11 @@ export const removeFromState = (state, id) => {
   delete newState[id];
   return newState;
 };
+
+export const injectPayload = (action, obj) => ({
+  ...action,
+  payload: {
+    ...action.payload,
+    ...obj
+  }
+});
