@@ -149,7 +149,7 @@ const recurseToNodeArray = (argsObj) => {
       We are at or below the targetNode.
 
       We assume that the event could have changed anything below this node,
-      So now we have to recurse into all children
+      So now we have to recurse into all children.
     */
 
     const [resultSources, resultValues] = getChildResultValuesAndSources(
