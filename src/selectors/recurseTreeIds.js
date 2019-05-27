@@ -2,7 +2,6 @@ import { getNextIdFactory } from '../utils/selectorUtils';
 
 const recurseTreeIds = (
   getNodeChildren,
-  getNodeValue,
   resultReducer,
   id,
 ) => {

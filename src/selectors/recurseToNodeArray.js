@@ -1,3 +1,6 @@
+import { getNextIdFactory } from '../utils/selectorUtils';
+
+
 const isInArray = (toCheck, arr, toCheckGetter, arrItemGetter) => {
   let len = arr.length;
   let found = false;
@@ -73,13 +76,17 @@ const recurseToNodeArray = (argsObj) => {
 
   const {
     cache,
-    getNodeChildren, // Returns an array of ids obj of the children of the current node
+    // getNodeChildren, // Returns an array of ids obj of the children of the current node
+    getNodeChildrenMappedToTreeId,
+    setNestedCacheValues, // a function which takes a node id and a cached value of the current node
+    // and determines a value for which it will set the cache for all children.
     currentNodeIdObj, // obj with id  and treeId of the node we are currently at.
     resultReducer, // takes an array - and returns a single value
     getNodeValue, // Func that takes an id and returns the value for that node.
     targetNodeArray, // id objs of the target nodes.
+    counter = getNextIdFactory(argsObj.currentNodeIdObj.id - 1),
+    setTreeId = false,
   } = argsObj;
-
   /*
     The cache is serving two purposes.
 
@@ -100,7 +107,9 @@ const recurseToNodeArray = (argsObj) => {
 
   const cachedValue = cache.getResultValue(currentNodeId);
   const cachedSources = cache.getResultSources(currentNodeId);
-
+  if (setTreeId || targetNodeArray.length === 0) {
+    cache.setResultTreeId(currentNodeId, counter());
+  }
   /*
   if (cachedValue !== null && cache.isCacheLocked()) {
     console.log('return cached value for: ', currentNodeId);
@@ -108,15 +117,24 @@ const recurseToNodeArray = (argsObj) => {
     return cachedValue;
   }
   */
-  debugger;
   console.log('checking node id: ', currentNodeId);
   // console.log('targetNodeArray: ', targetNodeArray);
+
+  // We have reached the targetNode - just ensure all children have the reverse
+  // of the current cached value. NOTE: this cheat won't generalise well.
+  // we do this before checking anything else to save on addition child selections
+  // etc.
+  if (targetNodeArray.length === 1 && targetNodeArray[0].id <= currentNodeId) {
+    const blah = setNestedCacheValues(currentNodeIdObj, cachedValue);
+    return blah;
+    // return setNestedCacheValues(currentNodeId, cachedValue);
+  }
 
   // the value returned by this node in isolation of it's children.
   const currentValue = getNodeValue(currentNodeId);
 
   // Arrays of child nodeIds we are going to recurse into.
-  const childArray = getNodeChildren(currentNodeId);
+  const childArray = getNodeChildrenMappedToTreeId(currentNodeId);
 
   // no children- just return.
   if (childArray.length === 0
@@ -139,24 +157,19 @@ const recurseToNodeArray = (argsObj) => {
 
 
   // it will be zero when no targets have been set - e.g. checking from root on
-  // very first render.
-  if (targetNodeArray.length === 0
-    //  Next line means we have reached or passed the target node itself.
-    // <= because going below the target should always mean the node ids are higher.
-    || (targetNodeArray.length === 1 && targetNodeArray[0].id <= currentNodeId)
-  ) {
-    /*
-      We are at or below the targetNode.
-
-      We assume that the event could have changed anything below this node,
-      So now we have to recurse into all children.
-    */
+  // very first render.  Need to do proper recurse because we don't know
+  // whether cached value for root node is accurate.
+  if (targetNodeArray.length === 0) {
 
     const [resultSources, resultValues] = getChildResultValuesAndSources(
       // todo: figure out better place to do this mapping.
       childArray.map(child => ({ currentNodeIdObj: child, targetNodeArray })),
       recurseToNodeArray,
-      { ...argsObj }
+      {
+        ...argsObj,
+        counter,
+        setTreeId: true,
+      }
     );
 
     const val = resultReducer([currentValue, ...resultValues]);

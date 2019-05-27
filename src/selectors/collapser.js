@@ -12,7 +12,7 @@ import { getItemExpanded, getItemRoot } from './collapserItem';
 import recurseToNodeArray from './recurseToNodeArray';
 import recurseAllChildren from './recurseAllChildren';
 import recurseTreeIds from './recurseTreeIds';
-
+import recurseSetCacheValues from './recurseSetCacheValues';
 
 const getCollapsers = entitiesObject => getOrNull(entitiesObject, 'collapsers');
 
@@ -53,23 +53,65 @@ const collapserItemsExpandedRootEvery = passArgsToIteratorEvery(
   getItemRoot
 );
 
+export const setNestedCollapserValuesRoot = (
+  cache,
+  getNodeChildrenMappedToTreeId,
+) => (collapserIdObj, cachedValue) => {
+  const valueToSet = !cachedValue;
+  recurseSetCacheValues(
+    (idObj) => {
+      const prevResultSources = cache.getResultSources(idObj.id);
+      // if we are expanding everything - then only go into branches that
+      // were false.
+      if (valueToSet) {
+        return prevResultSources;
+      }
+      // else go into branches that were expanded.
+      return getNodeChildrenMappedToTreeId(idObj.id);
+      // const sourceIds = prevResultSources.map(obj => obj.id);
+      // return getNodeChildrenMappedToTreeId(idObj.id).filter(
+      //  childIdObj => !sourceIds.includes(childIdObj.id)
+      //);
+    }, // getNodeChildren
+    (idObj, nextChildren) => {
+      // if everything below is expanded - then there are no sources of falsity.
+      // otherwise they are all sources of falsity.
+      const resultSources = valueToSet ? [] : nextChildren;
+      cache.addResult(idObj.id, valueToSet, resultSources);
+    }, // setCache
+    collapserIdObj
+  );
+  return valueToSet;
+};
+
 export const nestedCollapserItemsExpandedRootEvery = (
   state,
   { collapserId, nodeTargetArray },
   cache,
 ) => {
-  const getTreeId = getCollapserTreeIdRoot(state);
-  const mapIdToTreeId = id => ({ id, treeId: getTreeId(id) });
+  console.log('chache', cache);
+  // const getTreeId = getCollapserTreeIdRoot(state);
+  // const mapIdToTreeId = id => ({ id, treeId: getTreeId(id) });
+  const mapIdToTreeId = id => ({ id, treeId: cache.getResultTreeId(id) });
+
   const targetNodeTreeIdArray = nodeTargetArray.map(mapIdToTreeId);
-  const getNodeChildren = id => getCollapserCollapsersRoot(state)(id).map(mapIdToTreeId);
+  const getNodeChildren = id => getCollapserCollapsersRoot(state)(id);
+  const getNodeChildrenMappedToTreeId = id => getNodeChildren(id).map(mapIdToTreeId);
+  const getNodeValue = id => collapserItemsExpandedRootEvery(state)(id);
+  const setNestedCacheValues = setNestedCollapserValuesRoot(
+    cache,
+    getNodeChildrenMappedToTreeId,
+  );
 
   return recurseToNodeArray({
     cache,
-    getNodeChildren,
+    // getNodeChildren,
+    getNodeChildrenMappedToTreeId,
+    setNestedCacheValues,
     currentNodeIdObj: mapIdToTreeId(collapserId),
     resultReducer: everyReducer(true),
-    getNodeValue: id => collapserItemsExpandedRootEvery(state)(id),
-    getTreeId: getCollapserTreeIdRoot(state),
+    getNodeValue,
+    getTreeId: cache.getResultTreeId,
     targetNodeArray: targetNodeTreeIdArray, // change this arg name to the state key.
   });
 };
@@ -83,8 +125,13 @@ export const nestedCollapserItemsRoot = (state, { collapserId }) => recurseAllCh
 
 export const setTreeIdsRecursively = (state, collapserId, action) => recurseTreeIds(
   id => getCollapserCollapsersRoot(state)(id),
-  id => getCollapserTreeIdRoot(state)(id),
   action,
+  collapserId,
+);
+
+export const setTreeIdsRecursivelyToCache = (state, collapserId, cache) => recurseTreeIds(
+  id => getCollapserCollapsersRoot(state)(id),
+  cache.setResultTreeId,
   collapserId,
 );
 
@@ -123,7 +170,7 @@ export const createAreAllItemsExpandedSelector = (
       isRootNode,
       rootNodeId
     } = props;
-    let areAllItemsExpanded = cache.getResultValue(collapserId);
+    const areAllItemsExpanded = cache.getResultValue(collapserId);
 
     /*
       The nodes that need checking in the tree.  recurse as quickly to
@@ -134,14 +181,14 @@ export const createAreAllItemsExpandedSelector = (
     checkTreeStateNext = checkTreeStateSelector(state)(rootNodeId);
     // if (isRootNode) {
     // }
-    debugger;
     /* Only check state if we are root and we've been told to */
     if (
-      isRootNode
-      && (areAllItemsExpanded === null || checkTreeStateNext !== checkTreeStateCurrent)
+      (isRootNode && (areAllItemsExpanded === null || checkTreeStateNext !== checkTreeStateCurrent))
+      || cache.mounting
     ) {
       console.log('checking tree state');
       checkTreeStateCurrent = checkTreeStateNext;
+      cache.mounting = false;
       return nestedCollapserItemsExpandedRootEvery(
         state, { ...props, nodeTargetArray }, cache
       );

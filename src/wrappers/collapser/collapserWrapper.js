@@ -46,9 +46,20 @@ export const collapserWrapper = (WrappedComponent) => {
       the check tree state.  On mount it probably doesn't matter anyway.
     */
 
+    constructor(props, context) {
+      super(props, context);
+      const { cache, isRootNode, rootNodeId } = props;
+      if (isRootNode) {
+        cache.lastMountStartId = rootNodeId - 1;
+        cache.mountValue = rootNodeId - 1;
+        cache.mounting = false;
+      }
+    }
+
     componentDidMount() {
       const {
         addToNodeTargetArray,
+        cache,
         collapserId,
         isRootNode,
         rootNodeId,
@@ -57,17 +68,34 @@ export const collapserWrapper = (WrappedComponent) => {
         toggleCheckTreeState,
       } = this.props;
       checkForRef(WrappedComponent, this.elem, 'collapserRef');
-      debugger;
       // addToNodeTargetArray(addNodeValue, rootNodeId);
       if (!isRootNode) {
         // addToNodeTargetArray(collapserId, rootNodeId);
       }
-      if (isRootNode) {
+      debugger;
+      if (collapserId - cache.lastMountStartId > 1) {
+        if (!cache.mounting && collapserId > cache.mountValue) {
+          cache.mountValue = collapserId;
+        }
+
+        // cache.mounting = true;
+      } else {
+        cache.lastMountStartId = cache.mountValue;
+        cache.mounting = true;
+      }
+      if (cache.mounting) {
+
+      // if (cache.lastMountStartId === collapserId) {
+      // if (isRootNode) {
         // const addNodeValue = isRootNode ? null : collapserId;
-        selectors.setTreeIds(setTreeId);
+        // selectors.setTreeIds(setTreeId);
         console.log('toggling checkstate from didMount - id: ', collapserId);
         // addToNodeTargetArray(null, rootNodeId);
         toggleCheckTreeState(rootNodeId);
+      }
+      if (collapserId >= 3) {
+        debugger;
+        console.log('didMount: ', collapserId);
       }
     }
 
@@ -83,7 +111,10 @@ export const collapserWrapper = (WrappedComponent) => {
         selectors,
         toggleCheckTreeState
       } = this.props;
-      debugger;
+      if (collapserId >= 3) {
+        debugger;
+        console.log('didUpdate', collapserId);
+      }
       // const targetArray = selectors.nodeTargetArray();
       // if (targetArray.includes(collapserId)) {
         // console.log('toggling checkstate from didUpdate - id: ', collapserId);
@@ -197,11 +228,15 @@ export const collapserWrapper = (WrappedComponent) => {
       if (contextMethods.scroller) {
         contextMethods.scroller.scrollToTop(this.elem.current);
       }
+      addToNodeTargetArray(collapserId, rootNodeId, true);
+
+      /*
       if (!isRootNode) {
         addToNodeTargetArray(collapserId, rootNodeId, true);
       } else {
         addToNodeTargetArray(null, rootNodeId);
       }
+      */
       expandCollapseAll(areAllItemsExpanded, selectors.allChildItemIds(), rootNodeId);
     };
 

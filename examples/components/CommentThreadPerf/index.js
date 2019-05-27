@@ -7,9 +7,20 @@ import CommentWithButtons from '../Comment/CommentWithButtons';
 import ExpandButton from '../ExpandButton';
 
 import { collapserController } from '../../../src';
-import { ofBoolTypeOrNothing, ofChildrenType } from '../../../src/utils/propTypeHelpers';
+import { ofBoolTypeOrNothing, ofChildrenType, ofNumberTypeOrNothing } from '../../../src/utils/propTypeHelpers';
 
 import { generateCommentThreadData, getRandomInt } from '../../utils';
+
+const insertAtIndex = (arr1, arr2, index = null) => {
+  if (index === 0 || index === null) {
+    return [...arr2, ...arr1];
+  }
+  if (index >= arr1.length) {
+    return [...arr1, ...arr2];
+  }
+  return [...arr1.slice(0, index), ...arr2, ...arr1.slice(index, -1)];
+};
+
 
 class CommentThread extends PureComponent { // eslint-disable-line react/no-multi-comp
 
@@ -36,25 +47,26 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
     depth,
   );
 
-  addChildren = children => state => ({
+  addChildren = (children, insertChildAtIndex = null) => state => ({
     ...state,
     count: state.count + children.length,
-    localChildren: [...state.localChildren, ...children],
+    localChildren: insertAtIndex(state.localChildren, children, insertChildAtIndex),
+    // localChildren: [...state.localChildren, ...children],
   });
 
   removeChild = state => ({
     ...state,
-    localChildren: state.localChildren.slice(0, -2),
+    localChildren: state.localChildren.slice(0, -1),
   });
 
   insertThread = () => {
-    const { minChildren, maxChildren } = this.props;
+    const { minChildren, maxChildren, insertChildAtIndex } = this.props;
     const { count, depth } = this.state;
-    const numNewChildren = getRandomInt(minChildren, maxChildren);
+    const numNewChildren = getRandomInt(minChildren, maxChildren) - 1;
     const newChildren = [...Array(numNewChildren).keys()].map(
       i => this.generateChildData(count + i, depth + 1)
     );
-    this.setState(this.addChildren(newChildren));
+    this.setState(this.addChildren(newChildren, insertChildAtIndex));
   };
 
   removeThread = () => this.setState(this.removeChild);
@@ -105,9 +117,9 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
               key={childNodeData.key}
               nodeData={childNodeData}
               {...{
-                minChildren,
+                minChildren: minChildren - 1,
                 minDepth,
-                maxChildren,
+                maxChildren: maxChildren - 1,
                 maxDepth,
               }}
             />
@@ -121,6 +133,7 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
 CommentThread.defaultProps = {
   areAllItemsExpanded: null,
   children: [],
+  insertChildAtIndex: null,
   maxChildren: 1,
   maxDepth: 1,
   minChildren: 1,
@@ -134,6 +147,7 @@ CommentThread.propTypes = {
   collapserId: PropTypes.number.isRequired,
   collapserRef: PropTypes.object.isRequired,
   expandCollapseAll: PropTypes.func.isRequired,
+  insertChildAtIndex: ofNumberTypeOrNothing,
   isRootNode: PropTypes.bool.isRequired,
   nodeData: PropTypes.object.isRequired,
   maxChildren: PropTypes.number,
