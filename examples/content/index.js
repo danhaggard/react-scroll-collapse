@@ -142,17 +142,17 @@ export const generateCommentThreadData = (
 */
 
 const generateThreadConfig = {
-  minChildren: 1,
-  minDepth: 2,
-  maxChildren: 1,
-  maxDepth: 2,
+  minChildren: 2,
+  minDepth: 4,
+  maxChildren: 2,
+  maxDepth: 4,
 };
 
 const generateThreadConfigChild = {
   minChildren: 1,
-  minDepth: 1,
+  minDepth: 3,
   maxChildren: 1,
-  maxDepth: 1,
+  maxDepth: 5,
 };
 
 const someData = generateCommentThreadData(generateThreadConfig);
@@ -163,7 +163,8 @@ const example9 = (
     <Scroller style={{ height: '100%' }}>
       <CommentThreadPerf
         key={someData.key}
-        isOpenedInit
+        isOpenedInit={false}
+        childIsOpenedInit={true}
         nodeData={someData}
         {...generateThreadConfigChild}
         />

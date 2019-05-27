@@ -45,6 +45,7 @@ export const collapserWrapper = (WrappedComponent) => {
       Also - the nodeTargetArray is reset - but not sure why it's before
       the check tree state.  On mount it probably doesn't matter anyway.
     */
+
     componentDidMount() {
       const {
         addToNodeTargetArray,
@@ -56,16 +57,16 @@ export const collapserWrapper = (WrappedComponent) => {
         toggleCheckTreeState,
       } = this.props;
       checkForRef(WrappedComponent, this.elem, 'collapserRef');
-
+      debugger;
       // addToNodeTargetArray(addNodeValue, rootNodeId);
       if (!isRootNode) {
-        addToNodeTargetArray(collapserId, rootNodeId);
+        // addToNodeTargetArray(collapserId, rootNodeId);
       }
       if (isRootNode) {
         // const addNodeValue = isRootNode ? null : collapserId;
         selectors.setTreeIds(setTreeId);
         console.log('toggling checkstate from didMount - id: ', collapserId);
-        addToNodeTargetArray(null, rootNodeId);
+        // addToNodeTargetArray(null, rootNodeId);
         toggleCheckTreeState(rootNodeId);
       }
     }
@@ -82,12 +83,13 @@ export const collapserWrapper = (WrappedComponent) => {
         selectors,
         toggleCheckTreeState
       } = this.props;
-      const targetArray = selectors.nodeTargetArray();
-      if (targetArray.includes(collapserId)) {
-        console.log('toggling checkstate from didUpdate - id: ', collapserId);
+      debugger;
+      // const targetArray = selectors.nodeTargetArray();
+      // if (targetArray.includes(collapserId)) {
+        // console.log('toggling checkstate from didUpdate - id: ', collapserId);
         // toggleCheckTreeState(rootNodeId);
-        addToNodeTargetArray(null, rootNodeId);
-      }
+        // addToNodeTargetArray(null, rootNodeId);
+      // }
     }
 
 
@@ -116,7 +118,7 @@ export const collapserWrapper = (WrappedComponent) => {
       The children would all be removed from state before this component had
       actually unmounted.  Good argument for moving that logic down here and removing
       that wrapper altogether - although that separation has proven useful.
-    */
+
     componentWillUnmount() {
       const {
         addToUnmountArray,
@@ -127,7 +129,7 @@ export const collapserWrapper = (WrappedComponent) => {
         dispatch
       } = this.props;
 
-      /* the get fresh strate hack */
+      /* the get fresh strate hack
       let newState;
       const blah = dispatch((arg, getState) => {
         newState = getState();
@@ -142,7 +144,7 @@ export const collapserWrapper = (WrappedComponent) => {
       /*
         the array of children currently waiting to be unmounted.  Taken from
         fresh state yet to be pushed to the component instance.  ick.
-      */
+
       const unmountChildren = getRootUnmountArrayRoot(newState)(rootNodeId);
 
       const filteredUnmountChildren = unmountChildren.filter(id => (id !== collapserId));
@@ -153,18 +155,18 @@ export const collapserWrapper = (WrappedComponent) => {
         Make sure the order of these two are preserved,  Mapdispatch is
         called immediately after both so the state check of the tree needs
         to happen after the children are removed from state.
-      */
+
       if (children.length === 0 && filteredUnmountChildren.length === 0) {
         removeCollapser(parentScrollerId, parentCollapserId, collapserId);
         toggleCheckTreeState(rootNodeId);
       }
 
-      /* more children to unmount - add em! */
+      /* more children to unmount - add em!
       if (children.length > 0) {
         addToUnmountArray(children, rootNodeId);
       }
 
-      /* Remove from the array to keep track of what is left to unmount */
+      /* Remove from the array to keep track of what is left to unmount
       if (unmountChildren.includes(collapserId)) {
         removeFromUnmountArray(collapserId, rootNodeId);
       }
@@ -175,9 +177,10 @@ export const collapserWrapper = (WrappedComponent) => {
         after removeCollapser is called above - I got lost following the execution
         flow.  IT must right?  So calling it twice can't be good... but haven't
         sussed exact conditions.  Too much complexity anyway.
-      */
+
       removeCollapser(parentScrollerId, parentCollapserId, collapserId);
     }
+    */
 
     expandCollapseAll = () => {
       const {
@@ -194,12 +197,12 @@ export const collapserWrapper = (WrappedComponent) => {
       if (contextMethods.scroller) {
         contextMethods.scroller.scrollToTop(this.elem.current);
       }
-      expandCollapseAll(areAllItemsExpanded, selectors.allChildItemIds(), rootNodeId);
       if (!isRootNode) {
         addToNodeTargetArray(collapserId, rootNodeId, true);
       } else {
         addToNodeTargetArray(null, rootNodeId);
       }
+      expandCollapseAll(areAllItemsExpanded, selectors.allChildItemIds(), rootNodeId);
     };
 
     render() {
@@ -331,8 +334,7 @@ export const collapserWrapper = (WrappedComponent) => {
 
   const CollapserControllerConnect = connect(
     mapStateToPropsFactory,
-    /* part of the getState hack for component unmounting. */
-    (dispatch, getState) => ({ ...bindActionCreators({ ...collapserWrapperActions }, dispatch), dispatch }),
+    collapserWrapperActions,
   )(CollapserController);
 
   return CollapserControllerConnect;

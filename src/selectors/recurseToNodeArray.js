@@ -120,7 +120,11 @@ const recurseToNodeArray = (argsObj) => {
 
   // no children- just return.
   if (childArray.length === 0
-    || (targetNodeArray.length === 1 && targetNodeArray[0].id === currentNodeId)
+
+  // When you remember why you added this - please commment.
+  // currently it blocks the  scenario where the target node has children
+  // - this prevents them from getting checked.
+  // || (targetNodeArray.length === 1 && targetNodeArray[0].id === currentNodeId)
   ) {
 
     /*
@@ -134,7 +138,11 @@ const recurseToNodeArray = (argsObj) => {
   }
 
 
-  if (targetNodeArray.length === 0) {
+  if (targetNodeArray.length === 0
+    //  don't know why this wasn't here?  It means we have reach the target node
+    // as well.
+    || (targetNodeArray.length === 1 && targetNodeArray[0].id === currentNodeId)
+  ) {
     /*
       We are at or below the targetNode.
 

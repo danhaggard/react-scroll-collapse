@@ -63,6 +63,7 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
     const {
       areAllItemsExpanded,
       children,
+      childIsOpenedInit,
       expandCollapseAll,
       collapserRef,
       collapserId,
@@ -99,6 +100,8 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
         {
           localChildren.map(childNodeData => (
             <WrappedCommentThread
+              isOpenedInit={childIsOpenedInit}
+              childIsOpenedInit={childIsOpenedInit}
               key={childNodeData.key}
               nodeData={childNodeData}
               {...{
@@ -126,17 +129,17 @@ CommentThread.defaultProps = {
 };
 
 CommentThread.propTypes = {
+  areAllItemsExpanded: ofBoolTypeOrNothing,
   children: ofChildrenType,
   collapserId: PropTypes.number.isRequired,
-  areAllItemsExpanded: ofBoolTypeOrNothing,
-  expandCollapseAll: PropTypes.func.isRequired,
   collapserRef: PropTypes.object.isRequired,
+  expandCollapseAll: PropTypes.func.isRequired,
+  isRootNode: PropTypes.bool.isRequired,
   nodeData: PropTypes.object.isRequired,
   maxChildren: PropTypes.number,
   maxDepth: PropTypes.number,
   minChildren: PropTypes.number,
   minDepth: PropTypes.number,
-  isRootNode: PropTypes.bool.isRequired,
   style: PropTypes.object,
 };
 

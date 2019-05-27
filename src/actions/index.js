@@ -41,7 +41,7 @@ export const collapserControllerActions = {
 };
 
 export const collapserWrapperActions = {
-  addCollapser,
+  // addCollapser,
   removeCollapser,
   addToUnmountArray,
   removeFromUnmountArray,

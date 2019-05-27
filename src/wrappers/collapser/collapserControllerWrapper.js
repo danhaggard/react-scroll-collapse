@@ -10,11 +10,11 @@ export const collapserControllerWrapper = (CollapserController) => {
 
   class WrappedCollapserController extends Component {
 
+
     constructor(props) {
       super(props);
       this.addCollapser();
     }
-
 /*
     componentWillUnmount() {
       const { removeCollapser } = this.props;

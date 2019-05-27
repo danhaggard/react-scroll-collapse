@@ -2,11 +2,9 @@ import { combineReducers } from 'redux';
 
 import {
   ADD_COLLAPSER,
-  ADD_COLLAPSER_CHILD,
   ADD_ITEM,
   REMOVE_ITEM,
   REMOVE_COLLAPSER,
-  REMOVE_COLLAPSER_CHILD,
   SET_TREE_ID,
 } from '../actions/const';
 
@@ -98,7 +96,10 @@ export const collapsersReducer = (state = {}, action) => {
     case ADD_COLLAPSER: {
       let newState = addToState(state, action, collapserId, collapserReducer);
       if (!isUndefNull(parentCollapserId)) {
-        const newAction = injectPayload(action, { childCollapserId: collapserId });
+        const newAction = injectPayload(action, {
+          collapserId: parentCollapserId,
+          childCollapserId: collapserId
+        });
         newState = updateState(newState, newAction, parentCollapserId, collapserReducer);
       }
       return newState;

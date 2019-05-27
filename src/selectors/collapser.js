@@ -119,10 +119,11 @@ export const createAreAllItemsExpandedSelector = (
     const {
       cache,
       collapserId,
+      isOpenedInit,
       isRootNode,
       rootNodeId
     } = props;
-    let areAllItemsExpanded = cache[collapserId];
+    let areAllItemsExpanded = cache.getResultValue(collapserId);
 
     /*
       The nodes that need checking in the tree.  recurse as quickly to
@@ -135,15 +136,16 @@ export const createAreAllItemsExpandedSelector = (
     // }
     debugger;
     /* Only check state if we are root and we've been told to */
-    if (isRootNode && (areAllItemsExpanded === undefined || checkTreeStateNext !== checkTreeStateCurrent)) {
+    if (
+      isRootNode
+      && (areAllItemsExpanded === null || checkTreeStateNext !== checkTreeStateCurrent)
+    ) {
       console.log('checking tree state');
-      // cache.unlockCache();
-      areAllItemsExpanded = nestedCollapserItemsExpandedRootEvery(
+      checkTreeStateCurrent = checkTreeStateNext;
+      return nestedCollapserItemsExpandedRootEvery(
         state, { ...props, nodeTargetArray }, cache
       );
-      // cache.lockCache();
-      checkTreeStateCurrent = checkTreeStateNext;
-
+      /*
       if (logging) {
         if (!countCache[collapserId]) {
           countCache[collapserId] = {};
@@ -154,12 +156,26 @@ export const createAreAllItemsExpandedSelector = (
           countCache[collapserId][renderCount] += 1;
         }
       }
-      /* otherwise use the cache */
-    } else if (cache[collapserId] === undefined) {
-      areAllItemsExpanded = nestedCollapserItemsExpandedRootEvery(
+      */
+      /*
+        If cache is empty - then mapStateToProps is being called for the
+        first time for this collapser.  No items have made it to the state yet
+        so open question what value to return.  Currently the selector returns true,
+        which means a re-render if default expanded state is set to false.
+
+        Will naively use isOpenedInit for now - but if a child has a different value
+        for this - the parent value will be invalidated.
+      */
+    }
+    if (areAllItemsExpanded === null && isOpenedInit !== null) {
+      return cache.addResult(collapserId, isOpenedInit, []);
+    }
+    if (areAllItemsExpanded === null) {
+      return nestedCollapserItemsExpandedRootEvery(
         state, { ...props, nodeTargetArray: [collapserId] }, cache
       );
     }
+    /* otherwise use the cache */
     return areAllItemsExpanded;
   };
 };

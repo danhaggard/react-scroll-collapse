@@ -1,4 +1,4 @@
-import { getOrNull, compose, curryCompose } from '../utils/selectorUtils';
+import { getOrArray, getOrNull, compose, curryCompose } from '../utils/selectorUtils';
 import { getEntitiesRoot } from './common';
 
 const getRootNodes = entitiesObject => getOrNull(entitiesObject, 'rootNodes');
@@ -13,7 +13,7 @@ const getRootNode = rootNodesObject => id => getOrNull(rootNodesObject, id);
 export const getRootNodeRoot = compose(getRootNode, getRootNodesRoot);
 
 // --- rootNode.nodeTargetArray
-export const getRootNodeTargetArray = rootNodeObject => getOrNull(
+export const getRootNodeTargetArray = rootNodeObject => getOrArray(
   rootNodeObject,
   'nodeTargetArray'
 );
