@@ -138,10 +138,12 @@ const recurseToNodeArray = (argsObj) => {
   }
 
 
+  // it will be zero when no targets have been set - e.g. checking from root on
+  // very first render.
   if (targetNodeArray.length === 0
-    //  don't know why this wasn't here?  It means we have reach the target node
-    // as well.
-    || (targetNodeArray.length === 1 && targetNodeArray[0].id === currentNodeId)
+    //  Next line means we have reached or passed the target node itself.
+    // <= because going below the target should always mean the node ids are higher.
+    || (targetNodeArray.length === 1 && targetNodeArray[0].id <= currentNodeId)
   ) {
     /*
       We are at or below the targetNode.
