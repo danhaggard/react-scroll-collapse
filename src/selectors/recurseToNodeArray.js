@@ -101,10 +101,16 @@ const recurseToNodeArray = (argsObj) => {
   const cachedValue = cache.getResultValue(currentNodeId);
   const cachedSources = cache.getResultSources(currentNodeId);
 
+  /*
   if (cachedValue !== null && cache.isCacheLocked()) {
+    console.log('return cached value for: ', currentNodeId);
+
     return cachedValue;
   }
-
+  */
+  debugger;
+  console.log('checking node id: ', currentNodeId);
+  // console.log('targetNodeArray: ', targetNodeArray);
 
   // the value returned by this node in isolation of it's children.
   const currentValue = getNodeValue(currentNodeId);

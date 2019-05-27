@@ -70,6 +70,7 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
       minDepth,
       maxChildren,
       maxDepth,
+      isOpenedInit,
       isRootNode,
       style,
     } = this.props;
@@ -88,7 +89,7 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
           title={newTitle}
         />
         <CommentWithButtons
-          isOpenedInit={false}
+          isOpenedInit={isOpenedInit}
           addToThread={this.insertThread}
           childThreads={localChildren.length}
           deleteThread={this.removeThread}

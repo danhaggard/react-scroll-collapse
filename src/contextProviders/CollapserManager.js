@@ -25,6 +25,7 @@ const collapserManager = (Comp) => {
       if (!this.cache) {
         this.cache = this.getCreateCache(props, rootNodeId);
       }
+      this.cache.unlockCache();
       return this.cache;
     }
 

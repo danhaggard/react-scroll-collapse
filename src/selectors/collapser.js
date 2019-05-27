@@ -107,8 +107,8 @@ export const createAreAllItemsExpandedSelector = (
     mapStateToProps is a factory function so redux will create a separate
     instance of this function for every collapser instance.
   */
-  let checkTreeStateCurrent = null;
-  let checkTreeStateNext = null;
+  let checkTreeStateCurrent = false;
+  let checkTreeStateNext = false;
   let countCache;
   const { logging, renderCount } = loggingConfig;
   if (logging) {
@@ -122,7 +122,7 @@ export const createAreAllItemsExpandedSelector = (
       isRootNode,
       rootNodeId
     } = props;
-    let areAllItemsExpanded;
+    let areAllItemsExpanded = cache[collapserId];
 
     /*
       The nodes that need checking in the tree.  recurse as quickly to
@@ -130,17 +130,18 @@ export const createAreAllItemsExpandedSelector = (
       below as well.
     */
     const nodeTargetArray = nodeTargetArraySelector(state)(rootNodeId);
-    if (isRootNode) {
-      checkTreeStateNext = checkTreeStateSelector(state)(rootNodeId);
-    }
-
+    checkTreeStateNext = checkTreeStateSelector(state)(rootNodeId);
+    // if (isRootNode) {
+    // }
+    debugger;
     /* Only check state if we are root and we've been told to */
-    if (isRootNode && checkTreeStateNext !== checkTreeStateCurrent) {
-      cache.unlockCache();
+    if (isRootNode && (areAllItemsExpanded === undefined || checkTreeStateNext !== checkTreeStateCurrent)) {
+      console.log('checking tree state');
+      // cache.unlockCache();
       areAllItemsExpanded = nestedCollapserItemsExpandedRootEvery(
         state, { ...props, nodeTargetArray }, cache
       );
-      cache.lockCache();
+      // cache.lockCache();
       checkTreeStateCurrent = checkTreeStateNext;
 
       if (logging) {
@@ -154,7 +155,7 @@ export const createAreAllItemsExpandedSelector = (
         }
       }
       /* otherwise use the cache */
-    } else {
+    } else if (cache[collapserId] === undefined) {
       areAllItemsExpanded = nestedCollapserItemsExpandedRootEvery(
         state, { ...props, nodeTargetArray: [collapserId] }, cache
       );

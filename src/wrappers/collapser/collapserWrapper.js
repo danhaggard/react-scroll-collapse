@@ -57,10 +57,15 @@ export const collapserWrapper = (WrappedComponent) => {
       } = this.props;
       checkForRef(WrappedComponent, this.elem, 'collapserRef');
 
-      const addNodeValue = isRootNode ? null : collapserId;
-      addToNodeTargetArray(addNodeValue, rootNodeId);
-      selectors.setTreeIds(setTreeId);
+      // addToNodeTargetArray(addNodeValue, rootNodeId);
+      if (!isRootNode) {
+        addToNodeTargetArray(collapserId, rootNodeId);
+      }
       if (isRootNode) {
+        // const addNodeValue = isRootNode ? null : collapserId;
+        selectors.setTreeIds(setTreeId);
+        console.log('toggling checkstate from didMount - id: ', collapserId);
+        addToNodeTargetArray(null, rootNodeId);
         toggleCheckTreeState(rootNodeId);
       }
     }
@@ -79,7 +84,8 @@ export const collapserWrapper = (WrappedComponent) => {
       } = this.props;
       const targetArray = selectors.nodeTargetArray();
       if (targetArray.includes(collapserId)) {
-        toggleCheckTreeState(rootNodeId);
+        console.log('toggling checkstate from didUpdate - id: ', collapserId);
+        // toggleCheckTreeState(rootNodeId);
         addToNodeTargetArray(null, rootNodeId);
       }
     }
@@ -305,7 +311,6 @@ export const collapserWrapper = (WrappedComponent) => {
       getCheckTreeStateRoot,
       getNodeTargetArrayRoot,
     );
-    debugger;
     return (state, props) => {
       const { collapserId, rootNodeId } = props;
       selectors.allChildItemIds = () => nestedCollapserItemsRoot(state, props);
