@@ -88,12 +88,25 @@ export const setTreeIdsRecursively = (state, collapserId, action) => recurseTree
   collapserId,
 );
 
-
+/*
+  See /wrappers/collapserWrapper mapStateToProps for overall strategy
+  and rationale for this.
+*/
 export const createAreAllItemsExpandedSelector = (
   checkTreeStateSelector,
   nodeTargetArraySelector,
   loggingConfig = { logging: false, renderCount: 0 }
 ) => {
+  /*
+    checkTreeState is a boolean that is toggled.  So we init and then
+    watch for changes.  mapStateForProps is always called for the rootNode
+    first before any children so when told to it checks the tree and then
+    children just all look up the cached value.
+
+    Here we just init the prev and current values and store them in a closure.
+    mapStateToProps is a factory function so redux will create a separate
+    instance of this function for every collapser instance.
+  */
   let checkTreeStateCurrent = null;
   let checkTreeStateNext = null;
   let countCache;
@@ -110,11 +123,18 @@ export const createAreAllItemsExpandedSelector = (
       rootNodeId
     } = props;
     let areAllItemsExpanded;
-    const nodeTargetArray = nodeTargetArraySelector(state)(rootNodeId);
 
+    /*
+      The nodes that need checking in the tree.  recurse as quickly to
+      each one and then check all below.  Could move this under the conditional
+      below as well.
+    */
+    const nodeTargetArray = nodeTargetArraySelector(state)(rootNodeId);
     if (isRootNode) {
       checkTreeStateNext = checkTreeStateSelector(state)(rootNodeId);
     }
+
+    /* Only check state if we are root and we've been told to */
     if (isRootNode && checkTreeStateNext !== checkTreeStateCurrent) {
       cache.unlockCache();
       areAllItemsExpanded = nestedCollapserItemsExpandedRootEvery(
@@ -133,6 +153,7 @@ export const createAreAllItemsExpandedSelector = (
           countCache[collapserId][renderCount] += 1;
         }
       }
+      /* otherwise use the cache */
     } else {
       areAllItemsExpanded = nestedCollapserItemsExpandedRootEvery(
         state, { ...props, nodeTargetArray: [collapserId] }, cache

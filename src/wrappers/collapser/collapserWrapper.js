@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux'
+import { bindActionCreators } from 'redux';
 
 import forwardRefWrapper from '../../utils/forwardRef';
 import { checkForRef } from '../../utils/errorUtils';
@@ -28,6 +28,23 @@ export const collapserWrapper = (WrappedComponent) => {
 
     elem = React.createRef();
 
+    /*
+      After mounting a bunch of nodes we need to check state - but this method
+      only does that on mount of first render of the current root node.  Otherwise
+      it just logs the children mounted and the state check is initiated from
+      componentDidUpdate.
+
+      Children mount first so they are added to the targetArray of nodes
+      needing to be checked.
+
+      WHen we hit the root node we check state.
+
+      treeIds are naively regenerated on every mount.  Need to test doing this
+      after root mount only.
+
+      Also - the nodeTargetArray is reset - but not sure why it's before
+      the check tree state.  On mount it probably doesn't matter anyway.
+    */
     componentDidMount() {
       const {
         addToNodeTargetArray,
@@ -39,9 +56,7 @@ export const collapserWrapper = (WrappedComponent) => {
         toggleCheckTreeState,
       } = this.props;
       checkForRef(WrappedComponent, this.elem, 'collapserRef');
-      /*
-        On insertion of new node - we shouldn't check unrelated branches - so set this.
-      */
+
       const addNodeValue = isRootNode ? null : collapserId;
       addToNodeTargetArray(addNodeValue, rootNodeId);
       selectors.setTreeIds(setTreeId);
@@ -50,6 +65,10 @@ export const collapserWrapper = (WrappedComponent) => {
       }
     }
 
+    /*
+      Not sure what is gauranteeing the state update after children mounting.
+      Need to investigate further.
+    */
     componentDidUpdate() {
       const {
         addToNodeTargetArray,
@@ -65,6 +84,33 @@ export const collapserWrapper = (WrappedComponent) => {
       }
     }
 
+
+    /*
+      This strategy here is designed to limit the number of state checks
+      when unmounting.  The idea was that the parent node has its willUnmount
+      method before it's children.  So we could update state with a list of the
+      children left to unmount - and then check when the last child is about
+      to unmount themselves - and then notify to check state.
+
+      It would still require a state check for each parent node being unmounted
+      in a single render cycle.  But better than doing it for all the children too.
+
+      Problem is that willUnmount is called before previous state updates in a render
+      cycle are pushed through to the component.  So when the child checks
+      to see if it needs to be removed it has an old copy of state and is not
+      in the unmountArray.
+
+      THe hack below uses redux-thunks to get access to the getState() function
+      passed into async action creators - and get fresh state.
+
+      Nasty... gonna try something else anyway.
+
+      Also had to move the removeCollapser logic down from the collapserControllerWrapper
+      Because that would all get processed before we could detect the current children.
+      The children would all be removed from state before this component had
+      actually unmounted.  Good argument for moving that logic down here and removing
+      that wrapper altogether - although that separation has proven useful.
+    */
     componentWillUnmount() {
       const {
         addToUnmountArray,
@@ -74,9 +120,11 @@ export const collapserWrapper = (WrappedComponent) => {
         toggleCheckTreeState,
         dispatch
       } = this.props;
+
+      /* the get fresh strate hack */
       let newState;
-      const blah = dispatch((a, b) => {
-        newState = b();
+      const blah = dispatch((arg, getState) => {
+        newState = getState();
         return { type: 'blah' };
       });
 
@@ -84,18 +132,44 @@ export const collapserWrapper = (WrappedComponent) => {
       const { collapserId, parentCollapserId, parentScrollerId } = this.props;
 
       const children = childCollapsers();
+
+      /*
+        the array of children currently waiting to be unmounted.  Taken from
+        fresh state yet to be pushed to the component instance.  ick.
+      */
       const unmountChildren = getRootUnmountArrayRoot(newState)(rootNodeId);
+
       const filteredUnmountChildren = unmountChildren.filter(id => (id !== collapserId));
+
+      /*
+        if we have no children to unmount and we're the last to unmount.
+        Then go ahead and remove from state and initiate check of tree state.
+        Make sure the order of these two are preserved,  Mapdispatch is
+        called immediately after both so the state check of the tree needs
+        to happen after the children are removed from state.
+      */
       if (children.length === 0 && filteredUnmountChildren.length === 0) {
         removeCollapser(parentScrollerId, parentCollapserId, collapserId);
         toggleCheckTreeState(rootNodeId);
       }
+
+      /* more children to unmount - add em! */
       if (children.length > 0) {
         addToUnmountArray(children, rootNodeId);
       }
+
+      /* Remove from the array to keep track of what is left to unmount */
       if (unmountChildren.includes(collapserId)) {
         removeFromUnmountArray(collapserId, rootNodeId);
       }
+
+      /*
+        Another problematic aspect to this approach is that it's kinda hard
+        to tell when this is needed exactly.  Not even sure if this gets called
+        after removeCollapser is called above - I got lost following the execution
+        flow.  IT must right?  So calling it twice can't be good... but haven't
+        sussed exact conditions.  Too much complexity anyway.
+      */
       removeCollapser(parentScrollerId, parentCollapserId, collapserId);
     }
 
@@ -252,6 +326,7 @@ export const collapserWrapper = (WrappedComponent) => {
 
   const CollapserControllerConnect = connect(
     mapStateToPropsFactory,
+    /* part of the getState hack for component unmounting. */
     (dispatch, getState) => ({ ...bindActionCreators({ ...collapserWrapperActions }, dispatch), dispatch }),
   )(CollapserController);
 
