@@ -1,7 +1,9 @@
-import { createStore, compose } from 'redux';
+import { createStore, applyMiddleware, compose } from 'redux';
+import thunk from 'redux-thunk';
 
 import reducers from '../reducers';
 
+const middleware = applyMiddleware(thunk);
 
 function reduxStore(initialState) {
 
@@ -9,10 +11,11 @@ function reduxStore(initialState) {
 
   if (process.env.NODE_ENV !== 'production' && window.devToolsExtension) {
     enhancer = compose(
+      middleware,
       window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(), // eslint-disable-line
     );
   } else {
-    enhancer = compose();
+    enhancer = compose(middleware);
   }
 
   const store = createStore(reducers, initialState, enhancer);

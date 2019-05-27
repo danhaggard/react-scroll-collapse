@@ -2,15 +2,17 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux'
 
 import forwardRefWrapper from '../../utils/forwardRef';
 import { checkForRef } from '../../utils/errorUtils';
 import { ofNumberTypeOrNothing, ofObjectTypeOrNothing } from '../../utils/propTypeHelpers';
 import { collapserWrapperActions } from '../../actions';
 
-import { getNodeTargetArrayRoot, getCheckTreeStateRoot } from '../../selectors/rootNode';
+import { getNodeTargetArrayRoot, getCheckTreeStateRoot, getRootUnmountArrayRoot } from '../../selectors/rootNode';
 import {
   createAreAllItemsExpandedSelector,
+  getCollapserCollapsersRoot,
   nestedCollapserItemsRoot,
   setTreeIdsRecursively,
 } from '../../selectors/collapser';
@@ -64,7 +66,37 @@ export const collapserWrapper = (WrappedComponent) => {
     }
 
     componentWillUnmount() {
-      debugger;
+      const {
+        addToUnmountArray,
+        removeFromUnmountArray,
+        rootNodeId,
+        selectors: { childCollapsers, unmountArray },
+        toggleCheckTreeState,
+        dispatch
+      } = this.props;
+      let newState;
+      const blah = dispatch((a, b) => {
+        newState = b();
+        return { type: 'blah' };
+      });
+
+      const { removeCollapser } = this.props;
+      const { collapserId, parentCollapserId, parentScrollerId } = this.props;
+
+      const children = childCollapsers();
+      const unmountChildren = getRootUnmountArrayRoot(newState)(rootNodeId);
+      const filteredUnmountChildren = unmountChildren.filter(id => (id !== collapserId));
+      if (children.length === 0 && filteredUnmountChildren.length === 0) {
+        removeCollapser(parentScrollerId, parentCollapserId, collapserId);
+        toggleCheckTreeState(rootNodeId);
+      }
+      if (children.length > 0) {
+        addToUnmountArray(children, rootNodeId);
+      }
+      if (unmountChildren.includes(collapserId)) {
+        removeFromUnmountArray(collapserId, rootNodeId);
+      }
+      removeCollapser(parentScrollerId, parentCollapserId, collapserId);
     }
 
     expandCollapseAll = () => {
@@ -197,12 +229,15 @@ export const collapserWrapper = (WrappedComponent) => {
     const selectors = {};
     const areAllItemsExpandedSelector = createAreAllItemsExpandedSelector(
       getCheckTreeStateRoot,
-      getNodeTargetArrayRoot
+      getNodeTargetArrayRoot,
     );
+    debugger;
     return (state, props) => {
-      const { rootNodeId } = props;
+      const { collapserId, rootNodeId } = props;
       selectors.allChildItemIds = () => nestedCollapserItemsRoot(state, props);
+      selectors.childCollapsers = () => getCollapserCollapsersRoot(state)(collapserId);
       selectors.nodeTargetArray = () => getNodeTargetArrayRoot(state)(rootNodeId);
+      selectors.unmountArray = () => getRootUnmountArrayRoot(state)(rootNodeId);
       selectors.setTreeIds = action => setTreeIdsRecursively(
         state,
         rootNodeId,
@@ -217,7 +252,7 @@ export const collapserWrapper = (WrappedComponent) => {
 
   const CollapserControllerConnect = connect(
     mapStateToPropsFactory,
-    collapserWrapperActions,
+    (dispatch, getState) => ({ ...bindActionCreators({ ...collapserWrapperActions }, dispatch), dispatch }),
   )(CollapserController);
 
   return CollapserControllerConnect;

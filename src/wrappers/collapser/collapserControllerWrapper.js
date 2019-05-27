@@ -15,11 +15,13 @@ export const collapserControllerWrapper = (CollapserController) => {
       this.addCollapser();
     }
 
+/*
     componentWillUnmount() {
       const { removeCollapser } = this.props;
       const { collapserId, parentCollapserId, parentScrollerId } = this.props;
       removeCollapser(parentScrollerId, parentCollapserId, collapserId);
     }
+*/
 
     addCollapser() {
       const { addCollapser, isRootNode } = this.props;

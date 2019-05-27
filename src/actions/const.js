@@ -11,6 +11,8 @@ export const SET_TREE_ID = 'react-scroll-collapse/SET_TREE_ID';
 /* rootNodes action types */
 export const ADD_TO_NODE_TARGET_ARRAY = 'react-scroll-collapse/ADD_TO_NODE_TARGET_ARRAY';
 export const TOGGLE_CHECK_TREE_STATE = 'react-scroll-collapse/TOGGLE_CHECK_TREE_STATE';
+export const ADD_TO_UNMOUNT_ARRAY = 'react-scroll-collapse/ADD_TO_UNMOUNT_ARRAY';
+export const REMOVE_FROM_UNMOUNT_ARRAY = 'react-scroll-collapse/REMOVE_FROM_UNMOUNT_ARRAY';
 
 /* collapserItem action types */
 export const ADD_ITEM = 'react-scroll-collapse/ADD_ITEM';

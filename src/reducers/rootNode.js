@@ -6,8 +6,11 @@ import {
   EXPAND_COLLAPSE_ALL,
   EXPAND_COLLAPSE,
   REMOVE_COLLAPSER,
-  TOGGLE_CHECK_TREE_STATE
+  TOGGLE_CHECK_TREE_STATE,
+  ADD_TO_UNMOUNT_ARRAY,
+  REMOVE_FROM_UNMOUNT_ARRAY,
 } from '../actions/const';
+
 import { getOrObject } from '../utils/selectorUtils';
 import {
   addToState,
@@ -41,6 +44,18 @@ export const nodeTargetArrayReducer = (state = [], action) => {
   }
 };
 
+export const unmountArrayReducer = (state = [], action) => {
+  const { collapserId, collapserIdArray } = getOrObject(action, 'payload');
+  switch (action.type) {
+    case ADD_TO_UNMOUNT_ARRAY:
+      return [...state, ...collapserIdArray];
+    case REMOVE_FROM_UNMOUNT_ARRAY:
+      return state.filter(id => (id !== collapserId));
+    default:
+      return state;
+  }
+};
+
 export const checkTreeStateReducer = (state = false, action) => {
   switch (action.type) {
     case EXPAND_COLLAPSE_ALL:
@@ -56,6 +71,7 @@ export const rootNodeReducer = combineReducers({
   checkTreeState: checkTreeStateReducer,
   id: rootNodeIdReducer,
   nodeTargetArray: nodeTargetArrayReducer,
+  unmountArray: unmountArrayReducer,
 });
 
 export const rootNodesReducer = (state = {}, action) => {
@@ -75,6 +91,8 @@ export const rootNodesReducer = (state = {}, action) => {
     case EXPAND_COLLAPSE_ALL:
     case EXPAND_COLLAPSE:
     case TOGGLE_CHECK_TREE_STATE:
+    case ADD_TO_UNMOUNT_ARRAY:
+    case REMOVE_FROM_UNMOUNT_ARRAY:
       return updateState(state, action, rootNodeId, rootNodeReducer);
     default:
       return state;
