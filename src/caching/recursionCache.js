@@ -35,8 +35,8 @@ const createCache = (rootNodeIdArg = 0) => {
   });
 
   const initialMountInfoObjFactory = rootNodeId => ({
-    lastMountStartId: rootNodeId - 1,
-    mountValue: rootNodeId - 1,
+    largestValueFromPrevMountCycle: rootNodeId - 1,
+    largestValueFromThisMountCycle: rootNodeId - 1,
     mounting: false,
   });
 
@@ -60,6 +60,7 @@ const createCache = (rootNodeIdArg = 0) => {
       ...cache.mountInfo,
       ...obj
     };
+    return cache.mountInfo;
   };
 
   const getRecursionCache = () => getCache().recursionCache;
@@ -104,7 +105,6 @@ const createCache = (rootNodeIdArg = 0) => {
 
   const recursionCache = {
     addResult,
-    // cache: CACHE,
     clearCache,
     getRecursionCache,
     getMountInfo,

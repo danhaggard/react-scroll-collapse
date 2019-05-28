@@ -1,12 +1,12 @@
 import { COLLAPSERS, SCROLLERS } from '../constants';
 import createProvider from '../createProvider';
-import ScrollMethods from '../ScrollMethods';
+import ScrollerContext from '../ScrollerContext';
 
 const scrollerProvider = createProvider(
   SCROLLERS,
   [],
   [COLLAPSERS],
-  ScrollMethods
+  ScrollerContext
 );
 
 export default scrollerProvider;

@@ -8,18 +8,14 @@ import { checkForRef } from '../../utils/errorUtils';
 import { ofNumberTypeOrNothing, ofObjectTypeOrNothing } from '../../utils/propTypeHelpers';
 import { collapserWrapperActions } from '../../actions';
 
-import { getNodeTargetArrayRoot, getCheckTreeStateRoot, getRootUnmountArrayRoot } from '../../selectors/rootNode';
+import { getNodeTargetArrayRoot, getRootUnmountArrayRoot } from '../../selectors/rootNode';
 import {
-  createAreAllItemsExpandedSelector,
   getCollapserCollapsersRoot,
   nestedCollapserItemsRoot,
   setTreeIdsRecursively,
 } from '../../selectors/collapser';
 
 import addLoggingDefaultsToComponent from '../../utils/logging/utils';
-
-// import WebWorker from '../../webworkers/WebWorker';
-// import Worker from '../../workers/areAllItemsExpanded.worker';
 
 const clonableProps = ({
   collapserId,
@@ -64,146 +60,77 @@ export const collapserWrapper = (WrappedComponent) => {
 
     constructor(props, context) {
       super(props, context);
-      const {
-        areAllItemsExpanded,
-        areAllItemsExpandedWorker,
-        cache,
-        collapserId,
-        isOpenedInit,
-        isRootNode,
-        rootNodeId,
-        toggleCheckTreeState
-      } = props;
+      const { areAllItemsExpanded, areAllItemsExpandedWorker } = props;
 
       this.state = {
         areAllItemsExpanded,
       };
 
-      if (isRootNode) {
-        areAllItemsExpandedWorker.addEventListener('message', (e) => { // eslint-disable-line no-restricted-globals
-          if (!e) {
-            return;
-          }
-          cache.setCache(e.data);
-          // toggleCheckTreeState(rootNodeId);
-        });
-      }
-
-      areAllItemsExpandedWorker.addEventListener('message', (e) => { // eslint-disable-line no-restricted-globals
-        if (!e) {
-          return;
-        }
-        // console.log('toggling checkstate from didMount - id: ', collapserId);
-        // console.log('Message received from worker', e);
-        this.setExpandedState(this.props);
-        // toggleCheckTreeState(rootNodeId);
-      });
+      areAllItemsExpandedWorker.addEventListener('message', this.handleAllItemsExpandedWorkerMessage);
     }
 
     componentDidMount() {
-      const {
-        addToNodeTargetArray,
-        cache,
-        collapserId,
-        isRootNode,
-        rootNodeId,
-        setTreeId,
-        selectors,
-        toggleCheckTreeState,
-      } = this.props;
-      checkForRef(WrappedComponent, this.elem, 'collapserRef');
-      // addToNodeTargetArray(addNodeValue, rootNodeId);
-      if (!isRootNode) {
-        // addToNodeTargetArray(collapserId, rootNodeId);
-      }
-      console.log('didMount', collapserId);
-      this.setCacheOnMount();
       /*
-
-      if (collapserId - cache.lastMountStartId > 1) {
-        if (!cache.mounting && collapserId > cache.mountValue) {
-          cache.mountValue = collapserId;
-        }
-
-        // cache.mounting = true;
-      } else {
-        cache.lastMountStartId = cache.mountValue;
-        cache.mounting = true;
-      }
-      if (cache.mounting) {
-
-      // if (cache.lastMountStartId === collapserId) {
-      // if (isRootNode) {
-        // const addNodeValue = isRootNode ? null : collapserId;
-        // selectors.setTreeIds(setTreeId);
-        // console.log('toggling checkstate from didMount - id: ', collapserId);
-        // addToNodeTargetArray(null, rootNodeId);
-        debugger;
-        const cacheObj = cache.getCache();
-        this.worker.postMessage([selectors.stateProps.state, clonableProps(this.props), cacheObj]);
-        // toggleCheckTreeState(rootNodeId);
-      }
+        Make sure users pass a ref to a DOM node.
       */
+      checkForRef(WrappedComponent, this.elem, 'collapserRef');
+      this.setCacheOnMount();
+    }
 
+    componentWillUnmount() {
+      const { areAllItemsExpandedWorker } = this.props;
+      areAllItemsExpandedWorker.addEventListener('message', this.handleAllItemsExpandedWorkerMessage);
     }
 
     /*
-      Not sure what is gauranteeing the state update after children mounting.
-      Need to investigate further.
+            0
+          /   \
+         1     4
+       /   \  /  \
+      2    3 5    6
+
+      Given the above tree.  The mount order will be:
+        2, 3, 1, 5, 6, 4, 0
+
+      So we init the largestValueFromPrevMountCycle to be 1 less than the rootNode.
+      If any componentId > 0 mounts - we know the mounting cycle has begun and will
+      continue till the root node 0 mounts.
+
+      While we are mounting we record the highest id to mount in the current
+      cycle.  This get sets as the next value for: largestValueFromPrevMountCycle
+      i.e. 6 -as any mountings on a new render will start from the bottom and
+      work their way up to the top which will be node 7.
     */
-    componentDidUpdate() {
-      const {
-        addToNodeTargetArray,
-        collapserId,
-        rootNodeId,
-        selectors,
-        toggleCheckTreeState
-      } = this.props;
-      if (collapserId >= 3) {
-        console.log('didUpdate', collapserId);
-      }
-      // const targetArray = selectors.nodeTargetArray();
-      // if (targetArray.includes(collapserId)) {
-        // console.log('toggling checkstate from didUpdate - id: ', collapserId);
-        // toggleCheckTreeState(rootNodeId);
-        // addToNodeTargetArray(null, rootNodeId);
-      // }
-    }
-
     setCacheOnMount() {
+      const { cache, collapserId } = this.props;
       const {
-        cache,
-        collapserId,
-        isRootNode,
-        rootNodeId,
-        setTreeId,
-        selectors,
-        toggleCheckTreeState,
-      } = this.props;
-      const { lastMountStartId, mounting, mountValue } = cache.getMountInfo();
+        largestValueFromPrevMountCycle,
+        mounting,
+        largestValueFromThisMountCycle
+      } = cache.getMountInfo();
 
-      if (collapserId - lastMountStartId > 1) {
-        if (!mounting && collapserId > mountValue) {
-          cache.setMountInfo({ mountValue: collapserId });
-        }
+      const mountingStarted = collapserId - largestValueFromPrevMountCycle > 1;
+      const mountingFinished = !mountingStarted && mounting;
 
-        // cache.mounting = true;
-      } else {
+      if (mountingStarted) {
+        cache.setMountInfo({ mounting: mountingStarted });
+      }
+
+      if (mounting && collapserId > largestValueFromThisMountCycle) {
+        cache.setMountInfo({ largestValueFromThisMountCycle: collapserId });
+      }
+
+      if (mountingFinished) {
         cache.setMountInfo({
-          lastMountStartId: mountValue,
-          mounting: true,
+          largestValueFromPrevMountCycle: largestValueFromThisMountCycle,
         });
       }
-      if (cache.getMountInfo().mounting) {
 
-      // if (cache.lastMountStartId === collapserId) {
-      // if (isRootNode) {
-        // const addNodeValue = isRootNode ? null : collapserId;
-        // selectors.setTreeIds(setTreeId);
-        // console.log('toggling checkstate from didMount - id: ', collapserId);
-        // addToNodeTargetArray(null, rootNodeId);
-        this.initiateStateCheck();
-        // toggleCheckTreeState(rootNodeId);
+      if (mountingFinished) {
+        this.initiateTreeStateCheck();
+        cache.setMountInfo({
+          mounting: false,
+        });
       }
     }
 
@@ -211,139 +138,62 @@ export const collapserWrapper = (WrappedComponent) => {
       const { areAllItemsExpanded } = this.state;
       const cachedValue = cache.getResultValue(collapserId);
       if (areAllItemsExpanded !== cachedValue) {
-        console.log('settingState in collapserId, newVal, oldVal', collapserId, cachedValue, areAllItemsExpanded);
         this.setState(() => ({
           areAllItemsExpanded: cachedValue
         }));
       }
     }
 
-
-    /*
-      This strategy here is designed to limit the number of state checks
-      when unmounting.  The idea was that the parent node has its willUnmount
-      method before it's children.  So we could update state with a list of the
-      children left to unmount - and then check when the last child is about
-      to unmount themselves - and then notify to check state.
-
-      It would still require a state check for each parent node being unmounted
-      in a single render cycle.  But better than doing it for all the children too.
-
-      Problem is that willUnmount is called before previous state updates in a render
-      cycle are pushed through to the component.  So when the child checks
-      to see if it needs to be removed it has an old copy of state and is not
-      in the unmountArray.
-
-      THe hack below uses redux-thunks to get access to the getState() function
-      passed into async action creators - and get fresh state.
-
-      Nasty... gonna try something else anyway.
-
-      Also had to move the removeCollapser logic down from the collapserControllerWrapper
-      Because that would all get processed before we could detect the current children.
-      The children would all be removed from state before this component had
-      actually unmounted.  Good argument for moving that logic down here and removing
-      that wrapper altogether - although that separation has proven useful.
-
-    componentWillUnmount() {
-      const {
-        addToUnmountArray,
-        removeFromUnmountArray,
-        rootNodeId,
-        selectors: { childCollapsers, unmountArray },
-        toggleCheckTreeState,
-        dispatch
-      } = this.props;
-
-      /* the get fresh strate hack
-      let newState;
-      const blah = dispatch((arg, getState) => {
-        newState = getState();
-        return { type: 'blah' };
-      });
-
-      const { removeCollapser } = this.props;
-      const { collapserId, parentCollapserId, parentScrollerId } = this.props;
-
-      const children = childCollapsers();
-
-      /*
-        the array of children currently waiting to be unmounted.  Taken from
-        fresh state yet to be pushed to the component instance.  ick.
-
-      const unmountChildren = getRootUnmountArrayRoot(newState)(rootNodeId);
-
-      const filteredUnmountChildren = unmountChildren.filter(id => (id !== collapserId));
-
-      /*
-        if we have no children to unmount and we're the last to unmount.
-        Then go ahead and remove from state and initiate check of tree state.
-        Make sure the order of these two are preserved,  Mapdispatch is
-        called immediately after both so the state check of the tree needs
-        to happen after the children are removed from state.
-
-      if (children.length === 0 && filteredUnmountChildren.length === 0) {
-        removeCollapser(parentScrollerId, parentCollapserId, collapserId);
-        toggleCheckTreeState(rootNodeId);
-      }
-
-      /* more children to unmount - add em!
-      if (children.length > 0) {
-        addToUnmountArray(children, rootNodeId);
-      }
-
-      /* Remove from the array to keep track of what is left to unmount
-      if (unmountChildren.includes(collapserId)) {
-        removeFromUnmountArray(collapserId, rootNodeId);
-      }
-
-      /*
-        Another problematic aspect to this approach is that it's kinda hard
-        to tell when this is needed exactly.  Not even sure if this gets called
-        after removeCollapser is called above - I got lost following the execution
-        flow.  IT must right?  So calling it twice can't be good... but haven't
-        sussed exact conditions.  Too much complexity anyway.
-
-      removeCollapser(parentScrollerId, parentCollapserId, collapserId);
-    }
-    */
-
     expandCollapseAll = () => {
       const {
         addToNodeTargetArray,
-        // areAllItemsExpanded,
         collapserId,
         contextMethods,
         expandCollapseAll,
-        isRootNode,
         rootNodeId,
         selectors,
       } = this.props;
       const { areAllItemsExpanded } = this.state;
+
+      /*
+        Will need a whole object to manage autoscroll once we add more
+        configurability.
+      */
       if (contextMethods.scroller) {
         contextMethods.scroller.scrollToTop(this.elem.current);
       }
-      addToNodeTargetArray(collapserId, rootNodeId, true);
-
       /*
-      if (!isRootNode) {
-        addToNodeTargetArray(collapserId, rootNodeId, true);
-      } else {
-        addToNodeTargetArray(null, rootNodeId);
-      }
+        Adding the current collapserId to the targetNodes - tells the
+        tree state selector where in the tree to go.
+
+        NOTE: must dispatch relevant redux actions before checking tree state.
+        mapStateToProps will fire immediately and update the cache that
+        the selector uses.
       */
+      addToNodeTargetArray(collapserId, rootNodeId, true);
       expandCollapseAll(areAllItemsExpanded, selectors.allChildItemIds(), rootNodeId);
-      this.initiateStateCheck();
+      this.initiateTreeStateCheck();
     };
 
-    initiateStateCheck = () => {
-      const { areAllItemsExpandedWorker, cache, selectors } = this.props;
+    initiateTreeStateCheck = () => {
+      const { areAllItemsExpandedWorker, cache } = this.props;
       const cacheClone = cache.getCache();
       const currentReduxState = cache.getCurrentReduxState();
       areAllItemsExpandedWorker.postMessage([
         currentReduxState,
         clonableProps(this.props),
         cacheClone]);
+    }
+
+    handleAllItemsExpandedWorkerMessage = (e) => {
+      const { cache, isRootNode } = this.props;
+      if (!e) {
+        return;
+      }
+      if (isRootNode) {
+        cache.setCache(e.data);
+      }
+      this.setExpandedState(this.props);
     }
 
     render() {
@@ -354,13 +204,6 @@ export const collapserWrapper = (WrappedComponent) => {
         ...other
       } = this.props;
       const { areAllItemsExpanded } = this.state;
-      console.log('collapserRender', this.props.collapserId);
-      /*
-      if (this.props.collapserId === 0) {
-        renderCount += 1;
-        console.log('root rendercount:', renderCount);
-      }
-      */
       return (
         <WrappedComponentRef
           {...other}
@@ -398,6 +241,7 @@ export const collapserWrapper = (WrappedComponent) => {
     toggleCheckTreeState: PropTypes.func.isRequired,
 
     /* provided by scrollerProvider via context */
+    areAllItemsExpandedWorker: PropTypes.func.isRequired,
     contextMethods: ofObjectTypeOrNothing,
     rootNodeId: PropTypes.number.isRequired,
   };
@@ -443,19 +287,43 @@ export const collapserWrapper = (WrappedComponent) => {
     calls to setState would exceed 50 in a single render cycle and so react
     would think it was in a infinite setState loop and terminate.
 
-    Now - areAllItemsExpanded simply passes a true false value - and is responsible
-    for triggering component updates.  Because checking this state is the most
-    expensive - a new strategy had to be employed to ensure it is called
-    only when necessary.  See comments on: createAreAllItemsExpandedSelector
-    for details.
+    Next I tried areAllItemsExpanded simply passing a true false value -
+    and is responsible for triggering component updates.  In addition the
+    component would dispatch an action that would toggle some state that
+    would tell mapStateToProps to check the tree state again.
+
+    This was better but required the mapStateToProps func doing some nasty
+    conditional logic to check if it was a root node, if it was a mounting
+    scenario etc...
+
+    Now using a webworker which allows the component to just select
+    state exactly when it wants.  The tradeoff is that I have to
+    copy redux state into the cache so it can be passed to the webworker.
+    Required because with redux not triggering renders, redux state in the
+    component is stale.
   */
+
+  /*
+    first render init logic.  Sets the init value as the isOpenedInit.
+    Needs more thought - as that's actually a value for a collapserItem.
+
+    Could have a general init value passed to the collapser - and child items
+    can individually overide if desired.  Need to think of how.
+  */
+  const initAreAllItemsExpanded = (cache, collapserId, isOpenedInit) => {
+    let areAllItemsExpanded = cache.getResultValue(collapserId);
+    if (areAllItemsExpanded === null && isOpenedInit !== null) {
+      cache.addResult(collapserId, isOpenedInit, []);
+      areAllItemsExpanded = cache.getResultValue(collapserId);
+    }
+    return areAllItemsExpanded;
+  };
 
   const mapStateToPropsFactory = () => {
     const selectors = {};
-    const areAllItemsExpandedSelector = createAreAllItemsExpandedSelector(
-      getCheckTreeStateRoot,
-      getNodeTargetArrayRoot,
-    );
+
+    let areAllItemsExpanded = null;
+
     return (state, props) => {
       const {
         cache,
@@ -464,7 +332,6 @@ export const collapserWrapper = (WrappedComponent) => {
         rootNodeId,
       } = props;
       selectors.allChildItemIds = () => nestedCollapserItemsRoot(state, props);
-      selectors.areAllItemsExpanded = () => areAllItemsExpandedSelector(state, props);
       selectors.childCollapsers = () => getCollapserCollapsersRoot(state)(collapserId);
       selectors.nodeTargetArray = () => getNodeTargetArrayRoot(state)(rootNodeId);
       selectors.unmountArray = () => getRootUnmountArrayRoot(state)(rootNodeId);
@@ -473,18 +340,28 @@ export const collapserWrapper = (WrappedComponent) => {
         rootNodeId,
         action
       );
+
+      /*
+        Sneaking most recent redux state into the component without a re-render
+        cache is initiated for the root component and passed a prop by the
+        collapserProvider to all children of the root - so they share
+        the same cache obj.
+      */
       cache.setCurrentReduxState(state);
 
-      /* set the cache with initial values before anything has rendered / mounted */
-      let areAllItemsExpanded = cache.getResultValue(collapserId);
-      if (areAllItemsExpanded === null && isOpenedInit !== null) {
-        cache.addResult(collapserId, isOpenedInit, []);
-        areAllItemsExpanded = cache.getResultValue(collapserId);
-      }
+      /*
+        Set the cache with initial values before anything has rendered / mounted.
+        This is the only place to do this since this is derived state - otherwise
+        you get undefined prop errors that I don't want to typecheck away.
 
+        We only do this once to prevent further changes - as we rely on setstate
+        after first render.
+      */
+      if (areAllItemsExpanded === null) {
+        areAllItemsExpanded = initAreAllItemsExpanded(cache, collapserId, isOpenedInit);
+      }
       return {
         areAllItemsExpanded,
-        // areAllItemsExpanded: areAllItemsExpandedSelector(state, props),
         selectors,
       };
     };

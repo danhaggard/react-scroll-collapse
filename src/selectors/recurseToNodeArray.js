@@ -15,6 +15,9 @@ const isInArray = (toCheck, arr, toCheckGetter, arrItemGetter) => {
   return found;
 };
 
+/*
+  burn this with fire.
+*/
 const getChildTargetMapping = (childArray, targetNodeArray) => {
   const targetNodeArrayChildMapping = [];
   let currentChildIdObj = childArray.shift();
@@ -76,7 +79,6 @@ const recurseToNodeArray = (argsObj) => {
 
   const {
     cache,
-    // getNodeChildren, // Returns an array of ids obj of the children of the current node
     getNodeChildrenMappedToTreeId,
     setNestedCacheValues, // a function which takes a node id and a cached value of the current node
     // and determines a value for which it will set the cache for all children.
@@ -98,36 +100,23 @@ const recurseToNodeArray = (argsObj) => {
       get exponential with tree size.
 
       But since the root node must traverse the whole tree on first render,
-      we can save results along the way. The root collapser unlocks the cache
-      so the recursion func knows to recurse as needed. Then the root
-      collapser locks it when it is finished so subsequent nodes are given
-      cached vals.
+      we can save results along the way.
   */
   const currentNodeId = currentNodeIdObj.id;
 
   const cachedValue = cache.getResultValue(currentNodeId);
   const cachedSources = cache.getResultSources(currentNodeId);
+
+  /* sets tree ids to the cache on first traversal on mount */
   if (setTreeId || targetNodeArray.length === 0) {
     cache.setResultTreeId(currentNodeId, counter());
   }
-  /*
-  if (cachedValue !== null && cache.isCacheLocked()) {
-    console.log('return cached value for: ', currentNodeId);
-
-    return cachedValue;
-  }
-  */
-  console.log('checking node id: ', currentNodeId);
-  // console.log('targetNodeArray: ', targetNodeArray);
 
   // We have reached the targetNode - just ensure all children have the reverse
   // of the current cached value. NOTE: this cheat won't generalise well.
   // we do this before checking anything else to save on addition child selections
-  // etc.
   if (targetNodeArray.length === 1 && targetNodeArray[0].id <= currentNodeId) {
-    const blah = setNestedCacheValues(currentNodeIdObj, cachedValue);
-    return blah;
-    // return setNestedCacheValues(currentNodeId, cachedValue);
+    return setNestedCacheValues(currentNodeId, cachedValue);
   }
 
   // the value returned by this node in isolation of it's children.
@@ -137,21 +126,7 @@ const recurseToNodeArray = (argsObj) => {
   const childArray = getNodeChildrenMappedToTreeId(currentNodeId);
 
   // no children- just return.
-  if (childArray.length === 0
-
-  // When you remember why you added this - please commment.
-  // currently it blocks the  scenario where the target node has children
-  // - this prevents them from getting checked.
-  // || (targetNodeArray.length === 1 && targetNodeArray[0].id === currentNodeId)
-  ) {
-
-    /*
-      Caching itself as a falsity source causes problems currently in the scenario
-      where it has children - but not when it doesn't,
-
-      TODO: investigate why - and how this handles changes to indidual
-      collapserItem state changes.
-    */
+  if (childArray.length === 0) {
     return cache.addResult(currentNodeId, currentValue, []);
   }
 
@@ -232,7 +207,6 @@ const recurseToNodeArray = (argsObj) => {
     removing the nodes we just checked from  the sources.
 
   */
-
   const cachedSourceInChildren = cachedIdObj => isInArray(
     cachedIdObj,
     childTargetMapping,
