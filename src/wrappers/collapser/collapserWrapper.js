@@ -338,7 +338,9 @@ export const collapserWrapper = (WrappedComponent) => {
     initiateStateCheck = () => {
       const { areAllItemsExpandedWorker, cache, selectors } = this.props;
       const cacheObj = cache.getCache();
-      areAllItemsExpandedWorker.postMessage([selectors.state, clonableProps(this.props), cacheObj]);
+      console.log('oldState', selectors.state);
+      console.log('newState', selectors.getNewState());
+      areAllItemsExpandedWorker.postMessage([selectors.getNewState(), clonableProps(this.props), cacheObj]);
     }
 
     render() {
@@ -451,7 +453,10 @@ export const collapserWrapper = (WrappedComponent) => {
       getCheckTreeStateRoot,
       getNodeTargetArrayRoot,
     );
+    let newState;
+    const getNewState = () => newState;
     return (state, props) => {
+      newState = state;
       const {
         cache,
         collapserId,
@@ -469,6 +474,7 @@ export const collapserWrapper = (WrappedComponent) => {
         action
       );
       selectors.state = state;
+      selectors.getNewState = getNewState;
 
       /* set the cache with initial values before anything has rendered / mounted */
       let areAllItemsExpanded = cache.getResultValue(collapserId);
