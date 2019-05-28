@@ -26,20 +26,31 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
 
   state = (() => {
     const {
+      branch,
       children,
       comment,
       count,
+      isOpenedInit,
       depth,
       title
     } = this.props.nodeData;
     return {
+      branch,
       comment,
       count,
       depth,
       title,
       localChildren: children,
+      threadActive: isOpenedInit || false,
     };
   })();
+
+  componentDidMount() {
+    const { registerSetChildInactive } = this.props;
+    if (typeof registerSetChildInactive === 'function') {
+      registerSetChildInactive(this.setThreadInactive);
+    }
+  }
 
   generateChildData = (count, depth) => generateCommentThreadData(
     this.props,
@@ -71,6 +82,37 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
 
   removeThread = () => this.setState(this.removeChild);
 
+  handleOnClick = () => {
+    const { areAllItemsExpanded, expandCollapseAll, getParentThreadActive } = this.props;
+    const { threadActive } = this.state;
+    const parentThreadActive = getParentThreadActive();
+    this.setInactiveChildRegistry.forEach((setChildInactive) => {
+      if (typeof setChildInactive === 'function') {
+        setChildInactive();
+      }
+    });
+    if (threadActive !== !areAllItemsExpanded && !parentThreadActive) {
+      this.setState(() => ({ threadActive: !areAllItemsExpanded && !parentThreadActive }));
+    }
+    setTimeout(expandCollapseAll, 250);
+    // expandCollapseAll();
+  }
+
+  getThreadActive = () => this.state.threadActive;
+
+  setInactiveChildRegistry = [];
+
+  registerSetChildInactive = setChildInactive => (
+    this.setInactiveChildRegistry.push(setChildInactive)
+  );
+
+  setThreadInactive = () => {
+    const { threadActive } = this.state;
+    if (threadActive) {
+      this.setState(() => ({ threadActive: false }));
+    }
+  }
+
   render() {
     const {
       areAllItemsExpanded,
@@ -87,18 +129,25 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
       isRootNode,
       style,
     } = this.props;
-    const { comment, localChildren, title } = this.state;
+    const {
+      branch,
+      comment,
+      localChildren,
+      threadActive,
+      title
+    } = this.state;
+
     const idStr = collapserId.toString();
     const newTitle = ` Collapser ${idStr} -- ${title || 'row: 0 - node: 0'}`;
     return (
       <div
-        className={`${styles.commentThread}`}
+        className={`${styles.commentThread} ${(!threadActive || isRootNode) || styles.expanded}`}
         ref={collapserRef}
-        style={{ ...style }}
+        style={{ ...style, zIndex: `${0 - branch}`, order: `${branch}` }}
       >
         <ExpandButton
           isOpened={areAllItemsExpanded}
-          onClick={expandCollapseAll}
+          onClick={this.handleOnClick}
           title={newTitle}
         />
         <CommentWithButtons
@@ -114,6 +163,8 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
             <WrappedCommentThread
               isOpenedInit={childIsOpenedInit}
               childIsOpenedInit={childIsOpenedInit}
+              getParentThreadActive={this.getThreadActive}
+              registerSetChildInactive={this.registerSetChildInactive}
               key={childNodeData.key}
               nodeData={childNodeData}
               {...{
@@ -133,6 +184,7 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
 CommentThread.defaultProps = {
   areAllItemsExpanded: null,
   children: [],
+  getParentThreadActive: () => false,
   insertChildAtIndex: null,
   maxChildren: 1,
   maxDepth: 1,
@@ -147,6 +199,7 @@ CommentThread.propTypes = {
   collapserId: PropTypes.number.isRequired,
   collapserRef: PropTypes.object.isRequired,
   expandCollapseAll: PropTypes.func.isRequired,
+  getParentThreadActive: PropTypes.func,
   insertChildAtIndex: ofNumberTypeOrNothing,
   isRootNode: PropTypes.bool.isRequired,
   nodeData: PropTypes.object.isRequired,

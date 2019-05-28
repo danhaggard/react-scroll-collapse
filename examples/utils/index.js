@@ -67,6 +67,7 @@ const getNodeChildren = (
 
 const getNodeObj = (count, depth, index) => ({
   comment: genRandText(),
+  branch: index,
   count,
   depth,
   key: `comment-${count}`,

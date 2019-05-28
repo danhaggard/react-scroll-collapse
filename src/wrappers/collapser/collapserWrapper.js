@@ -241,7 +241,7 @@ export const collapserWrapper = (WrappedComponent) => {
     toggleCheckTreeState: PropTypes.func.isRequired,
 
     /* provided by scrollerProvider via context */
-    areAllItemsExpandedWorker: PropTypes.func.isRequired,
+    areAllItemsExpandedWorker: PropTypes.object.isRequired,
     contextMethods: ofObjectTypeOrNothing,
     rootNodeId: PropTypes.number.isRequired,
   };
