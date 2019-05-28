@@ -23,7 +23,6 @@ const areAllItemsExpandedSelector = (state, props) => {
   nestedCollapserItemsExpandedRootEvery(
     state, { ...props, nodeTargetArray }, cache
   );
-
   return cache.getCache();
 };
 

@@ -92,7 +92,7 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
     const newTitle = ` Collapser ${idStr} -- ${title || 'row: 0 - node: 0'}`;
     return (
       <div
-        className={`${styles.commentThread} ${!isRootNode && styles.hover}`}
+        className={`${styles.commentThread}`}
         ref={collapserRef}
         style={{ ...style }}
       >

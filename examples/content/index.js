@@ -143,9 +143,9 @@ export const generateCommentThreadData = (
 
 const generateThreadConfig = {
   minChildren: 2,
-  minDepth: 3,
+  minDepth: 4,
   maxChildren: 4,
-  maxDepth: 3,
+  maxDepth: 5,
 };
 
 const generateThreadConfigChild = {

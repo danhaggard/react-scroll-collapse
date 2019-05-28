@@ -86,7 +86,7 @@ export const setNestedCollapserValuesRoot = (
 
 export const nestedCollapserItemsExpandedRootEvery = (
   state,
-  { collapserId, nodeTargetArray },
+  { nodeTargetArray, rootNodeId },
   cache,
 ) => {
   console.log('chache', cache);
@@ -108,7 +108,7 @@ export const nestedCollapserItemsExpandedRootEvery = (
     // getNodeChildren,
     getNodeChildrenMappedToTreeId,
     setNestedCacheValues,
-    currentNodeIdObj: mapIdToTreeId(collapserId),
+    currentNodeIdObj: mapIdToTreeId(rootNodeId),
     resultReducer: everyReducer(true),
     getNodeValue,
     getTreeId: cache.getResultTreeId,

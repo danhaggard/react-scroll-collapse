@@ -124,7 +124,6 @@ const recurseToNodeArray = (argsObj) => {
   // of the current cached value. NOTE: this cheat won't generalise well.
   // we do this before checking anything else to save on addition child selections
   // etc.
-  debugger;
   if (targetNodeArray.length === 1 && targetNodeArray[0].id <= currentNodeId) {
     const blah = setNestedCacheValues(currentNodeIdObj, cachedValue);
     return blah;

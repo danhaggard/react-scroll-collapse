@@ -28,7 +28,7 @@ export const getRandString = (minSize = 1, maxSize = 10) => {
 */
 export const genRandText = (
   minWords = 20,
-  maxWords = 100,
+  maxWords = 50,
   minWordSize = 1,
   maxWordSize = 10
 ) => {

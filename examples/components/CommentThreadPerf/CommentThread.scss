@@ -20,6 +20,7 @@
   }
 }
 
+/*
 :local(.hover) {
   transition: transform .2s ease, box-shadow .2s ease, padding .2s ease, -webkit-transform .2s ease, -webkit-box-shadow .2s ease;
   will-change: transform, box-shadow;
@@ -29,7 +30,7 @@
     transform: translateY(-1px) translateX(1px) translateZ(0px);
   }
 }
-
+*/
 
 :local(.wrapper) {
   display: flex;

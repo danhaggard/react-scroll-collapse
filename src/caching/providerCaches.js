@@ -1,4 +1,4 @@
-import PROVIDER_TYPES, { PROVIDER_WORKERS } from '../contextProviders/constants';
+import PROVIDER_TYPES from '../contextProviders/constants';
 
 const providerCaches = {}; // eslint-disable-line
 

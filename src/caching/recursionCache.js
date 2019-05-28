@@ -40,22 +40,17 @@ const createCache = (rootNodeIdArg = 0) => {
     mounting: false,
   });
 
+  const clearCache = () => (CACHE = null);
+
   const getCache = () => CACHE;
 
-  const getResultOrObj = id => getOrObject(getCache(), id);
+  const setCache = newCache => (CACHE = newCache);
 
-  const addResult = (id, value, source) => {
-    // so we can store additional info like treeId
-    const cache = getCache();
-    const resultObj = {
-      ...getResultOrObj(id),
-      ...resultObjFactory(id, value, source)
-    };
-    cache[id] = cacheLock ? cache[id] : resultObj;
-    return value;
-  };
-
-  const clearCache = () => (CACHE = null);
+  const initCache = rootNodeId => (CACHE = {
+    currentReduxState: {},
+    mountInfo: initialMountInfoObjFactory(rootNodeId),
+    recursionCache: {},
+  });
 
   const getMountInfo = () => getCache().mountInfo;
 
@@ -67,15 +62,31 @@ const createCache = (rootNodeIdArg = 0) => {
     };
   };
 
-  const initCache = rootNodeId => (CACHE = {
-    mountInfo: initialMountInfoObjFactory(rootNodeId)
-  });
+  const getRecursionCache = () => getCache().recursionCache;
 
-  const setCache = newCache => (CACHE = newCache);
+  const setRecursionCache = obj => (getCache().recursionCache = obj);
+
+  const getCurrentReduxState = () => getCache().currentReduxState;
+
+  const setCurrentReduxState = obj => (getCache().currentReduxState = obj);
+
+
+  const getResultOrObj = id => getOrObject(getRecursionCache(), id);
+
+  const addResult = (id, value, source) => {
+    // so we can store additional info like treeId
+    const cache = getRecursionCache();
+    const resultObj = {
+      ...getResultOrObj(id),
+      ...resultObjFactory(id, value, source)
+    };
+    cache[id] = cacheLock ? cache[id] : resultObj;
+    return value;
+  };
 
   const isCacheLocked = () => cacheLock;
 
-  const getResult = getResultFactory(getCache);
+  const getResult = getResultFactory(getRecursionCache);
 
   const getResultSources = id => (getResult('source')(id) || []);
 
@@ -83,7 +94,7 @@ const createCache = (rootNodeIdArg = 0) => {
 
   const getResultValue = getResult('value');
 
-  const setResult = setResultFactory(getCache);
+  const setResult = setResultFactory(getRecursionCache);
 
   const setResultTreeId = setResult('treeId');
 
@@ -95,17 +106,21 @@ const createCache = (rootNodeIdArg = 0) => {
     addResult,
     // cache: CACHE,
     clearCache,
+    getRecursionCache,
     getMountInfo,
-    setMountInfo,
+    getCurrentReduxState,
     getResultSources,
     getResultTreeId,
     getResultValue,
     getCache,
     initCache,
     isCacheLocked,
-    setCache,
-    setResultTreeId,
     lockCache,
+    setCache,
+    setCurrentReduxState,
+    setMountInfo,
+    setRecursionCache,
+    setResultTreeId,
     unlockCache,
   };
 
