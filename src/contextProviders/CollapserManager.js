@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import createCache from '../caching/recursionCache';
 import providerCaches from '../caching/providerCaches';
+import providerWorkers from '../caching/providerWorkers';
 
 const getRootNodeId = ({
   collapserId,
@@ -16,7 +17,7 @@ const collapserManager = (Comp) => {
       const { isRootNode, providerType } = props;
       const providerCache = providerCaches[providerType];
       if (isRootNode) {
-        providerCache[rootNodeId] = createCache();
+        providerCache[rootNodeId] = createCache(rootNodeId);
       }
       return providerCache[rootNodeId];
     }
@@ -29,11 +30,18 @@ const collapserManager = (Comp) => {
       return this.cache;
     }
 
+    getWorker = (props, rootNodeId) => {
+      const { providerType } = props;
+      const workerCache = providerWorkers[providerType];
+      return workerCache.getWorker(rootNodeId);
+    }
+
     render() {
       const rootNodeId = getRootNodeId(this.props);
       return (
         <Comp
           {...this.props}
+          areAllItemsExpandedWorker={this.getWorker(this.props, rootNodeId)}
           cache={this.getCache(this.props, rootNodeId)}
           rootNodeId={rootNodeId}
         />

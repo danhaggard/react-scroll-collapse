@@ -58,8 +58,8 @@ export const unmountArrayReducer = (state = [], action) => {
 
 export const checkTreeStateReducer = (state = false, action) => {
   switch (action.type) {
-    case EXPAND_COLLAPSE_ALL:
-    case EXPAND_COLLAPSE:
+    // case EXPAND_COLLAPSE_ALL:
+    // case EXPAND_COLLAPSE:
     case TOGGLE_CHECK_TREE_STATE:
       return !state;
     default:

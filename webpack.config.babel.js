@@ -7,6 +7,8 @@ const path = require('path');
 const prodConfig = require('./config/webpack.production.config.js');
 const devConfig = require('./config/webpack.development.config.js');
 const ghPagesConfig = require('./config/webpack.ghPages.config.js');
+const hotConfig = require('./config/webpack.development-hot.config.js');
+
 
 const EXAMPLES_PATH = path.join(__dirname, 'examples');
 const BUNDLES_PATH = path.resolve(EXAMPLES_PATH, 'bundles');
@@ -24,6 +26,8 @@ const OPTIONS = {
 
 module.exports = (() => {
   switch (process.env.NODE_ENV) {
+    case 'hot':
+      return hotConfig;
     case 'production':
       return prodConfig;
     case 'development':

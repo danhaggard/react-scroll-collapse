@@ -1,16 +1,34 @@
 /* eslint-disable react/no-unused-state */
 import React, { PureComponent } from 'react';
 import { ofBoolTypeOrNothing } from '../utils/propTypeHelpers';
+import providerWorkers from '../caching/providerWorkers';
 
 class CollapserContext extends PureComponent {
 
-  isOpenedInit = this.props.isOpenedInit;
+  constructor(props, context) {
+    super(props, context);
+    const {
+      cache,
+      collapserId,
+      // isRootNode,
+      // rootNodeId,
+      // toggleCheckTreeState
+    } = props;
+    if (isRootNode) {
 
-  isOpenedInitOverride = false;
+      this.worker = new Worker();
 
-  overrideParentIsOpenedInit = () => (this.isOpenedInitOverride = true);
-
-  getParentIsOpenedInit = isOpenedInitOverride
+      this.worker.addEventListener('message', (e) => { // eslint-disable-line no-restricted-globals
+        if (!e) {
+          return;
+        }
+        console.log('toggling checkstate from didMount - id: ', collapserId);
+        console.log('Message received from worker', e);
+        cache.setCache(e.data);
+        // toggleCheckTreeState(rootNodeId);
+      });
+    }
+  }
 
   constructor(props, context) {
     super(props, context);

@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 
 import forwardRefWrapper from '../../utils/forwardRef';
 import { checkForRef } from '../../utils/errorUtils';
@@ -18,6 +17,23 @@ import {
 } from '../../selectors/collapser';
 
 import addLoggingDefaultsToComponent from '../../utils/logging/utils';
+
+// import WebWorker from '../../webworkers/WebWorker';
+// import Worker from '../../workers/areAllItemsExpanded.worker';
+
+const clonableProps = ({
+  collapserId,
+  isOpenedInit,
+  providerType,
+  rootNodeId,
+  cache,
+}) => ({
+  cacheClone: cache.getCache(),
+  collapserId,
+  isOpenedInit,
+  providerType,
+  rootNodeId
+});
 
 
 export const collapserWrapper = (WrappedComponent) => {
@@ -48,12 +64,40 @@ export const collapserWrapper = (WrappedComponent) => {
 
     constructor(props, context) {
       super(props, context);
-      const { cache, isRootNode, rootNodeId } = props;
+      const {
+        areAllItemsExpanded,
+        areAllItemsExpandedWorker,
+        cache,
+        collapserId,
+        isOpenedInit,
+        isRootNode,
+        rootNodeId,
+        toggleCheckTreeState
+      } = props;
+
+      this.state = {
+        areAllItemsExpanded,
+      };
+
       if (isRootNode) {
-        cache.lastMountStartId = rootNodeId - 1;
-        cache.mountValue = rootNodeId - 1;
-        cache.mounting = false;
+        areAllItemsExpandedWorker.addEventListener('message', (e) => { // eslint-disable-line no-restricted-globals
+          if (!e) {
+            return;
+          }
+          cache.setCache(e.data);
+          // toggleCheckTreeState(rootNodeId);
+        });
       }
+
+      areAllItemsExpandedWorker.addEventListener('message', (e) => { // eslint-disable-line no-restricted-globals
+        if (!e) {
+          return;
+        }
+        // console.log('toggling checkstate from didMount - id: ', collapserId);
+        // console.log('Message received from worker', e);
+        this.setExpandedState(this.props);
+        // toggleCheckTreeState(rootNodeId);
+      });
     }
 
     componentDidMount() {
@@ -72,7 +116,10 @@ export const collapserWrapper = (WrappedComponent) => {
       if (!isRootNode) {
         // addToNodeTargetArray(collapserId, rootNodeId);
       }
-      debugger;
+
+      this.setCacheOnMount();
+      /*
+
       if (collapserId - cache.lastMountStartId > 1) {
         if (!cache.mounting && collapserId > cache.mountValue) {
           cache.mountValue = collapserId;
@@ -89,14 +136,15 @@ export const collapserWrapper = (WrappedComponent) => {
       // if (isRootNode) {
         // const addNodeValue = isRootNode ? null : collapserId;
         // selectors.setTreeIds(setTreeId);
-        console.log('toggling checkstate from didMount - id: ', collapserId);
+        // console.log('toggling checkstate from didMount - id: ', collapserId);
         // addToNodeTargetArray(null, rootNodeId);
-        toggleCheckTreeState(rootNodeId);
-      }
-      if (collapserId >= 3) {
         debugger;
-        console.log('didMount: ', collapserId);
+        const cacheObj = cache.getCache();
+        this.worker.postMessage([selectors.stateProps.state, clonableProps(this.props), cacheObj]);
+        // toggleCheckTreeState(rootNodeId);
       }
+      */
+
     }
 
     /*
@@ -112,7 +160,6 @@ export const collapserWrapper = (WrappedComponent) => {
         toggleCheckTreeState
       } = this.props;
       if (collapserId >= 3) {
-        debugger;
         console.log('didUpdate', collapserId);
       }
       // const targetArray = selectors.nodeTargetArray();
@@ -121,6 +168,53 @@ export const collapserWrapper = (WrappedComponent) => {
         // toggleCheckTreeState(rootNodeId);
         // addToNodeTargetArray(null, rootNodeId);
       // }
+    }
+
+    setCacheOnMount() {
+      const {
+        cache,
+        collapserId,
+        isRootNode,
+        rootNodeId,
+        setTreeId,
+        selectors,
+        toggleCheckTreeState,
+      } = this.props;
+      const { lastMountStartId, mounting, mountValue } = cache.getMountInfo();
+
+      if (collapserId - lastMountStartId > 1) {
+        if (!mounting && collapserId > mountValue) {
+          cache.setMountInfo({ mountValue: collapserId });
+        }
+
+        // cache.mounting = true;
+      } else {
+        cache.setMountInfo({
+          lastMountStartId: mountValue,
+          mounting: true,
+        });
+      }
+      if (cache.getMountInfo().mounting) {
+
+      // if (cache.lastMountStartId === collapserId) {
+      // if (isRootNode) {
+        // const addNodeValue = isRootNode ? null : collapserId;
+        // selectors.setTreeIds(setTreeId);
+        // console.log('toggling checkstate from didMount - id: ', collapserId);
+        // addToNodeTargetArray(null, rootNodeId);
+        this.initiateStateCheck();
+        // toggleCheckTreeState(rootNodeId);
+      }
+    }
+
+    setExpandedState = ({ cache, collapserId }) => {
+      const { areAllItemsExpanded } = this.state;
+      const cachedValue = cache.getResultValue(collapserId);
+      if (areAllItemsExpanded !== cachedValue) {
+        this.setState(() => ({
+          areAllItemsExpanded: cache.getResultValue(collapserId)
+        }));
+      }
     }
 
 
@@ -216,7 +310,7 @@ export const collapserWrapper = (WrappedComponent) => {
     expandCollapseAll = () => {
       const {
         addToNodeTargetArray,
-        areAllItemsExpanded,
+        // areAllItemsExpanded,
         collapserId,
         contextMethods,
         expandCollapseAll,
@@ -224,7 +318,7 @@ export const collapserWrapper = (WrappedComponent) => {
         rootNodeId,
         selectors,
       } = this.props;
-
+      const { areAllItemsExpanded } = this.state;
       if (contextMethods.scroller) {
         contextMethods.scroller.scrollToTop(this.elem.current);
       }
@@ -238,7 +332,14 @@ export const collapserWrapper = (WrappedComponent) => {
       }
       */
       expandCollapseAll(areAllItemsExpanded, selectors.allChildItemIds(), rootNodeId);
+      this.initiateStateCheck();
     };
+
+    initiateStateCheck = () => {
+      const { areAllItemsExpandedWorker, cache, selectors } = this.props;
+      const cacheObj = cache.getCache();
+      areAllItemsExpandedWorker.postMessage([selectors.state, clonableProps(this.props), cacheObj]);
+    }
 
     render() {
       const {
@@ -276,6 +377,7 @@ export const collapserWrapper = (WrappedComponent) => {
 
   CollapserController.propTypes = {
     /* provided by collapserControllerWrapper */
+    cache: PropTypes.object.isRequired,
     collapserId: ofNumberTypeOrNothing,
     parentCollapserId: ofNumberTypeOrNothing,
     parentScrollerId: PropTypes.number,
@@ -350,8 +452,14 @@ export const collapserWrapper = (WrappedComponent) => {
       getNodeTargetArrayRoot,
     );
     return (state, props) => {
-      const { collapserId, rootNodeId } = props;
+      const {
+        cache,
+        collapserId,
+        isOpenedInit,
+        rootNodeId,
+      } = props;
       selectors.allChildItemIds = () => nestedCollapserItemsRoot(state, props);
+      selectors.areAllItemsExpanded = () => areAllItemsExpandedSelector(state, props);
       selectors.childCollapsers = () => getCollapserCollapsersRoot(state)(collapserId);
       selectors.nodeTargetArray = () => getNodeTargetArrayRoot(state)(rootNodeId);
       selectors.unmountArray = () => getRootUnmountArrayRoot(state)(rootNodeId);
@@ -360,8 +468,18 @@ export const collapserWrapper = (WrappedComponent) => {
         rootNodeId,
         action
       );
+      selectors.state = state;
+
+      /* set the cache with initial values before anything has rendered / mounted */
+      let areAllItemsExpanded = cache.getResultValue(collapserId);
+      if (areAllItemsExpanded === null && isOpenedInit !== null) {
+        cache.addResult(collapserId, isOpenedInit, []);
+        areAllItemsExpanded = cache.getResultValue(collapserId);
+      }
+
       return {
-        areAllItemsExpanded: areAllItemsExpandedSelector(state, props),
+        areAllItemsExpanded,
+        // areAllItemsExpanded: areAllItemsExpandedSelector(state, props),
         selectors,
       };
     };

@@ -18,6 +18,13 @@ module.exports = (opts) => {
       test: /\.(jpg|png|gif)$/,
       exclude: /node_modules/,
       loaders: ['url-loader?limit=10000&name=images/[hash:12].[ext]'],
+    },
+    {
+      test: /\.worker\.js$/,
+      use: {
+        loader: 'worker-loader',
+        options: { inline: true }
+      }
     }
   ];
 

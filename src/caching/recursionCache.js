@@ -3,20 +3,14 @@ import {
   getOrObject,
 } from '../utils/selectorUtils';
 
-const ERROR_MESSAGES = {
-  noCacheResult: (id, cache) => `Error:
-    you are setting a value for a cache result id: ${id} that doesn't exist yet in
-    cache: ${cache}
-  `
-};
-
-const getResultFactory = cache => key => (id) => {
+const getResultFactory = getCache => key => (id) => {
+  const cache = getCache();
   const result = cache[id];
   return !isUndefNull(result) ? result[key] : null;
 };
 
-const setResultFactory = cacheArg => key => (id, val) => {
-  const cache = cacheArg;
+const setResultFactory = getCache => key => (id, val) => {
+  const cache = getCache();
   const result = cache[id];
   if (!isUndefNull(result)) {
     result[key] = val;
@@ -29,8 +23,8 @@ const setResultFactory = cacheArg => key => (id, val) => {
 };
 
 
-const createCache = () => {
-  let cache = {};
+const createCache = (rootNodeIdArg = 0) => {
+  let CACHE = null;
 
   let cacheLock = false;
 
@@ -40,10 +34,19 @@ const createCache = () => {
     source,
   });
 
-  const getResultOrObj = id => getOrObject(cache, id);
+  const initialMountInfoObjFactory = rootNodeId => ({
+    lastMountStartId: rootNodeId - 1,
+    mountValue: rootNodeId - 1,
+    mounting: false,
+  });
+
+  const getCache = () => CACHE;
+
+  const getResultOrObj = id => getOrObject(getCache(), id);
 
   const addResult = (id, value, source) => {
     // so we can store additional info like treeId
+    const cache = getCache();
     const resultObj = {
       ...getResultOrObj(id),
       ...resultObjFactory(id, value, source)
@@ -52,13 +55,27 @@ const createCache = () => {
     return value;
   };
 
-  const clearCache = () => (cache = {});
+  const clearCache = () => (CACHE = null);
 
-  const getCache = () => cache;
+  const getMountInfo = () => getCache().mountInfo;
+
+  const setMountInfo = (obj) => {
+    const cache = getCache();
+    cache.mountInfo = {
+      ...cache.mountInfo,
+      ...obj
+    };
+  };
+
+  const initCache = rootNodeId => (CACHE = {
+    mountInfo: initialMountInfoObjFactory(rootNodeId)
+  });
+
+  const setCache = newCache => (CACHE = newCache);
 
   const isCacheLocked = () => cacheLock;
 
-  const getResult = getResultFactory(cache);
+  const getResult = getResultFactory(getCache);
 
   const getResultSources = id => (getResult('source')(id) || []);
 
@@ -66,7 +83,7 @@ const createCache = () => {
 
   const getResultValue = getResult('value');
 
-  const setResult = setResultFactory(cache);
+  const setResult = setResultFactory(getCache);
 
   const setResultTreeId = setResult('treeId');
 
@@ -76,17 +93,23 @@ const createCache = () => {
 
   const recursionCache = {
     addResult,
-    cache,
+    // cache: CACHE,
     clearCache,
+    getMountInfo,
+    setMountInfo,
     getResultSources,
     getResultTreeId,
     getResultValue,
     getCache,
+    initCache,
     isCacheLocked,
+    setCache,
     setResultTreeId,
     lockCache,
     unlockCache,
   };
+
+  initCache(rootNodeIdArg);
 
   return recursionCache;
 };
