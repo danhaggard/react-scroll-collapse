@@ -4,10 +4,8 @@ import { getOrObject, isUndefNull } from '../utils/selectorUtils';
 import {
   ADD_COLLAPSER,
   ADD_SCROLLER,
-  ADD_SCROLLER_CHILD,
   REMOVE_COLLAPSER,
   REMOVE_SCROLLER,
-  REMOVE_SCROLLER_CHILD,
 } from '../actions/const';
 
 

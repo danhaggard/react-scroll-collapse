@@ -7,6 +7,7 @@ import forwardRefWrapper from '../../utils/forwardRef';
 import { checkForRef } from '../../utils/errorUtils';
 import { ofNumberTypeOrNothing, ofObjectTypeOrNothing } from '../../utils/propTypeHelpers';
 import { collapserWrapperActions } from '../../actions';
+import { isUndefNull } from '../../utils/selectorUtils';
 
 import { getNodeTargetArrayRoot, getRootUnmountArrayRoot } from '../../selectors/rootNode';
 import {
@@ -60,11 +61,20 @@ export const collapserWrapper = (WrappedComponent) => {
 
     constructor(props, context) {
       super(props, context);
-      const { areAllItemsExpanded, areAllItemsExpandedWorker } = props;
+      const {
+        areAllItemsExpanded,
+        areAllItemsExpandedWorker,
+        collapserId,
+        contextMethods,
+        activeChildLimit,
+      } = props;
 
       this.state = {
         areAllItemsExpanded,
       };
+      if (!isUndefNull(activeChildLimit)) {
+        contextMethods.collapser.setActiveChildrenLimit(activeChildLimit);
+      }
 
       areAllItemsExpandedWorker.addEventListener('message', this.handleAllItemsExpandedWorkerMessage);
     }
@@ -172,6 +182,11 @@ export const collapserWrapper = (WrappedComponent) => {
       */
       addToNodeTargetArray(collapserId, rootNodeId, true);
       expandCollapseAll(areAllItemsExpanded, selectors.allChildItemIds(), rootNodeId);
+
+      if (contextMethods.collapser) {
+        contextMethods.collapser.addSelfToActiveSiblings(this.props, this.state);
+      }
+
       this.initiateTreeStateCheck();
     };
 
@@ -196,7 +211,12 @@ export const collapserWrapper = (WrappedComponent) => {
       this.setExpandedState(this.props);
     }
 
+    isActiveSibling = () => this.props.contextMethods.collapser.checkIfActiveSibling(this.props);
+
+    noActiveSiblings = () => this.props.contextMethods.collapser.noActiveSiblings(this.props);
+
     render() {
+      // console.log('collapser render id, props.contextProps', this.props.collapserId, this.props.contextProps);
       const {
         expandCollapseAll,
         rootNodeId,
@@ -207,6 +227,8 @@ export const collapserWrapper = (WrappedComponent) => {
       return (
         <WrappedComponentRef
           {...other}
+          isActiveSibling={this.isActiveSibling(this.props)}
+          noActiveSiblings={this.noActiveSiblings(this.props)}
           ref={this.elem}
           expandCollapseAll={this.expandCollapseAll}
           areAllItemsExpanded={areAllItemsExpanded}

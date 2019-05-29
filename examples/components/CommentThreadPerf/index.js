@@ -52,12 +52,6 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
     }
   }
 
-  generateChildData = (count, depth) => generateCommentThreadData(
-    this.props,
-    count,
-    depth,
-  );
-
   addChildren = (children, insertChildAtIndex = null) => state => ({
     ...state,
     count: state.count + children.length,
@@ -102,6 +96,12 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
 
   setInactiveChildRegistry = [];
 
+  generateChildData = (count, depth) => generateCommentThreadData(
+    this.props,
+    count,
+    depth,
+  );
+
   registerSetChildInactive = setChildInactive => (
     this.setInactiveChildRegistry.push(setChildInactive)
   );
@@ -115,6 +115,9 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
 
   render() {
     const {
+      activeChildLimit,
+      isActiveSibling,
+      noActiveSiblings,
       areAllItemsExpanded,
       children,
       childIsOpenedInit,
@@ -139,15 +142,17 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
 
     const idStr = collapserId.toString();
     const newTitle = ` Collapser ${idStr} -- ${title || 'row: 0 - node: 0'}`;
+    const className = isActiveSibling ? styles.expanded : noActiveSiblings ? styles.noActive : '';
     return (
       <div
-        className={`${styles.commentThread} ${(!threadActive || isRootNode) || styles.expanded}`}
+        className={`${styles.commentThread} ${className}`}
         ref={collapserRef}
-        style={{ ...style, zIndex: `${0 - branch}`, order: `${branch}` }}
+        style={{ ...style, zIndex: `${0 - branch}` }}
       >
         <ExpandButton
           isOpened={areAllItemsExpanded}
           onClick={this.handleOnClick}
+          style={{ order: -5 }}
           title={newTitle}
         />
         <CommentWithButtons
@@ -161,6 +166,7 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
         {
           localChildren.map(childNodeData => (
             <WrappedCommentThread
+              activeChildLimit={activeChildLimit}
               isOpenedInit={childIsOpenedInit}
               childIsOpenedInit={childIsOpenedInit}
               getParentThreadActive={this.getThreadActive}

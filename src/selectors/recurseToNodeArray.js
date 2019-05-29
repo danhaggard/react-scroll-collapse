@@ -1,19 +1,5 @@
 import { getNextIdFactory } from '../utils/selectorUtils';
-
-
-const isInArray = (toCheck, arr, toCheckGetter, arrItemGetter) => {
-  let len = arr.length;
-  let found = false;
-  while (len) {
-    len -= 1;
-    const item = arr[len];
-    if (arrItemGetter(item) === toCheckGetter(toCheck)) {
-      found = true;
-      break;
-    }
-  }
-  return found;
-};
+import { isInArray } from '../utils/arrayUtils';
 
 /*
   burn this with fire.

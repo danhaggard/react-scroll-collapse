@@ -9,20 +9,6 @@ export const whyUpdate = (state, nextState, component, id, checkAgainst = []) =>
   });
 };
 
-export const compareIntArrays = (arr1, arr2) => {
-  let len = arr1.length;
-  if (len !== arr2.length) {
-    return false;
-  }
-  while (len) {
-    len -= 1;
-    if (arr1[len] !== arr2[len]) {
-      return false;
-    }
-  }
-  return true;
-};
-
 export const shouldLogProvider = (props, state, id, log) => {
   if (!Object.keys(props).includes('isOpenedInit')) {
     console.log(log, id, props, state); // eslint-disable-line

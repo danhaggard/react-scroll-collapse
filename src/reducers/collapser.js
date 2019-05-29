@@ -5,12 +5,14 @@ import {
   ADD_ITEM,
   REMOVE_ITEM,
   REMOVE_COLLAPSER,
-  SET_ACTIVE_CHILDREN,
+  ADD_ACTIVE_CHILDREN,
+  REMOVE_ACTIVE_CHILDREN,
   SET_ACTIVE_CHILDREN_LIMIT,
   SET_TREE_ID,
 } from '../actions/const';
 
 import { getOrObject, isUndefNull } from '../utils/selectorUtils';
+import { addShiftArray, dedupeArraysByFilter } from '../utils/arrayUtils';
 
 import {
   addToState,
@@ -35,18 +37,29 @@ import {
   arbitrarily deep in other components in the DOM.
 */
 
-export const activeChildrenReducer = (state = [], action) => {
-  const { collapserId, childCollapserId } = getOrObject(action, 'payload');
+export const activeChildrenLimitReducer = (state = Infinity, action) => {
+  const { activeChildrenLimit } = getOrObject(action, 'payload');
   switch (action.type) {
-    case ADD_COLLAPSER:
-      return !isUndefNull(childCollapserId) ? [...state, childCollapserId] : state;
-    case REMOVE_COLLAPSER:
-      return state.filter(val => val !== collapserId);
+    case SET_ACTIVE_CHILDREN_LIMIT:
+      return activeChildrenLimit;
     default:
       return state;
   }
 };
 
+export const activeChildrenReducer = (state = [], action) => {
+  const { activeChildrenToAdd, activeChildrenToRemove, activeChildrenLimit } = getOrObject(action, 'payload');
+  switch (action.type) {
+    case ADD_ACTIVE_CHILDREN:
+      return addShiftArray(state, activeChildrenToAdd, activeChildrenLimit);
+    case REMOVE_ACTIVE_CHILDREN:
+      return dedupeArraysByFilter(state, activeChildrenToRemove);
+    case SET_ACTIVE_CHILDREN_LIMIT:
+      return addShiftArray(state, [], activeChildrenLimit);
+    default:
+      return state;
+  }
+};
 
 
 // handles the id attr for collapsers.
@@ -99,6 +112,8 @@ export const itemsIdArray = (state = [], action) => {
 };
 
 export const collapserReducer = combineReducers({
+  activeChildren: activeChildrenReducer,
+  activeChildrenLimit: activeChildrenLimitReducer,
   collapsers: collapsersIdArray,
   id: collapserIdReducer,
   items: itemsIdArray,
@@ -127,6 +142,9 @@ export const collapsersReducer = (state = {}, action) => {
     case ADD_ITEM:
     case REMOVE_ITEM:
     case SET_TREE_ID:
+    case ADD_ACTIVE_CHILDREN:
+    case REMOVE_ACTIVE_CHILDREN:
+    case SET_ACTIVE_CHILDREN_LIMIT:
       return updateState(state, action, collapserId, collapserReducer);
     default:
       return state;

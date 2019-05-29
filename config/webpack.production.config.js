@@ -1,4 +1,6 @@
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const baseConfig = require('./webpack.base.config');
+
 
 module.exports = (opts) => {
   const { DEVELOPMENT, DIST_PATH, SRC_PATH } = opts;
@@ -68,6 +70,11 @@ module.exports = (opts) => {
         jsLoader,
         cssLoader,
       ]
+    },
+    optimization: {
+      minimizer: [new UglifyJsPlugin({
+        parallel: 4,
+      })],
     },
     output: {
       path: DIST_PATH,

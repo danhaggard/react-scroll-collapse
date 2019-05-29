@@ -19,8 +19,8 @@ const OPTIONS = {
   DIST_PATH: path.join(__dirname, 'dist'),
   EXAMPLES_PATH,
   SRC_PATH: path.join(__dirname, 'src'),
-  DEVELOPMENT: process.env.NODE_ENV === 'development',
-  PRODUCTION: process.env.NODE_ENV === 'production',
+  DEVELOPMENT: process.env.NODE_ENV === ('development' || 'hot'),
+  PRODUCTION: process.env.NODE_ENV === ('production' || 'ghPages'),
   TEST: process.env.NODE_ENV === 'test',
 };
 

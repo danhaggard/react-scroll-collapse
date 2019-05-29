@@ -1,9 +1,10 @@
 import {
-  getOrNull,
   compose,
   curryCompose,
   everyReducer,
   getOrArray,
+  getOrDefault,
+  getOrNull,
   passArgsToIteratorEvery,
 } from '../utils/selectorUtils';
 import { getEntitiesRoot } from './common';
@@ -37,7 +38,6 @@ export const getCollapserCollapsersRoot = curryCompose(getCollapserCollapsers, g
 // --- collapser.items: => array
 const getCollapserItems = collapserObject => getOrArray(collapserObject, 'items');
 
-
 // rootState => id => collapserItemsArray
 const getCollapserItemsRoot = curryCompose(getCollapserItems, getCollapserRoot);
 
@@ -45,6 +45,30 @@ const getCollapserItemsRoot = curryCompose(getCollapserItems, getCollapserRoot);
 const getCollapserTreeId = collapserObject => getOrNull(collapserObject, 'treeId');
 
 export const getCollapserTreeIdRoot = curryCompose(getCollapserTreeId, getCollapserRoot);
+
+// --- collapser.activeChildren: => array
+const getCollapserActiveChildren = collapserObject => getOrArray(collapserObject, 'activeChildren');
+
+// rootState, id => collapserActiveChildren
+export const getCollapserActiveChildrenRoot = curryCompose(
+  getCollapserActiveChildren,
+  getCollapserRoot
+);
+
+// --- collapser.activeChildrenLimit: => number
+const getCollapserActiveChildrenLimit = collapserObject => getOrDefault(Infinity)(
+  collapserObject,
+  'activeChildrenLimit'
+);
+
+// rootState => id => collapserActiveChildrenLimit
+export const getCollapserActiveChildrenLimitRoot = curryCompose(
+  getCollapserActiveChildrenLimit,
+  getCollapserRoot
+);
+
+
+// getOrDefault
 
 // rootState => id => true / false
 const collapserItemsExpandedRootEvery = passArgsToIteratorEvery(

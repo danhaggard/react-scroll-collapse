@@ -5,7 +5,11 @@ import React, { PureComponent } from 'react';
 
 import providerIdStore from './providerCounter';
 import { getIdKey } from './providerKeyManager';
-import { mergeContextWithPropsConsumerFactory } from '../utils/contextUtils';
+import {
+  defaultMergeContextWithProps,
+  defaultContextRendererFactory,
+  mergeContextWithPropsConsumerFactory
+} from '../utils/contextUtils';
 
 /*
   registerConsumer
@@ -28,8 +32,14 @@ import { mergeContextWithPropsConsumerFactory } from '../utils/contextUtils';
 const registerConsumerFactory = consumerFactory => (
   Context,
   Comp,
-  typeKey
+  typeKey,
+  providerRenderContext = {}
 ) => {
+  const { contextRenderer, mergeContextWithProps } = {
+    contextRenderer: defaultContextRendererFactory,
+    mergeContextWithProps: defaultMergeContextWithProps,
+    ...providerRenderContext
+  };
 
   class Registry extends PureComponent {
 
@@ -53,7 +63,7 @@ const registerConsumerFactory = consumerFactory => (
     customName: 'Registry'
   };
 
-  return consumerFactory(Context, Registry);
+  return consumerFactory(Context, Registry, mergeContextWithProps, contextRenderer);
 };
 
 /*

@@ -1,9 +1,22 @@
 /* eslint-disable max-len */
-
 import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
+
+import shallowEqual from 'react-pure-render/shallowEqual';
 import registerConsumer from './registerConsumer';
 import { getIdKey, getParentIdKey } from './providerKeyManager';
 import { isUndefNull } from '../utils/selectorUtils';
+import { ofObjectTypeOrNothing } from '../utils/propTypeHelpers';
+
+
+const extendClass = (subClassFactory, SuperClass) => {
+  if (typeof subClassFactory !== 'function') {
+    return SuperClass;
+  }
+  return subClassFactory(SuperClass);
+};
+
+
 /*
   createProvider
 
@@ -29,15 +42,27 @@ import { isUndefNull } from '../utils/selectorUtils';
    wrapped component - but don't need anything passed deeper into the content.
 */
 
+/*
+constructor(props, context) {
+  super(props, context);
+  console.log('Find parent class methods?', this.setNextContextProps);
+
+  this.prevContextProps = {};
+  this.nextContextProps = this.prevContextProps;
+  this.compareContextProps = () => shallowEqual(this.prevContextProps, this.nextContextProps);
+  this.setNextContextProps = () => (this.nextContextProps = this.prevContextProps);
+}
+*/
+
 const createProvider = (
   typeKey,
   parentTypeKeys = [],
   childTypeKeys = [],
-  Base = PureComponent,
+  subClassFactory = {},
   wrapper = null,
 ) => (Context, Comp) => {
   const Wrapped = wrapper ? wrapper(Comp) : Comp;
-  class Provider extends Base {
+  class Provider extends PureComponent {
 
     /*
       To ensure all nodes get access to parent context while getting an
@@ -103,7 +128,18 @@ const createProvider = (
 
     id = this.props[this.idKey];
 
-    mapParentIds = (props) => {
+    defaultContextProps = {};
+
+    prevContextProps = this.defaultContextProps;
+
+    nextContextProps = this.prevContextProps;
+
+    constructor(props, context) {
+      super(props, context);
+      this.setChildContext();
+    }
+
+    mapParentIds = (props) => { // eslint-disable-line react/sort-comp
       const parentIdObj = {};
 
       // Adds its own id as a parent.
@@ -138,9 +174,9 @@ const createProvider = (
       return rootNodes;
     }
 
-    mergedContextMethods = this.props.contextMethods
+    setMergedContextMethods = () => (this.mergedContextMethods = this.props.contextMethods
       ? { ...this.props.contextMethods, ...this.contextMethods }
-      : this.contextMethods;
+      : this.contextMethods);
 
     /*
       childContext  - create the context to be inserted into the context
@@ -156,11 +192,16 @@ const createProvider = (
       inherited from Base.  Need to revist this.
     */
 
-    childContext = {
-      ...this.mapParentIds(this.props),
-      contextMethods: this.mergedContextMethods,
-      rootNodes: this.getRootNodes(),
-    }
+
+    setChildContext = () => {
+      this.setMergedContextMethods();
+      this.childContext = {
+        ...this.mapParentIds(this.props),
+        contextMethods: this.mergedContextMethods,
+        contextProps: this.nextContextProps,
+        rootNodes: this.getRootNodes(),
+      };
+    };
 
     getProps = () => ({
       isRootNode: this.checkIfRoot(),
@@ -168,9 +209,22 @@ const createProvider = (
       ...this.props,
       ...this.state,
       contextMethods: this.mergedContextMethods,
-    })
+    });
+
+    compareContextProps = () => shallowEqual(this.prevContextProps, this.nextContextProps);
+
+    setNextContextProps = () => (this.nextContextProps = this.prevContextProps);
+
+    updateChildContext = () => {
+      if (this.props.collapserId === 0) {
+      //  debugger;
+      }
+      this.setNextContextProps();
+      this.childContext.contextProps = this.nextContextProps;
+    }
 
     render() {
+      this.updateChildContext();
       return childTypeKeys.length === 0 ? <Comp {...this.getProps()} /> : (
         <Context.Provider value={this.childContext}>
           <Wrapped
@@ -183,15 +237,27 @@ const createProvider = (
 
   }
 
+  Provider.defaultProps = {
+    contextMethods: null,
+    rootNodes: null,
+  };
+
+  Provider.propTypes = {
+    contextMethods: ofObjectTypeOrNothing,
+    rootNodes: ofObjectTypeOrNothing,
+  };
+
   Provider.whyDidYouRender = {
     logOnDifferentValues: false,
     customName: 'Provider'
   };
 
+  const ExtendedProvider = extendClass(subClassFactory, Provider);
+
   /*
     This provider might itself be a child - so we must register it.
   */
-  return registerConsumer(Context, Provider, typeKey);
+  return registerConsumer(Context, ExtendedProvider, typeKey, { ...subClassFactory.renderContext });
 };
 
 
