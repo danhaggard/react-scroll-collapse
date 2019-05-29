@@ -5,6 +5,8 @@ import {
   ADD_ITEM,
   REMOVE_ITEM,
   REMOVE_COLLAPSER,
+  SET_ACTIVE_CHILDREN,
+  SET_ACTIVE_CHILDREN_LIMIT,
   SET_TREE_ID,
 } from '../actions/const';
 
@@ -32,6 +34,20 @@ import {
   included can't be immediate children of other collapsers - but again can be nested
   arbitrarily deep in other components in the DOM.
 */
+
+export const activeChildrenReducer = (state = [], action) => {
+  const { collapserId, childCollapserId } = getOrObject(action, 'payload');
+  switch (action.type) {
+    case ADD_COLLAPSER:
+      return !isUndefNull(childCollapserId) ? [...state, childCollapserId] : state;
+    case REMOVE_COLLAPSER:
+      return state.filter(val => val !== collapserId);
+    default:
+      return state;
+  }
+};
+
+
 
 // handles the id attr for collapsers.
 export const collapserIdReducer = (state = null, action) => {
