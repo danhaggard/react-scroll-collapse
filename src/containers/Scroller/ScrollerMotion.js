@@ -1,10 +1,11 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 
-import { Motion, spring } from 'react-motion';
+import { Motion, presets, spring } from 'react-motion';
 import Scroller from '../../components/Scroller';
 
 import { ofFuncTypeOrNothing, ofNumberTypeOrNothing, ofObjectTypeOrNothing } from '../../utils/propTypeHelpers';
+import { DEFAULT_MOTION_SPRING } from '../../const';
 
 
 const scrollerMotionWrapper = (ScrollerComponent) => {
@@ -20,7 +21,8 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
   */
   class ScrollerMotion extends PureComponent {
 
-    defaultSpringConfig = { stiffness: 170, damping: 20 };
+    // defaultSpringConfig = { stiffness: 170, damping: 20 };
+    defaultSpringConfig = DEFAULT_MOTION_SPRING;
 
     prevY = null;
 

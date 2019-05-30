@@ -170,7 +170,7 @@ export const collapserWrapper = (WrappedComponent) => {
         configurability.
       */
       if (contextMethods.scroller) {
-        contextMethods.scroller.scrollToTop(this.elem.current);
+        // contextMethods.scroller.scrollToTop(this.elem.current);
       }
       /*
         Adding the current collapserId to the targetNodes - tells the
@@ -216,7 +216,6 @@ export const collapserWrapper = (WrappedComponent) => {
     noActiveSiblings = () => this.props.contextMethods.collapser.noActiveSiblings(this.props);
 
     render() {
-      debugger;
       // console.log('collapser render id, props.contextProps', this.props.collapserId, this.props.contextProps);
       const {
         expandCollapseAll,

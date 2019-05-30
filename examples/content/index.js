@@ -9,6 +9,7 @@ import SimpleComment from '../components/SimpleComment';
 import CommentThread from '../components/CommentThreadFun';
 import CommentThreadPerf from '../components/CommentThreadPerf';
 import CommentThreadOrig from '../components/CommentThread';
+import CommentThreadFlex from '../components/CommentThreadFlex';
 
 import Example from '../components/Example';
 
@@ -142,9 +143,9 @@ export const generateCommentThreadData = (
 
 const generateThreadConfig = {
   minChildren: 2,
-  minDepth: 4,
-  maxChildren: 3,
-  maxDepth: 4,
+  minDepth: 2,
+  maxChildren: 2,
+  maxDepth: 2,
 };
 
 const generateThreadConfigChild = {
@@ -179,6 +180,23 @@ const example10 = (
     </Scroller>
   </Example>
 );
+
+
+const example11 = (
+  <Example {...COPY[6]} style={{}} key={5}>
+    <Scroller style={{ height: '100%' }}>
+      <CommentThreadFlex
+        key={someData.key}
+        isOpenedInit={false}
+        childIsOpenedInit={false}
+        nodeData={someData}
+        activeChildLimit={1}
+        {...generateThreadConfigChild}
+        />
+    </Scroller>
+  </Example>
+);
+
 /*
 const examples = {
   0: [example0],
@@ -191,7 +209,7 @@ const examples = {
 
 
 const examples = {
-  0: example9,
+  0: example11,
 };
 
 export default examples;
