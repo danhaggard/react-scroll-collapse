@@ -1,6 +1,6 @@
 import { COLLAPSERS, SCROLLERS } from '../constants';
-import createProvider from '../createProvider';
-import ScrollerContext from '../ScrollerContext';
+import createProvider from '../providerFactories/createProvider';
+import { ScrollerContext } from '../contextManagers';
 
 const scrollerProvider = createProvider(
   SCROLLERS,

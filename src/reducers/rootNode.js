@@ -3,8 +3,6 @@ import { combineReducers } from 'redux';
 import {
   ADD_COLLAPSER,
   ADD_TO_NODE_TARGET_ARRAY,
-  EXPAND_COLLAPSE_ALL,
-  EXPAND_COLLAPSE,
   REMOVE_COLLAPSER,
   TOGGLE_CHECK_TREE_STATE,
   ADD_TO_UNMOUNT_ARRAY,
@@ -58,8 +56,6 @@ export const unmountArrayReducer = (state = [], action) => {
 
 export const checkTreeStateReducer = (state = false, action) => {
   switch (action.type) {
-    // case EXPAND_COLLAPSE_ALL:
-    // case EXPAND_COLLAPSE:
     case TOGGLE_CHECK_TREE_STATE:
       return !state;
     default:
@@ -88,8 +84,6 @@ export const rootNodesReducer = (state = {}, action) => {
       }
       return state;
     case ADD_TO_NODE_TARGET_ARRAY:
-    case EXPAND_COLLAPSE_ALL:
-    case EXPAND_COLLAPSE:
     case TOGGLE_CHECK_TREE_STATE:
     case ADD_TO_UNMOUNT_ARRAY:
     case REMOVE_FROM_UNMOUNT_ARRAY:

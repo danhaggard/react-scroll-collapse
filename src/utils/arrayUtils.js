@@ -1,4 +1,3 @@
-import hasOwnProperty from './hasOwnProperty';
 /*
   Keep the most recent, rightmost members of arr1 - add the members of arr2
   to the right.
@@ -55,7 +54,6 @@ export const compareIntArrays = (arr1, arr2) => {
   if (len === arr2.length === 0) {
     return true;
   }
-
   while (len) {
     len -= 1;
     if (arr1[len] !== arr2[len]) {
@@ -65,59 +63,31 @@ export const compareIntArrays = (arr1, arr2) => {
   return true;
 };
 
-/*
-const createCompareCondition = defaultCondition => condition => (objB, objA) => key => (
-  !hasOwnProperty(objB, key) || !condition(objB[key], objA[key], defaultCondition)
+export const insertArrayAtIndex = (arr1, arr2, index = null) => {
+  if (index === 0 || index === null) {
+    return [...arr2, ...arr1];
+  }
+  if (index >= arr1.length) {
+    return [...arr1, ...arr2];
+  }
+  return [...arr1.slice(0, index), ...arr2, ...arr1.slice(index, -1)];
+};
+
+// The Array.apply trick used here I learnt from: http://stackoverflow.com/a/20066663/1914452
+export const arrayFromNumber = number => [...Array(number).keys()];
+
+export const doFromNumber = method => (number, callBack) => (
+  arrayFromNumber(number)[method](n => callBack(n))
 );
-*/
 
-const createCompareCondition = (defaultCondition) => {
-  return (condition) => {
-    return (objB, objA) => (key) => {
-      const a = !hasOwnProperty(objB, key);
-      const b = !condition(objB[key], objA[key], defaultCondition);
-      return (a || b);
-    };
-  };
+export const mapFromNumber = doFromNumber('map');
+
+export const forEachNumber = doFromNumber('forEach');
+
+// find the maximum of the array and add one to it. zero index.
+export const getNextIdFromArr = arr => (arr.length < 1 ? 0 : Math.max(...arr) + 1);
+
+export const getNextIdFromObj = (obj) => {
+  const keys = Object.keys(obj);
+  return getNextIdFromArr(keys);
 };
-
-const objKeyValShallowEquals = (valA, valB) => (valA === valB);
-
-const defaultCondition = createCompareCondition(objKeyValShallowEquals);
-
-const checkArrayCondition = (valA, valB, condition) => {
-  if (Array.isArray(valA) && Array.isArray(valB)) {
-    return compareIntArrays(valA, valB);
-  }
-  return condition(valA, valB);
-};
-
-export const shallowEqualExcept = (
-  condition = defaultCondition(objKeyValShallowEquals)
-) => (objA, objB) => {
-
-  if (objA === objB) {
-    return true;
-  }
-
-  if (typeof objA !== 'object' || objA === null || typeof objB !== 'object' || objB === null) {
-    return false;
-  }
-
-  const keysA = Object.keys(objA);
-  const keysB = Object.keys(objB);
-
-  if (keysA.length !== keysB.length) {
-    return false;
-  }
-
-  const finalCondition = condition(objA, objB);
-
-  // Test for A's keys different from B.
-  return !Object.keys(objA).some(key => finalCondition(key));
-
-};
-
-const arrayCondition = defaultCondition(checkArrayCondition);
-
-export const shallowEqualExceptArray = shallowEqualExcept(arrayCondition);

@@ -7,7 +7,7 @@ import ExpandButton from '../ExpandButton';
 
 import { collapserController } from '../../../src';
 import { ofNumberTypeOrNothing, ofBoolTypeOrNothing, ofChildrenType } from '../../../src/utils/propTypeHelpers';
-import { genRandText, getRandomInt } from '../../utils';
+import { getRandomInt, getRandomTextWithDefaults } from '../../../src/utils/randomUtils';
 
 
 class GetNested extends PureComponent {
@@ -71,7 +71,7 @@ GetNested.propTypes = {
 
 class CommentThread extends PureComponent { // eslint-disable-line react/no-multi-comp
 
-  randText = genRandText();
+  randText = getRandomTextWithDefaults();
 
   animations = {
     // 0: 'animate-linear',

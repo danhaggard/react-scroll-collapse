@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
-import createCache from '../caching/recursionCache';
-import providerCaches from '../caching/providerCaches';
-import providerWorkers from '../caching/providerWorkers';
+import createCache from '../../../caching/recursionCache';
+import providerCaches from '../../../caching/providerCaches';
+import providerWorkers from '../../../caching/providerWorkers';
 
 const getRootNodeId = ({
   collapserId,

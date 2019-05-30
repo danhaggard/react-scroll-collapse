@@ -4,8 +4,6 @@
   border: 1px solid #AAA;
   border-radius: 6px;
   background: linear-gradient(225deg, #ddffab, #abe4ff, #d9abff);
-  // background-size: 300% 300%;
-  // background: linear-gradient(225deg, #ffabab, #ffdaab, #ddffab, #abe4ff, #d9abff);
   display: flex;
   flex-direction: row;
   flex: 1 1 15%;
@@ -15,10 +13,11 @@
   margin-right: 1em;
   padding: 1em;
   padding-top: 0.5em;
-  // font-size: 0.7rem;
-  transition: flex 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94), order 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  // transition: transform .4s ease-in-out, -webkit-transform .4s ease-in-out 0.5s;
-  will-change: transform, flex, order;
+  transition:
+    background 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    background-size 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    flex 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: background, background-size, transform, flex;
 
   &:last-child {
     margin-right: 0;
@@ -27,17 +26,23 @@
 
 :local(.noActive) {
   flex: 1 1 30%;
-  transition: flex 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94), order 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  will-change: transform, flex, order;
+  transition:
+    background 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    background-size 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    flex 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: background, background-size, transform, flex;
 }
 
 
 :local(.expanded) {
-  // order: -1;
-  flex: 1 0 60%;
-  transition: flex 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94), order 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  will-change: transform, flex, order;
-  // margin-top: 0.5em;
+  background: linear-gradient(225deg, #ffabab, #ffdaab, #ddffab, #abe4ff, #d9abff);
+  background-size: 300% 300%;
+  flex: 1 0 75%;
+  transition:
+    background 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    background-size 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    flex 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: background, background-size, transform, flex;
 }
 
 /*
@@ -51,15 +56,3 @@
   }
 }
 */
-
-:local(.wrapper) {
-  display: flex;
-  flex-direction: row;
-  flex: 1 1 30%;
-  flex-wrap: wrap;
-  justify-content: space-around;
-}
-
-:local(.blah) {
-  width: calc(100% - 1em);
-}

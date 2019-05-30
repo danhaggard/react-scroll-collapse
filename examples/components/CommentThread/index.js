@@ -6,7 +6,7 @@ import CommentWithButtons from '../Comment/CommentWithButtons';
 import { CollapserExpandButton } from '../ExpandButtonWrapped';
 import { collapserIdentity } from '../../../src';
 
-import { genRandText } from '../../utils';
+import { getRandomTextWithDefaults } from '../../../src/utils/randomUtils';
 
 
 const getNested = noOfChildThreads => (
@@ -22,7 +22,7 @@ const getNested = noOfChildThreads => (
 
 class CommentThread extends PureComponent {
 
-  randText = genRandText();
+  randText = getRandomTextWithDefaults();
 
   state = {
     childThreads: this.props.childThreads, // eslint-disable-line react/destructuring-assignment

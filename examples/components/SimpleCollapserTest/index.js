@@ -7,11 +7,11 @@ import CommentBody from '../CommentBody';
 import ExpandButton from '../ExpandButton';
 import SimpleComment from '../SimpleComment';
 import { collapserController } from '../../../src';
-import { genRandText } from '../../utils';
+import { getRandomTextWithDefaults } from '../../../src/utils/randomUtils';
 
 const createComment = key => ({
   key,
-  text: genRandText()
+  text: getRandomTextWithDefaults()
 });
 
 class SimpleCollapserFixed extends Component {

@@ -1,12 +1,11 @@
 /* eslint-disable max-len */
 import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
 
 import shallowEqual from 'react-pure-render/shallowEqual';
 import registerConsumer from './registerConsumer';
-import { getIdKey, getParentIdKey } from './providerKeyManager';
-import { isUndefNull } from '../utils/selectorUtils';
-import { ofObjectTypeOrNothing } from '../utils/propTypeHelpers';
+import { getIdKey, getParentIdKey } from '../utils/providerKeyManager';
+import { isUndefNull } from '../../utils/selectorUtils';
+import { ofObjectTypeOrNothing } from '../../utils/propTypeHelpers';
 
 
 const extendClass = (subClassFactory, SuperClass) => {
@@ -164,12 +163,9 @@ const createProvider = (
     checkIfRoot = () => !Object.keys(this.props).includes(this.parentIdKey)
       && childTypeKeys.length > 0;
 
-    getRootNodes = () => {
-      const rootNodes = {
-        ...this.props.rootNodes,
-      };
+    getRootNodes = ({ rootNodes }) => {
       if (this.checkIfRoot()) {
-        rootNodes[typeKey] = this.id;
+        return { ...rootNodes, [typeKey]: this.id };
       }
       return rootNodes;
     }
@@ -199,7 +195,7 @@ const createProvider = (
         ...this.mapParentIds(this.props),
         contextMethods: this.mergedContextMethods,
         contextProps: this.nextContextProps,
-        rootNodes: this.getRootNodes(),
+        rootNodes: this.getRootNodes(this.props),
       };
     };
 
@@ -216,9 +212,6 @@ const createProvider = (
     setNextContextProps = () => (this.nextContextProps = this.prevContextProps);
 
     updateChildContext = () => {
-      if (this.props.collapserId === 0) {
-      //  debugger;
-      }
       this.setNextContextProps();
       this.childContext.contextProps = this.nextContextProps;
     }

@@ -1,3 +1,15 @@
+/*
+  No longer in use!
+
+  providerCacheFactory:
+    Used to create cached selector functions - as an alternative model to
+    using the mapStateToProps factory functions when generating individual
+    selector instances per component instance.
+
+    Has specific functions for reselect memoized selectors which I moved
+    away from using - but this might come in handy again.
+*/
+
 import { COLLAPSERS, ITEMS, SCROLLERS } from '../contextProviders/constants';
 
 const wrapSelectorFactory = (selectorFactory, propKey) => (id) => {

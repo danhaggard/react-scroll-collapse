@@ -1,10 +1,9 @@
 /* eslint-disable max-len */
 
-
 import React, { PureComponent } from 'react';
 
-import providerIdStore from './providerCounter';
-import { getIdKey } from './providerKeyManager';
+import providerIdStore from '../utils/providerCounter';
+import { getIdKey } from '../utils/providerKeyManager';
 import {
   defaultMergeContextWithProps,
   defaultContextRendererFactory,

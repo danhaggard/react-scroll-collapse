@@ -1,7 +1,6 @@
 import { COLLAPSERS, ITEMS, SCROLLERS } from '../constants';
-import createProvider from '../createProvider';
-import CollapserManager from '../CollapserManager';
-import CollapserContext from '../CollapserContext';
+import createProvider from '../providerFactories/createProvider';
+import { CollapserManager, CollapserContext } from '../contextManagers';
 
 const collapserProvider = createProvider(
   COLLAPSERS, // your provider type

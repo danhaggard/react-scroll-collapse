@@ -12,7 +12,9 @@ import CommentThreadOrig from '../components/CommentThread';
 
 import Example from '../components/Example';
 
-import { generateCommentThreadData, genRandText } from '../utils';
+import { getRandomTextWithDefaults } from '../../src/utils/randomUtils';
+
+import { generateCommentThreadData } from '../../src/utils/randomContentGenerators';
 
 const COPY = {
   0: {
@@ -90,11 +92,11 @@ const example4 = key => (
 const example5 = (
   <Example {...COPY[5]} style={{ marginBottom: '3em' }} key={5}>
     <EvenSimplerCollapser>
-      <SimpleComment text={genRandText()} />
+      <SimpleComment text={getRandomTextWithDefaults()} />
     </EvenSimplerCollapser>
     <EvenSimplerCollapser>
-      <SimpleComment text={genRandText()} />
-      <SimpleComment text={genRandText()} />
+      <SimpleComment text={getRandomTextWithDefaults()} />
+      <SimpleComment text={getRandomTextWithDefaults()} />
     </EvenSimplerCollapser>
   </Example>
 );
@@ -107,17 +109,14 @@ const example6 = (
     </Scroller>
   </Example>
 );
+
 const example7 = (
   <Example {...COPY[5]} style={{ marginBottom: '3em' }} key={5}>
     <CommentThread depth={0} childNodes={2}>
       <EvenSimplerCollapser>
-      <EvenSimplerCollapser>
+        <EvenSimplerCollapser />
       </EvenSimplerCollapser>
-      </EvenSimplerCollapser>
-
-      <EvenSimplerCollapser>
-
-      </EvenSimplerCollapser>
+      <EvenSimplerCollapser />
     </CommentThread>
   </Example>
 );
@@ -143,9 +142,9 @@ export const generateCommentThreadData = (
 
 const generateThreadConfig = {
   minChildren: 2,
-  minDepth: 3,
-  maxChildren: 5,
-  maxDepth: 5,
+  minDepth: 4,
+  maxChildren: 3,
+  maxDepth: 4,
 };
 
 const generateThreadConfigChild = {

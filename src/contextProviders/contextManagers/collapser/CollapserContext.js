@@ -1,13 +1,10 @@
 /* eslint-disable react/no-unused-state */
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import shallowEqual from 'react-pure-render/shallowEqual';
-
 import { connect } from 'react-redux';
-import { collapserContextActions } from '../actions';
-import { ofNumberTypeOrNothing, ofObjectTypeOrNothing } from '../utils/propTypeHelpers';
-import { getCollapserActiveChildrenRoot, getCollapserActiveChildrenLimitRoot } from '../selectors/collapser';
-import { shallowEqualExceptArray } from '../utils/arrayUtils';
+import { collapserContextActions } from '../../../actions';
+import { getCollapserActiveChildrenRoot, getCollapserActiveChildrenLimitRoot } from '../../../selectors/collapser';
+import { shallowEqualExceptArray } from '../../../utils/equalityUtils';
 
 const collapserContext = (Base) => {
 
@@ -19,20 +16,8 @@ const collapserContext = (Base) => {
       this.setChildContext();
     }
 
-    getNextContextProps1 = () => {
-      const { selectors: { activeChildren, activeChildrenLimit } } = this.props;
-      const newContextProps = {
-        activeChildren: activeChildren(),
-        activeChildrenLimit: activeChildrenLimit()
-      };
-      return newContextProps;
-    }
-
     getNextContextProps = () => {
-      const {
-        activeChildren,
-        activeChildrenLimit,
-      } = this.props;
+      const { activeChildren, activeChildrenLimit } = this.props;
       const newContextProps = {
         activeSiblings: activeChildren,
         activeSiblingLimit: activeChildrenLimit,
@@ -111,16 +96,6 @@ const collapserContext = (Base) => {
     customName: 'CollapserContext'
   };
 
-  const mapStateToPropsFactory2 = () => {
-    const selectors = {};
-    return (state, props) => {
-      const { collapserId } = props;
-      selectors.activeChildren = () => getCollapserActiveChildrenRoot(state)(collapserId);
-      selectors.activeChildrenLimit = () => getCollapserActiveChildrenLimitRoot(state)(collapserId);
-      return { selectors };
-    };
-  };
-
   const mapStateToPropsFactory = () => (state, props) => {
     const { collapserId } = props;
     const activeChildren = getCollapserActiveChildrenRoot(state)(collapserId);
@@ -146,11 +121,10 @@ const mergeContextWithProps = (props, context) => ({
 
 const contextRenderer = (Context, Comp, mergeContextProps) => {
 
-  class ContextRender extends React.Component {
+  class ContextRender extends Component {
 
     shouldComponentUpdate(props) {
       const checked = this.equalCheck(props, shallowEqualExceptArray);
-      // const checked = this.equalCheck(props, shallowEquals);
 
       return checked;
     }

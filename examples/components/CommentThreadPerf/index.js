@@ -1,28 +1,18 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import styles from './CommentThread.scss';
-// import styles from './Simple.scss';
+import cx from 'classnames';
 
 import CommentWithButtons from '../Comment/CommentWithButtons';
 import ExpandButton from '../ExpandButton';
-
 import { collapserController } from '../../../src';
 import { ofBoolTypeOrNothing, ofChildrenType, ofNumberTypeOrNothing } from '../../../src/utils/propTypeHelpers';
-
-import { generateCommentThreadData, getRandomInt } from '../../utils';
-
-const insertAtIndex = (arr1, arr2, index = null) => {
-  if (index === 0 || index === null) {
-    return [...arr2, ...arr1];
-  }
-  if (index >= arr1.length) {
-    return [...arr1, ...arr2];
-  }
-  return [...arr1.slice(0, index), ...arr2, ...arr1.slice(index, -1)];
-};
+import { getRandomInt } from '../../../src/utils/randomUtils';
+import { insertArrayAtIndex } from '../../../src/utils/arrayUtils';
+import { generateCommentThreadData } from '../../../src/utils/randomContentGenerators';
+import styles from './CommentThread.scss';
 
 
-class CommentThread extends PureComponent { // eslint-disable-line react/no-multi-comp
+class CommentThread extends PureComponent {
 
   state = (() => {
     const {
@@ -45,20 +35,6 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
     };
   })();
 
-  componentDidMount() {
-    const { registerSetChildInactive } = this.props;
-    if (typeof registerSetChildInactive === 'function') {
-      registerSetChildInactive(this.setThreadInactive);
-    }
-  }
-
-  addChildren = (children, insertChildAtIndex = null) => state => ({
-    ...state,
-    count: state.count + children.length,
-    localChildren: insertAtIndex(state.localChildren, children, insertChildAtIndex),
-    // localChildren: [...state.localChildren, ...children],
-  });
-
   removeChild = state => ({
     ...state,
     localChildren: state.localChildren.slice(0, -1),
@@ -76,25 +52,12 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
 
   removeThread = () => this.setState(this.removeChild);
 
-  handleOnClick = () => {
-    const { areAllItemsExpanded, expandCollapseAll, getParentThreadActive } = this.props;
-    const { threadActive } = this.state;
-    const parentThreadActive = getParentThreadActive();
-    this.setInactiveChildRegistry.forEach((setChildInactive) => {
-      if (typeof setChildInactive === 'function') {
-        setChildInactive();
-      }
-    });
-    if (threadActive !== !areAllItemsExpanded && !parentThreadActive) {
-      this.setState(() => ({ threadActive: !areAllItemsExpanded && !parentThreadActive }));
-    }
-    setTimeout(expandCollapseAll, 250);
-    // expandCollapseAll();
-  }
-
-  getThreadActive = () => this.state.threadActive;
-
-  setInactiveChildRegistry = [];
+  addChildren = (children, insertChildAtIndex = null) => state => ({
+    ...state,
+    count: state.count + children.length,
+    localChildren: insertArrayAtIndex(state.localChildren, children, insertChildAtIndex),
+    // localChildren: [...state.localChildren, ...children],
+  });
 
   generateChildData = (count, depth) => generateCommentThreadData(
     this.props,
@@ -102,22 +65,18 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
     depth,
   );
 
-  registerSetChildInactive = setChildInactive => (
-    this.setInactiveChildRegistry.push(setChildInactive)
-  );
+  appendTitle = (id, title) => ` Collapser ${id.toString()} -- ${title || 'row: 0 - node: 0'}`;
 
-  setThreadInactive = () => {
-    const { threadActive } = this.state;
-    if (threadActive) {
-      this.setState(() => ({ threadActive: false }));
+  getClassName = ({ isActiveSibling, noActiveSiblings }) => cx(
+    styles.commentThread, {
+      [styles.expanded]: isActiveSibling,
+      [styles.noActive]: noActiveSiblings,
     }
-  }
+  );
 
   render() {
     const {
       activeChildLimit,
-      isActiveSibling,
-      noActiveSiblings,
       areAllItemsExpanded,
       children,
       childIsOpenedInit,
@@ -136,24 +95,20 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
       branch,
       comment,
       localChildren,
-      threadActive,
       title
     } = this.state;
 
-    const idStr = collapserId.toString();
-    const newTitle = ` Collapser ${idStr} -- ${title || 'row: 0 - node: 0'}`;
-    const className = isActiveSibling ? styles.expanded : noActiveSiblings ? styles.noActive : '';
     return (
       <div
-        className={`${styles.commentThread} ${className}`}
+        className={this.getClassName(this.props)}
         ref={collapserRef}
         style={{ ...style, zIndex: `${0 - branch}` }}
       >
         <ExpandButton
           isOpened={areAllItemsExpanded}
-          onClick={this.handleOnClick}
+          onClick={expandCollapseAll}
           style={{ order: -5 }}
-          title={newTitle}
+          title={this.appendTitle(collapserId, title)}
         />
         <CommentWithButtons
           isOpenedInit={isOpenedInit}
@@ -169,8 +124,6 @@ class CommentThread extends PureComponent { // eslint-disable-line react/no-mult
               activeChildLimit={activeChildLimit}
               isOpenedInit={childIsOpenedInit}
               childIsOpenedInit={childIsOpenedInit}
-              getParentThreadActive={this.getThreadActive}
-              registerSetChildInactive={this.registerSetChildInactive}
               key={childNodeData.key}
               nodeData={childNodeData}
               {...{

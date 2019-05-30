@@ -1,5 +1,4 @@
-import hasOwnProperty from '../utils/hasOwnProperty';
-import { getNextIdFactory } from '../utils/selectorUtils';
+import { getNextIdFactory, hasOwnProperty } from '../../utils/selectorUtils';
 
 
 const createCounterStore = storeArg => (key) => {

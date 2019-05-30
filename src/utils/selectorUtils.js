@@ -17,6 +17,8 @@ export const getOrArray = (state, attr) => getOrDefault([])(state, attr);
 export const getOrNull = (state, attr) => getOrDefault()(state, attr);
 export const getOrObject = (state, attr) => getOrDefault({})(state, attr, {});
 
+// https://eslint.org/docs/rules/no-prototype-builtins
+export const hasOwnProperty = (obj, key) => Object.prototype.hasOwnProperty.call(obj, key);
 
 /*
   -------------------------- Reducers

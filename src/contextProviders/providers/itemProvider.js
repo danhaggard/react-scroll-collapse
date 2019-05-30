@@ -1,5 +1,5 @@
 import { COLLAPSERS, SCROLLERS, ITEMS } from '../constants';
-import createProvider from '../createProvider';
+import createProvider from '../providerFactories/createProvider';
 
 const itemProvider = createProvider(
   ITEMS,
