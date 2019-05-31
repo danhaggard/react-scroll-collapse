@@ -45,6 +45,7 @@ const registerConsumerFactory = consumerFactory => (
     id = providerIdStore(typeKey);
 
     render() {
+      debugger;
       const newProps = { ...this.props, [getIdKey(typeKey)]: this.id };
       return <Comp {...newProps} />;
     }

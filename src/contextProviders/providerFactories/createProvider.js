@@ -217,6 +217,7 @@ const createProvider = (
     }
 
     render() {
+      debugger;
       this.updateChildContext();
       return childTypeKeys.length === 0 ? <Comp {...this.getProps()} /> : (
         <Context.Provider value={this.childContext}>

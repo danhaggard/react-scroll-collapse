@@ -10,7 +10,7 @@ import { ofChildrenTypeOrNothing } from '../../../src/utils/propTypeHelpers';
 
 import { collapserItemController } from '../../../src';
 import styles from './Comment.scss';
-import { DEFAULT_MOTION_SPRING } from '../../../src/const';
+import { MOTION_SPRINGS, DEFAULT_MOTION_SPRING } from '../../../src/const';
 
 
 const Comment = (props) => {
@@ -27,7 +27,7 @@ const Comment = (props) => {
     <div className={styles.comment} ref={collapserItemRef}>
       <Collapse
         isOpened={isOpened}
-        springConfig={DEFAULT_MOTION_SPRING}
+        springConfig={MOTION_SPRINGS.fast}
       >
         <div className={styles.commentChildren}>
           <CommentBody text={text} />

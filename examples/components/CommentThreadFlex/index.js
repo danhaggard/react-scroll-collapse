@@ -78,12 +78,12 @@ class CommentThread extends PureComponent {
 
   getFlexBasis = ({ isActiveSibling, noActiveSiblings }) => {
     if (isActiveSibling) {
-      return 0.75;
+      return 0.65;
     }
     if (noActiveSiblings) {
       return 0.3;
     }
-    return 0.15;
+    return 0;
   }
 
   handleOnClick = () => setTimeout(this.props.expandCollapseAll, 0);

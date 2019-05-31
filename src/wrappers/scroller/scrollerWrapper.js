@@ -61,7 +61,9 @@ export const scrollerWrapper = (ScrollerComponent) => {
     customName: 'WrappedScroller'
   };
 
-  return connect(undefined, scrollerWrapperActions)(scrollerProvider(WrappedScroller));
+  return scrollerProvider(connect(undefined, scrollerWrapperActions)(WrappedScroller));
+
+  // return connect(undefined, scrollerWrapperActions)(scrollerProvider(WrappedScroller));
 };
 
 export default scrollerWrapper;

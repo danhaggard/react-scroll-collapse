@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Motion, presets, spring } from 'react-motion';
 import forwardRefWrapper from '../../utils/forwardRef';
-import { DEFAULT_MOTION_SPRING } from '../../const';
+import { MOTION_SPRINGS, DEFAULT_MOTION_SPRING } from '../../const';
 import { ofChildrenType, ofNumberStringTypeOrNothing } from '../../utils/propTypeHelpers';
 
 const FLEX_STYLE = {
@@ -23,7 +23,7 @@ class AnimatedFlexbox extends Component {
 
   // defaultSpringConfig = { stiffness: 170, damping: 20 };
 
-  defaultSpringConfig = DEFAULT_MOTION_SPRING;
+  defaultSpringConfig = MOTION_SPRINGS.slow;
 
   componentDidMount() {
     const { flexRef } = this.props;
@@ -84,7 +84,7 @@ class AnimatedFlexbox extends Component {
               style={{
                 ...FLEX_STYLE.parent,
                 ...style,
-                ...this.getInterpolFlexPercent(interpolatedStyle)
+                // ...this.getInterpolFlexPercent(interpolatedStyle)
               }}
             >
               { children }

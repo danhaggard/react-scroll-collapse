@@ -170,7 +170,7 @@ export const collapserWrapper = (WrappedComponent) => {
         configurability.
       */
       if (contextMethods.scroller) {
-        // contextMethods.scroller.scrollToTop(this.elem.current);
+        contextMethods.scroller.scrollToTop(this.elem.current);
       }
       /*
         Adding the current collapserId to the targetNodes - tells the
