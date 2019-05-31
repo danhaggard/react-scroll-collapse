@@ -86,8 +86,6 @@ class CommentThread extends PureComponent {
     return 0;
   }
 
-  handleOnClick = this.props.expandCollapseAll;
-
   render() {
     const {
       setActiveChildLimit,
@@ -96,13 +94,12 @@ class CommentThread extends PureComponent {
       childIsOpenedInit,
       expandCollapseAll,
       collapserRef,
-      collapserId,
+      _reactScrollCollapse: { id: collapserId },
       minChildren,
       minDepth,
       maxChildren,
       maxDepth,
       isOpenedInit,
-      isRootNode,
       style,
     } = this.props;
     const {
@@ -120,7 +117,7 @@ class CommentThread extends PureComponent {
       >
         <ExpandButton
           isOpened={areAllItemsExpanded}
-          onClick={this.handleOnClick}
+          onClick={expandCollapseAll}
           style={{ order: -5 }}
           title={this.appendTitle(collapserId, title)}
         />
@@ -169,12 +166,11 @@ CommentThread.defaultProps = {
 CommentThread.propTypes = {
   areAllItemsExpanded: ofBoolTypeOrNothing,
   children: ofChildrenType,
-  collapserId: PropTypes.number.isRequired,
+  // collapserId: PropTypes.number.isRequired,
   collapserRef: PropTypes.object.isRequired,
   expandCollapseAll: PropTypes.func.isRequired,
   getParentThreadActive: PropTypes.func,
   insertChildAtIndex: ofNumberTypeOrNothing,
-  isRootNode: PropTypes.bool.isRequired,
   nodeData: PropTypes.object.isRequired,
   maxChildren: PropTypes.number,
   maxDepth: PropTypes.number,

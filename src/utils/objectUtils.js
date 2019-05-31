@@ -19,6 +19,7 @@ export const setContextAttrs = (that) => {
         id, isRootNode, parents: {
           collapser: parentCollapserId, scroller: parentScrollerId
         },
+        methods,
         rootNodeId,
         rootNodes,
         type,
@@ -28,6 +29,7 @@ export const setContextAttrs = (that) => {
   addPropertiesToObject(that, {
     id,
     isRootNode,
+    methods,
     parentCollapserId,
     parentScrollerId,
     rootNodeId,

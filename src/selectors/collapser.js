@@ -120,7 +120,6 @@ export const nestedCollapserItemsExpandedRootEvery = (
     cache,
     getNodeChildrenMappedToTreeId,
   );
-
   return recurseToNodeArray({
     cache,
     getNodeChildrenMappedToTreeId,
@@ -133,7 +132,10 @@ export const nestedCollapserItemsExpandedRootEvery = (
   });
 };
 
-export const nestedCollapserItemsRoot = (state, { collapserId }) => recurseAllChildren(
+export const nestedCollapserItemsRoot = (
+  state,
+  { _reactScrollCollapse: { id: collapserId } }
+) => recurseAllChildren(
   id => getCollapserCollapsersRoot(state)(id),
   id => getCollapserItemsRoot(state)(id),
   (result, nextResult) => [...result, ...nextResult],

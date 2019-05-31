@@ -1,11 +1,11 @@
 /* eslint-disable max-len */
 import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
 
 import shallowEqual from 'react-pure-render/shallowEqual';
 import registerConsumer from './registerConsumer';
 import { getIdKey, getParentIdKey } from '../utils/providerKeyManager';
 import { isUndefNull } from '../../utils/selectorUtils';
-import { ofObjectTypeOrNothing } from '../../utils/propTypeHelpers';
 
 
 const extendClass = (subClassFactory, SuperClass) => {
@@ -123,10 +123,9 @@ const createProvider = (
 
     idKey = getIdKey(typeKey);
 
-    parentIdKey = getParentIdKey(typeKey);
+    typeKey = typeKey;
 
-    // id = this.props[this.idKey];
-    // id = providerIdStore(typeKey);
+    parentIdKey = getParentIdKey(typeKey);
 
     defaultContextProps = {};
 
@@ -141,26 +140,6 @@ const createProvider = (
 
     getId = () => this.props._reactScrollCollapse.id; // eslint_disable_line
 
-    // deprecating
-    mapParentIds = (props) => { // eslint-disable-line react/sort-comp
-      const parentIdObj = {};
-
-      // Adds its own id as a parent.
-      if (childTypeKeys.length > 0) {
-        parentIdObj[this.parentIdKey] = this.getId();
-      }
-
-      // Adds the other parent ids as asked for the be provider.
-      parentTypeKeys.forEach((key) => {
-        const parentIdKey = getParentIdKey(key);
-        if (!isUndefNull(props[parentIdKey])) {
-          parentIdObj[parentIdKey] = props[parentIdKey];
-        }
-      });
-      return parentIdObj;
-    };
-
-    // NEW
     getParentIdObj = (props) => {
       const parentIdObj = {};
 
@@ -183,8 +162,16 @@ const createProvider = (
       If it can't find it's own type as parent in props,
       but is a parent of something - then it is a root node.
     */
-    checkIfRoot = () => !Object.keys(this.props).includes(this.parentIdKey)
-      && childTypeKeys.length > 0;
+    checkIfRoot = () => {
+      const { _reactScrollCollapse: { parents } } = this.props;
+      if (typeof parents === 'undefined') {
+        return true;
+      }
+      if (typeof parents[typeKey] === 'undefined') {
+        return true;
+      }
+      return false;
+    };
 
     getRootNodes = ({ rootNodes }) => {
       if (this.checkIfRoot()) {
@@ -228,8 +215,7 @@ const createProvider = (
     setChildContext = () => {
       this.setMergedContextMethods();
       this.childContext = {
-        parents: this.getParentIdObj(this.props),
-        ...this.mapParentIds(this.props),
+        parents: this.getParentIdObj(this.props), // must stay
         contextMethods: this.mergedContextMethods,
         contextProps: this.nextContextProps,
         rootNodes: this.getRootNodes(this.props),
@@ -238,36 +224,20 @@ const createProvider = (
     };
 
     getProps = () => ({
-      isRootNode: this.checkIfRoot(),
-      [getIdKey(typeKey)]: this.getId(),
-      providerType: typeKey,
       ...this.props,
-      rootNodeId: this.childContext.rootNodeId,  // needs to replace rootnodeids of other provider types.
       ...this.state,
       contextMethods: this.mergedContextMethods,
       _reactScrollCollapse: {
         id: this.getId(),
         isRootNode: this.checkIfRoot(),
         parents: this.props._reactScrollCollapse.parents, // eslint-disable-line
-        // methods: this.getMergedContextMethods(this.props),
+        methods: this.mergedContextMethods,
         rootNodeId: this.childContext.rootNodeId,
         rootNodes: this.getRootNodes(this.props),
         type: typeKey,
       },
     });
 
-    /*
-    self = { // eslint-disable-line
-      provider: {
-        id: this.getId(),
-        isRootNode: this.checkIfRoot(),
-        parents: this.props._reactScrollCollapse.parents, // eslint-disable-line
-        // methods: this.getMergedContextMethods(this.props),
-        rootNodes: this.getRootNodes(this.props),
-        type: typeKey,
-      },
-    };
-    */
     compareContextProps = () => shallowEqual(this.prevContextProps, this.nextContextProps);
 
     setNextContextProps = () => (this.nextContextProps = this.prevContextProps);
@@ -298,8 +268,7 @@ const createProvider = (
   };
 
   Provider.propTypes = {
-    // contextMethods: ofObjectTypeOrNothing,
-    // rootNodes: ofObjectTypeOrNothing,
+    _reactScrollCollapse: PropTypes.object.isRequired,
   };
 
   Provider.whyDidYouRender = {

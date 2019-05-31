@@ -18,10 +18,10 @@ const Comment = (props) => {
     children,
     collapserItemRef,
     isOpened,
-    itemId,
+    _reactScrollCollapse: { id },
   } = props;
   let { text } = props;
-  const idStr = itemId.toString();
+  const idStr = id.toString();
   text = `Collapser Item ${idStr}: --- ${text}`;
   return (
     <div className={styles.comment} ref={collapserItemRef}>
@@ -43,10 +43,10 @@ Comment.defaultProps = {
 };
 
 Comment.propTypes = {
+  _reactScrollCollapse: PropTypes.object.isRequired,
   children: ofChildrenTypeOrNothing,
   collapserItemRef: PropTypes.object.isRequired, // provided by collapserItemController
   isOpened: PropTypes.bool.isRequired, // provided by collapserItemController
-  itemId: PropTypes.number.isRequired, // provided by collapserItemController
   text: PropTypes.string.isRequired,
 };
 

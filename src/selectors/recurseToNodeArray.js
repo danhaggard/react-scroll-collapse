@@ -75,6 +75,7 @@ const recurseToNodeArray = (argsObj) => {
     counter = getNextIdFactory(argsObj.currentNodeIdObj.id - 1),
     setTreeId = false,
   } = argsObj;
+
   /*
     The cache is serving two purposes.
 

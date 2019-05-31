@@ -183,7 +183,6 @@ export const collapserWrapper = (WrappedComponent) => {
           cacheClone,
           id: this.id,
           isOpenedInit: this.props.isOpenedInit,
-          providerType: this.type,
           rootNodeId: this.rootNodeId,
         }]);
     }
@@ -204,7 +203,7 @@ export const collapserWrapper = (WrappedComponent) => {
     noActiveSiblings = () => this.props.contextMethods.collapser.noActiveSiblings(this.props);
 
     render() {
-      // console.log('collapser render id, props.contextProps', this.props.collapserId, this.props.contextProps);
+      console.log('collapser render id, props.contextProps', this.id, this.props.contextProps);
       const { expandCollapseAll, selectors, ...other } = this.props;
       const { areAllItemsExpanded } = this.state;
       return (

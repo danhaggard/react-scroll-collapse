@@ -76,7 +76,7 @@ export const collapserItemWrapper = (WrappedComponent) => {
   };
 
   const mapStateToProps = (state, ownProps) => ({
-    isOpened: getItemExpandedRoot(state)(ownProps.itemId),
+    isOpened: getItemExpandedRoot(state)(ownProps._reactScrollCollapse.id),
   });
 
   const CollapserItemControllerConnect = connect(

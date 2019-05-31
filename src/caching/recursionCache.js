@@ -24,6 +24,7 @@ const setResultFactory = getCache => key => (id, val) => {
 
 
 const createCache = (rootNodeIdArg = 0) => {
+
   let CACHE = null;
 
   let cacheLock = false;

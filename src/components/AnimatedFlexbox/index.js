@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Motion, presets, spring } from 'react-motion';
+import { Motion, spring } from 'react-motion';
 import forwardRefWrapper from '../../utils/forwardRef';
 import { MOTION_SPRINGS, DEFAULT_MOTION_SPRING } from '../../const';
-import { ofChildrenType, ofNumberStringTypeOrNothing } from '../../utils/propTypeHelpers';
+import { ofChildrenType } from '../../utils/propTypeHelpers';
 
 const FLEX_STYLE = {
   child: {
