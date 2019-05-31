@@ -6,7 +6,6 @@ import registerConsumer from './registerConsumer';
 import { getIdKey, getParentIdKey } from '../utils/providerKeyManager';
 import { isUndefNull } from '../../utils/selectorUtils';
 import { ofObjectTypeOrNothing } from '../../utils/propTypeHelpers';
-import providerIdStore from '../utils/providerCounter';
 
 
 const extendClass = (subClassFactory, SuperClass) => {
@@ -140,12 +139,7 @@ const createProvider = (
       this.setChildContext();
     }
 
-    getId = () => {
-      if (typeof this.id === 'undefined') {
-        this.id = providerIdStore(typeKey);
-      }
-      return this.id;
-    }
+    getId = () => this.props._reactScrollCollapse.id; // eslint_disable_line
 
     // deprecating
     mapParentIds = (props) => { // eslint-disable-line react/sort-comp
@@ -258,7 +252,7 @@ const createProvider = (
       provider: {
         id: this.getId(),
         isRootNode: this.checkIfRoot(),
-        // parents: this.props._reactScrollCollapse.parents, // eslint-disable-line
+        parents: this.props._reactScrollCollapse.parents, // eslint-disable-line
         // methods: this.getMergedContextMethods(this.props),
         type: typeKey,
       },
@@ -276,7 +270,6 @@ const createProvider = (
     render() {
       this.updateChildContext();
       const newProps = this.getProps();
-      debugger;
       return childTypeKeys.length === 0 ? <Comp {...this.getProps()} /> : (
         <Context.Provider value={this.childContext}>
           <Wrapped

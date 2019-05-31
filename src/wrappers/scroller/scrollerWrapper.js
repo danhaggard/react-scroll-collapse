@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
 import { scrollerWrapperActions } from '../../actions';
 import { cleanHoCProps } from '../../utils/hocUtils/cleanHoCProps';
 import providers from '../../contextProviders';
@@ -19,40 +18,33 @@ export const scrollerWrapper = (ScrollerComponent) => {
     }
 
     componentWillUnmount() {
-      const { removeScroller, scrollerId } = this.props;
-      removeScroller(scrollerId);
+      const { removeScroller, _reactScrollCollapse: { id } } = this.props;
+      removeScroller(id);
     }
 
     addScroller() {
-      const { addScroller, scrollerId } = this.props;
-      addScroller(scrollerId);
+      const { addScroller, _reactScrollCollapse: { id } } = this.props;
+      addScroller(id);
     }
 
     render() {
-      const { scrollerId } = this.props;
-      if (scrollerId >= 0) {
-        return (
-          <ScrollerComponent
-            {...cleanHoCProps(
-              this.props,
-              // WrappedScroller.defaultProps,
-              scrollerWrapperActions
-            )}
-            scrollerId={scrollerId}
-          />
-        );
-      }
-      return <div />;
+      return (
+        <ScrollerComponent
+          {...cleanHoCProps(
+            this.props,
+            scrollerWrapperActions
+          )}
+        />
+      );
+
     }
   }
 
-  WrappedScroller.defaultProps = {
-    scrollerId: null,
-  };
+  WrappedScroller.defaultProps = {};
 
   WrappedScroller.propTypes = {
+    _reactScrollCollapse: PropTypes.object.isRequired,
     addScroller: PropTypes.func.isRequired,
-    scrollerId: ofNumberTypeOrNothing,
     removeScroller: PropTypes.func.isRequired,
   };
 
@@ -62,8 +54,6 @@ export const scrollerWrapper = (ScrollerComponent) => {
   };
 
   return scrollerProvider(connect(undefined, scrollerWrapperActions)(WrappedScroller));
-
-  // return connect(undefined, scrollerWrapperActions)(scrollerProvider(WrappedScroller));
 };
 
 export default scrollerWrapper;

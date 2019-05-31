@@ -28,16 +28,15 @@ const collapserContext = (Base) => {
     }
 
     setNextContextProps = () => {
-      debugger;
       this.nextContextProps = this.getNextContextProps();
     }
 
     checkIfActiveSibling = () => {
-      const { collapserId, contextProps: { activeSiblings } } = this.props;
+      const { _reactScrollCollapse: { id }, contextProps: { activeSiblings } } = this.props;
       if (this.checkIfRoot()) {
         return false;
       }
-      return activeSiblings.includes(collapserId);
+      return activeSiblings.includes(id);
     }
 
     noActiveSiblings = () => {
@@ -51,12 +50,13 @@ const collapserContext = (Base) => {
     addSelfToActiveSiblings = (props, state) => {
       const {
         addActiveChildren,
-        collapserId,
+        _reactScrollCollapse: { id: collapserId },
+        // collapserId,
         isActiveSibling,
         parentCollapserId,
         removeActiveChildren
-      } = props;
-      const { activeChildren, contextProps: { activeSiblingLimit } } = props;
+      } = this.props;
+      const { activeChildren, contextProps: { activeSiblingLimit } } = this.props;
       if (this.checkIfRoot()) {
         removeActiveChildren(collapserId, activeChildren);
       }
@@ -100,9 +100,9 @@ const collapserContext = (Base) => {
   };
 
   const mapStateToPropsFactory = () => (state, props) => {
-    const { collapserId } = props;
-    const activeChildren = getCollapserActiveChildrenRoot(state)(collapserId);
-    const activeChildrenLimit = getCollapserActiveChildrenLimitRoot(state)(collapserId);
+    const { _reactScrollCollapse: { id } } = props;
+    const activeChildren = getCollapserActiveChildrenRoot(state)(id);
+    const activeChildrenLimit = getCollapserActiveChildrenLimitRoot(state)(id);
     return {
       activeChildren,
       activeChildrenLimit

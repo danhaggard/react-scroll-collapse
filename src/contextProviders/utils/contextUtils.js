@@ -6,7 +6,7 @@ export const defaultMergeContextWithProps = (props, context = {}) => {
     parents,
   };
   return {
-    ...context, ...props, //  _reactScrollCollapse
+    ...other, ...props, _reactScrollCollapse
   };
 };
 

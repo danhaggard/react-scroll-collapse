@@ -1,15 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-
-import { ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
 import { collapserControllerActions } from '../../actions';
-import cleanHoCProps from '../../utils/cleanHoCProps';
+import { cleanHoCProps } from '../../utils/hocUtils/cleanHoCProps';
 
 export const collapserControllerWrapper = (CollapserController) => {
 
   class WrappedCollapserController extends Component {
-
 
     constructor(props) {
       super(props);
@@ -26,47 +23,30 @@ export const collapserControllerWrapper = (CollapserController) => {
     */
 
     addCollapser() {
-      const { addCollapser, isRootNode } = this.props;
-      const { collapserId, parentCollapserId, parentScrollerId } = this.props;
-      addCollapser(parentScrollerId, parentCollapserId, collapserId, isRootNode);
+      const {
+        addCollapser, _reactScrollCollapse: { id, isRootNode, parents: { collapser, scroller } }
+      } = this.props;
+      addCollapser(scroller, collapser, id, isRootNode);
     }
 
     render() {
-      const { collapserId, parentScrollerId } = this.props;
-      if (collapserId >= 0 && parentScrollerId >= 0) {
-        return (
-          <CollapserController
-            {...cleanHoCProps(
-              this.props,
-              WrappedCollapserController.defaultProps,
-              collapserControllerActions
-            )}
-            collapserId={collapserId}
-          />
-        );
-      }
-      return <div />;
+      return (
+        <CollapserController
+          {...cleanHoCProps(
+            this.props,
+            collapserControllerActions
+          )}
+        />
+      );
     }
   }
 
-  WrappedCollapserController.defaultProps = {
-    collapserId: null,
-    parentCollapserId: null,
-    parentScrollerId: null,
-    rootNodes: {},
-  };
+  WrappedCollapserController.defaultProps = {};
 
   WrappedCollapserController.propTypes = {
+    _reactScrollCollapse: PropTypes.object.isRequired,
     addCollapser: PropTypes.func.isRequired,
-    isRootNode: PropTypes.bool.isRequired,
-    rootNodes: PropTypes.object,
-    rootNodeId: PropTypes.number.isRequired,
-    providerType: PropTypes.string.isRequired,
     removeCollapser: PropTypes.func.isRequired,
-
-    collapserId: ofNumberTypeOrNothing,
-    parentCollapserId: ofNumberTypeOrNothing,
-    parentScrollerId: ofNumberTypeOrNothing,
   };
 
   WrappedCollapserController.whyDidYouRender = {

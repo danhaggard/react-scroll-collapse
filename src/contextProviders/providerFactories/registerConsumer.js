@@ -42,13 +42,16 @@ const registerConsumerFactory = consumerFactory => (
 
   class Registry extends PureComponent {
 
-    // id = providerIdStore(typeKey);
+    /* Id must be created here otherwise Context managers can't select state. */
+    id = providerIdStore(typeKey);
+
+    _reactScrollCollapse = {
+      ...this.props._reactScrollCollapse,
+      id: this.id
+    }
 
     render() {
-      // debugger;
-      // const newProps = { ...this.props, [getIdKey(typeKey)]: this.id };
-      const newProps = this.props;
-
+      const newProps = { ...this.props, _reactScrollCollapse: this._reactScrollCollapse };
       return <Comp {...newProps} />;
     }
   }

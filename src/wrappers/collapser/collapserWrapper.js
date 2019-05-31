@@ -216,7 +216,7 @@ export const collapserWrapper = (WrappedComponent) => {
     noActiveSiblings = () => this.props.contextMethods.collapser.noActiveSiblings(this.props);
 
     render() {
-      console.log('collapser render id, props.contextProps', this.props.collapserId, this.props.contextProps);
+      // console.log('collapser render id, props.contextProps', this.props.collapserId, this.props.contextProps);
       const {
         expandCollapseAll,
         rootNodeId,

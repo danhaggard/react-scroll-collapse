@@ -111,8 +111,6 @@ class CommentThread extends PureComponent {
       localChildren,
       title
     } = this.state;
-
-    console.log('threadRender', collapserId);
     return (
       <AnimatedFlexbox
         className={this.getClassName(this.props)}
