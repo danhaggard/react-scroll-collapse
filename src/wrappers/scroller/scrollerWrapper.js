@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
 import { scrollerWrapperActions } from '../../actions';
-import cleanHoCProps from '../../utils/cleanHoCProps';
+import { cleanHoCProps } from '../../utils/hocUtils/cleanHoCProps';
 import providers from '../../contextProviders';
 
 const { scrollerProvider } = providers;
@@ -35,7 +35,7 @@ export const scrollerWrapper = (ScrollerComponent) => {
           <ScrollerComponent
             {...cleanHoCProps(
               this.props,
-              WrappedScroller.defaultProps,
+              // WrappedScroller.defaultProps,
               scrollerWrapperActions
             )}
             scrollerId={scrollerId}

@@ -37,13 +37,13 @@ const collapserManager = (Comp) => {
     }
 
     render() {
-      const rootNodeId = getRootNodeId(this.props);
+      const { rootNodeId } = this.props;
       return (
         <Comp
           {...this.props}
           areAllItemsExpandedWorker={this.getWorker(this.props, rootNodeId)}
           cache={this.getCache(this.props, rootNodeId)}
-          rootNodeId={rootNodeId}
+          // rootNodeId={rootNodeId}
         />
       );
     }

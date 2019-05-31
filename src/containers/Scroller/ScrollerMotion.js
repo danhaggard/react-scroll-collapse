@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 
-import { Motion, presets, spring } from 'react-motion';
+import { Motion, spring } from 'react-motion';
 import Scroller from '../../components/Scroller';
 
 import { ofFuncTypeOrNothing, ofNumberTypeOrNothing, ofObjectTypeOrNothing } from '../../utils/propTypeHelpers';
@@ -142,7 +142,6 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
     onAnimationCancel: null,
     onRest: null,
     motionStyle: null,
-    scrollerId: null,
     scrollOffset: 0,
     scrollTo: null,
     springConfig: null,
@@ -156,7 +155,6 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
     motionStyle: ofObjectTypeOrNothing,
     onAnimationCancel: ofFuncTypeOrNothing,
     onRest: ofFuncTypeOrNothing,
-    scrollerId: ofNumberTypeOrNothing,
     scrollOffset: PropTypes.number,
     scrollTo: ofNumberTypeOrNothing,
     springConfig: PropTypes.object,

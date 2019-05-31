@@ -1,8 +1,14 @@
 import React from 'react';
 
-export const defaultMergeContextWithProps = (props, context) => ({
-  ...context, ...props
-});
+export const defaultMergeContextWithProps = (props, context = {}) => {
+  const { parents, ...other } = context;
+  const _reactScrollCollapse = {  // eslint-disable-line
+    parents,
+  };
+  return {
+    ...context, ...props, //  _reactScrollCollapse
+  };
+};
 
 export const defaultContextRendererFactory = (Context, Comp, mergeContextWithProps) => React.memo(
   props => (

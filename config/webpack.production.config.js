@@ -71,11 +71,13 @@ module.exports = (opts) => {
         cssLoader,
       ]
     },
+    /*
     optimization: {
       minimizer: [new UglifyJsPlugin({
         parallel: 4,
       })],
     },
+    */
     output: {
       path: DIST_PATH,
       filename: 'index.js',

@@ -144,8 +144,8 @@ export const generateCommentThreadData = (
 const generateThreadConfig = {
   minChildren: 2,
   minDepth: 2,
-  maxChildren: 4,
-  maxDepth: 4,
+  maxChildren: 2,
+  maxDepth: 2,
 };
 
 const generateThreadConfigChild = {
@@ -190,7 +190,7 @@ const example11 = (
         isOpenedInit={false}
         childIsOpenedInit={false}
         nodeData={someData}
-        activeChildLimit={1}
+        setActiveChildLimit={1}
         {...generateThreadConfigChild}
         />
     </Scroller>

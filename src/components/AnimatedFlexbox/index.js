@@ -84,7 +84,7 @@ class AnimatedFlexbox extends Component {
               style={{
                 ...FLEX_STYLE.parent,
                 ...style,
-                // ...this.getInterpolFlexPercent(interpolatedStyle)
+                ...this.getInterpolFlexPercent(interpolatedStyle)
               }}
             >
               { children }

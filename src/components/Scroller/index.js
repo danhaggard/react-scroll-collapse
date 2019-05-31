@@ -1,9 +1,8 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 
-import { ofChildrenType, ofNumberStringTypeOrNothing } from '../../utils/propTypeHelpers';
+import { ofChildrenType } from '../../utils/propTypeHelpers';
 import { targetIsScrollBar } from '../../utils/domUtils';
-import { isUndefNull } from '../../utils/selectorUtils';
 
 
 /*
@@ -63,7 +62,7 @@ class Scroller extends PureComponent {
   getProps = ({
     children,
     className,
-    id,
+    // id,
     style
   }) => {
     const newProps = {
@@ -80,9 +79,6 @@ class Scroller extends PureComponent {
         ...style
       },
     };
-    if (!isUndefNull(id)) {
-      newProps.id = id;
-    }
     return newProps;
   };
 
@@ -92,7 +88,6 @@ class Scroller extends PureComponent {
 Scroller.defaultProps = {
   children: [],
   className: '',
-  id: null,
   style: {},
 };
 
@@ -102,7 +97,6 @@ Scroller.propTypes = {
   contextMethods: PropTypes.object.isRequired,
   className: PropTypes.string,
   getUserScrollActive: PropTypes.func.isRequired,
-  id: ofNumberStringTypeOrNothing,
   style: PropTypes.object,
 };
 

@@ -66,14 +66,14 @@ export const collapserWrapper = (WrappedComponent) => {
         areAllItemsExpandedWorker,
         collapserId,
         contextMethods,
-        activeChildLimit,
+        setActiveChildLimit,
       } = props;
 
       this.state = {
         areAllItemsExpanded,
       };
-      if (!isUndefNull(activeChildLimit)) {
-        contextMethods.collapser.setActiveChildrenLimit(activeChildLimit);
+      if (!isUndefNull(setActiveChildLimit)) {
+        contextMethods.collapser.setActiveChildrenLimit(setActiveChildLimit);
       }
 
       areAllItemsExpandedWorker.addEventListener('message', this.handleAllItemsExpandedWorkerMessage);
@@ -216,7 +216,7 @@ export const collapserWrapper = (WrappedComponent) => {
     noActiveSiblings = () => this.props.contextMethods.collapser.noActiveSiblings(this.props);
 
     render() {
-      // console.log('collapser render id, props.contextProps', this.props.collapserId, this.props.contextProps);
+      console.log('collapser render id, props.contextProps', this.props.collapserId, this.props.contextProps);
       const {
         expandCollapseAll,
         rootNodeId,
@@ -242,7 +242,7 @@ export const collapserWrapper = (WrappedComponent) => {
     contextMethods: null,
     parentCollapserId: null,
     parentScrollerId: null,
-    rootNodes: {},
+    // rootNodes: {},
   };
 
   CollapserController.propTypes = {
@@ -252,7 +252,7 @@ export const collapserWrapper = (WrappedComponent) => {
     parentCollapserId: ofNumberTypeOrNothing,
     parentScrollerId: PropTypes.number,
     isRootNode: PropTypes.bool.isRequired,
-    rootNodes: PropTypes.object,
+    rootNodes: PropTypes.object.isRequired,
 
     /* provided by redux */
     addToNodeTargetArray: PropTypes.func.isRequired,
@@ -266,6 +266,9 @@ export const collapserWrapper = (WrappedComponent) => {
     areAllItemsExpandedWorker: PropTypes.object.isRequired,
     contextMethods: ofObjectTypeOrNothing,
     rootNodeId: PropTypes.number.isRequired,
+
+    /* provided by user */
+    setActiveChildLimit: PropTypes.number,
   };
 
   addLoggingDefaultsToComponent(

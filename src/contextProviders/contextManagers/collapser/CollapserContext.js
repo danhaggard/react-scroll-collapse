@@ -5,6 +5,8 @@ import { connect } from 'react-redux';
 import { collapserContextActions } from '../../../actions';
 import { getCollapserActiveChildrenRoot, getCollapserActiveChildrenLimitRoot } from '../../../selectors/collapser';
 import { shallowEqualExceptArray } from '../../../utils/equalityUtils';
+import { defaultMergeContextWithProps } from '../../utils/contextUtils';
+
 
 const collapserContext = (Base) => {
 
@@ -26,6 +28,7 @@ const collapserContext = (Base) => {
     }
 
     setNextContextProps = () => {
+      debugger;
       this.nextContextProps = this.getNextContextProps();
     }
 
@@ -69,7 +72,7 @@ const collapserContext = (Base) => {
     }
 
     setActiveChildrenLimit = limit => this.props.setActiveChildrenLimit(
-      this.props.collapserId, limit
+      this.getId(), limit
     );
 
     contextMethods = {
@@ -114,10 +117,6 @@ const collapserContext = (Base) => {
   return CollapserContextConnect;
 };
 
-const mergeContextWithProps = (props, context) => ({
-  ...context, ...props
-});
-
 
 const contextRenderer = (Context, Comp, mergeContextProps) => {
 
@@ -125,7 +124,6 @@ const contextRenderer = (Context, Comp, mergeContextProps) => {
 
     shouldComponentUpdate(props) {
       const checked = this.equalCheck(props, shallowEqualExceptArray);
-
       return checked;
     }
 
@@ -161,6 +159,7 @@ const contextRenderer = (Context, Comp, mergeContextProps) => {
     }
 
     render() {
+      const newProps = this.addToProps();
       return <Comp {...this.addToProps()} />;
     }
 
@@ -178,7 +177,7 @@ const contextRenderer = (Context, Comp, mergeContextProps) => {
 };
 
 collapserContext.renderContext = {
-  mergeContextWithProps,
+  mergeContextWithProps: defaultMergeContextWithProps,
   contextRenderer
 };
 

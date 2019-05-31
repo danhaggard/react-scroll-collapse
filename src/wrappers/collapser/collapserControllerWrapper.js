@@ -41,6 +41,7 @@ export const collapserControllerWrapper = (CollapserController) => {
               WrappedCollapserController.defaultProps,
               collapserControllerActions
             )}
+            collapserId={collapserId}
           />
         );
       }

@@ -86,11 +86,11 @@ class CommentThread extends PureComponent {
     return 0;
   }
 
-  handleOnClick = () => setTimeout(this.props.expandCollapseAll, 0);
+  handleOnClick = this.props.expandCollapseAll;
 
   render() {
     const {
-      activeChildLimit,
+      setActiveChildLimit,
       areAllItemsExpanded,
       children,
       childIsOpenedInit,
@@ -112,6 +112,7 @@ class CommentThread extends PureComponent {
       title
     } = this.state;
 
+    console.log('threadRender', collapserId);
     return (
       <AnimatedFlexbox
         className={this.getClassName(this.props)}
@@ -136,7 +137,7 @@ class CommentThread extends PureComponent {
         {
           localChildren.map(childNodeData => (
             <WrappedCommentThread
-              activeChildLimit={activeChildLimit}
+              setActiveChildLimit={setActiveChildLimit}
               isOpenedInit={childIsOpenedInit}
               childIsOpenedInit={childIsOpenedInit}
               key={childNodeData.key}
