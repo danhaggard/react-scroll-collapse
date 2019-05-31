@@ -12,19 +12,21 @@ export const scrollerWrapper = (ScrollerComponent) => {
 
   class WrappedScroller extends Component {
 
+    id = this.props._reactScrollCollapse.id
+
     constructor(props, context) {
       super(props, context);
       this.addScroller();
     }
 
     componentWillUnmount() {
-      const { removeScroller, _reactScrollCollapse: { id } } = this.props;
-      removeScroller(id);
+      const { removeScroller } = this.props;
+      removeScroller(this.id);
     }
 
     addScroller() {
-      const { addScroller, _reactScrollCollapse: { id } } = this.props;
-      addScroller(id);
+      const { addScroller } = this.props;
+      addScroller(this.id);
     }
 
     render() {

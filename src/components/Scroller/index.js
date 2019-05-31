@@ -62,7 +62,6 @@ class Scroller extends PureComponent {
   getProps = ({
     children,
     className,
-    // id,
     style
   }) => {
     const newProps = {

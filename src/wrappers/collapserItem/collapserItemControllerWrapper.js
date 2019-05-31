@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { ofBoolTypeOrNothing, ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
-import cleanHoCProps from '../../utils/cleanHoCProps';
+import { ofBoolTypeOrNothing } from '../../utils/propTypeHelpers';
+import { cleanHoCProps } from '../../utils/hocUtils/cleanHoCProps';
 import { itemControllerActions } from '../../actions';
+import { setContextAttrs } from '../../utils/objectUtils';
 
 
 export const collapserItemControllerWrapper = (CollapserItemController) => {
@@ -13,70 +14,50 @@ export const collapserItemControllerWrapper = (CollapserItemController) => {
 
     constructor(props) {
       super(props);
-
-      /*
-        create state slice for this collapserItem in redux store.
-      */
+      setContextAttrs(this);
       this.addItem();
     }
 
     componentWillUnmount() {
-      const { itemId, parentCollapserId, removeItem } = this.props;
-      removeItem(parentCollapserId, itemId);
+      const { id, parentCollapserId, props: { removeItem } } = this;
+      removeItem(parentCollapserId, id);
     }
 
     addItem() {
-      const {
-        addItem,
-        itemId,
-        isOpenedInit,
-        parentCollapserId
-      } = this.props;
+      const { addItem, isOpenedInit } = this.props;
+      const { id, parentCollapserId } = this;
       if (isOpenedInit !== null) {
-        addItem(parentCollapserId, itemId, isOpenedInit);
+        addItem(parentCollapserId, id, isOpenedInit);
       } else {
-        addItem(parentCollapserId, itemId);
+        addItem(parentCollapserId, id);
       }
     }
 
     render() {
-      const {
-        itemId,
-        parentCollapserId,
-      } = this.props;
-      if (itemId >= 0 && parentCollapserId >= 0) {
-        return (
-          <CollapserItemController
-            {...cleanHoCProps(
-              this.props,
-              WrappedCollapserItemController.defaultProps,
-              itemControllerActions
-            )}
-          />
-        );
-      }
-      return <div />;
+      return (
+        <CollapserItemController
+          {...cleanHoCProps(
+            this.props,
+            itemControllerActions
+          )}
+        />
+      );
     }
   }
 
   WrappedCollapserItemController.defaultProps = {
     isOpenedInit: null,
-    itemId: null,
-    parentCollapserId: null,
-    parentScrollerId: null,
   };
 
   WrappedCollapserItemController.propTypes = {
+    _reactScrollCollapse: PropTypes.object.isRequired,
+
+    // provided by redux dispatchToProps
     addItem: PropTypes.func.isRequired,
     removeItem: PropTypes.func.isRequired,
 
-    /*
-      isOpenedInit: overrides the default isOpened status.
-    */
+    //  isOpenedInit: overrides the default isOpened status. provided by user
     isOpenedInit: ofBoolTypeOrNothing,
-    itemId: ofNumberTypeOrNothing,
-    parentCollapserId: ofNumberTypeOrNothing,
-    parentScrollerId: ofNumberTypeOrNothing,
   };
 
   WrappedCollapserItemController.whyDidYouRender = {

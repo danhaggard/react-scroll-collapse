@@ -14,16 +14,13 @@ import createCache from '../caching/recursionCache';
   component which attaches it back to its own manager.
 */
 const areAllItemsExpandedSelector = (state, props) => {
-  const {
-    cacheClone,
-    rootNodeId
-  } = props;
+  const { cacheClone, rootNodeId } = props;
   const cache = createCache();
   cache.setCache(cacheClone);
   const nodeTargetArray = getNodeTargetArrayRoot(state)(rootNodeId);
 
   nestedCollapserItemsExpandedRootEvery(
-    state, { ...props, nodeTargetArray }, cache
+    state, nodeTargetArray, rootNodeId, cache
   );
   return cache.getCache();
 };
@@ -32,7 +29,7 @@ self.addEventListener('message', (e) => {
   if (!e) {
     return;
   }
-  const { data: [state, props, cacheClone] } = e;
-  const cache = areAllItemsExpandedSelector(state, props, cacheClone);
+  const { data: [state, props] } = e;
+  const cache = areAllItemsExpandedSelector(state, props);
   postMessage(cache);
 });

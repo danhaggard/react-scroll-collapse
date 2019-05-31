@@ -1,9 +1,8 @@
 /* eslint-disable max-len */
-
 import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
 
 import providerIdStore from '../utils/providerCounter';
-import { getIdKey } from '../utils/providerKeyManager';
 import {
   defaultMergeContextWithProps,
   defaultContextRendererFactory,
@@ -56,6 +55,9 @@ const registerConsumerFactory = consumerFactory => (
     }
   }
 
+  Registry.propTypes = {
+    _reactScrollCollapse: PropTypes.object.isRequired,
+  };
   /*
     This subscribes the wrapped child provider in a context consumer wrapper.
     So that it  can receive word from its ancestors above.

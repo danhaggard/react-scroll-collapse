@@ -6,6 +6,7 @@ import { collapserContextActions } from '../../../actions';
 import { getCollapserActiveChildrenRoot, getCollapserActiveChildrenLimitRoot } from '../../../selectors/collapser';
 import { shallowEqualExceptArray } from '../../../utils/equalityUtils';
 import { defaultMergeContextWithProps } from '../../utils/contextUtils';
+import { setContextAttrs } from '../../../utils/objectUtils';
 
 
 const collapserContext = (Base) => {
@@ -14,6 +15,7 @@ const collapserContext = (Base) => {
 
     constructor(props, context) {
       super(props, context);
+      // setContextAttrs(this);
       this.setNextContextProps();
       this.setChildContext();
     }
@@ -47,27 +49,25 @@ const collapserContext = (Base) => {
       return activeSiblings.length === 0;
     }
 
-    addSelfToActiveSiblings = (props, state) => {
+    addSelfToActiveSiblings = (state) => {
       const {
         addActiveChildren,
-        _reactScrollCollapse: { id: collapserId },
-        // collapserId,
+        _reactScrollCollapse: { id, parents: { collapser: parentCollapserId } },
         isActiveSibling,
-        parentCollapserId,
         removeActiveChildren
       } = this.props;
       const { activeChildren, contextProps: { activeSiblingLimit } } = this.props;
       if (this.checkIfRoot()) {
-        removeActiveChildren(collapserId, activeChildren);
+        removeActiveChildren(id, activeChildren);
       }
       if (!this.checkIfRoot() && state.areAllItemsExpanded) {
-        removeActiveChildren(parentCollapserId, [collapserId]);
+        removeActiveChildren(parentCollapserId, [id]);
       }
       if (!this.checkIfRoot() && !this.checkIfActiveSibling() && !state.areAllItemsExpanded) {
-        addActiveChildren(parentCollapserId, [collapserId], activeSiblingLimit);
-        removeActiveChildren(collapserId, activeChildren);
+        addActiveChildren(parentCollapserId, [id], activeSiblingLimit);
+        removeActiveChildren(id, activeChildren);
       } else if (!this.checkIfRoot() && this.checkIfActiveSibling()) {
-        // removeActiveChildren(parentCollapserId, [collapserId]);
+        // removeActiveChildren(parentCollapserId, [id]);
       }
     }
 
@@ -86,13 +86,9 @@ const collapserContext = (Base) => {
 
   }
 
-  CollapserContext.defaultProps = {
+  CollapserContext.defaultProps = {};
 
-  };
-
-  CollapserContext.propTypes = {
-    // selectors: PropTypes.object.isRequired,
-  };
+  CollapserContext.propTypes = {};
 
   CollapserContext.whyDidYouRender = {
     logOnDifferentValues: false,
@@ -159,7 +155,6 @@ const contextRenderer = (Context, Comp, mergeContextProps) => {
     }
 
     render() {
-      const newProps = this.addToProps();
       return <Comp {...this.addToProps()} />;
     }
 
@@ -167,6 +162,7 @@ const contextRenderer = (Context, Comp, mergeContextProps) => {
 
   ContextRender.propTypes = {
     contextProps: PropTypes.object.isRequired,
+    contextMethods: PropTypes.object.isRequired,
   };
 
   return props => (

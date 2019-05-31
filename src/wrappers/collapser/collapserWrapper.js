@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 
 import forwardRefWrapper from '../../utils/forwardRef';
 import { checkForRef } from '../../utils/errorUtils';
-import { ofNumberTypeOrNothing, ofObjectTypeOrNothing } from '../../utils/propTypeHelpers';
+import { ofObjectTypeOrNothing } from '../../utils/propTypeHelpers';
 import { collapserWrapperActions } from '../../actions';
 import { isUndefNull } from '../../utils/selectorUtils';
 
@@ -15,22 +15,9 @@ import {
   nestedCollapserItemsRoot,
   setTreeIdsRecursively,
 } from '../../selectors/collapser';
+import { setContextAttrs } from '../../utils/objectUtils';
 
 import addLoggingDefaultsToComponent from '../../utils/logging/utils';
-
-const clonableProps = ({
-  collapserId,
-  isOpenedInit,
-  providerType,
-  rootNodeId,
-  cache,
-}) => ({
-  cacheClone: cache.getCache(),
-  collapserId,
-  isOpenedInit,
-  providerType,
-  rootNodeId
-});
 
 
 export const collapserWrapper = (WrappedComponent) => {
@@ -61,21 +48,17 @@ export const collapserWrapper = (WrappedComponent) => {
 
     constructor(props, context) {
       super(props, context);
+      setContextAttrs(this);
       const {
         areAllItemsExpanded,
         areAllItemsExpandedWorker,
-        collapserId,
         contextMethods,
         setActiveChildLimit,
       } = props;
-
-      this.state = {
-        areAllItemsExpanded,
-      };
+      this.state = { areAllItemsExpanded };
       if (!isUndefNull(setActiveChildLimit)) {
         contextMethods.collapser.setActiveChildrenLimit(setActiveChildLimit);
       }
-
       areAllItemsExpandedWorker.addEventListener('message', this.handleAllItemsExpandedWorkerMessage);
     }
 
@@ -112,22 +95,22 @@ export const collapserWrapper = (WrappedComponent) => {
       work their way up to the top which will be node 7.
     */
     setCacheOnMount() {
-      const { cache, collapserId } = this.props;
+      const { props: { cache }, id } = this;
       const {
         largestValueFromPrevMountCycle,
         mounting,
         largestValueFromThisMountCycle
       } = cache.getMountInfo();
 
-      const mountingStarted = collapserId - largestValueFromPrevMountCycle > 1;
+      const mountingStarted = id - largestValueFromPrevMountCycle > 1;
       const mountingFinished = !mountingStarted && mounting;
 
       if (mountingStarted) {
         cache.setMountInfo({ mounting: mountingStarted });
       }
 
-      if (mounting && collapserId > largestValueFromThisMountCycle) {
-        cache.setMountInfo({ largestValueFromThisMountCycle: collapserId });
+      if (mounting && id > largestValueFromThisMountCycle) {
+        cache.setMountInfo({ largestValueFromThisMountCycle: id });
       }
 
       if (mountingFinished) {
@@ -144,9 +127,10 @@ export const collapserWrapper = (WrappedComponent) => {
       }
     }
 
-    setExpandedState = ({ cache, collapserId }) => {
+    setExpandedState = () => {
+      const { props: { cache }, id } = this;
       const { areAllItemsExpanded } = this.state;
-      const cachedValue = cache.getResultValue(collapserId);
+      const cachedValue = cache.getResultValue(id);
       if (areAllItemsExpanded !== cachedValue) {
         this.setState(() => ({
           areAllItemsExpanded: cachedValue
@@ -155,12 +139,11 @@ export const collapserWrapper = (WrappedComponent) => {
     }
 
     expandCollapseAll = () => {
+      const { id, rootNodeId } = this;
       const {
         addToNodeTargetArray,
-        collapserId,
         contextMethods,
         expandCollapseAll,
-        rootNodeId,
         selectors,
       } = this.props;
       const { areAllItemsExpanded } = this.state;
@@ -180,11 +163,11 @@ export const collapserWrapper = (WrappedComponent) => {
         mapStateToProps will fire immediately and update the cache that
         the selector uses.
       */
-      addToNodeTargetArray(collapserId, rootNodeId, true);
+      addToNodeTargetArray(id, rootNodeId, true);
       expandCollapseAll(areAllItemsExpanded, selectors.allChildItemIds(), rootNodeId);
 
       if (contextMethods.collapser) {
-        contextMethods.collapser.addSelfToActiveSiblings(this.props, this.state);
+        contextMethods.collapser.addSelfToActiveSiblings(this.state);
       }
 
       this.initiateTreeStateCheck();
@@ -196,16 +179,21 @@ export const collapserWrapper = (WrappedComponent) => {
       const currentReduxState = cache.getCurrentReduxState();
       areAllItemsExpandedWorker.postMessage([
         currentReduxState,
-        clonableProps(this.props),
-        cacheClone]);
+        {
+          cacheClone,
+          id: this.id,
+          isOpenedInit: this.props.isOpenedInit,
+          providerType: this.type,
+          rootNodeId: this.rootNodeId,
+        }]);
     }
 
     handleAllItemsExpandedWorkerMessage = (e) => {
-      const { cache, isRootNode } = this.props;
+      const { cache } = this.props;
       if (!e) {
         return;
       }
-      if (isRootNode) {
+      if (this.isRootNode) {
         cache.setCache(e.data);
       }
       this.setExpandedState(this.props);
@@ -217,12 +205,7 @@ export const collapserWrapper = (WrappedComponent) => {
 
     render() {
       // console.log('collapser render id, props.contextProps', this.props.collapserId, this.props.contextProps);
-      const {
-        expandCollapseAll,
-        rootNodeId,
-        selectors,
-        ...other
-      } = this.props;
+      const { expandCollapseAll, selectors, ...other } = this.props;
       const { areAllItemsExpanded } = this.state;
       return (
         <WrappedComponentRef
@@ -238,21 +221,12 @@ export const collapserWrapper = (WrappedComponent) => {
   }
 
   CollapserController.defaultProps = {
-    collapserId: null,
     contextMethods: null,
-    parentCollapserId: null,
-    parentScrollerId: null,
-    // rootNodes: {},
   };
 
   CollapserController.propTypes = {
     /* provided by collapserControllerWrapper */
     cache: PropTypes.object.isRequired,
-    collapserId: ofNumberTypeOrNothing,
-    parentCollapserId: ofNumberTypeOrNothing,
-    parentScrollerId: PropTypes.number,
-    isRootNode: PropTypes.bool.isRequired,
-    rootNodes: PropTypes.object.isRequired,
 
     /* provided by redux */
     addToNodeTargetArray: PropTypes.func.isRequired,
@@ -265,7 +239,6 @@ export const collapserWrapper = (WrappedComponent) => {
     /* provided by scrollerProvider via context */
     areAllItemsExpandedWorker: PropTypes.object.isRequired,
     contextMethods: ofObjectTypeOrNothing,
-    rootNodeId: PropTypes.number.isRequired,
 
     /* provided by user */
     setActiveChildLimit: PropTypes.number,
@@ -350,14 +323,10 @@ export const collapserWrapper = (WrappedComponent) => {
     let areAllItemsExpanded = null;
 
     return (state, props) => {
-      const {
-        cache,
-        collapserId,
-        isOpenedInit,
-        rootNodeId,
-      } = props;
+      const { _reactScrollCollapse: { id, rootNodeId } } = props;
+      const { cache, isOpenedInit } = props;
       selectors.allChildItemIds = () => nestedCollapserItemsRoot(state, props);
-      selectors.childCollapsers = () => getCollapserCollapsersRoot(state)(collapserId);
+      selectors.childCollapsers = () => getCollapserCollapsersRoot(state)(id);
       selectors.nodeTargetArray = () => getNodeTargetArrayRoot(state)(rootNodeId);
       selectors.unmountArray = () => getRootUnmountArrayRoot(state)(rootNodeId);
       selectors.setTreeIds = action => setTreeIdsRecursively(
@@ -383,7 +352,7 @@ export const collapserWrapper = (WrappedComponent) => {
         after first render.
       */
       if (areAllItemsExpanded === null) {
-        areAllItemsExpanded = initAreAllItemsExpanded(cache, collapserId, isOpenedInit);
+        areAllItemsExpanded = initAreAllItemsExpanded(cache, id, isOpenedInit);
       }
       return {
         areAllItemsExpanded,

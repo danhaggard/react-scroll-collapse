@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { collapserControllerActions } from '../../actions';
 import { cleanHoCProps } from '../../utils/hocUtils/cleanHoCProps';
+import { setContextAttrs } from '../../utils/objectUtils';
 
 export const collapserControllerWrapper = (CollapserController) => {
 
@@ -10,6 +11,8 @@ export const collapserControllerWrapper = (CollapserController) => {
 
     constructor(props) {
       super(props);
+      /* grab the context attrs under props._reactScrollCollapse and attach */
+      setContextAttrs(this);
       this.addCollapser();
     }
 
@@ -24,9 +27,13 @@ export const collapserControllerWrapper = (CollapserController) => {
 
     addCollapser() {
       const {
-        addCollapser, _reactScrollCollapse: { id, isRootNode, parents: { collapser, scroller } }
-      } = this.props;
-      addCollapser(scroller, collapser, id, isRootNode);
+        props: { addCollapser },
+        parentScrollerId,
+        parentCollapserId,
+        id,
+        isRootNode
+      } = this;
+      addCollapser(parentScrollerId, parentCollapserId, id, isRootNode);
     }
 
     render() {

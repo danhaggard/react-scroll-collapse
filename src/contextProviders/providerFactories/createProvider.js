@@ -245,19 +245,29 @@ const createProvider = (
       rootNodeId: this.childContext.rootNodeId,  // needs to replace rootnodeids of other provider types.
       ...this.state,
       contextMethods: this.mergedContextMethods,
-      _reactScrollCollapse: this.self.provider,
+      _reactScrollCollapse: {
+        id: this.getId(),
+        isRootNode: this.checkIfRoot(),
+        parents: this.props._reactScrollCollapse.parents, // eslint-disable-line
+        // methods: this.getMergedContextMethods(this.props),
+        rootNodeId: this.childContext.rootNodeId,
+        rootNodes: this.getRootNodes(this.props),
+        type: typeKey,
+      },
     });
 
+    /*
     self = { // eslint-disable-line
       provider: {
         id: this.getId(),
         isRootNode: this.checkIfRoot(),
         parents: this.props._reactScrollCollapse.parents, // eslint-disable-line
         // methods: this.getMergedContextMethods(this.props),
+        rootNodes: this.getRootNodes(this.props),
         type: typeKey,
       },
     };
-
+    */
     compareContextProps = () => shallowEqual(this.prevContextProps, this.nextContextProps);
 
     setNextContextProps = () => (this.nextContextProps = this.prevContextProps);

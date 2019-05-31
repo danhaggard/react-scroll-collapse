@@ -9,6 +9,7 @@ import { ofObjectTypeOrNothing } from '../../utils/propTypeHelpers';
 
 import { itemWrapperActions } from '../../actions';
 import { getItemExpandedRoot } from '../../selectors/collapserItem';
+import { setContextAttrs } from '../../utils/objectUtils';
 
 /*
   collapserItemWrapper is an HoC that is to be used to wrap components which make use
@@ -16,8 +17,6 @@ import { getItemExpandedRoot } from '../../selectors/collapserItem';
 
   It provides the wrapped component with the props:
     isOpened: boolean - which can be used as the <Collapse> isOpened prop.
-    onHeightReady: function - which should be passed into the  <Collapse>
-      onHeightReady prop.
     expandCollapse: function - which can be used as an event callback to trigger
       change of state.
 */
@@ -30,33 +29,23 @@ export const collapserItemWrapper = (WrappedComponent) => {
 
     elem = React.createRef();
 
+    setAttrs = (() => setContextAttrs(this))();
+
     componentDidMount() {
       checkForRef(WrappedComponent, this.elem, 'collapserItemRef');
     }
 
     expandCollapse = () => {
-      const {
-        addToNodeTargetArray,
-        contextMethods,
-        itemId,
-        expandCollapse: expandCollapseAction,
-        parentCollapserId,
-        rootNodes,
-      } = this.props;
+      const { addToNodeTargetArray, contextMethods, expandCollapse } = this.props;
       if (contextMethods.scroller) {
         contextMethods.scroller.scrollToTop(this.elem.current);
       }
-      expandCollapseAction(itemId, parentCollapserId);
-      addToNodeTargetArray(parentCollapserId, rootNodes.collapser);
+      expandCollapse(this.id, this.parentCollapserId);
+      addToNodeTargetArray(this.parentCollapserId, this.rootNodes.collapser);
     };
 
     render() {
-      const {
-        contextMethods,
-        isOpened,
-        expandCollapse,
-        ...other
-      } = this.props;
+      const { isOpened, expandCollapse, ...other } = this.props;
       return (
         <WrappedComponentRef
           {...other}
@@ -70,18 +59,12 @@ export const collapserItemWrapper = (WrappedComponent) => {
 
   CollapserItemController.defaultProps = {
     contextMethods: null,
-    parentScrollerId: null,
-    rootNodes: {},
   };
 
   CollapserItemController.propTypes = {
     addToNodeTargetArray: PropTypes.func.isRequired,
     isOpened: PropTypes.bool.isRequired,
-    itemId: PropTypes.number.isRequired,
-    parentCollapserId: PropTypes.number.isRequired,
-    parentScrollerId: PropTypes.number,
     expandCollapse: PropTypes.func.isRequired,
-    rootNodes: PropTypes.object,
 
     /* provided by scrollerProvider via context */
     contextMethods: ofObjectTypeOrNothing,
