@@ -6,6 +6,7 @@ import Scroller from '../../components/Scroller';
 
 import { ofFuncTypeOrNothing, ofNumberTypeOrNothing, ofObjectTypeOrNothing } from '../../utils/propTypeHelpers';
 import { DEFAULT_MOTION_SPRING } from '../../const';
+import { setContextAttrs } from '../../utils/objectUtils';
 
 
 const scrollerMotionWrapper = (ScrollerComponent) => {
@@ -20,6 +21,8 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
     getScrollTop method from Scroller to that saga.
   */
   class ScrollerMotion extends PureComponent {
+
+    setAttrs = (() => setContextAttrs(this))();
 
     // defaultSpringConfig = { stiffness: 170, damping: 20 };
     defaultSpringConfig = DEFAULT_MOTION_SPRING;
@@ -37,7 +40,7 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
       this.userScrollActive = false;
     }
 
-    setScrollTop = this.props.contextMethods.scroller.setScrollTop;
+    setScrollTop = this.methods.scroller.setScrollTop;
 
     /*
       If scrollTo prop passed a value - use that.  Otherwise use the current
@@ -161,7 +164,6 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
     style: PropTypes.object,
 
     /* provided by scrollerProvider via context */
-    contextMethods: PropTypes.object.isRequired,
     providerMotionStyle: PropTypes.object.isRequired,
   };
 

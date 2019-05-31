@@ -223,20 +223,23 @@ const createProvider = (
       this.addRootNodeId(this.props);
     };
 
-    getProps = () => ({
-      ...this.props,
-      ...this.state,
-      contextMethods: this.mergedContextMethods,
-      _reactScrollCollapse: {
-        id: this.getId(),
-        isRootNode: this.checkIfRoot(),
-        parents: this.props._reactScrollCollapse.parents, // eslint-disable-line
-        methods: this.mergedContextMethods,
-        rootNodeId: this.childContext.rootNodeId,
-        rootNodes: this.getRootNodes(this.props),
-        type: typeKey,
-      },
-    });
+    getProps = () => {
+      const { contextMethods, rootNodes, ...other } = this.props;
+      debugger;
+      return {
+        ...other,
+        ...this.state,
+        _reactScrollCollapse: {
+          id: this.getId(),
+          isRootNode: this.checkIfRoot(),
+          parents: this.props._reactScrollCollapse.parents, // eslint-disable-line
+          methods: this.mergedContextMethods,
+          rootNodeId: this.childContext.rootNodeId,
+          rootNodes: this.getRootNodes(this.props),
+          type: typeKey,
+        },
+      };
+    }
 
     compareContextProps = () => shallowEqual(this.prevContextProps, this.nextContextProps);
 

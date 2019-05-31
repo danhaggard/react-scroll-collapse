@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 
 import forwardRefWrapper from '../../utils/forwardRef';
 import { checkForRef } from '../../utils/errorUtils';
-import { ofObjectTypeOrNothing } from '../../utils/propTypeHelpers';
 
 import { itemWrapperActions } from '../../actions';
 import { getItemExpandedRoot } from '../../selectors/collapserItem';
@@ -36,9 +35,9 @@ export const collapserItemWrapper = (WrappedComponent) => {
     }
 
     expandCollapse = () => {
-      const { addToNodeTargetArray, contextMethods, expandCollapse } = this.props;
-      if (contextMethods.scroller) {
-        contextMethods.scroller.scrollToTop(this.elem.current);
+      const { addToNodeTargetArray, expandCollapse } = this.props;
+      if (this.methods.scroller) {
+        this.methods.scroller.scrollToTop(this.elem.current);
       }
       expandCollapse(this.id, this.parentCollapserId);
       addToNodeTargetArray(this.parentCollapserId, this.rootNodes.collapser);
@@ -57,17 +56,12 @@ export const collapserItemWrapper = (WrappedComponent) => {
     }
   }
 
-  CollapserItemController.defaultProps = {
-    contextMethods: null,
-  };
+  CollapserItemController.defaultProps = {};
 
   CollapserItemController.propTypes = {
     addToNodeTargetArray: PropTypes.func.isRequired,
     isOpened: PropTypes.bool.isRequired,
     expandCollapse: PropTypes.func.isRequired,
-
-    /* provided by scrollerProvider via context */
-    contextMethods: ofObjectTypeOrNothing,
   };
 
   CollapserItemController.whyDidYouRender = {

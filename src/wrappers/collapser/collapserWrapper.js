@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 
 import forwardRefWrapper from '../../utils/forwardRef';
 import { checkForRef } from '../../utils/errorUtils';
-import { ofObjectTypeOrNothing } from '../../utils/propTypeHelpers';
 import { collapserWrapperActions } from '../../actions';
 import { isUndefNull } from '../../utils/selectorUtils';
 
@@ -52,12 +51,11 @@ export const collapserWrapper = (WrappedComponent) => {
       const {
         areAllItemsExpanded,
         areAllItemsExpandedWorker,
-        contextMethods,
         setActiveChildLimit,
       } = props;
       this.state = { areAllItemsExpanded };
       if (!isUndefNull(setActiveChildLimit)) {
-        contextMethods.collapser.setActiveChildrenLimit(setActiveChildLimit);
+        this.methods.collapser.setActiveChildrenLimit(setActiveChildLimit);
       }
       areAllItemsExpandedWorker.addEventListener('message', this.handleAllItemsExpandedWorkerMessage);
     }
@@ -142,7 +140,6 @@ export const collapserWrapper = (WrappedComponent) => {
       const { id, rootNodeId } = this;
       const {
         addToNodeTargetArray,
-        contextMethods,
         expandCollapseAll,
         selectors,
       } = this.props;
@@ -152,8 +149,8 @@ export const collapserWrapper = (WrappedComponent) => {
         Will need a whole object to manage autoscroll once we add more
         configurability.
       */
-      if (contextMethods.scroller) {
-        contextMethods.scroller.scrollToTop(this.elem.current);
+      if (this.methods.scroller) {
+        this.methods.scroller.scrollToTop(this.elem.current);
       }
       /*
         Adding the current collapserId to the targetNodes - tells the
@@ -166,8 +163,8 @@ export const collapserWrapper = (WrappedComponent) => {
       addToNodeTargetArray(id, rootNodeId, true);
       expandCollapseAll(areAllItemsExpanded, selectors.allChildItemIds(), rootNodeId);
 
-      if (contextMethods.collapser) {
-        contextMethods.collapser.addSelfToActiveSiblings(this.state);
+      if (this.methods.collapser) {
+        this.methods.collapser.addSelfToActiveSiblings(this.state);
       }
 
       this.initiateTreeStateCheck();
@@ -198,12 +195,13 @@ export const collapserWrapper = (WrappedComponent) => {
       this.setExpandedState(this.props);
     }
 
-    isActiveSibling = () => this.props.contextMethods.collapser.checkIfActiveSibling(this.props);
+    isActiveSibling = () => this.methods.collapser.checkIfActiveSibling(this.props);
 
-    noActiveSiblings = () => this.props.contextMethods.collapser.noActiveSiblings(this.props);
+    noActiveSiblings = () => this.methods.collapser.noActiveSiblings(this.props);
 
     render() {
       console.log('collapser render id, props.contextProps', this.id, this.props.contextProps);
+      debugger;
       const { expandCollapseAll, selectors, ...other } = this.props;
       const { areAllItemsExpanded } = this.state;
       return (
@@ -219,9 +217,7 @@ export const collapserWrapper = (WrappedComponent) => {
     }
   }
 
-  CollapserController.defaultProps = {
-    contextMethods: null,
-  };
+  CollapserController.defaultProps = {};
 
   CollapserController.propTypes = {
     /* provided by collapserControllerWrapper */
@@ -237,7 +233,6 @@ export const collapserWrapper = (WrappedComponent) => {
 
     /* provided by scrollerProvider via context */
     areAllItemsExpandedWorker: PropTypes.object.isRequired,
-    contextMethods: ofObjectTypeOrNothing,
 
     /* provided by user */
     setActiveChildLimit: PropTypes.number,

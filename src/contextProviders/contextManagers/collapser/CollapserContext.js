@@ -151,6 +151,7 @@ const contextRenderer = (Context, Comp, mergeContextProps) => {
       if (collapser && collapser.checkIfActiveSibling) {
         newProps.isActiveSibling = collapser.checkIfActiveSibling();
       }
+      debugger;
       return newProps;
     }
 

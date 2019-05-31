@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { collapserControllerActions } from '../../actions';
+import { collapserControllerActions, collapserContextActions } from '../../actions';
 import { cleanHoCProps } from '../../utils/hocUtils/cleanHoCProps';
 import { setContextAttrs } from '../../utils/objectUtils';
 
@@ -37,12 +37,14 @@ export const collapserControllerWrapper = (CollapserController) => {
     }
 
     render() {
+      const newProps = cleanHoCProps(
+        this.props,
+        { ...collapserControllerActions, ...collapserContextActions }
+      );
+      debugger;
       return (
         <CollapserController
-          {...cleanHoCProps(
-            this.props,
-            collapserControllerActions
-          )}
+          {...newProps}
         />
       );
     }

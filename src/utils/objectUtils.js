@@ -12,13 +12,18 @@ export const filterObject = (objToFilter, objToFilterBy) => { //eslint-disable-l
 
 export const addPropertiesToObject = (objA, objB) => Object.entries(objB).forEach(([key, value]) => (objA[key] = value));  // eslint-disable-line
 
+/*
+{
+  collapser: parentCollapserId, scroller: parentScrollerId
+},
+*/
+
+
 export const setContextAttrs = (that) => {
   const {
     props: {
       _reactScrollCollapse: {
-        id, isRootNode, parents: {
-          collapser: parentCollapserId, scroller: parentScrollerId
-        },
+        id, isRootNode, parents,
         methods,
         rootNodeId,
         rootNodes,
@@ -26,6 +31,8 @@ export const setContextAttrs = (that) => {
       }
     }
   } = that;
+  const parentCollapserId = parents ? parents.collapser : undefined;
+  const parentScrollerId = parents ? parents.scroller : undefined;
   addPropertiesToObject(that, {
     id,
     isRootNode,

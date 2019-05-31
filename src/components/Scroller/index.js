@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import { ofChildrenType } from '../../utils/propTypeHelpers';
 import { targetIsScrollBar } from '../../utils/domUtils';
+import { setContextAttrs } from '../../utils/objectUtils';
 
 
 /*
@@ -24,6 +25,8 @@ import { targetIsScrollBar } from '../../utils/domUtils';
 */
 
 class Scroller extends PureComponent {
+
+  setAttrs = (() => setContextAttrs(this))();
 
   callIfAnimating = callback => (...args) => { // eslint-disable-line react/sort-comp
     if (!this.props.getUserScrollActive()) {
@@ -53,7 +56,7 @@ class Scroller extends PureComponent {
     e => this.breakScrollAnimation(e.keyCode === 38 || e.keyCode === 40)
   );
 
-  context = this.props.contextMethods.scroller;
+  context = this.methods.scroller;
 
   getElem = this.context.getElem;
 
@@ -93,7 +96,6 @@ Scroller.defaultProps = {
 Scroller.propTypes = {
   breakScrollAnimation: PropTypes.func.isRequired,
   children: ofChildrenType,
-  contextMethods: PropTypes.object.isRequired,
   className: PropTypes.string,
   getUserScrollActive: PropTypes.func.isRequired,
   style: PropTypes.object,
