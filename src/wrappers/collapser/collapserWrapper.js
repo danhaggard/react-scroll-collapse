@@ -95,7 +95,7 @@ export const collapserWrapper = (WrappedComponent) => {
       work their way up to the top which will be node 7.
     */
     setCacheOnMount() {
-      const { props: { cache }, id } = this;
+      const { props: { cache, _reactScrollCollapse: { isRootNode } }, id } = this;
       const {
         largestValueFromPrevMountCycle,
         mounting,
@@ -104,6 +104,15 @@ export const collapserWrapper = (WrappedComponent) => {
 
       const mountingStarted = id - largestValueFromPrevMountCycle > 1;
       const mountingFinished = !mountingStarted && mounting;
+      /* a root node mounted without children */
+      if (!mountingStarted && !mountingFinished && !mounting
+        && isRootNode) {
+        // cache.setMountInfo({ largestValueFromPrevMountCycle: id });
+        // You'd think checking tree state here is need - but it causes
+        // state mismatch currently.  TODO ionvestigate.
+        // this.initiateTreeStateCheck();
+        return;
+      }
 
       if (mountingStarted) {
         cache.setMountInfo({ mounting: mountingStarted });
@@ -120,10 +129,15 @@ export const collapserWrapper = (WrappedComponent) => {
       }
 
       if (mountingFinished) {
-        this.initiateTreeStateCheck();
+        console.log('checking tree after mount - id, cache', id, cache);
+        this.initiateTreeStateCheck(true);
         cache.setMountInfo({
           mounting: false,
         });
+      }
+
+      if (mountingStarted && !mounting && !isRootNode) {
+        setTimeout(this.checkForSingleNodeMount, 100);
       }
     }
 
@@ -172,7 +186,7 @@ export const collapserWrapper = (WrappedComponent) => {
       this.initiateTreeStateCheck();
     };
 
-    initiateTreeStateCheck = () => {
+    initiateTreeStateCheck = (setTreeId = false) => {
       const { areAllItemsExpandedWorker, cache } = this.props;
       const cacheClone = cache.getCache();
       const currentReduxState = cache.getCurrentReduxState();
@@ -183,6 +197,7 @@ export const collapserWrapper = (WrappedComponent) => {
           id: this.id,
           isOpenedInit: this.props.isOpenedInit,
           rootNodeId: this.rootNodeId,
+          setTreeId,
         }]);
     }
 
@@ -201,25 +216,44 @@ export const collapserWrapper = (WrappedComponent) => {
 
     noActiveSiblings = () => this.methods.collapser.noActiveSiblings();
 
-    cleanProps = (props) => {
-      return cleanHoCProps(
-        props,
-        {
-          ...collapserWrapperActions,
-          ...collapserContextActions,
-        },
-        [
-          'activeChildren',
-          'activeChildrenLimit',
-          'areAllItemsExpandedWorker',
-          'cache',
-          'contextProps',
-          'rootNodeId',
-          'selectors',
-          // 'setActiveChildLimit',
-          '_reactScrollCollapseParents'
-        ]
-      );
+    cleanProps = props => cleanHoCProps(
+      props,
+      {
+        ...collapserWrapperActions,
+        ...collapserContextActions,
+      },
+      [
+        'activeChildren',
+        'activeChildrenLimit',
+        'areAllItemsExpandedWorker',
+        'cache',
+        'contextProps',
+        'rootNodeId',
+        'selectors',
+        // 'setActiveChildLimit',
+        '_reactScrollCollapseParents'
+      ]
+    );
+
+    checkForSingleNodeMount = () => {
+      const { props: { cache }, id } = this;
+      const {
+        mounting,
+        largestValueFromPrevMountCycle
+      } = cache.getMountInfo();
+      if (mounting && id - largestValueFromPrevMountCycle > 1) {
+        /*
+          assume no more are mounting for now - have no idea ohw long to wait. ?
+          Don't update largestValueFromPrevMountCycle because other the next node
+          value will be only +1 the current and won't initiate a mount sequence.
+        */
+        console.log('checking tree after mount && mount timeout - id, cache', id, cache);
+        this.initiateTreeStateCheck(true);
+        cache.setMountInfo({
+          mounting: false,
+        });
+      }
+
     }
 
     render() {
@@ -255,6 +289,7 @@ export const collapserWrapper = (WrappedComponent) => {
     selectors: PropTypes.object.isRequired, // includes nested
     setTreeId: PropTypes.func.isRequired,
     toggleCheckTreeState: PropTypes.func.isRequired,
+    _reactScrollCollapse: PropTypes.object.isRequired,
 
     /* provided by scrollerProvider via context */
     areAllItemsExpandedWorker: PropTypes.object.isRequired,

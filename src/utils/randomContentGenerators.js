@@ -25,12 +25,12 @@ export const getNodeChildren = (
   );
 };
 
-export const getNodeObj = (count, depth, index) => ({
+export const getNodeObj = (count, depth, index, randomNum) => ({
   comment: getRandomTextWithDefaults(),
   branch: index,
   count,
   depth,
-  key: `comment-${count}`,
+  key: `comment-${count}-${depth}-${index}-${randomNum}`, // lazy uniqueness
   title: `depth: ${depth} - branch: ${index}`,
 });
 
@@ -51,11 +51,13 @@ initialDepthCount = 0) => {
   ) => {
     const count = counter(initCount);
     const countModifier = initCount === -1 ? 0 : initCount;
+    const randomNum = getRandomInt(0, 99999999);
     const nodeData = {
       ...getNodeObj(
         count + countModifier,
         currentDepth + initialDepthCount,
         currentNodeIndex + countModifier,
+        randomNum
       ),
       children: getNodeChildren(
         allowedDepth,

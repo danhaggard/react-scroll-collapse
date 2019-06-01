@@ -144,8 +144,8 @@ export const generateCommentThreadData = (
 const generateThreadConfig = {
   minChildren: 3,
   minDepth: 3,
-  maxChildren: 4,
-  maxDepth: 4,
+  maxChildren: 3,
+  maxDepth: 3,
 };
 
 const generateThreadConfigChild = {
@@ -188,6 +188,7 @@ const example11 = (
     <Scroller style={{ height: '100%' }}>
       <CommentThreadFlex
         key={someData.key}
+        insertChildAtIndex={2}
         isOpenedInit={false}
         childIsOpenedInit={false}
         nodeData={someData}

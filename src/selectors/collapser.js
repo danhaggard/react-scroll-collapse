@@ -110,6 +110,7 @@ export const nestedCollapserItemsExpandedRootEvery = (
   nodeTargetArray,
   rootNodeId,
   cache,
+  setTreeId = false,
 ) => {
   const mapIdToTreeId = id => ({ id, treeId: cache.getResultTreeId(id) });
   const targetNodeTreeIdArray = nodeTargetArray.map(mapIdToTreeId);
@@ -129,6 +130,7 @@ export const nestedCollapserItemsExpandedRootEvery = (
     getNodeValue,
     getTreeId: cache.getResultTreeId,
     targetNodeArray: targetNodeTreeIdArray, // change this arg name to the state key.
+    setTreeId,
   });
 };
 

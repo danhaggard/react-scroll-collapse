@@ -14,13 +14,13 @@ import createCache from '../caching/recursionCache';
   component which attaches it back to its own manager.
 */
 const areAllItemsExpandedSelector = (state, props) => {
-  const { cacheClone, rootNodeId } = props;
+  const { cacheClone, rootNodeId, setTreeId } = props;
   const cache = createCache();
   cache.setCache(cacheClone);
   const nodeTargetArray = getNodeTargetArrayRoot(state)(rootNodeId);
 
   nestedCollapserItemsExpandedRootEvery(
-    state, nodeTargetArray, rootNodeId, cache
+    state, nodeTargetArray, rootNodeId, cache, setTreeId
   );
   return cache.getCache();
 };

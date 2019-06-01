@@ -17,6 +17,8 @@ class CommentThread extends PureComponent { //eslint-disable-line
 
   buttonStyle = { order: -5 };
 
+  totalAddedChildren = 0;
+
   state = (() => {
     const {
       branch,
@@ -46,10 +48,11 @@ class CommentThread extends PureComponent { //eslint-disable-line
   insertThread = () => {
     const { minChildren, maxChildren, insertChildAtIndex } = this.props;
     const { count, depth } = this.state;
-    const numNewChildren = getRandomInt(minChildren, maxChildren) - 1;
+    const numNewChildren = getRandomInt(minChildren, maxChildren);
     const newChildren = [...Array(numNewChildren).keys()].map(
       i => this.generateChildData(count + i, depth + 1)
     );
+    console.log('newChildren', newChildren);
     this.setState(this.addChildren(newChildren, insertChildAtIndex));
   };
 
@@ -73,13 +76,14 @@ class CommentThread extends PureComponent { //eslint-disable-line
   getClassName = ({ isActiveSibling, children, areAllItemsExpanded }) => cx(
     styles.commentThread, {
       [styles.expanded]: isActiveSibling,
-      [styles.noChildren]: (children.length === 0 && !areAllItemsExpanded) || (children.length > 0 && areAllItemsExpanded),
+      [styles.noChildren]: (children.length === 0 && !areAllItemsExpanded)
+        || (children.length > 0 && areAllItemsExpanded),
     }
   );
 
   getFlexBasis = ({ isActiveSibling, noActiveSiblings }) => {
     if (isActiveSibling) {
-      return 0.70;
+      return 0.65;
     }
     if (noActiveSiblings) {
       return 0.25;
@@ -87,9 +91,29 @@ class CommentThread extends PureComponent { //eslint-disable-line
     return 0.15;
   }
 
+  getBackgroundRotation = ({ isActiveSibling, noActiveSiblings, areAllItemsExpanded }) => {
+    if (areAllItemsExpanded && isActiveSibling) {
+      return 45 + (this.state.depth * 180);
+    }
+    if (areAllItemsExpanded && noActiveSiblings) {
+      return 45 + (this.state.depth * 180);
+    }
+    if (areAllItemsExpanded && !isActiveSibling) {
+      return 225 + (this.state.depth * 180);
+    }
+    return 225 + (this.state.depth * 180);
+  }
+
   handleOnClick = (e) => {
     this.props.expandCollapseAll();
   };
+
+  handleKeyDown = (e) => {
+    debugger;
+    if (e.keyCode === 13) {
+      this.props.expandCollapseAll();
+    }
+  }
 
   /* to prevent renders from recreating the style obj everytime */
   // styleObj = { ...this.props.style, zIndex: `${0 - this.state.branch}` };
@@ -100,7 +124,6 @@ class CommentThread extends PureComponent { //eslint-disable-line
       areAllItemsExpanded,
       children,
       childIsOpenedInit,
-      expandCollapseAll,
       collapserRef,
       _reactScrollCollapse: { id: collapserId, isRootNode },
       minChildren,
@@ -108,11 +131,11 @@ class CommentThread extends PureComponent { //eslint-disable-line
       maxChildren,
       maxDepth,
       isOpenedInit,
-      parentOnClick,
+      insertChildAtIndex,
       style,
     } = this.props;
     const {
-      branch,
+      // branch,
       comment,
       localChildren,
       title
@@ -123,22 +146,24 @@ class CommentThread extends PureComponent { //eslint-disable-line
         className={this.getClassName(this.props)}
         id={collapserId}
         flexBasis={this.getFlexBasis(this.props)}
+        backgroundRotation={this.getBackgroundRotation(this.props)}
         isRootNode={isRootNode}
         onClick={this.handleOnClick}
+        onKeyDown={this.handleKeyDown}
         ref={collapserRef}
         style={style}
       >
         <ExpandButton
           isOpened={areAllItemsExpanded}
-          // onClick={expandCollapseAll}
           style={this.buttonStyle}
           title={this.appendTitle(collapserId, title)}
         />
         <CommentWithButtons
-          isOpenedInit={isOpenedInit}
           addToThread={this.insertThread}
           childThreads={localChildren.length}
           deleteThread={this.removeThread}
+          isOpenedInit={isOpenedInit}
+          tabFocusButtons={areAllItemsExpanded}
           text={comment}
         />
         { children.length > 0 && children }
@@ -150,10 +175,11 @@ class CommentThread extends PureComponent { //eslint-disable-line
               childIsOpenedInit={childIsOpenedInit}
               key={childNodeData.key}
               nodeData={childNodeData}
+              insertChildAtIndex={insertChildAtIndex}
               {...{
-                minChildren: minChildren - 1,
+                minChildren,
                 minDepth,
-                maxChildren: maxChildren - 1,
+                maxChildren,
                 maxDepth,
               }}
             />
@@ -168,7 +194,9 @@ CommentThread.defaultProps = {
   areAllItemsExpanded: null,
   children: [],
   getParentThreadActive: () => false,
-  insertChildAtIndex: null,
+  insertChildAtIndex: 0,
+  isOpenedInit: true,
+  childIsOpenedInit: true,
   maxChildren: 1,
   maxDepth: 1,
   minChildren: 1,
@@ -179,16 +207,18 @@ CommentThread.defaultProps = {
 CommentThread.propTypes = {
   areAllItemsExpanded: ofBoolTypeOrNothing,
   children: ofChildrenType,
-  // collapserId: PropTypes.number.isRequired,
+  childIsOpenedInit: PropTypes.bool,
   collapserRef: PropTypes.object.isRequired,
   expandCollapseAll: PropTypes.func.isRequired,
   getParentThreadActive: PropTypes.func,
   insertChildAtIndex: ofNumberTypeOrNothing,
+  isOpenedInit: PropTypes.bool,
   nodeData: PropTypes.object.isRequired,
   maxChildren: PropTypes.number,
   maxDepth: PropTypes.number,
   minChildren: PropTypes.number,
   minDepth: PropTypes.number,
+  _reactScrollCollapse: PropTypes.object.isRequired,
   style: PropTypes.object,
 };
 

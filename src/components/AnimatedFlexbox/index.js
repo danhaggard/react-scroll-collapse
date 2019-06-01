@@ -22,7 +22,7 @@ const FLEX_STYLE = {
   },
 };
 
-const StaticChild = React.forwardRef(({ children, className, onClick, style }, ref) => (
+const StaticChild = React.forwardRef(({ children, className, onClick, style, onKeyDown }, ref) => (
   <div
     className={className}
     onClick={onClick}
@@ -30,6 +30,7 @@ const StaticChild = React.forwardRef(({ children, className, onClick, style }, r
     style={style}
     role="button"
     tabIndex={0}
+    onKeyDown={onKeyDown}
     type="button"
   >
     { children }
@@ -51,6 +52,7 @@ const FlexMotion = React.forwardRef(({ // eslint-disable-line
   getInterpolatedStyle,
   motionStyle,
   onClick,
+  onKeyDown,
   style,
 }, ref) => (
   <Motion
@@ -71,6 +73,7 @@ const FlexMotion = React.forwardRef(({ // eslint-disable-line
             ref={ref}
             style={newStyle}
             onClick={onClick}
+            onKeyDown={onKeyDown}
           >
             { children }
           </PureStaticChild>
@@ -114,6 +117,8 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
     return percentage * this.parentWidth;
   }
 
+  getBackgroundString = val => `linear-gradient(${val}deg, #ddffab, #abe4ff, #d9abff)`
+
   getFlexBasisString = pixelInt => `1 1 ${pixelInt}px`;
 
   getFlexBasisStringPer = per => `1 1 ${per * 100}%`;
@@ -138,6 +143,11 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
     width: this.getWidthStringPer(width)
   });
 
+  getInterpolWidthRotation = ({ background, width }) => ({
+    background: this.getBackgroundString(background),
+    width: this.getWidthStringPer(width)
+  });
+
   getParentWidth = (refresh = false) => {
     if (!this.parentWidth || refresh) {
       this.parentWidth = this.parentNode ? this.parentNode.clientWidth : 500;
@@ -148,8 +158,11 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
   getSpringConfig = () => this.defaultSpringConfig;
 
   getMotionStyle = () => {
-    const { flexBasis } = this.props;
-    const motionStyle = { width: spring(flexBasis, this.getSpringConfig()) };
+    const { backgroundRotation, flexBasis } = this.props;
+    const motionStyle = {
+      background: spring(backgroundRotation, this.getSpringConfig()),
+      width: spring(flexBasis, this.getSpringConfig())
+    };
     // console.log('motionStyle', motionStyle);
     return motionStyle;
     // return { width: spring(flexBasis, this.getSpringConfig()) };
@@ -157,9 +170,17 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
   }
 
   handleOnClick = (e) => {
+    if (e.target.type !== 'button') {
+      e.stopPropagation();
+      this.props.onClick(e);
+    }
+  }
+
+  handleKeyDown = (e) => {
     e.stopPropagation();
-    //e.preventDefault();
-    this.props.onClick(e);
+    if (e.keyCode === 13) {
+      this.props.onKeyDown(e);
+    }
   }
 
   render() {
@@ -170,6 +191,7 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
       flexRef,
       isRootNode,
       onClick,
+      onKeyDown,
       style
     } = this.props;
     return !isRootNode ? (
@@ -177,9 +199,10 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
         id={id}
         className={className}
         flexStyle={FLEX_STYLE.parent}
-        getInterpolatedStyle={this.getInterpolWidthPercent}
+        getInterpolatedStyle={this.getInterpolWidthRotation}
         motionStyle={this.getMotionStyle()}
         onClick={this.handleOnClick}
+        onKeyDown={this.handleKeyDown}
         ref={flexRef}
         style={style}
       >
@@ -189,6 +212,7 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
       <PureStaticChild
         className={className}
         onClick={this.handleOnClick}
+        onKeyDown={this.handleKeyDown}
         ref={flexRef}
         style={this.childStyle}
       >

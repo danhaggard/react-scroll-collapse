@@ -90,10 +90,9 @@ const recurseToNodeArray = (argsObj) => {
       we can save results along the way.
   */
   const currentNodeId = currentNodeIdObj.id;
-
+  // debugger;
   const cachedValue = cache.getResultValue(currentNodeId);
   const cachedSources = cache.getResultSources(currentNodeId);
-
   /* sets tree ids to the cache on first traversal on mount */
   if (setTreeId || targetNodeArray.length === 0) {
     cache.setResultTreeId(currentNodeId, counter());
@@ -102,7 +101,7 @@ const recurseToNodeArray = (argsObj) => {
   // We have reached the targetNode - just ensure all children have the reverse
   // of the current cached value. NOTE: this cheat won't generalise well.
   // we do this before checking anything else to save on addition child selections
-  if (targetNodeArray.length === 1 && targetNodeArray[0].id <= currentNodeId) {
+  if (!setTreeId && targetNodeArray.length === 1 && targetNodeArray[0].id <= currentNodeId) {
     return setNestedCacheValues(currentNodeIdObj, cachedValue);
   }
 
@@ -121,7 +120,7 @@ const recurseToNodeArray = (argsObj) => {
   // it will be zero when no targets have been set - e.g. checking from root on
   // very first render.  Need to do proper recurse because we don't know
   // whether cached value for root node is accurate.
-  if (targetNodeArray.length === 0) {
+  if (targetNodeArray.length === 0 || setTreeId) {
 
     const [resultSources, resultValues] = getChildResultValuesAndSources(
       // todo: figure out better place to do this mapping.

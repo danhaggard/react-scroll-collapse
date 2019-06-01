@@ -70,7 +70,7 @@ export const insertArrayAtIndex = (arr1, arr2, index = null) => {
   if (index >= arr1.length) {
     return [...arr1, ...arr2];
   }
-  return [...arr1.slice(0, index), ...arr2, ...arr1.slice(index, -1)];
+  return [...arr1.slice(0, index), ...arr2, ...arr1.slice(index)];
 };
 
 // The Array.apply trick used here I learnt from: http://stackoverflow.com/a/20066663/1914452

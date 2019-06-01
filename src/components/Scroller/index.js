@@ -53,7 +53,7 @@ class Scroller extends PureComponent {
   handleWheel = this.callIfAnimating(() => this.breakScrollAnimation(true));
 
   handleKeyDown = this.callIfAnimating(
-    e => this.breakScrollAnimation(e.keyCode === 38 || e.keyCode === 40)
+    e => this.breakScrollAnimation([33, 34, 38, 40].includes(e.keyCode))
   );
 
   context = this.methods.scroller;

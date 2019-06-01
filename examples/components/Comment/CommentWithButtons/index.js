@@ -6,9 +6,9 @@ import ButtonSmall from '../../Button/ButtonSmall';
 import ButtonGroupSmall from '../../Button/ButtonGroup/ButtonGroupSmall';
 
 
-const DeleteThread = ({ childThreads, deleteThread }) => (
+const DeleteThread = ({ childThreads, deleteThread, ...rest }) => (
   childThreads === 0 ? <div /> : (
-    <ButtonSmall onClick={deleteThread} type="button">
+    <ButtonSmall onClick={deleteThread} type="button" {...rest}>
       Delete Thread
     </ButtonSmall>
   )
@@ -19,8 +19,8 @@ DeleteThread.propTypes = {
   deleteThread: PropTypes.func.isRequired,
 };
 
-const AddToThread = ({ addToThread }) => (
-  <ButtonSmall onClick={addToThread} type="button">
+const AddToThread = ({ addToThread, ...rest }) => (
+  <ButtonSmall onClick={addToThread} type="button" {...rest}>
     Insert Thread
   </ButtonSmall>
 );
@@ -34,6 +34,7 @@ const PureAddToThread = React.memo(AddToThread);
 
 const CommentWithButtons = ({
   addToThread,
+  tabFocusButtons,
   childThreads,
   deleteThread,
   isOpenedInit,
@@ -47,8 +48,12 @@ const CommentWithButtons = ({
     text={text}
   >
     <ButtonGroupSmall>
-      <PureDeleteThread childThreads={childThreads} deleteThread={deleteThread} />
-      <PureAddToThread addToThread={addToThread} />
+      <PureDeleteThread
+        tabIndex={!tabFocusButtons ? -1 : undefined}
+        childThreads={childThreads}
+        deleteThread={deleteThread}
+      />
+      <PureAddToThread tabIndex={!tabFocusButtons ? -1 : undefined} addToThread={addToThread} />
     </ButtonGroupSmall>
   </Comment>
 );

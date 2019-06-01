@@ -66,9 +66,10 @@ const scrollerContext = (Base) => {
       }
     };
 
-    startScrollAnimation = () => this.setState({
-      providerMotionStyle: this.getMotionStyle(),
+    startScrollAnimation = (needsReset = false) => this.setState({
+      providerMotionStyle: this.getMotionStyle(needsReset),
     });
+
 
     /*
       Get the difference of distance of both parent and child from the top of
@@ -94,8 +95,8 @@ const scrollerContext = (Base) => {
       this.resetMotionStyle();
     };
 
-    getMotionStyle = () => ({
-      needsReset: false,
+    getMotionStyle = (needsReset = false) => ({
+      needsReset,
       y: this.getChildDistanceToTop(this.currentChildElem),
     });
 
@@ -103,7 +104,6 @@ const scrollerContext = (Base) => {
       const { providerMotionStyle: { y } } = this.state;
       const nextY = this.getScrollTop(this.getElem());
       const childDistance = this.getChildDistanceToTop(this.currentChildElem);
-
       /* User hasn't clicked anything yet and hasn't scrolled and we aren't at the top already */
       if (this.userScrollActive === null && nextY === 0) {
         this.startScrollAnimation();
@@ -121,9 +121,12 @@ const scrollerContext = (Base) => {
       /*
         If y === nextY and we do need to scroll - don't bother
         doing a refresh - everything is in sync - just start the animation.
+
+        Passing a true value to needsReset because it puts state at where
+        it would be otherwise.
       */
       if (y === nextY && childDistance !== nextY) {
-        this.startScrollAnimation();
+        this.startScrollAnimation(true);
         return [false, null];
       }
 
