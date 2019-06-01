@@ -70,21 +70,21 @@ class CommentThread extends PureComponent { //eslint-disable-line
 
   appendTitle = (id, title) => ` Collapser ${id.toString()} -- ${title || 'row: 0 - node: 0'}`;
 
-  getClassName = ({ isActiveSibling, noActiveSiblings }) => cx(
+  getClassName = ({ isActiveSibling, children, areAllItemsExpanded }) => cx(
     styles.commentThread, {
       [styles.expanded]: isActiveSibling,
-      [styles.noActive]: noActiveSiblings,
+      [styles.noChildren]: (children.length === 0 && !areAllItemsExpanded) || (children.length > 0 && areAllItemsExpanded),
     }
   );
 
   getFlexBasis = ({ isActiveSibling, noActiveSiblings }) => {
     if (isActiveSibling) {
-      return 0.65;
+      return 0.70;
     }
     if (noActiveSiblings) {
       return 0.25;
     }
-    return 0.20;
+    return 0.15;
   }
 
   handleOnClick = (e) => {
