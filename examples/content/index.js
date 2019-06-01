@@ -142,10 +142,10 @@ export const generateCommentThreadData = (
 */
 
 const generateThreadConfig = {
-  minChildren: 2,
-  minDepth: 2,
-  maxChildren: 2,
-  maxDepth: 2,
+  minChildren: 3,
+  minDepth: 4,
+  maxChildren: 3,
+  maxDepth: 4,
 };
 
 const generateThreadConfigChild = {

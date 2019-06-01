@@ -200,8 +200,7 @@ export const collapserWrapper = (WrappedComponent) => {
     noActiveSiblings = () => this.methods.collapser.noActiveSiblings(this.props);
 
     render() {
-      console.log('collapser render id, props.contextProps', this.id, this.props.contextProps);
-      debugger;
+      // console.log('collapser render id, props.contextProps', this.id, this.props.contextProps);
       const { expandCollapseAll, selectors, ...other } = this.props;
       const { areAllItemsExpanded } = this.state;
       return (

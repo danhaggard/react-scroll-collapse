@@ -41,7 +41,6 @@ export const collapserControllerWrapper = (CollapserController) => {
         this.props,
         { ...collapserControllerActions, ...collapserContextActions }
       );
-      debugger;
       return (
         <CollapserController
           {...newProps}

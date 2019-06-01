@@ -81,9 +81,9 @@ class CommentThread extends PureComponent {
       return 0.65;
     }
     if (noActiveSiblings) {
-      return 0.3;
+      return 0.25;
     }
-    return 0;
+    return 0.20;
   }
 
   render() {
@@ -94,7 +94,7 @@ class CommentThread extends PureComponent {
       childIsOpenedInit,
       expandCollapseAll,
       collapserRef,
-      _reactScrollCollapse: { id: collapserId },
+      _reactScrollCollapse: { id: collapserId, isRootNode },
       minChildren,
       minDepth,
       maxChildren,
@@ -111,7 +111,9 @@ class CommentThread extends PureComponent {
     return (
       <AnimatedFlexbox
         className={this.getClassName(this.props)}
+        id={collapserId}
         flexBasis={this.getFlexBasis(this.props)}
+        isRootNode={isRootNode}
         ref={collapserRef}
         style={{ ...style, zIndex: `${0 - branch}` }}
       >

@@ -225,7 +225,6 @@ const createProvider = (
 
     getProps = () => {
       const { contextMethods, rootNodes, ...other } = this.props;
-      debugger;
       return {
         ...other,
         ...this.state,
