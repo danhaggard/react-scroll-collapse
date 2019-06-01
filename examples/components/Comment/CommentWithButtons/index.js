@@ -66,5 +66,10 @@ CommentWithButtons.propTypes = {
   text: PropTypes.string.isRequired,
 };
 
+CommentWithButtons.whyDidYouRender = {
+  logOnDifferentValues: false,
+  customName: 'CommentWithButtons'
+};
+
 const PureCommentWithButtons = React.memo(CommentWithButtons);
 export default PureCommentWithButtons;

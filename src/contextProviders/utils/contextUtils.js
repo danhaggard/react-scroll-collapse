@@ -2,11 +2,9 @@ import React from 'react';
 
 export const defaultMergeContextWithProps = (props, context = {}) => {
   const { parents, ...other } = context;
-  const _reactScrollCollapse = {  // eslint-disable-line
-    parents,
-  };
+  const _reactScrollCollapseParents = parents; //eslint-disable-line
   return {
-    ...other, ...props, _reactScrollCollapse
+    ...other, ...props, _reactScrollCollapseParents
   };
 };
 

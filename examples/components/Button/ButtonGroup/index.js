@@ -1,3 +1,4 @@
+import React from 'react';
 import extendAndForwardRef from '../../../../src/utils/extendAndForwardRef';
 
 import ButtonGroup from './ButtonGroup';
@@ -7,4 +8,4 @@ const ButtonGroupRef = extendAndForwardRef(ButtonGroup, {
   defaultClassName: styles.buttonGroup
 });
 
-export default ButtonGroupRef;
+export default React.memo(ButtonGroupRef);

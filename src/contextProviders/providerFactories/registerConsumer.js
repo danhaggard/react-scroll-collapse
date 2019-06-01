@@ -45,7 +45,6 @@ const registerConsumerFactory = consumerFactory => (
     id = providerIdStore(typeKey);
 
     _reactScrollCollapse = {
-      ...this.props._reactScrollCollapse,
       id: this.id
     }
 
@@ -55,9 +54,7 @@ const registerConsumerFactory = consumerFactory => (
     }
   }
 
-  Registry.propTypes = {
-    _reactScrollCollapse: PropTypes.object.isRequired,
-  };
+  Registry.propTypes = {};
   /*
     This subscribes the wrapped child provider in a context consumer wrapper.
     So that it  can receive word from its ancestors above.

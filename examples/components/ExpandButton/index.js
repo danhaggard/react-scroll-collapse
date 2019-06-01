@@ -13,12 +13,13 @@ const ExpandButton = ({
 }) => (
   <div
     className={style.expandButton}
-    onClick={onClick}
-    onKeyDown={onKeyDown}
+    key={title}
+    // onClick={onClick}
+    // onKeyDown={onKeyDown}
     ref={forwardRef}
-    role="button"
-    tabIndex={0}
-    type="button"
+    // role="button"
+    // tabIndex={0}
+    // type="button"
   >
     <CommentTitle title={title} isOpened={isOpened} />
   </div>

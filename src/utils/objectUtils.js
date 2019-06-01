@@ -1,9 +1,14 @@
 
 
-export const filterObject = (objToFilter, objToFilterBy) => { //eslint-disable-line
+export const filterObject = (
+  objToFilter,
+  objToFilterBy = {},
+  arrayToFilterBy = []
+) => { //eslint-disable-line
   const newObj = {};
+  const totalKeys = [...Object.keys(objToFilterBy), ...arrayToFilterBy];
   Object.entries(objToFilter).forEach(([key, value]) => {
-    if (!Object.keys(objToFilterBy).includes(key)) {
+    if (!totalKeys.includes(key)) {
       newObj[key] = value;
     }
   });

@@ -50,5 +50,10 @@ Comment.propTypes = {
   text: PropTypes.string.isRequired,
 };
 
+Comment.whyDidYouRender = {
+  logOnDifferentValues: false,
+  customName: 'Comment'
+};
+
 const PureComment = React.memo(Comment);
 export default collapserItemController(PureComment); // wrap and export your component

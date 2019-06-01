@@ -1,21 +1,21 @@
 import React from 'react';
 import whyDidYouRender from '@welldone-software/why-did-you-render';
-import notifier from './customNotifier';
+import customNotifier from './customNotifier';
 
 const notifiers = {
-  1: notifier
+  0: whyDidYouRender.defaultNotifier,
+  1: customNotifier
 };
 
 // const getNotifier = (logType) => {};
 
-const whyUpdate = (logType = 1) => {
-  if (logType === 0) {
-    whyDidYouRender(React);
-  }
-
-  if (logType === 1) {
-    whyDidYouRender(React, { notifier: notifiers[1] });
-  }
+const whyUpdate = (logType = 0) => {
+  whyDidYouRender(React, {
+    exclude: [/^AnimatedFlexbox/],
+    logOnDifferentValues: false,
+    notifier: notifiers[logType],
+    trackHooks: false,
+  });
 };
 
 

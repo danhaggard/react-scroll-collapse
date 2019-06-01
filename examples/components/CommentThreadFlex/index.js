@@ -13,7 +13,9 @@ import { generateCommentThreadData } from '../../../src/utils/randomContentGener
 import styles from './CommentThread.scss';
 
 
-class CommentThread extends PureComponent {
+class CommentThread extends PureComponent { //eslint-disable-line
+
+  buttonStyle = { order: -5 };
 
   state = (() => {
     const {
@@ -75,7 +77,6 @@ class CommentThread extends PureComponent {
     }
   );
 
-
   getFlexBasis = ({ isActiveSibling, noActiveSiblings }) => {
     if (isActiveSibling) {
       return 0.65;
@@ -85,6 +86,13 @@ class CommentThread extends PureComponent {
     }
     return 0.20;
   }
+
+  handleOnClick = (e) => {
+    this.props.expandCollapseAll();
+  };
+
+  /* to prevent renders from recreating the style obj everytime */
+  // styleObj = { ...this.props.style, zIndex: `${0 - this.state.branch}` };
 
   render() {
     const {
@@ -100,6 +108,7 @@ class CommentThread extends PureComponent {
       maxChildren,
       maxDepth,
       isOpenedInit,
+      parentOnClick,
       style,
     } = this.props;
     const {
@@ -108,19 +117,21 @@ class CommentThread extends PureComponent {
       localChildren,
       title
     } = this.state;
+    // console.log('thread render: id', collapserId);
     return (
       <AnimatedFlexbox
         className={this.getClassName(this.props)}
         id={collapserId}
         flexBasis={this.getFlexBasis(this.props)}
         isRootNode={isRootNode}
+        onClick={this.handleOnClick}
         ref={collapserRef}
-        style={{ ...style, zIndex: `${0 - branch}` }}
+        style={style}
       >
         <ExpandButton
           isOpened={areAllItemsExpanded}
-          onClick={expandCollapseAll}
-          style={{ order: -5 }}
+          // onClick={expandCollapseAll}
+          style={this.buttonStyle}
           title={this.appendTitle(collapserId, title)}
         />
         <CommentWithButtons
@@ -130,9 +141,9 @@ class CommentThread extends PureComponent {
           deleteThread={this.removeThread}
           text={comment}
         />
-        { children }
+        { children.length > 0 && children }
         {
-          localChildren.map(childNodeData => (
+          localChildren.length > 0 && localChildren.map(childNodeData => (
             <WrappedCommentThread
               setActiveChildLimit={setActiveChildLimit}
               isOpenedInit={childIsOpenedInit}
@@ -182,7 +193,7 @@ CommentThread.propTypes = {
 };
 
 CommentThread.whyDidYouRender = {
-  logOnDifferentValues: true,
+  logOnDifferentValues: false,
   customName: 'CommentThreadPerf'
 };
 

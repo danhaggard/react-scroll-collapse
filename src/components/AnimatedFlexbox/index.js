@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { Motion, spring } from 'react-motion';
 import forwardRefWrapper from '../../utils/forwardRef';
@@ -22,18 +22,40 @@ const FLEX_STYLE = {
   },
 };
 
+const StaticChild = React.forwardRef(({ children, className, onClick, style }, ref) => (
+  <div
+    className={className}
+    onClick={onClick}
+    ref={ref}
+    style={style}
+    role="button"
+    tabIndex={0}
+    type="button"
+  >
+    { children }
+  </div>
+));
 
-const FlexMotion = React.forwardRef(({
+StaticChild.whyDidYouRender = {
+  logOnDifferentValues: false,
+  customName: 'StaticChild'
+};
+
+const PureStaticChild = React.memo(StaticChild);
+
+const FlexMotion = React.forwardRef(({ // eslint-disable-line
   id,
   className,
   children,
   flexStyle,
   getInterpolatedStyle,
   motionStyle,
+  onClick,
   style,
 }, ref) => (
   <Motion
     style={motionStyle}
+    onClick={onClick}
   >
     {
       (interpolatedStyle) => {
@@ -42,26 +64,39 @@ const FlexMotion = React.forwardRef(({
           ...style,
           ...getInterpolatedStyle(interpolatedStyle)
         };
-        console.log('id, interpolated, parsed', id, interpolatedStyle.width, newStyle.width);
+      //  console.log('id, interpolated, parsed', id, interpolatedStyle.width, newStyle.width);
         return (
-          <div
+          <PureStaticChild
             className={className}
             ref={ref}
             style={newStyle}
+            onClick={onClick}
           >
             { children }
-          </div>
+          </PureStaticChild>
         );
       }
     }
   </Motion>
 ));
 
-class AnimatedFlexbox extends Component { // eslint-disable-line
+FlexMotion.whyDidYouRender = {
+  logOnDifferentValues: false,
+  customName: 'FlexMotion'
+};
+
+const PureFlexMotion = React.memo(FlexMotion);
+
+class AnimatedFlexbox extends PureComponent { // eslint-disable-line
 
   // defaultSpringConfig = { stiffness: 170, damping: 20 };
 
   defaultSpringConfig = DEFAULT_MOTION_SPRING;
+
+  childStyle = {
+    ...FLEX_STYLE.parent,
+    ...this.props.style,
+  }
 
   componentDidMount() {
     const { flexRef } = this.props;
@@ -115,10 +150,16 @@ class AnimatedFlexbox extends Component { // eslint-disable-line
   getMotionStyle = () => {
     const { flexBasis } = this.props;
     const motionStyle = { width: spring(flexBasis, this.getSpringConfig()) };
-    console.log('motionStyle', motionStyle);
+    // console.log('motionStyle', motionStyle);
     return motionStyle;
     // return { width: spring(flexBasis, this.getSpringConfig()) };
     // return { flex: spring(flexBasis, this.getSpringConfig()) };
+  }
+
+  handleOnClick = (e) => {
+    e.stopPropagation();
+    //e.preventDefault();
+    this.props.onClick(e);
   }
 
   render() {
@@ -128,31 +169,31 @@ class AnimatedFlexbox extends Component { // eslint-disable-line
       className,
       flexRef,
       isRootNode,
+      onClick,
       style
     } = this.props;
     return !isRootNode ? (
-      <FlexMotion
+      <PureFlexMotion
         id={id}
         className={className}
         flexStyle={FLEX_STYLE.parent}
         getInterpolatedStyle={this.getInterpolWidthPercent}
         motionStyle={this.getMotionStyle()}
+        onClick={this.handleOnClick}
         ref={flexRef}
         style={style}
       >
         { children }
-      </FlexMotion>
+      </PureFlexMotion>
     ) : (
-      <div
+      <PureStaticChild
         className={className}
+        onClick={this.handleOnClick}
         ref={flexRef}
-        style={{
-          ...FLEX_STYLE.parent,
-          ...style,
-        }}
+        style={this.childStyle}
       >
         { children }
-      </div>
+      </PureStaticChild>
     );
 
   }

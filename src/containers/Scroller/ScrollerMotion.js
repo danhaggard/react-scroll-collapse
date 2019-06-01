@@ -11,36 +11,29 @@ import { setContextAttrs } from '../../utils/objectUtils';
 
 const scrollerMotionWrapper = (ScrollerComponent) => {
 
-  /*
-    Scroller motion controls the scroll animation by rendering
-    src/components/Scroller and passing a scrollTop prop that has been
-    interpolated into a series of values by react-motion.
-
-    It is also responsibile for intermediating between the sagas and the Scroller
-    component by initialising a saga for that Scroller and passing the
-    getScrollTop method from Scroller to that saga.
-  */
   class ScrollerMotion extends PureComponent {
 
     setAttrs = (() => setContextAttrs(this))();
 
-    // defaultSpringConfig = { stiffness: 170, damping: 20 };
     defaultSpringConfig = DEFAULT_MOTION_SPRING;
 
     prevY = null;
 
-    /*
-      userScrollActive: used to give back scroll control to the user.
-      Set to true so event handlers do not fire until animation starts.
-      Kept outside react state to prevent unecessary renders.
-    */
-    userScrollActive = true;
+    getSpringConfig = () => this.props.springConfig || this.defaultSpringConfig;
 
-    componentDidUpdate() {
-      this.userScrollActive = false;
-    }
+    getUserScrollActive = this.methods.scroller.getUserScrollActive;
+
+    setUserScrollActive = this.methods.scroller.setUserScrollActive;
 
     setScrollTop = this.methods.scroller.setScrollTop;
+
+    breakScrollAnimation = () => {
+      const { onAnimationCancel } = this.props;
+      this.setUserScrollActive(true);
+      if (typeof onAnimationCancel === 'function') {
+        onAnimationCancel();
+      }
+    }
 
     /*
       If scrollTo prop passed a value - use that.  Otherwise use the current
@@ -85,18 +78,6 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
       return { y };
     }
 
-    breakScrollAnimation = () => {
-      const { onAnimationCancel } = this.props;
-      this.userScrollActive = true;
-      if (typeof onAnimationCancel === 'function') {
-        onAnimationCancel();
-      }
-    }
-
-    getUserScrollActive = () => this.userScrollActive;
-
-    getSpringConfig = () => this.props.springConfig || this.defaultSpringConfig;
-
     render() {
       const { onRest, ...rest } = this.props;
       const motionStyle = this.modifyMotionStyle();
@@ -123,7 +104,7 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
               an unneccesary render of the parent and child components.
             */
             (val) => {
-              if (!this.userScrollActive) {
+              if (!this.getUserScrollActive()) {
                 this.setScrollTop(val.y);
               }
               return (

@@ -61,4 +61,9 @@ ButtonGroup.propTypes = {
   className: PropTypes.string,
 };
 
+ButtonGroup.whyDidYouRender = {
+  logOnDifferentValues: false,
+  customName: 'ButtonGroup'
+};
+
 export default ButtonGroup;

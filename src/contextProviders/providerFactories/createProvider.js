@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import shallowEqual from 'react-pure-render/shallowEqual';
@@ -61,7 +61,7 @@ const createProvider = (
   wrapper = null,
 ) => (Context, Comp) => {
   const Wrapped = wrapper ? wrapper(Comp) : Comp;
-  class Provider extends PureComponent {
+  class Provider extends Component {
 
     /*
       To ensure all nodes get access to parent context while getting an
@@ -131,31 +131,33 @@ const createProvider = (
 
     prevContextProps = this.defaultContextProps;
 
-    nextContextProps = this.prevContextProps;
+    nextContextProps = null;
+
+    parentIds = {};
 
     constructor(props, context) {
       super(props, context);
       this.setChildContext();
+      this.setReactScrollCollapse();
     }
 
     getId = () => this.props._reactScrollCollapse.id; // eslint_disable_line
 
     getParentIdObj = (props) => {
-      const parentIdObj = {};
 
       // Adds its own id as a parent.
       if (childTypeKeys.length > 0) {
-        parentIdObj[typeKey] = this.getId();
+        this.parentIds[typeKey] = this.getId();
       }
 
       // Adds the other parent ids as asked for the be provider.
       parentTypeKeys.forEach((key) => {
         const parentIdKey = getParentIdKey(key); // remove this and get it from the new props schema thingo
         if (!isUndefNull(props[parentIdKey])) {
-          parentIdObj[key] = props[parentIdKey];
+          this.parentIds[key] = props[parentIdKey];
         }
       });
-      return parentIdObj;
+      return this.parentIds;
     }
 
     /*
@@ -163,11 +165,11 @@ const createProvider = (
       but is a parent of something - then it is a root node.
     */
     checkIfRoot = () => {
-      const { _reactScrollCollapse: { parents } } = this.props;
-      if (typeof parents === 'undefined') {
+      const { _reactScrollCollapseParents } = this.props;
+      if (typeof _reactScrollCollapseParents === 'undefined') {
         return true;
       }
-      if (typeof parents[typeKey] === 'undefined') {
+      if (typeof _reactScrollCollapseParents[typeKey] === 'undefined') {
         return true;
       }
       return false;
@@ -228,15 +230,7 @@ const createProvider = (
       return {
         ...other,
         ...this.state,
-        _reactScrollCollapse: {
-          id: this.getId(),
-          isRootNode: this.checkIfRoot(),
-          parents: this.props._reactScrollCollapse.parents, // eslint-disable-line
-          methods: this.mergedContextMethods,
-          rootNodeId: this.childContext.rootNodeId,
-          rootNodes: this.getRootNodes(this.props),
-          type: typeKey,
-        },
+        _reactScrollCollapse: this._reactScrollCollapse,
       };
     }
 
@@ -249,11 +243,27 @@ const createProvider = (
       this.childContext.contextProps = this.nextContextProps;
     }
 
+    setReactScrollCollapse = (() => {
+      this._reactScrollCollapse = {
+        id: this.getId(),
+        isRootNode: this.checkIfRoot(),
+        parents: this.props._reactScrollCollapseParents, // eslint-disable-line
+        methods: this.mergedContextMethods,
+        rootNodeId: this.childContext.rootNodeId,
+        rootNodes: this.getRootNodes(this.props),
+        type: typeKey,
+      };
+    });
+
     render() {
+      if (typeKey === 'collapser') {
+        // console.log(`CreateProvider - id: ${this.getId()} - props, this`, this.props, this);
+
+      }
       this.updateChildContext();
       const newProps = this.getProps();
-      return childTypeKeys.length === 0 ? <Comp {...this.getProps()} /> : (
-        <Context.Provider value={this.childContext}>
+      return /* childTypeKeys.length === 0 ? <Comp {...this.getProps()} /> : */(
+        <Context.Provider value={{ ...this.childContext }}>
           <Wrapped
             {...this.getProps()}
             key={this.idKey}

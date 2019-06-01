@@ -16,4 +16,9 @@ CommentBody.propTypes = {
   text: PropTypes.string.isRequired,
 };
 
+CommentBody.whyDidYouRender = {
+  logOnDifferentValues: false,
+  customName: 'CommentBody'
+};
+
 export default React.memo(CommentBody);

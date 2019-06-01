@@ -37,7 +37,7 @@ import {
   arbitrarily deep in other components in the DOM.
 */
 
-export const activeChildrenLimitReducer = (state = Infinity, action) => {
+export const activeChildrenLimitReducer = (state = 1, action) => {
   const { activeChildrenLimit } = getOrObject(action, 'payload');
   switch (action.type) {
     case SET_ACTIVE_CHILDREN_LIMIT:

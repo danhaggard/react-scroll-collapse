@@ -56,7 +56,7 @@ export const getCollapserActiveChildrenRoot = curryCompose(
 );
 
 // --- collapser.activeChildrenLimit: => number
-const getCollapserActiveChildrenLimit = collapserObject => getOrDefault(Infinity)(
+const getCollapserActiveChildrenLimit = collapserObject => getOrDefault(1)(
   collapserObject,
   'activeChildrenLimit'
 );

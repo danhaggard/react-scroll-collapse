@@ -5,8 +5,9 @@ import { connect } from 'react-redux';
 
 import forwardRefWrapper from '../../utils/forwardRef';
 import { checkForRef } from '../../utils/errorUtils';
-import { collapserWrapperActions } from '../../actions';
+import { collapserWrapperActions, collapserContextActions } from '../../actions';
 import { isUndefNull } from '../../utils/selectorUtils';
+import { cleanHoCProps } from '../../utils/hocUtils/cleanHoCProps';
 
 import { getNodeTargetArrayRoot, getRootUnmountArrayRoot } from '../../selectors/rootNode';
 import {
@@ -54,7 +55,8 @@ export const collapserWrapper = (WrappedComponent) => {
         setActiveChildLimit,
       } = props;
       this.state = { areAllItemsExpanded };
-      if (!isUndefNull(setActiveChildLimit)) {
+      if (!isUndefNull(setActiveChildLimit)
+        && setActiveChildLimit !== CollapserController.defaultProps.setActiveChildLimit) {
         this.methods.collapser.setActiveChildrenLimit(setActiveChildLimit);
       }
       areAllItemsExpandedWorker.addEventListener('message', this.handleAllItemsExpandedWorkerMessage);
@@ -195,17 +197,39 @@ export const collapserWrapper = (WrappedComponent) => {
       this.setExpandedState(this.props);
     }
 
-    isActiveSibling = () => this.methods.collapser.checkIfActiveSibling(this.props);
+    isActiveSibling = () => this.methods.collapser.checkIfActiveSibling();
 
-    noActiveSiblings = () => this.methods.collapser.noActiveSiblings(this.props);
+    noActiveSiblings = () => this.methods.collapser.noActiveSiblings();
+
+    cleanProps = (props) => {
+      return cleanHoCProps(
+        props,
+        {
+          ...collapserWrapperActions,
+          ...collapserContextActions,
+        },
+        [
+          'activeChildren',
+          'activeChildrenLimit',
+          'areAllItemsExpandedWorker',
+          'cache',
+          'contextProps',
+          'rootNodeId',
+          'selectors',
+          // 'setActiveChildLimit',
+          '_reactScrollCollapseParents'
+        ]
+      );
+    }
 
     render() {
-      // console.log('collapser render id, props.contextProps', this.id, this.props.contextProps);
-      const { expandCollapseAll, selectors, ...other } = this.props;
+      // console.log('collapser render id, props.contextProps', this.id, this.props, this);
+      // const { expandCollapseAll, selectors, ...other } = this.props;
       const { areAllItemsExpanded } = this.state;
+      const cleanProps = this.cleanProps(this.props);
       return (
         <WrappedComponentRef
-          {...other}
+          {...cleanProps}
           isActiveSibling={this.isActiveSibling(this.props)}
           noActiveSiblings={this.noActiveSiblings(this.props)}
           ref={this.elem}
@@ -216,7 +240,9 @@ export const collapserWrapper = (WrappedComponent) => {
     }
   }
 
-  CollapserController.defaultProps = {};
+  CollapserController.defaultProps = {
+    setActiveChildLimit: 1,
+  };
 
   CollapserController.propTypes = {
     /* provided by collapserControllerWrapper */

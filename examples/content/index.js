@@ -143,8 +143,8 @@ export const generateCommentThreadData = (
 
 const generateThreadConfig = {
   minChildren: 3,
-  minDepth: 4,
-  maxChildren: 3,
+  minDepth: 3,
+  maxChildren: 4,
   maxDepth: 4,
 };
 
@@ -156,7 +156,7 @@ const generateThreadConfigChild = {
 };
 
 const someData = generateCommentThreadData(generateThreadConfig);
-console.log('someData', someData);
+// console.log('someData', someData);
 
 const example9 = (
   <Example {...COPY[6]} style={{}} key={5}>
