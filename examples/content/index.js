@@ -48,8 +48,8 @@ const COPY = {
     text: '',
   },
   6: {
-    title: 'The most over engineered accordion you will ever see',
-    text: 'And I have barely even started',
+    title: '',
+    text: '',
   }
 };
 
@@ -142,17 +142,17 @@ export const generateCommentThreadData = (
 */
 
 const generateThreadConfig = {
-  minChildren: 3,
-  minDepth: 3,
-  maxChildren: 3,
-  maxDepth: 3,
+  minChildren: 2,
+  minDepth: 2,
+  maxChildren: 4,
+  maxDepth: 5,
 };
 
 const generateThreadConfigChild = {
-  minChildren: 2,
-  minDepth: 3,
-  maxChildren: 2,
-  maxDepth: 3,
+  minChildren: 1,
+  minDepth: 1,
+  maxChildren: 4,
+  maxDepth: 4,
 };
 
 const someData = generateCommentThreadData(generateThreadConfig);

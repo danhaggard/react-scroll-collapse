@@ -74,6 +74,7 @@ const recurseToNodeArray = (argsObj) => {
     targetNodeArray, // id objs of the target nodes.
     counter = getNextIdFactory(argsObj.currentNodeIdObj.id - 1),
     setTreeId = false,
+    rootNodeId,
   } = argsObj;
 
   /*
@@ -90,9 +91,13 @@ const recurseToNodeArray = (argsObj) => {
       we can save results along the way.
   */
   const currentNodeId = currentNodeIdObj.id;
-  // debugger;
   const cachedValue = cache.getResultValue(currentNodeId);
   const cachedSources = cache.getResultSources(currentNodeId);
+
+  if (setTreeId && currentNodeId === rootNodeId) {
+    counter.resetCounter();
+  }
+
   /* sets tree ids to the cache on first traversal on mount */
   if (setTreeId || targetNodeArray.length === 0) {
     cache.setResultTreeId(currentNodeId, counter());

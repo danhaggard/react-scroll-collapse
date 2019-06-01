@@ -71,8 +71,12 @@ export const collapserWrapper = (WrappedComponent) => {
     }
 
     componentWillUnmount() {
-      const { areAllItemsExpandedWorker } = this.props;
-      areAllItemsExpandedWorker.addEventListener('message', this.handleAllItemsExpandedWorkerMessage);
+      const {
+        props: { areAllItemsExpandedWorker, cache, _reactScrollCollapse: { isRootNode } }, id
+      } = this;
+      areAllItemsExpandedWorker.removeEventListener('message', this.handleAllItemsExpandedWorkerMessage);
+      cache.deleteRecursionCacheEntry(id);
+      console.log(`collapser Id ${id} - about to unmount`);
     }
 
     /*
@@ -101,8 +105,10 @@ export const collapserWrapper = (WrappedComponent) => {
         mounting,
         largestValueFromThisMountCycle
       } = cache.getMountInfo();
+      debugger;
 
-      const mountingStarted = id - largestValueFromPrevMountCycle > 1;
+      const mountingStarted = (id - largestValueFromPrevMountCycle > 1
+        || (id - largestValueFromPrevMountCycle === 1 && !mounting));
       const mountingFinished = !mountingStarted && mounting;
       /* a root node mounted without children */
       if (!mountingStarted && !mountingFinished && !mounting
@@ -241,6 +247,7 @@ export const collapserWrapper = (WrappedComponent) => {
         mounting,
         largestValueFromPrevMountCycle
       } = cache.getMountInfo();
+      debugger;
       if (mounting && id - largestValueFromPrevMountCycle > 1) {
         /*
           assume no more are mounting for now - have no idea ohw long to wait. ?

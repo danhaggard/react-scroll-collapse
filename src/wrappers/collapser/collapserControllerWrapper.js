@@ -17,13 +17,18 @@ export const collapserControllerWrapper = (CollapserController) => {
     }
 
     // Currently moved this func to collapserWrapper.
-    /*
-      componentWillUnmount() {
-        const { removeCollapser } = this.props;
-        const { collapserId, parentCollapserId, parentScrollerId } = this.props;
-        removeCollapser(parentScrollerId, parentCollapserId, collapserId);
-      }
-    */
+
+    componentWillUnmount() {
+      const {
+        props: { removeCollapser },
+        parentScrollerId,
+        parentCollapserId,
+        id,
+        isRootNode
+      } = this;
+      removeCollapser(parentScrollerId, parentCollapserId, id, isRootNode);
+    }
+
 
     addCollapser() {
       const {

@@ -52,7 +52,6 @@ class CommentThread extends PureComponent { //eslint-disable-line
     const newChildren = [...Array(numNewChildren).keys()].map(
       i => this.generateChildData(count + i, depth + 1)
     );
-    console.log('newChildren', newChildren);
     this.setState(this.addChildren(newChildren, insertChildAtIndex));
   };
 

@@ -56,6 +56,7 @@ const createCache = (rootNodeIdArg = 0) => {
   const getMountInfo = () => getCache().mountInfo;
 
   const setMountInfo = (obj) => {
+    debugger;
     const cache = getCache();
     cache.mountInfo = {
       ...cache.mountInfo,
@@ -72,6 +73,7 @@ const createCache = (rootNodeIdArg = 0) => {
 
   const setCurrentReduxState = obj => (getCache().currentReduxState = obj);
 
+  const deleteRecursionCacheEntry = id => (delete getRecursionCache()[id]);
 
   const getResultOrObj = id => getOrObject(getRecursionCache(), id);
 
@@ -107,6 +109,7 @@ const createCache = (rootNodeIdArg = 0) => {
   const recursionCache = {
     addResult,
     clearCache,
+    deleteRecursionCacheEntry,
     getRecursionCache,
     getMountInfo,
     getCurrentReduxState,

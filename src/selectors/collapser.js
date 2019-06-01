@@ -129,6 +129,7 @@ export const nestedCollapserItemsExpandedRootEvery = (
     resultReducer: everyReducer(true),
     getNodeValue,
     getTreeId: cache.getResultTreeId,
+    rootNodeId,
     targetNodeArray: targetNodeTreeIdArray, // change this arg name to the state key.
     setTreeId,
   });

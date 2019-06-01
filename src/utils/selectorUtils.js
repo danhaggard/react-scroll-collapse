@@ -73,5 +73,6 @@ export const getNextIdFactory = (initialId = -1) => {
     return currentId;
   };
   counter.getCurrent = () => currentId;
+  counter.resetCounter = () => (currentId = initialId);
   return counter;
 };
