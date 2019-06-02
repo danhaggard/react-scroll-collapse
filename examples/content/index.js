@@ -142,17 +142,17 @@ export const generateCommentThreadData = (
 */
 
 const generateThreadConfig = {
-  minChildren: 2,
-  minDepth: 2,
+  minChildren: 4,
+  minDepth: 4,
   maxChildren: 4,
-  maxDepth: 5,
+  maxDepth: 4,
 };
 
 const generateThreadConfigChild = {
-  minChildren: 1,
-  minDepth: 1,
-  maxChildren: 4,
-  maxDepth: 4,
+  minChildren: 2,
+  minDepth: 2,
+  maxChildren: 2,
+  maxDepth: 2,
 };
 
 const someData = generateCommentThreadData(generateThreadConfig);
@@ -181,14 +181,14 @@ const example10 = (
   </Example>
 );
 
-
+const style = { height: '100%', willChange: 'scroll-position'}
 const example11 = (
   <Example {...COPY[6]} style={{}} key={5}>
 
-    <Scroller style={{ height: '100%' }}>
+    <Scroller style={style}>
       <CommentThreadFlex
         key={someData.key}
-        insertChildAtIndex={2}
+        insertChildAtIndex={0}
         isOpenedInit={false}
         childIsOpenedInit={false}
         nodeData={someData}

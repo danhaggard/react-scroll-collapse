@@ -1,3 +1,4 @@
+/*
 :local(.commentThread) {
   border: 1px solid #AAA;
   border-radius: 1.5em;
@@ -8,9 +9,24 @@
   padding: 2em;
   padding-top: 1.5em;
   flex: 1 1 auto;
+  will-change: transform;
   cursor: pointer;
 }
+*/
 
+:local(.commentThread) {
+  border: 1px solid #AAA;
+  border-radius: 1.5em;
+  background: linear-gradient(225deg, #ddffab, #abe4ff, #d9abff);
+  // background-size: 200% 200%;
+  margin: 1.5em;
+  min-width: min-content;
+  padding: 1.5em;
+  padding-top: 1.5em;
+  flex: 1 1 auto;
+  will-change: transform;
+  cursor: pointer;
+}
 
 :local(.expanded) {
   min-width: min-content;
