@@ -1,3 +1,6 @@
+@import '../../style/settings/index';
+@import '../../style/tools/index';
+
 /*
 :local(.commentThread) {
   border: 1px solid #AAA;
@@ -20,12 +23,26 @@
   background: linear-gradient(225deg, #ddffab, #abe4ff, #d9abff);
   // background-size: 200% 200%;
   margin: 1.5em;
-  min-width: min-content;
+  //min-width: min-content;
   padding: 1.5em;
   padding-top: 1.5em;
   flex: 1 1 auto;
   will-change: transform;
   cursor: pointer;
+
+  @include respond-to(md) {
+    min-width: min-content;
+
+    > * {
+      &:first-child {
+        margin-right: 0.75em;
+      }
+
+      &:last-child {
+        margin-left: 0.75em;
+      }
+    }
+  }
 }
 
 :local(.expanded) {
@@ -34,5 +51,5 @@
 }
 
 :local(.noChildren) {
-  padding-bottom: 1em;
+  //padding-bottom: 1em;
 }

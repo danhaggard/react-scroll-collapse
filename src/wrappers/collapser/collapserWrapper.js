@@ -19,7 +19,12 @@ import { setContextAttrs } from '../../utils/objectUtils';
 
 import addLoggingDefaultsToComponent from '../../utils/logging/utils';
 
+import createMountCache from '../../caching/mountCache';
+import { createForkedNodesTracker } from '../../selectors/trackForkedNodes';
 
+const forkedNodesTracker = createForkedNodesTracker(0);
+
+const mountCache = createMountCache(0);
 export const collapserWrapper = (WrappedComponent) => {
 
   const WrappedComponentRef = forwardRefWrapper(WrappedComponent, 'collapserRef');
@@ -27,6 +32,7 @@ export const collapserWrapper = (WrappedComponent) => {
   class CollapserController extends Component {
 
     elem = React.createRef();
+
 
     /*
       After mounting a bunch of nodes we need to check state - but this method
@@ -63,6 +69,13 @@ export const collapserWrapper = (WrappedComponent) => {
     }
 
     componentDidMount() {
+      const {
+        props: { areAllItemsExpandedWorker, cache, _reactScrollCollapse: { isRootNode, parents: { collapser } } }, id
+      } = this;
+
+      console.log('id', id);
+      debugger;
+      forkedNodesTracker.checkForkOrphan(id, collapser);
       /*
         Make sure users pass a ref to a DOM node.
       */
@@ -136,6 +149,45 @@ export const collapserWrapper = (WrappedComponent) => {
         consequently not as the bstarting point of the next mount cycle.  The
         top most node of the next cycle will be 2 - and is not > 1.  SO we
         woin't be able to detect when that cycle finishes.
+
+
+        !!!!--- BAD NODE MOUNT LOCATION DETECTION ---!!!!
+
+        When adding new nodes.  Need to detect whether it is safe to use
+        it's id as the treeId - or whether there is a treeId we can use,
+        or if we have to rebuild some of the tree.
+
+        Algo.
+
+        1) init arr = [rootNodeId].
+          (never pop arr[0])
+        2) Add next node to tree.  Pick any entry currently in arr as it's parent.
+        3) If child node is + 1 parent node, then simply add this id to the array.
+        4) if child node is > parent + 1.  Then pop id greater than parent, and then push
+          child node after that.
+        5) Back to 2 - noting that the selection choices for next node are reduced.
+
+        Explanation.  By doing this you are ensured of there always being a path
+        to your node by choosing the largest child < target available.
+
+        [0] - you can always fork from zero safely because you can always touch
+          root so not blocked from reaching child.
+        1 is 1 + 0 - so by 3) add 1 to the array. [0, 1]
+
+        Id = 2 can now choose 0 or 1.  if 1 then [0, 1, 2] - 3 can still pick
+        any of these safely - because at node 0 - you'd pick the largest child 1.
+        There you either can see 3 as child - or your only choise is two then to 3.
+
+        If Three picks 1.  Then 2 has to get popped.  Because if 4 chose two - there
+        would be no path.  At node 1 you'd pick 3 as the > val that is less than
+        four - but then you'd be stuck.
+
+        ACTUALLY - don't need to store the whole array.
+
+        Store an array of tuples of the lastForkParent and then id of the node that forked lastForkChild,.
+        If new node gets given a parent which is between any of those two values for any pair
+        you're lost.
+
     */
 
     /*
@@ -161,160 +213,16 @@ export const collapserWrapper = (WrappedComponent) => {
       CASE: 3 - Single node mounted in cycle, is + 1 from BASE - no children.
         distance === 1  && (BASE + 1 === id) && !mounting.
 
-                        0
-                      /   \
-                     1     2  distance from parent < 2
 
+*/
 
-                              3 under 2 is fine.
-                     0
-                   /   \      3 under 1 is not.
-                  1     2   distance 3 -> 1 = 2
-                /
-              3
-                                1) get parent (treeId = 1).
-
-                                1 => 2
-                                2 => 1
--------------
-                    0
-                  /   \     id = 4
-                 2     1    a) child of 3 - distance is 1 is fine.
-               /            b) child of 2 - distance = 2 < prev highest 3 - is ok.
-             3              c) child of 1 - distance = 3 = prev highest = not ok
-
-                            -- get parent.
-                              1 => 3
-                            -- get parent.
-                              isRootNode - leave.
-                            -- get children
-                              2 => 1
-                            -- get children
-                              3 => 2
-
-                            d) child of root.  Is fine.
------------------
-        0
-        1 2 3 4 5 6
-        2 3 4 5 6
-        3 4 5 6
-        4 5 6
-        5 6
-        6
-  ---------------
-
-  a:  0
-  b:  0 -> 1
-
-  c:  0 -> 1 -> 2
-        -> 2
-
-  d:  0 -> 1 -> 2 -> 3
-        -> 2 -> 3
-        -> 3
-
-  e:  0 -> 1 -> 2 -> 3 -> 4
-        -> 2 -> 3 -> 4
-        -> 3 -> 4
-        -> 4
-
-  d = 4, p = [3] - || 4 - dist = 0
-  d = 3, p = [2,3] || 4 - dist = 1
-  d = 2, p = [2,3] || 4 - dist = 2
-  d = 1, p = [0]  || 4 - dist = 3
-
-  bad:
-
-  d = 2, p = [1] - || 4 - dist = 2
-
-  id - dist > p === bad?
-
-  -----
-
-  e:  0 -> 1 -> 2 -> 3 -> 4 -> 5
-        -> 2 -> 3 -> 4 -> 5
-        -> 3 -> 4 -> 5
-        -> 4 -> 5
-        -> 5
-
-        p = [4], d = 5, df = 0
-        p = [3, 4], d = 4, df = 0
-        p = [3, 4], d = 3
-        p = [3, 4], d = 2
-        p = [0], d = 1
-
-
-        e:  0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6
-              -> 2 -> 3 -> 4 -> 5 -> 6
-              -> 3 -> 4 -> 5 -> 6
-              -> 4 -> 5 -> 6 -> 7
-              -> 5 -> 6 -> 7
-              -> 6 -> 7
-
-              e:  0 -> 1 -> 2
-                       (2)
-                    -> 3 -> 4
-                       (4)
-                    -> 5 -> 6 -> 7
-                       (6)
-                       (7)
-
-
-                       e:  0 -> 1 -> 2
-                               (2
-                             -> 3 -> 4 -> 5
-
-                            5 can choose any great than 2.
-
-                            e:  0 -> 1 -> 2
-                                    (2
-                                  -> 3 -> 4
-
-
-                          forking from root.  store the highest
-                          number since last root fork.catch
-                          you can choose
-
-
-
-
-
-                0
-             /  |  \             id = 8
-            1   5    3            a) child of [1, 2, 3, 4]
-          /    |     |               [ 8 - 4] = 4
-        2      6     4
-              /
-            7
-
-
-
-
-
-
-
-
-
-
-
-          0
-        /   \
-       1     5
-     /   \  /  \
-    2    4 6    8
-  /        |
-3          7
+    /*
+    setCacheOnMount() {
+      const { props: { cache, _reactScrollCollapse: { isRootNode } }, id } = this;
+    }
     */
 
     setCacheOnMount() {
-      const { props: { cache, _reactScrollCollapse: { isRootNode } }, id } = this;
-
-      const { BASE_NODE } = cache.getMountInfo();
-      const BASE_NODE =
-      /* CASE:  top node no children.  */
-    }
-
-    setCacheOnMountOld() {
       const { props: { cache, _reactScrollCollapse: { isRootNode } }, id } = this;
       const {
         largestValueFromPrevMountCycle,
@@ -474,7 +382,6 @@ export const collapserWrapper = (WrappedComponent) => {
         mounting,
         largestValueFromPrevMountCycle
       } = cache.getMountInfo();
-      debugger;
       if (mounting && id - largestValueFromPrevMountCycle > 1) {
         /*
           assume no more are mounting for now - have no idea ohw long to wait. ?
