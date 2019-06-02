@@ -56,7 +56,6 @@ const createCache = (rootNodeIdArg = 0) => {
   const getMountInfo = () => getCache().mountInfo;
 
   const setMountInfo = (obj) => {
-    debugger;
     const cache = getCache();
     cache.mountInfo = {
       ...cache.mountInfo,

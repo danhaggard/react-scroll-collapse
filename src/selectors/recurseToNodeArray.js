@@ -164,6 +164,20 @@ const recurseToNodeArray = (argsObj) => {
      5   6 8  9
 
 
+     0
+    / \
+   1   2
+     / | \
+    3  4  7
+     / \   \
+    5   13  14
+  / | \
+6   8  10
+|   |  |
+7   9  11
+       |
+       12
+
   /*
     Create targetNodeArray for each child.
 

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Motion, spring } from 'react-motion';
 import forwardRefWrapper from '../../utils/forwardRef';
 import { MOTION_SPRINGS, DEFAULT_MOTION_SPRING } from '../../const';
-import { ofChildrenType } from '../../utils/propTypeHelpers';
+import { ofChildrenType, ofFuncTypeOrNothing } from '../../utils/propTypeHelpers';
 
 const FLEX_STYLE = {
   child: {
@@ -45,7 +45,6 @@ StaticChild.whyDidYouRender = {
 const PureStaticChild = React.memo(StaticChild);
 
 const FlexMotion = React.forwardRef(({ // eslint-disable-line
-  id,
   className,
   children,
   flexStyle,
@@ -92,8 +91,6 @@ const PureFlexMotion = React.memo(FlexMotion);
 
 class AnimatedFlexbox extends PureComponent { // eslint-disable-line
 
-  // defaultSpringConfig = { stiffness: 170, damping: 20 };
-
   defaultSpringConfig = DEFAULT_MOTION_SPRING;
 
   childStyle = {
@@ -113,9 +110,7 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
     this.parentWidth = this.getParentWidth();
   }
 
-  calcPixels = (percentage) => {
-    return percentage * this.parentWidth;
-  }
+  calcPixels = percentage => (percentage * this.parentWidth);
 
   getBackgroundString = val => `linear-gradient(${val}deg, #ddffab, #abe4ff, #d9abff)`
 
@@ -163,10 +158,7 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
       background: spring(backgroundRotation, this.getSpringConfig()),
       width: spring(flexBasis, this.getSpringConfig())
     };
-    // console.log('motionStyle', motionStyle);
     return motionStyle;
-    // return { width: spring(flexBasis, this.getSpringConfig()) };
-    // return { flex: spring(flexBasis, this.getSpringConfig()) };
   }
 
   handleOnClick = (e) => {
@@ -185,18 +177,14 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
 
   render() {
     const {
-      id,
       children,
       className,
       flexRef,
       isRootNode,
-      onClick,
-      onKeyDown,
       style
     } = this.props;
     return !isRootNode ? (
       <PureFlexMotion
-        id={id}
         className={className}
         flexStyle={FLEX_STYLE.parent}
         getInterpolatedStyle={this.getInterpolWidthRotation}
@@ -223,45 +211,20 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
   }
 }
 
-/*
-<Motion
-  style={this.getMotionStyle()}
->
-  {
-    (interpolatedStyle) => {
-
-      const newStyle = {
-        ...FLEX_STYLE.parent,
-        ...style,
-        ...this.getInterpolWidthPercent(interpolatedStyle)
-      };
-      console.log('newStyle', newStyle.width);
-      return (
-        <div
-          className={className}
-          ref={flexRef}
-          style={{
-            ...FLEX_STYLE.parent,
-            ...style,
-            ...this.getInterpolWidthPercent(interpolatedStyle)
-          }}
-        >
-          { children }
-        </div>
-      )
-    }
-  }
-</Motion>
-*/
-
 AnimatedFlexbox.defaultProps = {
   children: [],
   className: '',
   flexBasis: 0.15,
+  onClick: null,
+  onKeyDown: null,
   style: {},
 };
 
 AnimatedFlexbox.propTypes = {
+  backgroundRotation: PropTypes.number.isRequired,
+  isRootNode: PropTypes.bool.isRequired,
+  onClick: ofFuncTypeOrNothing,
+  onKeyDown: ofFuncTypeOrNothing,
   children: ofChildrenType,
   className: PropTypes.string,
   flexBasis: PropTypes.number,

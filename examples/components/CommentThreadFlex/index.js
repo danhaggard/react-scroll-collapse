@@ -103,12 +103,11 @@ class CommentThread extends PureComponent { //eslint-disable-line
     return 225 + (this.state.depth * 180);
   }
 
-  handleOnClick = (e) => {
+  handleOnClick = () => {
     this.props.expandCollapseAll();
   };
 
   handleKeyDown = (e) => {
-    debugger;
     if (e.keyCode === 13) {
       this.props.expandCollapseAll();
     }
