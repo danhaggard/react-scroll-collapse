@@ -7,18 +7,10 @@ import { ofChildrenType, ofFuncTypeOrNothing } from '../../utils/propTypeHelpers
 
 const FLEX_STYLE = {
   child: {
-    flex: '1 1 content',
+
   },
   parent: {
-    alignContent: 'start',
-    alignItems: 'flex-start',
-    display: 'flex',
-    flexGrow: 1,
-    flexShrink: 1,
-    flexBasis: 'auto',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-start',
+
   },
 };
 

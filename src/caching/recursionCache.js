@@ -10,6 +10,10 @@ const getResultFactory = getCache => key => (id) => {
 };
 
 const setResultFactory = getCache => key => (id, val) => {
+  if (key === 'treeId') {
+    debugger;
+    console.log(`setting cache treeId val ${val} for collapserId: ${id}`);
+  }
   const cache = getCache();
   const result = cache[id];
   if (!isUndefNull(result)) {

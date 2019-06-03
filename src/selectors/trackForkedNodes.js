@@ -1,11 +1,11 @@
 export const createForkedNodesTracker = (rootNodeId) => {  // eslint-disable-line
-  let prevLargestActiveFork = null;
+  let activeForks = {};
   let largestActiveFork = null;
   let lowestActiveFork = null;
   let rangeUpperBound = null;
 
   let orphanNodes = {};
-  let forkedNodes = {};
+  let allForkedNodes = {};
   let checkedParents = {};
 
   const checkIfOrphanedNode = (parentNodeId, nodeId) => {
@@ -13,36 +13,66 @@ export const createForkedNodesTracker = (rootNodeId) => {  // eslint-disable-lin
       return false;
     }
     if (parentNodeId === lowestActiveFork || parentNodeId === largestActiveFork) {
-      return false;
+      // return false;
     }
 
-    const isOrphan = (lowestActiveFork < parentNodeId && parentNodeId < rangeUpperBound);
-    if (lowestActiveFork < parentNodeId && parentNodeId < rangeUpperBound) {
-      const orphanNodeObj = {
-        nodeId,
-        parentNodeId,
-        rangeStart: lowestActiveFork,
-        rangeEnd: rangeUpperBound
+    /*
+      activeForks[parentNodeId] = {
+        id: parentNodeId,
+        rangeEnd: nodeId
       };
+    */
+    const parentIsOrphan = orphanNodes[parentNodeId];
 
-      orphanNodes[parentNodeId] = orphanNodeObj;
-      console.log(`nodeId ${nodeId} is orphaned by parent: ${parentNodeId} because`, orphanNodeObj);
-      return true;
+    let isOrphan = false;
+
+    let responsibleFork = null;
+    if (!parentIsOrphan) {
+      isOrphan = Object.entries(activeForks).some(([id, fork]) => {
+        const foundFork = id < parentNodeId && parentNodeId < fork.rangeEnd;
+        if (foundFork) {
+          responsibleFork = fork;
+        }
+        return foundFork;
+      });
     }
 
+    let orphanObj = {
+      id: nodeId,
+      parentNodeId,
+    };
 
-    return isOrphan; // (lowestActiveFork < id && id < rangeUpperBound);
+    if (parentIsOrphan) {
+      orphanObj = {
+        ...orphanNodes[parentNodeId],
+        ...orphanObj,
+      };
+    }
+
+    if (isOrphan) {
+      orphanObj = {
+        ...orphanObj,
+        rootOrphan: nodeId,
+        rangeStart: responsibleFork.id,
+        rangeEnd: responsibleFork.rangeEnd,
+      };
+    }
+
+    if (isOrphan || parentIsOrphan) {
+      orphanNodes[nodeId] = orphanObj;
+      console.log(`nodeId ${nodeId} is orphaned by parent: ${parentNodeId} because`, orphanObj);
+      console.log(`all orphan nodes: `, orphanNodes);
+
+    }
+    return isOrphan || parentIsOrphan;
+
   };
 
 
   const logCurrentOrphanRange = () => {
-    const message = `rangeStart: ${lowestActiveFork} - rangeEnd: ${rangeUpperBound}.`;
-    console.log(message);
-
-    if (lowestActiveFork < largestActiveFork && largestActiveFork < rangeUpperBound) {
-      const message2 = `Note that the largestActiveFork: ${largestActiveFork} is currently within this range and is excluded.  You can mount there!`;
-      console.log(message2);
-    }
+    const getRangeString = (start, end) => `rangeStart: ${start} - rangeEnd: ${end}.`;
+    console.log('Current Active Orphan ranges are: ');
+    Object.entries(activeForks).forEach(([id, fork]) => console.log(`${getRangeString(id, fork.rangeEnd)}`));
   };
 
   const clearCheckedParents = () => (checkedParents = {});
@@ -51,25 +81,27 @@ export const createForkedNodesTracker = (rootNodeId) => {  // eslint-disable-lin
 
   const getOrphanNodes = () => orphanNodes;
 
-  const getForkedNodes = () => forkedNodes;
+  const getAllForkedNodes = () => allForkedNodes;
 
-  const clearForkedNodes = () => (forkedNodes = {});
+  const clearAllForkedNodes = () => (allForkedNodes = {});
 
-  const clearAllNodes = () => (clearOrphanNodes() && clearForkedNodes() && clearCheckedParents());
+  const clearAllNodes = () => (
+    clearOrphanNodes() && clearAllForkedNodes() && clearCheckedParents()
+  );
 
-  const logAllNodes = () => console.log('orphanNodes, forkedNodes', orphanNodes, forkedNodes);
+  const logAllNodes = () => console.log('orphanNodes, allForkedNodes', orphanNodes, allForkedNodes);
 
   const addToCheckedParents = (parentNodeId, nodeId) => {
     const newCheckedParent = {
       id: parentNodeId,
-      chlidren: nodeId,
+      children: [nodeId],
     };
     if (!checkedParents[parentNodeId]) {
       checkedParents[parentNodeId] = newCheckedParent;
     } else {
       checkedParents[parentNodeId].children.push(nodeId);
     }
-    console.log('checkedParents', checkedParents);
+    // console.log('checkedParents', checkedParents);
   };
 
 
@@ -93,8 +125,11 @@ export const createForkedNodesTracker = (rootNodeId) => {  // eslint-disable-lin
       /*
         You can still fork from the points at which determine the current range
         within which parents will orphan new nodes.
+
+        So I was counting it.  But we need to update their state if forked multiple
+        times.  So let it through.
       */
-      && (parentNodeId !== lowestActiveFork || parentNodeId !== largestActiveFork);
+    // && (parentNodeId !== lowestActiveFork || parentNodeId !== largestActiveFork);
 
     // basically re caching duplicate info - but this is dirty for now.
     addToCheckedParents(parentNodeId, nodeId);
@@ -102,7 +137,7 @@ export const createForkedNodesTracker = (rootNodeId) => {  // eslint-disable-lin
     if (!isFork) {
       return false;
     }
-    forkedNodes[parentNodeId] = {
+    allForkedNodes[parentNodeId] = {
       parentNodeId,
       nodeId,
       lowestActiveFork,
@@ -113,14 +148,36 @@ export const createForkedNodesTracker = (rootNodeId) => {  // eslint-disable-lin
     // console.log(`lowestActiveFork - before set: ${lowestActiveFork}`);
     lowestActiveFork = parentNodeId !== rootNodeId
       && (lowestActiveFork === null
-        || parentNodeId < lowestActiveFork) ? parentNodeId : lowestActiveFork;
+      || parentNodeId < lowestActiveFork) ? parentNodeId : lowestActiveFork;
+
 
     largestActiveFork = lowestActiveFork !== null
-      && parentNodeId > largestActiveFork ? parentNodeId
+      && parentNodeId > largestActiveFork // || parentNodeId === prevLargestActiveFork)
+      ? parentNodeId
       : largestActiveFork; // && parentNodeId > lowestActiveFork
 
-    prevLargestActiveFork = prevLargestActiveFork !== largestActiveFork
-      ? largestActiveFork : prevLargestActiveFork;
+
+    if (!activeForks[parentNodeId]) {
+      activeForks[parentNodeId] = {
+        id: parentNodeId,
+        rangeEnd: nodeId
+      };
+    } else {
+      activeForks[parentNodeId].rangeEnd = nodeId;
+    }
+
+    let prevActiveForks = Object.keys(activeForks);
+    while (parentNodeId < largestActiveFork && prevActiveForks.length !== 0) {
+      prevActiveForks = prevActiveForks.slice(0, prevActiveForks.length);
+      const prevActiveFork = prevActiveForks.pop();
+      if (parentNodeId < prevActiveFork) {
+        console.log(`removing prev active fork id ${prevActiveFork}`);
+        delete activeForks[prevActiveFork];
+        largestActiveFork = prevActiveFork;
+      }
+    }
+
+
     // console.log(`lowestActiveFork - after set: ${lowestActiveFork}`);
     // console.log(`largestActiveFork - after set: ${largestActiveFork}`);
     rangeUpperBound = nodeId;
@@ -135,7 +192,7 @@ export const createForkedNodesTracker = (rootNodeId) => {  // eslint-disable-lin
     if (nodeId !== rootNodeId) {
       const isOrphaned = checkIfOrphanedNode(parentNodeId, nodeId);
       if (!isOrphaned) {
-        checkIfFork(nodeId, parentNodeId);
+        const parentIsForked = checkIfFork(nodeId, parentNodeId);
       }
     }
   };
@@ -150,7 +207,7 @@ export const createForkedNodesTracker = (rootNodeId) => {  // eslint-disable-lin
     logAllNodes,
     logCurrentOrphanRange,
     orphanNodes,
-    forkedNodes
+    activeForks
   };
   // console.log('orphan cache', returnObj);
   // console.log('logAllNodes', returnObj.logAllNodes);

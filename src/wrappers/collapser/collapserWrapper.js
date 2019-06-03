@@ -101,7 +101,10 @@ export const collapserWrapper = (WrappedComponent) => {
       2    3 5    6
 
       Given the above tree.  The mount order will be:
-        2, 3, 1, 5, 6, 4, 0
+        2, 3, 1, 5, 6, 4, 0  - in order traversal.
+
+        great refresher pages on trees.
+        // https://www.freecodecamp.org/news/all-you-need-to-know-about-tree-data-structures-bceacb85490c/
 
       So we init the largestValueFromPrevMountCycle to be 1 less than the rootNode.
       If any componentId > 0 mounts - we know the mounting cycle has begun and will
