@@ -74,8 +74,9 @@ export const collapserWrapper = (WrappedComponent) => {
       } = this;
 
       console.log('id', id);
-      debugger;
+      // debugger;
       forkedNodesTracker.checkForkOrphan(id, collapser);
+      forkedNodesTracker.logCurrentOrphanRange();
       /*
         Make sure users pass a ref to a DOM node.
       */
@@ -388,7 +389,7 @@ export const collapserWrapper = (WrappedComponent) => {
           Don't update largestValueFromPrevMountCycle because other the next node
           value will be only +1 the current and won't initiate a mount sequence.
         */
-        console.log('checking tree after mount && mount timeout - id, cache', id, cache);
+        console.log('checking tree after mount && mount timeout - id, cache', id);
         this.initiateTreeStateCheck(true);
         cache.setMountInfo({
           mounting: false,
