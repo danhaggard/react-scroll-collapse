@@ -282,7 +282,7 @@ export const collapserWrapper = (WrappedComponent) => {
       }
 
       if (mountingStarted && !mounting && !isRootNode) {
-        setTimeout(this.checkForSingleNodeMount, 100);
+      //  setTimeout(this.checkForSingleNodeMount, 100);
       }
     }
 

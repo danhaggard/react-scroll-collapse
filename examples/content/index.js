@@ -150,9 +150,9 @@ const generateThreadConfig = {
 
 const generateThreadConfigChild = {
   minChildren: 1,
-  minDepth: 1,
-  maxChildren: 3,
-  maxDepth: 4,
+  minDepth: 2,
+  maxChildren: 1,
+  maxDepth: 2,
 };
 
 const someData = generateCommentThreadData(generateThreadConfig);

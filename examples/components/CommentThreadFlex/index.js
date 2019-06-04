@@ -26,6 +26,7 @@ class CommentThread extends PureComponent { //eslint-disable-line
       comment,
       count,
       isOpenedInit,
+      insertChildAtIndex,
       depth,
       title
     } = this.props.nodeData;
@@ -34,6 +35,7 @@ class CommentThread extends PureComponent { //eslint-disable-line
       comment,
       count,
       depth,
+      insertChildAtIndex,
       title,
       localChildren: children,
       threadActive: isOpenedInit || false,
