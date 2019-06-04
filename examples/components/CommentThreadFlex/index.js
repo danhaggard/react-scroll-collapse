@@ -19,15 +19,29 @@ class CommentThread extends PureComponent { //eslint-disable-line
 
   totalAddedChildren = 0;
 
+  constructor(props, context) {
+    super(props, context);
+    const {
+      nodeData: {
+        branch,
+        children,
+        comment,
+        count,
+        depth,
+        title
+      }
+    } = this.props;
+  }
+
   state = (() => {
     const {
       branch,
       children,
       comment,
       count,
+      depth,
       isOpenedInit,
       insertChildAtIndex,
-      depth,
       title
     } = this.props.nodeData;
     return {

@@ -63,9 +63,23 @@ export const compareIntArrays = (arr1, arr2) => {
   return true;
 };
 
+
+export const loopIndex = (array, index) => {
+  const { length } = array.length;
+  if (index <= -1) {
+    return length - 1;
+  }
+
+  if (index >= length) {
+    return 0;
+  }
+
+  return index;
+};
+
 export const insertAtIndex = (arr1, arr2, index = null) => {
   if (!Array.isArray(arr2)) {
-    return insertAtIndex(arr1, arr2, index);
+    return insertAtIndex(arr1, [arr2], index);
   }
   if (index < 0) {
     return insertAtIndex(arr1, arr2, index + arr1.length);
@@ -108,7 +122,6 @@ export const doFromNumber = method => (number, callBack) => (
 export const mapFromNumber = doFromNumber('map');
 
 export const forEachNumber = doFromNumber('forEach');
-
 
 
 // find the maximum of the array and add one to it. zero index.
