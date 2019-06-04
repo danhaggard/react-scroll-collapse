@@ -181,7 +181,7 @@ const example10 = (
   </Example>
 );
 
-const style = { height: '100%', willChange: 'scroll-position'}
+const style = { height: '100%', willChange: 'scroll-position' };
 const example11 = (
   <Example showHeader={false} {...COPY[6]} style={{}} key={5}>
 

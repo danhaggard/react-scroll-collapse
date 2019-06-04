@@ -7,7 +7,7 @@ import ExpandButton from '../ExpandButton';
 import { collapserController } from '../../../src';
 import { ofBoolTypeOrNothing, ofChildrenType, ofNumberTypeOrNothing } from '../../../src/utils/propTypeHelpers';
 import { getRandomInt } from '../../../src/utils/randomUtils';
-import { insertArrayAtIndex } from '../../../src/utils/arrayUtils';
+import { insertAtIndex } from '../../../src/utils/arrayUtils';
 import { generateCommentThreadData } from '../../../src/utils/randomContentGenerators';
 import styles from './CommentThread.scss';
 
@@ -55,7 +55,7 @@ class CommentThread extends PureComponent {
   addChildren = (children, insertChildAtIndex = null) => state => ({
     ...state,
     count: state.count + children.length,
-    localChildren: insertArrayAtIndex(state.localChildren, children, insertChildAtIndex),
+    localChildren: insertAtIndex(state.localChildren, children, insertChildAtIndex),
     // localChildren: [...state.localChildren, ...children],
   });
 

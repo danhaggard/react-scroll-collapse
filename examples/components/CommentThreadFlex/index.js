@@ -8,7 +8,7 @@ import AnimatedFlexbox from '../../../src/components/AnimatedFlexbox';
 import { collapserController } from '../../../src';
 import { ofBoolTypeOrNothing, ofChildrenType, ofNumberTypeOrNothing } from '../../../src/utils/propTypeHelpers';
 import { getRandomInt } from '../../../src/utils/randomUtils';
-import { insertArrayAtIndex } from '../../../src/utils/arrayUtils';
+import { insertAtIndex, removeFromArrayAtIndex } from '../../../src/utils/arrayUtils';
 import { generateCommentThreadData } from '../../../src/utils/randomContentGenerators';
 import styles from './CommentThread.scss';
 
@@ -42,14 +42,35 @@ class CommentThread extends PureComponent { //eslint-disable-line
     };
   })();
 
-  removeChild = state => ({
+  /* ------------------- Child Management --------------------- */
+  generateChildData = (count, depth) => generateCommentThreadData(
+    this.props,
+    count,
+    depth,
+  );
+
+  getNextChildAtIndexVal = (incrementByVal) => {
+    const { insertChildAtIndex, localChildren } = this.state;
+    const numChildren = localChildren.length;
+  }
+
+  setChildAtIndex = val => this.setState(
+    ({ insertChildAtIndex }) => ({ insertChildAtIndex: insertChildAtIndex + val })
+  );
+
+  addChildren = (children, insertChildAtIndex = null) => state => ({
     ...state,
-    localChildren: state.localChildren.slice(0, -1),
+    count: state.count + children.length,
+    localChildren: insertAtIndex(state.localChildren, children, insertChildAtIndex),
+  });
+
+  removeChild = ({ localChildren, insertChildAtIndex }) => ({
+    localChildren: removeFromArrayAtIndex(localChildren, insertChildAtIndex),
   });
 
   insertThread = () => {
-    const { minChildren, maxChildren, insertChildAtIndex } = this.props;
-    const { count, depth } = this.state;
+    const { minChildren, maxChildren } = this.props;
+    const { count, depth, insertChildAtIndex } = this.state;
     const numNewChildren = getRandomInt(minChildren, maxChildren);
     const newChildren = [...Array(numNewChildren).keys()].map(
       i => this.generateChildData(count + i, depth + 1)
@@ -59,18 +80,10 @@ class CommentThread extends PureComponent { //eslint-disable-line
 
   removeThread = () => this.setState(this.removeChild);
 
-  addChildren = (children, insertChildAtIndex = null) => state => ({
-    ...state,
-    count: state.count + children.length,
-    localChildren: insertArrayAtIndex(state.localChildren, children, insertChildAtIndex),
-    // localChildren: [...state.localChildren, ...children],
-  });
+  /* -------------------END - Child Management - END --------------------- */
 
-  generateChildData = (count, depth) => generateCommentThreadData(
-    this.props,
-    count,
-    depth,
-  );
+
+  /* ------------------- Style / Content - Management --------------------- */
 
   appendTitle = (id, title) => ` Collapser ${id.toString()} -- ${title || 'row: 0 - node: 0'}`;
 
@@ -105,6 +118,11 @@ class CommentThread extends PureComponent { //eslint-disable-line
     return 225 + (this.state.depth * 180);
   }
 
+  /* ------------------- END - Style / Content - Management - END --------------------- */
+
+
+  /* ------------------- Event Handlers --------------------- */
+
   handleOnClick = () => {
     this.props.expandCollapseAll();
   };
@@ -114,6 +132,9 @@ class CommentThread extends PureComponent { //eslint-disable-line
       this.props.expandCollapseAll();
     }
   }
+
+  /* ------------------- END - Event Handlers - END --------------------- */
+
 
   /* to prevent renders from recreating the style obj everytime */
   // styleObj = { ...this.props.style, zIndex: `${0 - this.state.branch}` };

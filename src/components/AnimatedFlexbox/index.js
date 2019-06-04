@@ -159,10 +159,12 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
       this.props.onClick(e);
     }
   }
-
+  /*
+    Remember stopping propagation can break things above.
+  */
   handleKeyDown = (e) => {
-    e.stopPropagation();
     if (e.keyCode === 13) {
+      e.stopPropagation();
       this.props.onKeyDown(e);
     }
   }

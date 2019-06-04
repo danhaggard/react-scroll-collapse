@@ -63,7 +63,13 @@ export const compareIntArrays = (arr1, arr2) => {
   return true;
 };
 
-export const insertArrayAtIndex = (arr1, arr2, index = null) => {
+export const insertAtIndex = (arr1, arr2, index = null) => {
+  if (!Array.isArray(arr2)) {
+    return insertAtIndex(arr1, arr2, index);
+  }
+  if (index < 0) {
+    return insertAtIndex(arr1, arr2, index + arr1.length);
+  }
   if (index === 0 || index === null) {
     return [...arr2, ...arr1];
   }
@@ -72,6 +78,25 @@ export const insertArrayAtIndex = (arr1, arr2, index = null) => {
   }
   return [...arr1.slice(0, index), ...arr2, ...arr1.slice(index)];
 };
+
+
+export const removeFromArray = (array, index = 0) => {
+  const { length } = array;
+  if (index < 0) {
+    return removeFromArray(array, index + length);
+  }
+
+  if (index === 0) {
+    return array.slice(1, length);
+  }
+
+  if (length - 1 === index) {
+    return array.slice(0, index);
+  }
+
+  return [...array.slice(0, index), ...array.slice(index + 1, length)];
+};
+
 
 // The Array.apply trick used here I learnt from: http://stackoverflow.com/a/20066663/1914452
 export const arrayFromNumber = number => [...Array(number).keys()];
@@ -83,6 +108,8 @@ export const doFromNumber = method => (number, callBack) => (
 export const mapFromNumber = doFromNumber('map');
 
 export const forEachNumber = doFromNumber('forEach');
+
+
 
 // find the maximum of the array and add one to it. zero index.
 /*
