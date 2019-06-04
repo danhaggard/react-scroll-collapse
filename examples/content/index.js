@@ -183,7 +183,7 @@ const example10 = (
 
 const style = { height: '100%', willChange: 'scroll-position'}
 const example11 = (
-  <Example {...COPY[6]} style={{}} key={5}>
+  <Example showHeader={false} {...COPY[6]} style={{}} key={5}>
 
     <Scroller style={style}>
       <CommentThreadFlex

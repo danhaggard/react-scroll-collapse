@@ -7,26 +7,33 @@ const Example = ({
   children,
   style,
   title,
-  text
+  text,
+  showHeader,
 }) => (
   <div className={styles.example} style={style}>
-    <div className={styles.header}>
-      <h2>{ title }</h2>
-      <p>{ text }</p>
-    </div>
+    {
+      showHeader && (
+        <div className={styles.header}>
+          <h2>{ title }</h2>
+          <p>{ text }</p>
+        </div>
+      )
+    }
     { children }
   </div>
 );
 
 Example.defaultProps = {
   children: [],
+  showHeader: true,
   style: {},
 };
 
 Example.propTypes = {
   children: ofChildrenType,
-  text: PropTypes.string.isRequired,
+  showHeader: PropTypes.bool,
   style: PropTypes.object,
+  text: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
 };
 
