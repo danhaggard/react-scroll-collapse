@@ -1,3 +1,6 @@
+import createOrphanedNodeCache from './orphanedNodeCache';
+import { getCollapserParentIdRoot } from '../selectors/collapser';
+
 import {
   isUndefNull,
   getOrObject,
@@ -11,7 +14,7 @@ const getResultFactory = getCache => key => (id) => {
 
 const setResultFactory = getCache => key => (id, val) => {
   if (key === 'treeId') {
-    console.log(`setting cache treeId val ${val} for collapserId: ${id}`);
+  //  console.log(`setting cache treeId val ${val} for collapserId: ${id}`);
   }
   const cache = getCache();
   const result = cache[id];
@@ -98,11 +101,17 @@ const createCache = (rootNodeIdArg = 0) => {
 
   const getResultTreeId = id => (getResult('treeId')(id) || id);
 
+
   const getResultValue = getResult('value');
 
   const setResult = setResultFactory(getRecursionCache);
 
-  const setResultTreeId = setResult('treeId');
+  const orphanNodeCache = createOrphanedNodeCache(rootNodeIdArg, getResultTreeId, setResult('treeId'));
+
+  const setResultTreeId = (id, val) => orphanNodeCache.setTreeIdWrapper(
+    getCollapserParentIdRoot(getCurrentReduxState())
+  )(id, val);
+
 
   const lockCache = () => (cacheLock = true);
 
@@ -128,6 +137,7 @@ const createCache = (rootNodeIdArg = 0) => {
     setRecursionCache,
     setResultTreeId,
     unlockCache,
+    orphanNodeCache,
   };
 
   initCache(rootNodeIdArg);

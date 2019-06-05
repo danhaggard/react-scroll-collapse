@@ -44,6 +44,12 @@ const registerConsumerFactory = consumerFactory => (
     /* Id must be created here otherwise Context managers can't select state. */
     id = providerIdStore(typeKey);
 
+    blah = (() => {
+      if (typeKey === 'collapser') {
+        console.log(`Registry ${this.id}`);
+      }
+    })();
+
     _reactScrollCollapse = {
       id: this.id
     }

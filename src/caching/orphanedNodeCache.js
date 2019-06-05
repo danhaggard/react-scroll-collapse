@@ -1,27 +1,42 @@
-export const createForkedNodesTracker = (rootNodeId) => {  // eslint-disable-line
-  let activeForks = {};
-  let largestActiveFork = null;
-  let lowestActiveFork = null;
-  let rangeUpperBound = null;
+import { sortArrayAscending } from '../utils/arrayUtils';
 
-  let orphanNodes = {};
-  let allForkedNodes = {};
-  let checkedParents = {};
+const createOrphanedNodeCache = (rootNodeId, treeIdSelector, setTreeIdFunc) => {  // eslint-disable-line
+  let activeForks;
+  let largestActiveFork;
+  let lowestActiveFork;
+  let rangeUpperBound;
+
+  let orphanNodes;
+  let allForkedNodes;
+  let checkedParents;
+  let waitingForMountId;
+  let nodesToCheck = [];
+
+  let firstMount = false;
+  let largestNodeId = -1;
+  let nextMountId = null;
+  let prevNodesToCheck = [];
+  let foundOrphan;
+
+  const initCache = () => {
+    activeForks = {};
+    largestActiveFork = null;
+    lowestActiveFork = null;
+    rangeUpperBound = null;
+    waitingForMountId = false;
+    foundOrphan = false;
+    orphanNodes = {};
+    allForkedNodes = {};
+    checkedParents = {};
+  };
+
+  initCache();
 
   const checkIfOrphanedNode = (parentNodeId, nodeId) => {
     if (lowestActiveFork === null) {
       return false;
     }
-    if (parentNodeId === lowestActiveFork || parentNodeId === largestActiveFork) {
-      // return false;
-    }
 
-    /*
-      activeForks[parentNodeId] = {
-        id: parentNodeId,
-        rangeEnd: nodeId
-      };
-    */
     const parentIsOrphan = orphanNodes[parentNodeId];
 
     let isOrphan = false;
@@ -62,12 +77,9 @@ export const createForkedNodesTracker = (rootNodeId) => {  // eslint-disable-lin
       orphanNodes[nodeId] = orphanObj;
       console.log(`nodeId ${nodeId} is orphaned by parent: ${parentNodeId} because`, orphanObj);
       console.log('all orphan nodes: ', orphanNodes);
-
     }
     return isOrphan || parentIsOrphan;
-
   };
-
 
   const logCurrentOrphanRange = () => {
     const getRangeString = (start, end) => `rangeStart: ${start} - rangeEnd: ${end}.`;
@@ -77,11 +89,17 @@ export const createForkedNodesTracker = (rootNodeId) => {  // eslint-disable-lin
 
   const clearCheckedParents = () => (checkedParents = {});
 
+  const getCheckedParents = () => checkedParents;
+
   const clearOrphanNodes = () => (orphanNodes = {});
 
   const getOrphanNodes = () => orphanNodes;
 
   const getAllForkedNodes = () => allForkedNodes;
+
+  const getFirstMount = () => firstMount;
+
+  const setFirstMount = val => (firstMount = val);
 
   const clearAllForkedNodes = () => (allForkedNodes = {});
 
@@ -145,7 +163,7 @@ export const createForkedNodesTracker = (rootNodeId) => {  // eslint-disable-lin
       lowestActiveFork,
       largestActiveFork
     };
-    console.log(`nodeId: ${nodeId} is child of fork parentId: ${parentNodeId}`);
+    // console.log(`nodeId: ${nodeId} is child of fork parentId: ${parentNodeId}`);
     // console.log(`largestActiveFork - before set: ${largestActiveFork}`);
     // console.log(`lowestActiveFork - before set: ${lowestActiveFork}`);
     lowestActiveFork = // parentNodeId !== rootNodeId &&
@@ -173,7 +191,7 @@ export const createForkedNodesTracker = (rootNodeId) => {  // eslint-disable-lin
       prevActiveForks = prevActiveForks.slice(0, prevActiveForks.length);
       const prevActiveFork = prevActiveForks.pop();
       if (parentNodeId < prevActiveFork) {
-        console.log(`removing prev active fork id ${prevActiveFork}`);
+        // console.log(`removing prev active fork id ${prevActiveFork}`);
         delete activeForks[prevActiveFork];
         largestActiveFork = prevActiveFork;
       }
@@ -186,34 +204,137 @@ export const createForkedNodesTracker = (rootNodeId) => {  // eslint-disable-lin
     return true;
   };
 
+  const isMountNode = (nodeId, parentNodeId, counter, counterStore) => {
+    if (nodeId === 18) {
+      // debugger;
+    }
+    if (!waitingForMountId && foundOrphan) {
+      nodesToCheck = prevNodesToCheck;
+    }
+
+    if (!waitingForMountId && nodeId === nextMountId && nodeId - parentNodeId === 1) {
+      nodesToCheck = [];
+      nextMountId = parentNodeId;
+      waitingForMountId = true;
+    }
+
+    if (!waitingForMountId && !foundOrphan) {
+      prevNodesToCheck = [...prevNodesToCheck, ...nodesToCheck];
+      nodesToCheck = [];
+      waitingForMountId = true;
+    }
+
+    if (foundOrphan) {
+      initCache();
+    }
+
+    if (waitingForMountId) {
+      (nodesToCheck).push([nodeId, parentNodeId]);
+      nodesToCheck.sort(([u, v], [x, y]) => u - x);
+      // console.log('nodesToCheck', nodesToCheck);
+      //console.log('currentCounter before - id, count', nodeId, counterStore.getCurrent());
+      // counter('collapser');
+      //console.log('currentCounter after - id, count', nodeId, counterStore.getCurrent());
+    }
+
+    if (nodeId > largestNodeId) {
+      largestNodeId = nodeId;
+    }
+
+    if (nodeId === rootNodeId && firstMount === false) {
+      setFirstMount(true);
+      nextMountId = counterStore.getCurrent() + 1;
+      waitingForMountId = false;
+      // console.log('first mount nodesToCheck', nodesToCheck);
+      console.log('currentCounter before', counterStore.getCurrent());
+      // counter('collapser');
+      //console.log('currentCounter after',counterStore.getCurrent());
+
+      console.log('nodeId, new nextMountId', nodeId, nextMountId);
+
+      return true;
+    }
+
+    if (nodeId === nextMountId) {
+      nextMountId = counterStore.getCurrent() - 1;
+      waitingForMountId = false;
+      console.log('currentCounter before', counterStore.getCurrent() -1);
+      //counter('collapser');
+      //console.log('currentCounter after',counterStore.getCurrent());
+
+      console.log('found mount node - nodeId, new nextMountId', nodeId, nextMountId);
+
+      return true;
+    }
+
+    return false;
+  };
+
   const checkForkOrphan = (nodeId, parentNodeId) => {
 
+    const nodeTreeId = treeIdSelector(nodeId);
+    const parentNodeTreeId = treeIdSelector(parentNodeId);
+    // console.log('nodeId, parentNodeId', nodeId, parentNodeId);
+    // console.log('nodeTreeId, parentNodeTreeId', nodeTreeId, parentNodeTreeId);
+    // console.log('');
     if (nodeId === rootNodeId || parentNodeId === undefined || parentNodeId === null) {
       return false;
     }
-    const isOrphaned = checkIfOrphanedNode(parentNodeId, nodeId);
-    if (!isOrphaned) {
-      checkIfFork(nodeId, parentNodeId);
+    // const isOrphaned = checkIfOrphanedNode(parentNodeId, nodeId);
+
+    const isOrphaned = checkIfOrphanedNode(parentNodeTreeId, nodeTreeId);
+    if (isOrphaned) {
+      foundOrphan = true;
     }
+    if (!isOrphaned) {
+      checkIfFork(nodeTreeId, parentNodeTreeId);
+    }
+    // logCurrentOrphanRange();
     return isOrphaned;
+  };
+
+  const checkPendingNodesForOrphans = () => nodesToCheck.some(
+    ([nodeId, parentNodeId]) => checkForkOrphan(nodeId, parentNodeId)
+  );
+
+
+  const setTreeIdWrapper = parentIdSelector => (id, val) => {
+    const returnVal = setTreeIdFunc(id, val);
+    const parentId = parentIdSelector(id);
+    checkForkOrphan(id, parentId);
+    // console.log('All nodes forked', getAllForkedNodes());
+    // console.log('All checked parents', getCheckedParents());
+    // logCurrentOrphanRange();
+    // console.log('');
+    return returnVal;
   };
 
   const returnObj = {
     checkIfFork,
+    getAllForkedNodes,
+    getCheckedParents,
+    getFirstMount,
+    setFirstMount,
     getOrphanNodes,
     clearOrphanNodes,
+    checkPendingNodesForOrphans,
     checkIfOrphanedNode,
     clearAllNodes,
     checkForkOrphan,
+    initCache,
+    isMountNode,
     logAllNodes,
     logCurrentOrphanRange,
+    setTreeIdWrapper,
     orphanNodes,
     activeForks
   };
   // console.log('orphan cache', returnObj);
   // console.log('logAllNodes', returnObj.logAllNodes);
   // console.log('logCurrentOrphanRange', returnObj.logCurrentOrphanRange);
-  window.logAllNodes = returnObj.logAllNodes;
-  window.logOrphanRange = returnObj.logCurrentOrphanRange;
+  // window.logAllNodes = returnObj.logAllNodes;
+  // window.logOrphanRange = returnObj.logCurrentOrphanRange;
   return returnObj;
 };
+
+export default createOrphanedNodeCache;

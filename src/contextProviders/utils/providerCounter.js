@@ -10,7 +10,7 @@ const createCounterStore = storeArg => (key) => {
   return store[key]();
 };
 
-const initStore = {};
-const providerIdStore = createCounterStore(initStore);
+export const counterStore = {};
+const providerIdStore = createCounterStore(counterStore);
 
 export default providerIdStore;

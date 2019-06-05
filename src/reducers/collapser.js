@@ -61,13 +61,25 @@ export const activeChildrenReducer = (state = [], action) => {
   }
 };
 
-
 // handles the id attr for collapsers.
 export const collapserIdReducer = (state = null, action) => {
   const { collapserId } = getOrObject(action, 'payload');
   switch (action.type) {
     case ADD_COLLAPSER:
       return collapserId;
+    default:
+      return state;
+  }
+};
+
+// handles the id attr for collapsers.
+export const collapserParentIdReducer = (state = null, action) => {
+  const { parentCollapserId, parentUpdate } = getOrObject(action, 'payload');
+  switch (action.type) {
+    case ADD_COLLAPSER:
+      return (
+        typeof parentCollapserId === 'undefined' || parentUpdate
+      ) ? state : parentCollapserId;
     default:
       return state;
   }
@@ -117,6 +129,7 @@ export const collapserReducer = combineReducers({
   collapsers: collapsersIdArray,
   id: collapserIdReducer,
   items: itemsIdArray,
+  parentCollapserId: collapserParentIdReducer,
   treeId: collapserTreeIdReducer,
 });
 
@@ -129,7 +142,8 @@ export const collapsersReducer = (state = {}, action) => {
       if (!isUndefNull(parentCollapserId)) {
         const newAction = injectPayload(action, {
           collapserId: parentCollapserId,
-          childCollapserId: collapserId
+          childCollapserId: collapserId,
+          parentUpdate: true,
         });
         newState = updateState(newState, newAction, parentCollapserId, collapserReducer);
       }

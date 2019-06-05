@@ -67,6 +67,11 @@ export const getCollapserActiveChildrenLimitRoot = curryCompose(
   getCollapserRoot
 );
 
+// --- collapser.collapserParentId:
+const getCollapserParentId = collapserObject => getOrNull(collapserObject, 'parentCollapserId');
+
+export const getCollapserParentIdRoot = curryCompose(getCollapserParentId, getCollapserRoot);
+
 
 // getOrDefault
 

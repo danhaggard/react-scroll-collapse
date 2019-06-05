@@ -19,14 +19,14 @@ import { setContextAttrs } from '../../utils/objectUtils';
 
 import addLoggingDefaultsToComponent from '../../utils/logging/utils';
 
-import createMountCache from '../../caching/mountCache';
+// import createMountCache from '../../caching/mountCache';
 
-import { createForkedNodesTracker } from '../../selectors/trackForkedNodes';
-import providerIdStore from '../../../src/contextProviders/utils/providerCounter';
+// import { createForkedNodesTracker } from '../../selectors/trackForkedNodes';
+import providerIdStore, { counterStore } from '../../../src/contextProviders/utils/providerCounter';
 
-let forkedNodesTracker = createForkedNodesTracker(0);
+// let forkedNodesTracker = createForkedNodesTracker(0);
 
-const mountCache = createMountCache(0);
+// const mountCache = createMountCache(0);
 
 export const collapserWrapper = (WrappedComponent) => {
 
@@ -107,10 +107,10 @@ export const collapserWrapper = (WrappedComponent) => {
       */
 
     setCacheOnMount() {
-      const { props: { _reactScrollCollapse: { isRootNode, parents } }, id } = this;
-
-      console.log('collapserWrapper mount id', id);
-
+      const { props:
+        { cache:
+          { orphanNodeCache }, _reactScrollCollapse: { isRootNode, parents } }, id } = this;
+          console.log('mount id', id);
       /*
         If a node adds a new branch after first mount, then anything mounting
         underneath the original path will be orphaned because the algo will
@@ -119,8 +119,7 @@ export const collapserWrapper = (WrappedComponent) => {
         As nodes are mounted we track ranges of ids where orphans will occur
         and trigger a reset of tree ids when a node is orphaned.
       */
-      const isOrphan = forkedNodesTracker.checkForkOrphan(id, parents.collapser);
-      forkedNodesTracker.logCurrentOrphanRange();
+      let isOrphan = false;
 
       /*
         This is how we know the current mount cycle has finished.
@@ -128,24 +127,44 @@ export const collapserWrapper = (WrappedComponent) => {
         increment the counter again.  THe next node to mount will be +2.
 
         All child nodes mounting in the same sequence will be +1 - and so
-        won't trigger any treeId resets.  Once we reach the highest mounting
-        node - we increment the counter again.
-      */
-      const haveReachedTopOfSubtree = id - parents.collapser > 1;
+        won't trigger any treeId resets.
 
+        Nope - wrong. They mount in in-order traversal.
+      */
+      const haveReachedMountNode = orphanNodeCache.isMountNode(id, parents.collapser, providerIdStore, counterStore.collapser);
+      // console.log('haveReachedMountNode, id', haveReachedMountNode, id);
+      // const haveReachedTopOfSubtree = id - parents.collapser > 1;
+      if (haveReachedMountNode) {
+
+        isOrphan = orphanNodeCache.checkPendingNodesForOrphans();
+        orphanNodeCache.logCurrentOrphanRange();
+        // console.log('All nodes forked', orphanNodeCache.getAllForkedNodes());
+        // console.log('All checked parents', orphanNodeCache.getCheckedParents());
+        // console.log('isOrphan, id, parent id', isOrphan, id, parents.collapser);
+      // console.log('orphanNodeCache.logCurrentOrphanRange', orphanNodeCache.logCurrentOrphanRange);
+      }
       /*
         if worst cpomes to worst can opt for a tree reset on every new subtree
       */
-      if ((isOrphan /* && haveReachedTopOfSubtree */)) {
+      if ((isOrphan)) {
+        // orphanNodeCache.initCache();
         this.initiateTreeStateCheck(true);
-        console.log('isOrphan', id, parents.collapser);
+        orphanNodeCache.logCurrentOrphanRange();
+        // console.log('isOrphan, id, parent id', isOrphan, id, parents.collapser);
       }
 
       /* this increments the counter */
-      if (isRootNode || haveReachedTopOfSubtree) {
+      /*
+      if (haveReachedMountNode) {
+
+        console.log('currentCounter before - id, count', id, counterStore.collapser.getCurrent());
         providerIdStore('collapser');
+        console.log('currentCounter after - id, count', id, counterStore.collapser.getCurrent());
+
       }
+      */
     }
+
 
     setExpandedState = () => {
       const { props: { cache }, id } = this;
@@ -240,27 +259,6 @@ export const collapserWrapper = (WrappedComponent) => {
         '_reactScrollCollapseParents'
       ]
     );
-
-    checkForSingleNodeMount = () => {
-      const { props: { cache }, id } = this;
-      const {
-        mounting,
-        largestValueFromPrevMountCycle
-      } = cache.getMountInfo();
-      if (mounting && id - largestValueFromPrevMountCycle > 1) {
-        /*
-          assume no more are mounting for now - have no idea ohw long to wait. ?
-          Don't update largestValueFromPrevMountCycle because other the next node
-          value will be only +1 the current and won't initiate a mount sequence.
-        */
-        console.log('checking tree after mount && mount timeout - id, cache', id);
-        this.initiateTreeStateCheck(true);
-        cache.setMountInfo({
-          mounting: false,
-        });
-      }
-
-    }
 
     render() {
       // console.log('collapser render id, props.contextProps', this.id, this.props, this);

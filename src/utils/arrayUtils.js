@@ -111,6 +111,10 @@ export const removeFromArray = (array, index = 0) => {
   return [...array.slice(0, index), ...array.slice(index + 1, length)];
 };
 
+// from: https://stackoverflow.com/a/1063027
+export const sortArrayAscending = array => array.sort((a, b) => a - b);
+
+export const sortArrayDescending = array => array.sort((a, b) => b - a);
 
 // The Array.apply trick used here I learnt from: http://stackoverflow.com/a/20066663/1914452
 export const arrayFromNumber = number => [...Array(number).keys()];
