@@ -41,21 +41,21 @@ class CommentThread extends PureComponent {
   });
 
   insertThread = () => {
-    const { minChildren, maxChildren, insertChildAtIndex } = this.props;
+    const { minChildren, maxChildren, childInsertionIndex } = this.props;
     const { count, depth } = this.state;
     const numNewChildren = getRandomInt(minChildren, maxChildren) - 1;
     const newChildren = [...Array(numNewChildren).keys()].map(
       i => this.generateChildData(count + i, depth + 1)
     );
-    this.setState(this.addChildren(newChildren, insertChildAtIndex));
+    this.setState(this.addChildren(newChildren, childInsertionIndex));
   };
 
   removeThread = () => this.setState(this.removeChild);
 
-  addChildren = (children, insertChildAtIndex = null) => state => ({
+  addChildren = (children, childInsertionIndex = null) => state => ({
     ...state,
     count: state.count + children.length,
-    localChildren: insertAtIndex(state.localChildren, children, insertChildAtIndex),
+    localChildren: insertAtIndex(state.localChildren, children, childInsertionIndex),
     // localChildren: [...state.localChildren, ...children],
   });
 
@@ -144,7 +144,7 @@ CommentThread.defaultProps = {
   areAllItemsExpanded: null,
   children: [],
   getParentThreadActive: () => false,
-  insertChildAtIndex: null,
+  childInsertionIndex: null,
   maxChildren: 1,
   maxDepth: 1,
   minChildren: 1,
@@ -159,7 +159,7 @@ CommentThread.propTypes = {
   collapserRef: PropTypes.object.isRequired,
   expandCollapseAll: PropTypes.func.isRequired,
   getParentThreadActive: PropTypes.func,
-  insertChildAtIndex: ofNumberTypeOrNothing,
+  childInsertionIndex: ofNumberTypeOrNothing,
   isRootNode: PropTypes.bool.isRequired,
   nodeData: PropTypes.object.isRequired,
   maxChildren: PropTypes.number,

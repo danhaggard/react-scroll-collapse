@@ -64,7 +64,7 @@ export const compareIntArrays = (arr1, arr2) => {
 };
 
 
-export const loopIndex = (array, index) => {
+export const loopArrayIndex = (array, index) => {
   const { length } = array.length;
   if (index <= -1) {
     return length - 1;

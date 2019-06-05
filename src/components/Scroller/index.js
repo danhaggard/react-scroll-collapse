@@ -26,6 +26,10 @@ import { setContextAttrs } from '../../utils/objectUtils';
 
 class Scroller extends PureComponent {
 
+  state = {
+    style: {}
+  }
+
   setAttrs = (() => setContextAttrs(this))();
 
   callIfAnimating = callback => (...args) => { // eslint-disable-line react/sort-comp
@@ -56,6 +60,10 @@ class Scroller extends PureComponent {
     e => this.breakScrollAnimation([33, 34, 38, 40].includes(e.keyCode))
   );
 
+  handlePointerEnter = () => this.setState(() => ({ style: { willChange: 'scroll-position' } }));
+
+  handlePointerLeave = () => this.setState(() => ({ style: {} }));
+
   context = this.methods.scroller;
 
   getElem = this.context.getElem;
@@ -73,11 +81,14 @@ class Scroller extends PureComponent {
       onKeyDown: this.handleKeyDown,
       onMouseDown: this.handleMouseDown,
       onWheel: this.handleWheel,
+      onPointerEnter: this.handlePointerEnter,
+      onPointerLeave: this.handlePointerLeave,
       ref: this.getRef(),
       role: 'presentation',
       style: {
         overflow: 'auto',
         postion: 'relative',
+        ...this.state.style,
         ...style
       },
     };

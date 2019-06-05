@@ -30,8 +30,8 @@ const Comment = (props) => {
         springConfig={DEFAULT_MOTION_SPRING}
       >
         <div className={styles.commentChildren}>
-          <CommentBody text={text} />
           { children }
+          <CommentBody text={text} />
         </div>
       </Collapse>
     </div>

@@ -1,0 +1,24 @@
+@import '../../style/settings/index';
+@import '../../style/tools/index';
+
+
+
+:local(.settingsForm) {
+  align-content: start;
+  align-items: flex-start;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  padding: 0 1em 1em 0;
+
+  @include respond-to(md) {
+    // max-width: %;
+  }
+}
+
+:local(.settingsInput) {
+  //flex: 1 1 18%;
+  max-width: 2em;
+  margin-right: 1em;
+}

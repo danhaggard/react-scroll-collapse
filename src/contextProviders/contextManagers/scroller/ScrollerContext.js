@@ -127,7 +127,7 @@ const scrollerContext = (Base) => {
       */
       if (y === nextY && childDistance !== nextY) {
         this.startScrollAnimation(true);
-        return [false, null];
+        return [true, null];
       }
 
       /*

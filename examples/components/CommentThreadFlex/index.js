@@ -8,7 +8,7 @@ import AnimatedFlexbox from '../../../src/components/AnimatedFlexbox';
 import { collapserController } from '../../../src';
 import { ofBoolTypeOrNothing, ofChildrenType, ofNumberTypeOrNothing } from '../../../src/utils/propTypeHelpers';
 import { getRandomInt } from '../../../src/utils/randomUtils';
-import { insertAtIndex, removeFromArrayAtIndex } from '../../../src/utils/arrayUtils';
+import { insertAtIndex, loopArrayIndex, removeFromArray } from '../../../src/utils/arrayUtils';
 import { generateCommentThreadData } from '../../../src/utils/randomContentGenerators';
 import styles from './CommentThread.scss';
 
@@ -22,39 +22,24 @@ class CommentThread extends PureComponent { //eslint-disable-line
   constructor(props, context) {
     super(props, context);
     const {
-      nodeData: {
-        branch,
-        children,
-        comment,
-        count,
-        depth,
-        title
-      }
+      childInsertionIndex,
+      nodeData: { children, ...rest },
+      minChildren,
+      minDepth,
+      maxChildren,
+      maxDepth,
     } = this.props;
-  }
-
-  state = (() => {
-    const {
-      branch,
-      children,
-      comment,
-      count,
-      depth,
-      isOpenedInit,
-      insertChildAtIndex,
-      title
-    } = this.props.nodeData;
-    return {
-      branch,
-      comment,
-      count,
-      depth,
-      insertChildAtIndex,
-      title,
+    this.state = {
+      ...rest,
       localChildren: children,
-      threadActive: isOpenedInit || false,
+      childInsertionIndex,
+      minChildren,
+      minDepth,
+      maxChildren,
+      maxDepth,
+      showControls: false,
     };
-  })();
+  }
 
   /* ------------------- Child Management --------------------- */
   generateChildData = (count, depth) => generateCommentThreadData(
@@ -63,36 +48,42 @@ class CommentThread extends PureComponent { //eslint-disable-line
     depth,
   );
 
-  getNextChildAtIndexVal = (incrementByVal) => {
-    const { insertChildAtIndex, localChildren } = this.state;
-    const numChildren = localChildren.length;
-  }
-
-  setChildAtIndex = val => this.setState(
-    ({ insertChildAtIndex }) => ({ insertChildAtIndex: insertChildAtIndex + val })
+  setChildInsertionConfig = ({ childInsertionIndex, ...rest }) => this.setState(
+    ({ localChildren }) => ({
+      childInsertionIndex: loopArrayIndex(localChildren, childInsertionIndex),
+      ...rest,
+    })
   );
 
-  addChildren = (children, insertChildAtIndex = null) => state => ({
+
+  setChildInsertionIndex = val => this.setState(
+    ({ localChildren }) => ({ childInsertionIndex: loopArrayIndex(localChildren, val) })
+  );
+
+  addChildren = (children, childInsertionIndex = null) => state => ({
     ...state,
     count: state.count + children.length,
-    localChildren: insertAtIndex(state.localChildren, children, insertChildAtIndex),
+    localChildren: insertAtIndex(state.localChildren, children, childInsertionIndex),
   });
 
-  removeChild = ({ localChildren, insertChildAtIndex }) => ({
-    localChildren: removeFromArrayAtIndex(localChildren, insertChildAtIndex),
+  removeChild = ({ localChildren, childInsertionIndex }) => ({
+    localChildren: removeFromArray(localChildren, childInsertionIndex),
   });
 
   insertThread = () => {
-    const { minChildren, maxChildren } = this.props;
-    const { count, depth, insertChildAtIndex } = this.state;
+    const { count, depth, childInsertionIndex, minChildren, maxChildren } = this.state;
     const numNewChildren = getRandomInt(minChildren, maxChildren);
     const newChildren = [...Array(numNewChildren).keys()].map(
-      i => this.generateChildData(count + i, depth + 1)
+      i => generateCommentThreadData(this.state, count + i, depth + 1)
     );
-    this.setState(this.addChildren(newChildren, insertChildAtIndex));
+    this.setState(this.addChildren(newChildren, childInsertionIndex));
   };
 
   removeThread = () => this.setState(this.removeChild);
+
+  toggleControls = () => this.setState(
+    ({ showControls }) => ({ showControls: !showControls })
+  );
 
   /* -------------------END - Child Management - END --------------------- */
 
@@ -161,21 +152,21 @@ class CommentThread extends PureComponent { //eslint-disable-line
       childIsOpenedInit,
       collapserRef,
       _reactScrollCollapse: { id: collapserId, isRootNode },
-      minChildren,
-      minDepth,
-      maxChildren,
-      maxDepth,
       isOpenedInit,
-      insertChildAtIndex,
       style,
     } = this.props;
     const {
       // branch,
+      childInsertionIndex,
+      minChildren,
+      minDepth,
+      maxChildren,
+      maxDepth,
       comment,
       localChildren,
+      showControls,
       title
     } = this.state;
-    // console.log('thread render: id', collapserId);
     return (
       <AnimatedFlexbox
         className={this.getClassName(this.props)}
@@ -190,14 +181,22 @@ class CommentThread extends PureComponent { //eslint-disable-line
       >
         <ExpandButton
           isOpened={areAllItemsExpanded}
+          onHamburgerClick={this.toggleControls}
           style={this.buttonStyle}
           title={this.appendTitle(collapserId, title)}
         />
         <CommentWithButtons
           addToThread={this.insertThread}
+          childInsertionIndex={childInsertionIndex}
+          minChildren={minChildren}
+          maxChildren={maxChildren}
+          minDepth={minDepth}
+          maxDepth={maxDepth}
+          setChildInsertionConfig={this.setChildInsertionConfig}
           childThreads={localChildren.length}
           deleteThread={this.removeThread}
           isOpenedInit={isOpenedInit}
+          showControls={showControls}
           tabFocusButtons={areAllItemsExpanded}
           text={comment}
         />
@@ -210,7 +209,7 @@ class CommentThread extends PureComponent { //eslint-disable-line
               childIsOpenedInit={childIsOpenedInit}
               key={childNodeData.key}
               nodeData={childNodeData}
-              insertChildAtIndex={insertChildAtIndex}
+              childInsertionIndex={childInsertionIndex}
               {...{
                 minChildren,
                 minDepth,
@@ -228,14 +227,14 @@ class CommentThread extends PureComponent { //eslint-disable-line
 CommentThread.defaultProps = {
   areAllItemsExpanded: null,
   children: [],
-  getParentThreadActive: () => false,
-  insertChildAtIndex: 0,
+  childInsertionIndex: 0,
   isOpenedInit: true,
   childIsOpenedInit: true,
   maxChildren: 1,
   maxDepth: 1,
   minChildren: 1,
   minDepth: 1,
+  setActiveChildLimit: 0,
   style: {},
 };
 
@@ -245,8 +244,7 @@ CommentThread.propTypes = {
   childIsOpenedInit: PropTypes.bool,
   collapserRef: PropTypes.object.isRequired,
   expandCollapseAll: PropTypes.func.isRequired,
-  getParentThreadActive: PropTypes.func,
-  insertChildAtIndex: ofNumberTypeOrNothing,
+  childInsertionIndex: ofNumberTypeOrNothing,
   isOpenedInit: PropTypes.bool,
   nodeData: PropTypes.object.isRequired,
   maxChildren: PropTypes.number,
@@ -254,6 +252,7 @@ CommentThread.propTypes = {
   minChildren: PropTypes.number,
   minDepth: PropTypes.number,
   _reactScrollCollapse: PropTypes.object.isRequired,
+  setActiveChildLimit: PropTypes.number,
   style: PropTypes.object,
 };
 

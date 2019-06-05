@@ -50,7 +50,7 @@ const registerConsumerFactory = consumerFactory => (
 
     render() {
       const newProps = { ...this.props, _reactScrollCollapse: this._reactScrollCollapse };
-      return <Comp {...newProps} />;
+      return <Comp key={this.id} {...newProps} />;
     }
   }
 

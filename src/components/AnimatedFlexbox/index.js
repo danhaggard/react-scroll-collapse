@@ -5,16 +5,16 @@ import forwardRefWrapper from '../../utils/forwardRef';
 import { MOTION_SPRINGS, DEFAULT_MOTION_SPRING } from '../../const';
 import { ofChildrenType, ofFuncTypeOrNothing } from '../../utils/propTypeHelpers';
 
-const FLEX_STYLE = {
-  child: {
-
-  },
-  parent: {
-
-  },
-};
-
-const StaticChild = React.forwardRef(({ children, className, onClick, style, onKeyDown }, ref) => (
+const StaticChild = React.forwardRef(({
+  children,
+  className,
+  onClick,
+  style,
+  onKeyDown,
+  onPointerEnter,
+  onPointerLeave,
+  onPointerOver,
+}, ref) => (
   <div
     className={className}
     onClick={onClick}
@@ -24,10 +24,15 @@ const StaticChild = React.forwardRef(({ children, className, onClick, style, onK
     tabIndex={0}
     onKeyDown={onKeyDown}
     type="button"
+    onPointerEnter={onPointerEnter}
+    onPointerLeave={onPointerLeave}
+    onPointerOver={onPointerOver}
+    data-react-scroll-collapse-flex
   >
     { children }
   </div>
 ));
+
 
 StaticChild.whyDidYouRender = {
   logOnDifferentValues: false,
@@ -39,11 +44,13 @@ const PureStaticChild = React.memo(StaticChild);
 const FlexMotion = React.forwardRef(({ // eslint-disable-line
   className,
   children,
-  flexStyle,
   getInterpolatedStyle,
   motionStyle,
   onClick,
   onKeyDown,
+  onPointerEnter,
+  onPointerLeave,
+  onPointerOver,
   style,
 }, ref) => (
   <Motion
@@ -53,7 +60,6 @@ const FlexMotion = React.forwardRef(({ // eslint-disable-line
     {
       (interpolatedStyle) => {
         const newStyle = {
-          ...flexStyle,
           ...style,
           ...getInterpolatedStyle(interpolatedStyle)
         };
@@ -64,6 +70,9 @@ const FlexMotion = React.forwardRef(({ // eslint-disable-line
             ref={ref}
             style={newStyle}
             onClick={onClick}
+            onPointerEnter={onPointerEnter}
+            onPointerLeave={onPointerLeave}
+            onPointerOver={onPointerOver}
             onKeyDown={onKeyDown}
           >
             { children }
@@ -85,9 +94,12 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
 
   defaultSpringConfig = DEFAULT_MOTION_SPRING;
 
-  childStyle = {
-    ...FLEX_STYLE.parent,
-    ...this.props.style,
+  willChangeBackground = false;
+
+  willChangeWidth = false;
+
+  state = {
+    style: {},
   }
 
   componentDidMount() {
@@ -154,11 +166,12 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
   }
 
   handleOnClick = (e) => {
-    if (e.target.type !== 'button') {
+    if (!['INPUT', 'BUTTON'].includes(e.target.tagName)) {
       e.stopPropagation();
       this.props.onClick(e);
     }
   }
+
   /*
     Remember stopping propagation can break things above.
   */
@@ -169,6 +182,72 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
     }
   }
 
+
+  setWillChange = () => {
+    const { willChangeBackground: changeBg, willChangeWidth: changeW } = this;
+    if (!(changeBg || changeW)) {
+      this.setWontChange();
+    } else {
+      const bgStr = changeBg ? 'background' : '';
+      const widthStr = changeW ? 'width' : '';
+      const divStr = (changeBg && changeW) ? ', ' : '';
+      const willChangeStr = `${bgStr}${divStr}${widthStr}`;
+      this.setState(({ style }) => ({
+        style: { ...style, willChange: willChangeStr }
+      }));
+    }
+
+  }
+
+  setWontChange = () => {
+    this.setState(({ style: { willChange, ...rest } }) => ({
+      style: { ...rest }
+    }));
+  }
+
+  /*
+    On point hover over the div both width and background can change on click.
+    So we tell the browser to anticpate the animations.
+
+    onPointerEnter/leave do not respond to child pointer events.  So it's good
+    for setting animations completely on or off.
+  */
+  pointerEnter = () => {
+    this.willChangeWidth = true;
+    this.willChangeBackground = true;
+    this.setWillChange();
+  }
+
+  pointerLeave = () => {
+    this.willChangeBackground = false;
+    this.willChangeWidth = false;
+    this.setWillChange();
+  }
+
+  /*
+    When hovering over a child flex element - then it's no longer at risk of
+    having it's own width changed.
+
+    pointerOver detects any child pointerOver events - no matter how nested.
+    We need to detect when mouse enters a nested AnimatedFlexbox component - so
+    we use a dataset attribute to identify AnimatedFlexbox divs.
+
+    We use currentTarget (which points to the current instance) vs target (the
+    child instance to detect movement across the child AnimatedFlexbox)
+  */
+  pointerOver = (e) => {
+    if (e.target !== e.currentTarget && e.target.dataset.reactScrollCollapseFlex === 'true') {
+      this.willChangeWidth = false;
+      this.setWillChange();
+    }
+
+    if (e.target === e.currentTarget && e.target.dataset.reactScrollCollapseFlex === 'true') {
+      this.willChangeWidth = true;
+      this.setWillChange();
+    }
+  }
+
+
   render() {
     const {
       children,
@@ -177,16 +256,19 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
       isRootNode,
       style
     } = this.props;
+    const { style: stateStyle } = this.state;
     return !isRootNode ? (
       <PureFlexMotion
+        onPointerEnter={this.pointerEnter}
+        onPointerLeave={this.pointerLeave}
+        onPointerOver={this.pointerOver}
         className={className}
-        flexStyle={FLEX_STYLE.parent}
         getInterpolatedStyle={this.getInterpolWidthRotation}
         motionStyle={this.getMotionStyle()}
         onClick={this.handleOnClick}
         onKeyDown={this.handleKeyDown}
         ref={flexRef}
-        style={style}
+        style={{ ...style, ...stateStyle }}
       >
         { children }
       </PureFlexMotion>
@@ -196,7 +278,7 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
         onClick={this.handleOnClick}
         onKeyDown={this.handleKeyDown}
         ref={flexRef}
-        style={this.childStyle}
+        style={style}
       >
         { children }
       </PureStaticChild>

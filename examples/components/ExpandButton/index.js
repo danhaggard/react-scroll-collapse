@@ -7,27 +7,22 @@ import style from './ExpandButton.scss';
 const ExpandButton = ({
   forwardRef,
   isOpened,
-  onClick,
+  onHamburgerClick,
   onKeyDown,
   title
 }) => (
   <div
     className={style.expandButton}
     key={title}
-    // onClick={onClick}
-    // onKeyDown={onKeyDown}
     ref={forwardRef}
-    // role="button"
-    // tabIndex={0}
-    // type="button"
   >
-    <CommentTitle title={title} isOpened={isOpened} />
+    <CommentTitle onHamburgerClick={onHamburgerClick} title={title} isOpened={isOpened} />
   </div>
 );
 
 ExpandButton.defaultProps = {
   forwardRef: {},
-  onClick: () => undefined,
+  onHamburgerClick: () => undefined,
   onKeyDown: () => undefined,
   title: '',
 };
@@ -35,7 +30,7 @@ ExpandButton.defaultProps = {
 ExpandButton.propTypes = {
   forwardRef: PropTypes.object,
   isOpened: PropTypes.bool.isRequired,
-  onClick: PropTypes.func,
+  onHamburgerClick: PropTypes.func,
   onKeyDown: PropTypes.func,
   title: PropTypes.string,
 };

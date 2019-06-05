@@ -2,14 +2,91 @@
 @import '../../style/tools/index';
 
 :local(.commentTitle) {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   font-size: 1em;
   color: rgba(0, 0, 0, 100);
-  cursor: pointer;
   padding: 1em;
   padding-left: 0.5em;
 
   @include respond-to(md) {
     padding: 0;
     padding-left: 0;
+  }
+}
+
+:local(.hamburger) {
+  // padding: 1em;
+  align-self: center;
+  display: inline-block;
+  cursor: pointer;
+  transition-property: opacity, filter;
+  transition-duration: 0.15s;
+  transition-timing-function: linear;
+  font: inherit;
+  color: inherit;
+  text-transform: none;
+  background-color: transparent;
+  border: 0;
+  margin: 0;
+  margin-left: auto;
+  overflow: visible;
+  transform: scale(0.9);
+
+  &:hover {
+    opacity: 1;
+  }
+
+  &.is-active:hover {
+    opacity: 1;
+  }
+
+}
+
+:local(.hamburger-box) {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-block;
+  height: 1em;
+  pointer-events: none;
+  position: relative;
+  top: 0.5em;
+  width: 1.7em;
+}
+
+:local(.hamburger-inner) {
+  cursor: pointer;
+  display: block;
+  // top: 50%;
+  width: 1.7em;
+  height: 0.2em;
+  background-color: #fff;
+  border-radius: 1em;
+  position: absolute;
+  border: 0px;
+  margin: 0px;
+
+  &::before, &::after {
+    cursor: pointer;
+    width: 1.7em;
+    height: 0.2em;
+    background-color: #fff;
+    border-radius: 1em;
+    position: absolute;
+
+    content: "";
+    display: block;
+  }
+
+  &::before {
+    top: -0.5em;
+    left: 0;
+  }
+
+  &::after {
+    bottom: -0.5em;
+    left: 0;
   }
 }

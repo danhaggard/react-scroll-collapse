@@ -61,7 +61,7 @@ export const createForkedNodesTracker = (rootNodeId) => {  // eslint-disable-lin
     if (isOrphan || parentIsOrphan) {
       orphanNodes[nodeId] = orphanObj;
       console.log(`nodeId ${nodeId} is orphaned by parent: ${parentNodeId} because`, orphanObj);
-      console.log(`all orphan nodes: `, orphanNodes);
+      console.log('all orphan nodes: ', orphanNodes);
 
     }
     return isOrphan || parentIsOrphan;
@@ -115,8 +115,10 @@ export const createForkedNodesTracker = (rootNodeId) => {  // eslint-disable-lin
     const isFork = nodeId - parentNodeId > 1
       /*
       You can't orphan a node by branching from root.
+
+      tch tch - yes you can -
       */
-      && parentNodeId !== rootNodeId
+      // && parentNodeId !== rootNodeId
       /*
         Check if a parent has a child - since you can fork what doesn't have
         at least one child.
@@ -146,8 +148,8 @@ export const createForkedNodesTracker = (rootNodeId) => {  // eslint-disable-lin
     console.log(`nodeId: ${nodeId} is child of fork parentId: ${parentNodeId}`);
     // console.log(`largestActiveFork - before set: ${largestActiveFork}`);
     // console.log(`lowestActiveFork - before set: ${lowestActiveFork}`);
-    lowestActiveFork = parentNodeId !== rootNodeId
-      && (lowestActiveFork === null
+    lowestActiveFork = // parentNodeId !== rootNodeId &&
+      (lowestActiveFork === null
       || parentNodeId < lowestActiveFork) ? parentNodeId : lowestActiveFork;
 
 
@@ -185,16 +187,15 @@ export const createForkedNodesTracker = (rootNodeId) => {  // eslint-disable-lin
   };
 
   const checkForkOrphan = (nodeId, parentNodeId) => {
-    if (parentNodeId === undefined || parentNodeId === null) {
+
+    if (nodeId === rootNodeId || parentNodeId === undefined || parentNodeId === null) {
       return false;
     }
-
-    if (nodeId !== rootNodeId) {
-      const isOrphaned = checkIfOrphanedNode(parentNodeId, nodeId);
-      if (!isOrphaned) {
-        const parentIsForked = checkIfFork(nodeId, parentNodeId);
-      }
+    const isOrphaned = checkIfOrphanedNode(parentNodeId, nodeId);
+    if (!isOrphaned) {
+      checkIfFork(nodeId, parentNodeId);
     }
+    return isOrphaned;
   };
 
   const returnObj = {

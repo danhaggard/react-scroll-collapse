@@ -1,0 +1,10 @@
+@import '../../../style/settings/index';
+@import '../../../style/tools/index';
+
+
+:local(.controls) {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}

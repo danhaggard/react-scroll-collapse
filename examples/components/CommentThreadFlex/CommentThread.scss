@@ -1,38 +1,6 @@
 @import '../../style/settings/index';
 @import '../../style/tools/index';
 
-/*
-:local(.commentThread) {
-  border: 1px solid #AAA;
-  border-radius: 1.5em;
-  background: linear-gradient(225deg, #ddffab, #abe4ff, #d9abff);
-  // background-size: 200% 200%;
-  margin: 1em;
-  min-width: min-content;
-  padding: 2em;
-  padding-top: 1.5em;
-  flex: 1 1 auto;
-  will-change: transform;
-  cursor: pointer;
-}
-
-child: {
-  flex: '1 1 content',
-},
-parent: {
-  alignContent: 'start',
-  alignItems: 'flex-start',
-  display: 'flex',
-  flexGrow: 1,
-  flexShrink: 1,
-  flexBasis: 'auto',
-  flexDirection: 'row',
-  flexWrap: 'wrap',
-  justifyContent: 'flex-start',
-},
-};
-*/
-
 :local(.commentThread) {
   align-content: start;
   align-items: flex-start;
@@ -45,21 +13,19 @@ parent: {
   border: 1px solid #AAA;
   border-radius: 1em;
   background: linear-gradient(225deg, #ddffab, #abe4ff, #d9abff);
-  // background-size: 200% 200%;
   min-width: fit-content;
   min-width: -moz-fit-content;
   margin: 0.5em 0.2em;
   margin-left: 1.5em;
   padding: 0.5em;
-  // will-change: transform;
   cursor: pointer;
+
 
   @include respond-to(md) {
     border-radius: 1.5em;
     min-width: min-content;
     margin: 1.5em;
     padding: 1.5em;
-    // padding-top: 1.5em;
   }
 }
 

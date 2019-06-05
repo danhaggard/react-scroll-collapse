@@ -266,7 +266,6 @@ const createProvider = (
         <Context.Provider value={{ ...this.childContext }}>
           <Wrapped
             {...this.getProps()}
-            key={this.idKey}
             />
         </Context.Provider>
       );

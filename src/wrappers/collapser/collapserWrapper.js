@@ -20,11 +20,14 @@ import { setContextAttrs } from '../../utils/objectUtils';
 import addLoggingDefaultsToComponent from '../../utils/logging/utils';
 
 import createMountCache from '../../caching/mountCache';
-import { createForkedNodesTracker } from '../../selectors/trackForkedNodes';
 
-const forkedNodesTracker = createForkedNodesTracker(0);
+import { createForkedNodesTracker } from '../../selectors/trackForkedNodes';
+import providerIdStore from '../../../src/contextProviders/utils/providerCounter';
+
+let forkedNodesTracker = createForkedNodesTracker(0);
 
 const mountCache = createMountCache(0);
+
 export const collapserWrapper = (WrappedComponent) => {
 
   const WrappedComponentRef = forwardRefWrapper(WrappedComponent, 'collapserRef');
@@ -73,10 +76,6 @@ export const collapserWrapper = (WrappedComponent) => {
         props: { areAllItemsExpandedWorker, cache, _reactScrollCollapse: { isRootNode, parents: { collapser } } }, id
       } = this;
 
-      console.log('id', id);
-      // debugger;
-      forkedNodesTracker.checkForkOrphan(id, collapser);
-      forkedNodesTracker.logCurrentOrphanRange();
       /*
         Make sure users pass a ref to a DOM node.
       */
@@ -227,14 +226,36 @@ export const collapserWrapper = (WrappedComponent) => {
     */
 
     setCacheOnMount() {
-      const { props: { cache, _reactScrollCollapse: { isRootNode } }, id } = this;
+      const { props: { cache, _reactScrollCollapse: { isRootNode, parents, rootNodeId } }, id } = this;
+
+      /*
       const {
         largestValueFromPrevMountCycle,
         mounting,
         largestValueFromThisMountCycle
       } = cache.getMountInfo();
+      */
+      console.log('collapserWrapper mount id', id);
+      // debugger;
+      const isOrphan = forkedNodesTracker.checkForkOrphan(id, parents.collapser);
+      forkedNodesTracker.logCurrentOrphanRange();
 
-      const mountingStarted = id - largestValueFromPrevMountCycle > 1;
+      const treeNeedsReset = id - parents.collapser > 1;
+      /*
+        This blocked update when previous mount forked from root and mounting
+        node mounts under an existing node that gets the same treeId mapping
+        regardless.
+
+        (isOrphan && treeNeedsReset) || rootNodeId === parents.collapser
+      */
+      if ((isOrphan && treeNeedsReset)) {
+        this.initiateTreeStateCheck(true);
+        console.log('isOrphan && treeResetNeeded', id, parents.collapser);
+      }
+
+      if (isRootNode || treeNeedsReset) {
+        providerIdStore('collapser');
+      }
 
       /*
 
@@ -242,10 +263,10 @@ export const collapserWrapper = (WrappedComponent) => {
 
       const mountingStarted = (id - largestValueFromPrevMountCycle > 1
         || (id - largestValueFromPrevMountCycle === 1 && !mounting));
-      */
+
 
       const mountingFinished = !mountingStarted && mounting;
-      /* a root node mounted without children */
+      /* a root node mounted without children
       if (!mountingStarted && !mountingFinished && !mounting
         && isRootNode) {
         /*
@@ -255,20 +276,24 @@ export const collapserWrapper = (WrappedComponent) => {
           You'd think checking tree state here immediately would be fine -
           but it causes a state mismatch currently.
           TODO: ionvestigate.
-          */
+
         return;
       }
 
 
       if (mountingStarted) {
+        console.log('mounting started', id);
+        console.log('largestValueFromPrevMountCycle, id - largestValueFromPrevMountCycle', largestValueFromPrevMountCycle, id - largestValueFromPrevMountCycle);
         cache.setMountInfo({ mounting: mountingStarted });
       }
 
       if (mounting && id > largestValueFromThisMountCycle) {
+        console.log('mounting && id > largestValueFromThisMountCycle', id);
         cache.setMountInfo({ largestValueFromThisMountCycle: id });
       }
 
       if (mountingFinished) {
+        console.log('mountingFinished', id);
         cache.setMountInfo({
           largestValueFromPrevMountCycle: largestValueFromThisMountCycle,
         });
@@ -284,6 +309,7 @@ export const collapserWrapper = (WrappedComponent) => {
       if (mountingStarted && !mounting && !isRootNode) {
       //  setTimeout(this.checkForSingleNodeMount, 100);
       }
+      */
     }
 
     setExpandedState = () => {

@@ -37,6 +37,7 @@
     "no-underscore-dangle": ["off"],
     "no-mixed-operators": ["error", {"allowSamePrecedence": true}],
     "no-unused-vars": ["warn"],
+    "object-curly-newline": ["error", { "minProperties": 6, "consistent": true }],
     "padded-blocks": ["off"],
     "react/jsx-closing-bracket-location": ["off"],
     "react/jsx-space-before-closing": ["off"],
