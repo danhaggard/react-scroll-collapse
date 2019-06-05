@@ -16,8 +16,6 @@ export const collapserControllerWrapper = (CollapserController) => {
       this.addCollapser();
     }
 
-    // Currently moved this func to collapserWrapper.
-
     componentWillUnmount() {
       const {
         props: { removeCollapser },

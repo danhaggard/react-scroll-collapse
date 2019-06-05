@@ -6,6 +6,12 @@ import providerCaches from '../../../caching/providerCaches';
 import providerWorkers from '../../../caching/providerWorkers';
 import { setContextAttrs } from '../../../utils/objectUtils';
 
+/*
+  Really is a cache manager - but only the collapser is using it.
+
+  Cache needs to be accessible to all collapsers as info is stored there
+  about their location in the tree - as well as
+*/
 
 const collapserManager = (Comp) => {
   class CollapserManager extends PureComponent {
@@ -42,7 +48,6 @@ const collapserManager = (Comp) => {
         _reactScrollCollapse: { id },
         _reactScrollCollapseParents: { collapser }
       } = this.props;
-      console.log(`Collapser Manager registering mount: id, parentId ${id}, ${collapser}`);
       orphanNodeCache.registerIncomingMount(id, collapser);
     })();
 

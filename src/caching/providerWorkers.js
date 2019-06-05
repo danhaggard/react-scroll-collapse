@@ -1,3 +1,7 @@
+/*
+  Another basic singleton with getters - this time to wrap the WebWorker objects.
+*/
+
 import {
   isUndefNull,
 } from '../utils/selectorUtils';

@@ -109,12 +109,17 @@ const createProvider = (
        <Parent />
     */
 
-    idKey = getIdKey(typeKey);
+    idKey = getIdKey(typeKey); // I don't think this or the parentIdKey are really
+        // needed.
 
     typeKey = typeKey;
 
     parentIdKey = getParentIdKey(typeKey);
 
+
+    /*
+      Just placeholders for methods / state called by Extended Classes.
+    */
     defaultContextProps = {};
 
     prevContextProps = this.defaultContextProps;
@@ -131,6 +136,10 @@ const createProvider = (
 
     getId = () => this.props._reactScrollCollapse.id;
 
+    /*
+      Creates the object that sends information about children down through
+      the conmtext.
+    */
     getParentIdObj = (props) => {
 
       // Adds its own id as a parent.

@@ -19,14 +19,7 @@ import { setContextAttrs } from '../../utils/objectUtils';
 
 import addLoggingDefaultsToComponent from '../../utils/logging/utils';
 
-// import createMountCache from '../../caching/mountCache';
 
-// import { createForkedNodesTracker } from '../../selectors/trackForkedNodes';
-// import providerIdStore, { counterStore } from '../../../src/contextProviders/utils/providerCounter';
-
-// let forkedNodesTracker = createForkedNodesTracker(0);
-
-// const mountCache = createMountCache(0);
 
 export const collapserWrapper = (WrappedComponent) => {
 
@@ -64,6 +57,12 @@ export const collapserWrapper = (WrappedComponent) => {
         setActiveChildLimit,
       } = props;
       this.state = { areAllItemsExpanded };
+
+      /*
+        just sets the user provided value for this props.
+
+        Move to the context.
+      */
       if (!isUndefNull(setActiveChildLimit)
         && setActiveChildLimit !== CollapserController.defaultProps.setActiveChildLimit) {
         this.methods.collapser.setActiveChildrenLimit(setActiveChildLimit);
@@ -72,9 +71,6 @@ export const collapserWrapper = (WrappedComponent) => {
     }
 
     componentDidMount() {
-      const {
-        props: { areAllItemsExpandedWorker, cache, _reactScrollCollapse: { isRootNode, parents: { collapser } } }, id
-      } = this;
 
       /*
         Make sure users pass a ref to a DOM node.
@@ -84,12 +80,9 @@ export const collapserWrapper = (WrappedComponent) => {
     }
 
     componentWillUnmount() {
-      const {
-        props: { areAllItemsExpandedWorker, cache, _reactScrollCollapse: { isRootNode } }, id
-      } = this;
+      const { props: { areAllItemsExpandedWorker, cache }, id } = this;
       areAllItemsExpandedWorker.removeEventListener('message', this.handleAllItemsExpandedWorkerMessage);
       cache.deleteRecursionCacheEntry(id);
-      console.log(`collapser Id ${id} - about to unmount`);
     }
 
     /*
@@ -104,32 +97,38 @@ export const collapserWrapper = (WrappedComponent) => {
 
         great refresher pages on trees.
         // https://www.freecodecamp.org/news/all-you-need-to-know-about-tree-data-structures-bceacb85490c/
-      */
 
+
+    SetCacheOnMount intialises the mounting related state that it needs to keep track
+
+    It needs to know when the current mounting cycle is finishing so it can then
+    check if the tree ides need to be set because a node has orphaned.
+
+    I used a contstructor of a HoC higher up in the heirarchy.
+
+    It is sent information about mounting of nodes in normal sort order.
+    Mount orrder is in-order traversal - which doesn't work for my algo for
+    orphan detection.  And gets this info before the collapsers mount.
+
+    Thus I can see in advance how many new child coming down the pipe.
+    */
     setCacheOnMount() {
-      const { props:
-        { cache:
-          { orphanNodeCache }, _reactScrollCollapse: { isRootNode, parents } }, id } = this;
-      const { cache } = this.props;
-      console.log('mount id', id);
+      const { props: { cache: { orphanNodeCache }, _reactScrollCollapse: { parents } }, id } = this;
+
 
       const finishedMounting = orphanNodeCache.registerActualMount(id, parents.collapser);
 
       if (finishedMounting) {
 
-        console.log('finished mounting', id);
-        const [orphaned, checkedNodes] = orphanNodeCache.checkPendingNodes(
+        const [orphaned] = orphanNodeCache.checkPendingNodes(
           id, parents.collapser
         );
-        console.log('foundOrphan, checkedNode', orphaned, checkedNodes);
 
         if (orphaned) {
           orphanNodeCache.initCache();
           this.initiateTreeStateCheck(true);
         }
         orphanNodeCache.logCurrentOrphanRange();
-        console.log('orphanNodeCache', orphanNodeCache);
-        console.log('cache', cache.getCache);
       }
 
       /*
@@ -140,50 +139,7 @@ export const collapserWrapper = (WrappedComponent) => {
         As nodes are mounted we track ranges of ids where orphans will occur
         and trigger a reset of tree ids when a node is orphaned.
       */
-      // let isOrphan = false;
 
-      /*
-        This is how we know the current mount cycle has finished.
-        Ids increment by 1 - but when the root node finishes mounting - we
-        increment the counter again.  THe next node to mount will be +2.
-
-        All child nodes mounting in the same sequence will be +1 - and so
-        won't trigger any treeId resets.
-
-        Nope - wrong. They mount in in-order traversal.
-      */
-      // const haveReachedMountNode = orphanNodeCache.isMountNode(id, parents.collapser, providerIdStore, counterStore.collapser);
-      // console.log('haveReachedMountNode, id', haveReachedMountNode, id);
-      // const haveReachedTopOfSubtree = id - parents.collapser > 1;
-      // if (haveReachedMountNode) {
-
-        // isOrphan = orphanNodeCache.checkPendingNodesForOrphans();
-        //orphanNodeCache.logCurrentOrphanRange();
-        // console.log('All nodes forked', orphanNodeCache.getAllForkedNodes());
-        // console.log('All checked parents', orphanNodeCache.getCheckedParents());
-        // console.log('isOrphan, id, parent id', isOrphan, id, parents.collapser);
-      // console.log('orphanNodeCache.logCurrentOrphanRange', orphanNodeCache.logCurrentOrphanRange);
-      //}
-      /*
-        if worst cpomes to worst can opt for a tree reset on every new subtree
-      */
-      //if ((isOrphan)) {
-        // orphanNodeCache.initCache();
-        //this.initiateTreeStateCheck(true);
-      //  orphanNodeCache.logCurrentOrphanRange();
-        // console.log('isOrphan, id, parent id', isOrphan, id, parents.collapser);
-      //}
-
-      /* this increments the counter */
-      /*
-      if (haveReachedMountNode) {
-
-        console.log('currentCounter before - id, count', id, counterStore.collapser.getCurrent());
-        providerIdStore('collapser');
-        console.log('currentCounter after - id, count', id, counterStore.collapser.getCurrent());
-
-      }
-      */
     }
 
 
@@ -286,8 +242,6 @@ export const collapserWrapper = (WrappedComponent) => {
     );
 
     render() {
-      // console.log('collapser render id, props.contextProps', this.id, this.props, this);
-      // const { expandCollapseAll, selectors, ...other } = this.props;
       const { areAllItemsExpanded } = this.state;
       const cleanProps = this.cleanProps(this.props);
       return (

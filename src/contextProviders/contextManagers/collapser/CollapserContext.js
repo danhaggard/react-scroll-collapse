@@ -81,6 +81,15 @@ const collapserContext = (Base) => {
       return activeSiblings.length === 0;
     }
 
+    /*
+      This is currently adding the called to the active state.  There can be more
+      than one child in the active state - depending on what defautls are set
+
+      Ultimately what this odes in UI terms depends on how this is mapped to styles.
+
+      Was going for a specific effect - but this needs to be detached from the
+      state prop.
+    */
     addSelfToActiveSiblings = (state) => {
       const {
         addActiveChildren,
@@ -94,12 +103,20 @@ const collapserContext = (Base) => {
       */
       const { collapser: parentCollapserId } = this._reactScrollCollapse.parents;
       const { activeChildren, contextProps: { activeSiblingLimit } } = this.props;
+      /*
+        So clicking on the root collapser removes every child from the active state.
+        in flexbox terms amountst to them going back to equal width.
+      */
       if (this.checkIfRoot()) {
         removeActiveChildren(id, activeChildren);
       }
+      // So you go back to normal size if you get clicked while fully expanded.
+      // This is rmeoving the collapser from it's parents active set.
       if (!this.checkIfRoot() && state.areAllItemsExpanded) {
         removeActiveChildren(parentCollapserId, [id]);
       }
+      // but you can get add if yr not already in active state and expanded.
+      // Has the effect of giving flex width to expanding elements.
       if (!this.checkIfRoot() && !this.checkIfActiveSibling() && !state.areAllItemsExpanded) {
         addActiveChildren(parentCollapserId, [id], activeSiblingLimit);
         removeActiveChildren(id, activeChildren);
@@ -108,6 +125,9 @@ const collapserContext = (Base) => {
       }
     }
 
+    /*
+      Allows you to set a limt on how many children can be active at a time.
+    */
     setActiveChildrenLimit = limit => this.props.setActiveChildrenLimit(
       this.getId(), limit
     );

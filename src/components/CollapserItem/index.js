@@ -2,8 +2,7 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { Collapse } from 'react-collapse';
 
-import { ofChildrenType, ofNumberStringTypeOrNothing } from '../../utils/propTypeHelpers';
-import { cloneChildren } from '../../utils/hocUtils/cloneChildren';
+import { ofChildrenType } from '../../utils/propTypeHelpers';
 import { MOTION_SPRINGS } from '../../const';
 
 
@@ -45,8 +44,6 @@ CollapserItem.propTypes = {
   children: ofChildrenType,
   collapserItemRef: PropTypes.object.isRequired, // provided by collapserItemController
   isOpened: PropTypes.bool.isRequired, // provided by collapserItemController
-  itemId: PropTypes.number.isRequired, // provided by collapserItemController
-  breakScrollAnimation: PropTypes.func.isRequired,
   className: PropTypes.string,
   style: PropTypes.object,
 };

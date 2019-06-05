@@ -60,9 +60,12 @@ class Scroller extends PureComponent {
     e => this.breakScrollAnimation([33, 34, 38, 40].includes(e.keyCode))
   );
 
-  handlePointerEnter = () => this.setState(() => ({ style: { willChange: 'scroll-position' } }));
+  /*
+    Experimenting with the will-change property.
+  */
+  // handlePointerEnter = () => this.setState(() => ({ style: { willChange: 'scroll-position' } }));
 
-  handlePointerLeave = () => this.setState(() => ({ style: {} }));
+  // handlePointerLeave = () => this.setState(() => ({ style: {} }));
 
   context = this.methods.scroller;
 
@@ -81,8 +84,8 @@ class Scroller extends PureComponent {
       onKeyDown: this.handleKeyDown,
       onMouseDown: this.handleMouseDown,
       onWheel: this.handleWheel,
-      onPointerEnter: this.handlePointerEnter,
-      onPointerLeave: this.handlePointerLeave,
+      // onPointerEnter: this.handlePointerEnter,
+      // onPointerLeave: this.handlePointerLeave,
       ref: this.getRef(),
       role: 'presentation',
       style: {
