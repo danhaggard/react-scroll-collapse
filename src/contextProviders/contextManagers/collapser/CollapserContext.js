@@ -20,7 +20,6 @@ const collapserContext = (Base) => {
 
     constructor(props, context) {
       super(props, context);
-      // setContextAttrs(this);
       this.setNextContextProps();
       this.setChildContext();
       this.setReactScrollCollapse();
@@ -30,20 +29,17 @@ const collapserContext = (Base) => {
       Because the state for the active nodes is an array it causes rerenders
       so have added a array checker to shallow comparison.
     */
-    shouldComponentUpdate(nextProps) {
-      const checked = this.equalCheck(this.props, nextProps, shallowEqualExceptArray);
-      // console.log(`CollapserContext - shouldComponentUpdate - id: ${this.props._reactScrollCollapse.id} result,  props, nextProps`, checked, this.props, nextProps);
-      return checked;
-    }
+    shouldComponentUpdate = nextProps => !shallowEqualExceptArray(this.props, nextProps);
 
-    equalCheck = (props, nextProps, equalityChecker) => {
-      const equalProps = equalityChecker(props, nextProps);
-      if (!equalProps) {
-        return true;
-      }
-      return false;
-    }
+    /*
+      Here we are getting information as parent about its children,
+      and passing that to its children - received as info about it's siblings.
+      Hence the mapping from 'activeChildren', for instance, to 'activeSiblings'.
 
+      Care is being taken here to ensure the generation of a new object
+      only if there is a genuine change in state.  Otherwise we reuse the existing
+      object container and rely on shallow equality to prevent uneeded renders.
+    */
     getNextContextProps = () => {
       const {
         activeSiblings: prevActiveSiblings,
@@ -89,7 +85,7 @@ const collapserContext = (Base) => {
       const {
         addActiveChildren,
         _reactScrollCollapse: { id },
-        isActiveSibling,
+        // isActiveSibling,
         removeActiveChildren
       } = this.props;
       /*
@@ -155,14 +151,21 @@ const collapserContext = (Base) => {
 };
 
 
+/*
+  ContextRender - used in place of the default context renderer.
+
+  To prevent unecesary renders on the context needed more than shallow checking
+  on the array value for the active siblings.
+
+  Also handles logic for mergin context info regarding siblings from the parent
+  to it's immediate children.
+*/
 const contextRenderer = (Context, Comp, mergeContextProps) => {
 
   class ContextRender extends Component {
 
     shouldComponentUpdate(props) {
-
       const checked = this.equalCheck(props, shallowEqualExceptArray);
-      // console.log('ContextRender - shouldComponentUpdate - result,  props, nextProps', checked, this.props, props);
       return checked;
     }
 
@@ -171,12 +174,6 @@ const contextRenderer = (Context, Comp, mergeContextProps) => {
       const [nextContextProps, nextProps] = this.splitProps(props);
       const equalProps = equalityChecker(prevProps, nextProps);
       const equalContext = equalityChecker(prevContextProps, nextContextProps);
-      /*
-      console.log('');
-      console.log('equalProps, equalContext', equalProps, equalContext);
-      console.log('prevContextProps, nextContextProps', prevContextProps, nextContextProps);
-      console.log('prevProps, nextProps', prevProps, nextProps);
-      */
       if (!equalProps || !equalContext) {
         return true;
       }
@@ -198,7 +195,6 @@ const contextRenderer = (Context, Comp, mergeContextProps) => {
     }
 
     render() {
-      // console.log('ContextRender - render - props', this.props);
       return <Comp {...this.addToProps()} />;
     }
 
