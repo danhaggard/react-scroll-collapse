@@ -106,7 +106,10 @@ const createCache = (rootNodeIdArg = 0) => {
 
   const setResult = setResultFactory(getRecursionCache);
 
+
   const orphanNodeCache = createOrphanedNodeCache(rootNodeIdArg, getResultTreeId, setResult('treeId'));
+
+  const setOrphanNodeCache = newCache => orphanNodeCache.setCache(newCache);
 
   const setResultTreeId = (id, val) => orphanNodeCache.setTreeIdWrapper(
     getCollapserParentIdRoot(getCurrentReduxState())
@@ -134,6 +137,7 @@ const createCache = (rootNodeIdArg = 0) => {
     setCache,
     setCurrentReduxState,
     setMountInfo,
+    setOrphanNodeCache,
     setRecursionCache,
     setResultTreeId,
     unlockCache,

@@ -1,4 +1,6 @@
 import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
+
 import createCache from '../../../caching/recursionCache';
 import providerCaches from '../../../caching/providerCaches';
 import providerWorkers from '../../../caching/providerWorkers';
@@ -10,7 +12,7 @@ const collapserManager = (Comp) => {
 
     setAttrs = (() => setContextAttrs(this))();
 
-    getCreateCache = () => {
+    getCreateCache = () => { // eslint-disable-line
       const { isRootNode, rootNodeId, type } = this;
       const providerCache = providerCaches[type];
       if (isRootNode) {
@@ -33,21 +35,32 @@ const collapserManager = (Comp) => {
       return workerCache.getWorker(rootNodeId);
     }
 
-    registerMountWithCache = () => {
-      const { orphanNodeCache } = this.cache;
-
-    }
+    registerMountWithCache = (() => {
+      const cache = this.getCache();
+      const { orphanNodeCache } = cache;
+      const {
+        _reactScrollCollapse: { id },
+        _reactScrollCollapseParents: { collapser }
+      } = this.props;
+      console.log(`Collapser Manager registering mount: id, parentId ${id}, ${collapser}`);
+      orphanNodeCache.registerIncomingMount(id, collapser);
+    })();
 
     render() {
       return (
         <Comp
           {...this.props}
           areAllItemsExpandedWorker={this.getWorker()}
-          cache={this.getCache()}
+          cache={this.cache}
         />
       );
     }
   }
+
+  CollapserManager.propTypes = {
+    _reactScrollCollapse: PropTypes.object.isRequired,
+    _reactScrollCollapseParents: PropTypes.object.isRequired,
+  };
 
   CollapserManager.whyDidYouRender = {
     logOnDifferentValues: false,

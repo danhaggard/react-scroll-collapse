@@ -22,7 +22,7 @@ import addLoggingDefaultsToComponent from '../../utils/logging/utils';
 // import createMountCache from '../../caching/mountCache';
 
 // import { createForkedNodesTracker } from '../../selectors/trackForkedNodes';
-import providerIdStore, { counterStore } from '../../../src/contextProviders/utils/providerCounter';
+// import providerIdStore, { counterStore } from '../../../src/contextProviders/utils/providerCounter';
 
 // let forkedNodesTracker = createForkedNodesTracker(0);
 
@@ -110,7 +110,28 @@ export const collapserWrapper = (WrappedComponent) => {
       const { props:
         { cache:
           { orphanNodeCache }, _reactScrollCollapse: { isRootNode, parents } }, id } = this;
-          console.log('mount id', id);
+      const { cache } = this.props;
+      console.log('mount id', id);
+
+      const finishedMounting = orphanNodeCache.registerActualMount(id, parents.collapser);
+
+      if (finishedMounting) {
+
+        console.log('finished mounting', id);
+        const [orphaned, checkedNodes] = orphanNodeCache.checkPendingNodes(
+          id, parents.collapser
+        );
+        console.log('foundOrphan, checkedNode', orphaned, checkedNodes);
+
+        if (orphaned) {
+          orphanNodeCache.initCache();
+          this.initiateTreeStateCheck(true);
+        }
+        orphanNodeCache.logCurrentOrphanRange();
+        console.log('orphanNodeCache', orphanNodeCache);
+        console.log('cache', cache.getCache);
+      }
+
       /*
         If a node adds a new branch after first mount, then anything mounting
         underneath the original path will be orphaned because the algo will
@@ -119,7 +140,7 @@ export const collapserWrapper = (WrappedComponent) => {
         As nodes are mounted we track ranges of ids where orphans will occur
         and trigger a reset of tree ids when a node is orphaned.
       */
-      let isOrphan = false;
+      // let isOrphan = false;
 
       /*
         This is how we know the current mount cycle has finished.
@@ -131,27 +152,27 @@ export const collapserWrapper = (WrappedComponent) => {
 
         Nope - wrong. They mount in in-order traversal.
       */
-      const haveReachedMountNode = orphanNodeCache.isMountNode(id, parents.collapser, providerIdStore, counterStore.collapser);
+      // const haveReachedMountNode = orphanNodeCache.isMountNode(id, parents.collapser, providerIdStore, counterStore.collapser);
       // console.log('haveReachedMountNode, id', haveReachedMountNode, id);
       // const haveReachedTopOfSubtree = id - parents.collapser > 1;
-      if (haveReachedMountNode) {
+      // if (haveReachedMountNode) {
 
-        isOrphan = orphanNodeCache.checkPendingNodesForOrphans();
-        orphanNodeCache.logCurrentOrphanRange();
+        // isOrphan = orphanNodeCache.checkPendingNodesForOrphans();
+        //orphanNodeCache.logCurrentOrphanRange();
         // console.log('All nodes forked', orphanNodeCache.getAllForkedNodes());
         // console.log('All checked parents', orphanNodeCache.getCheckedParents());
         // console.log('isOrphan, id, parent id', isOrphan, id, parents.collapser);
       // console.log('orphanNodeCache.logCurrentOrphanRange', orphanNodeCache.logCurrentOrphanRange);
-      }
+      //}
       /*
         if worst cpomes to worst can opt for a tree reset on every new subtree
       */
-      if ((isOrphan)) {
+      //if ((isOrphan)) {
         // orphanNodeCache.initCache();
-        this.initiateTreeStateCheck(true);
-        orphanNodeCache.logCurrentOrphanRange();
+        //this.initiateTreeStateCheck(true);
+      //  orphanNodeCache.logCurrentOrphanRange();
         // console.log('isOrphan, id, parent id', isOrphan, id, parents.collapser);
-      }
+      //}
 
       /* this increments the counter */
       /*
@@ -215,10 +236,12 @@ export const collapserWrapper = (WrappedComponent) => {
       const { areAllItemsExpandedWorker, cache } = this.props;
       const cacheClone = cache.getCache();
       const currentReduxState = cache.getCurrentReduxState();
+      const orphanNodeCacheClone = cache.orphanNodeCache.getCache();
       areAllItemsExpandedWorker.postMessage([
         currentReduxState,
         {
           cacheClone,
+          orphanNodeCacheClone,
           id: this.id,
           isOpenedInit: this.props.isOpenedInit,
           rootNodeId: this.rootNodeId,
@@ -227,12 +250,14 @@ export const collapserWrapper = (WrappedComponent) => {
     }
 
     handleAllItemsExpandedWorkerMessage = (e) => {
+      const { orphanNodeCacheClone, recursionCacheClone } = e.data;
       const { cache } = this.props;
       if (!e) {
         return;
       }
       if (this.isRootNode) {
-        cache.setCache(e.data);
+        cache.orphanNodeCache.setCache(orphanNodeCacheClone);
+        cache.setCache(recursionCacheClone);
       }
       this.setExpandedState(this.props);
     }
