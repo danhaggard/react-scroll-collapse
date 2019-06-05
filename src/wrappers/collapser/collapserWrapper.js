@@ -104,212 +104,47 @@ export const collapserWrapper = (WrappedComponent) => {
 
         great refresher pages on trees.
         // https://www.freecodecamp.org/news/all-you-need-to-know-about-tree-data-structures-bceacb85490c/
-
-      So we init the largestValueFromPrevMountCycle to be 1 less than the rootNode.
-      If any componentId > 0 mounts - we know the mounting cycle has begun and will
-      continue till the root node 0 mounts.
-
-      While we are mounting we record the highest id to mount in the current
-      cycle.  This get sets as the next value for: largestValueFromPrevMountCycle
-      i.e. 6 -as any mountings on a new render will start from the bottom and
-      work their way up to the top which will be node 7.
-
-      !!!!----  MOUNT VARS ----!!!!
-      Couldn't think of good names to make this clear so:
-
-      mountingStarted: local var set when we first see a node mount id > 1
-        distance from root // or highest mounted id on previous cycle..
-
-      mountingFinished: local var set true when we first detect the node closer
-        than 2 distance from the last.
-
-      mounting:  cache var set with local mountingStarted so we know we are
-        mounting on the next cycle.
-
-      largestValueFromThisMountCycle: tracks the largest id value seen so far
-        this mount cycle so it can be set as the base number to measure node
-        distance next cycle.
-
-      largestValueFromPrevMountCycle: base to track distance from the top mounted
-        node this cycle.
-
-      ----------
-
-        !!!!---- EDGE CASES ----!!!!
-      Edge cases this doesn't deal with.
-
-      1) Mount of root node with no children.
-        e.g. id = 0, and mounts first.  So 'mountingStarted'
-        is never set.  ANd so 'mounting' in the cache is never set to true.
-
-      2) Mount of root node with one single child.
-        1 - (-1) = 2 > 1 - so mountingStarted is init'd ok in cache
-        But 'mounting' is false and won't be set unless there is another
-        non root node to mount.  This was to ensure the distance of at least 2
-        that allows us to detect the next mount cycle.
-
-        So id = 1 - is never set as: largestValueFromThisMountCycle - and
-        consequently not as the bstarting point of the next mount cycle.  The
-        top most node of the next cycle will be 2 - and is not > 1.  SO we
-        woin't be able to detect when that cycle finishes.
-
-
-        !!!!--- BAD NODE MOUNT LOCATION DETECTION ---!!!!
-
-        When adding new nodes.  Need to detect whether it is safe to use
-        it's id as the treeId - or whether there is a treeId we can use,
-        or if we have to rebuild some of the tree.
-
-        Algo.
-
-        1) init arr = [rootNodeId].
-          (never pop arr[0])
-        2) Add next node to tree.  Pick any entry currently in arr as it's parent.
-        3) If child node is + 1 parent node, then simply add this id to the array.
-        4) if child node is > parent + 1.  Then pop id greater than parent, and then push
-          child node after that.
-        5) Back to 2 - noting that the selection choices for next node are reduced.
-
-        Explanation.  By doing this you are ensured of there always being a path
-        to your node by choosing the largest child < target available.
-
-        [0] - you can always fork from zero safely because you can always touch
-          root so not blocked from reaching child.
-        1 is 1 + 0 - so by 3) add 1 to the array. [0, 1]
-
-        Id = 2 can now choose 0 or 1.  if 1 then [0, 1, 2] - 3 can still pick
-        any of these safely - because at node 0 - you'd pick the largest child 1.
-        There you either can see 3 as child - or your only choise is two then to 3.
-
-        If Three picks 1.  Then 2 has to get popped.  Because if 4 chose two - there
-        would be no path.  At node 1 you'd pick 3 as the > val that is less than
-        four - but then you'd be stuck.
-
-        ACTUALLY - don't need to store the whole array.
-
-        Store an array of tuples of the lastForkParent and then id of the node that forked lastForkChild,.
-        If new node gets given a parent which is between any of those two values for any pair
-        you're lost.
-
-    */
-
-    /*
-
-      CASE: 1 - end mount cycle isRootNode - no children.
-        distance === 1  && isRootNode === true && !mounting
-          break:
-            set BASE to rootNodeId.
-            set treeId to rootNodeId.
-
-      CASE: 2 - Single node mounted in cycle, is + 1 from root - no children.
-        distance === 1  && (rootNodeId + 1 === id) && !mounting.
-          break:
-            set BASE to id.
-            set treeId to id
-
-        (
-          We know no unmounted node can be higher.  We know it has no children or
-          we mounting would be true.  We know it is a child of rootNode so
-          treeId can be its id.
-        )
-
-      CASE: 3 - Single node mounted in cycle, is + 1 from BASE - no children.
-        distance === 1  && (BASE + 1 === id) && !mounting.
-
-
-*/
-
-    /*
-    setCacheOnMount() {
-      const { props: { cache, _reactScrollCollapse: { isRootNode } }, id } = this;
-    }
-    */
+      */
 
     setCacheOnMount() {
-      const { props: { cache, _reactScrollCollapse: { isRootNode, parents, rootNodeId } }, id } = this;
+      const { props: { _reactScrollCollapse: { isRootNode, parents } }, id } = this;
+
+      console.log('collapserWrapper mount id', id);
 
       /*
-      const {
-        largestValueFromPrevMountCycle,
-        mounting,
-        largestValueFromThisMountCycle
-      } = cache.getMountInfo();
+        If a node adds a new branch after first mount, then anything mounting
+        underneath the original path will be orphaned because the algo will
+        search down the other side of the tree.
+
+        As nodes are mounted we track ranges of ids where orphans will occur
+        and trigger a reset of tree ids when a node is orphaned.
       */
-      console.log('collapserWrapper mount id', id);
-      // debugger;
       const isOrphan = forkedNodesTracker.checkForkOrphan(id, parents.collapser);
       forkedNodesTracker.logCurrentOrphanRange();
 
-      const treeNeedsReset = id - parents.collapser > 1;
       /*
-        This blocked update when previous mount forked from root and mounting
-        node mounts under an existing node that gets the same treeId mapping
-        regardless.
+        This is how we know the current mount cycle has finished.
+        Ids increment by 1 - but when the root node finishes mounting - we
+        increment the counter again.  THe next node to mount will be +2.
 
-        (isOrphan && treeNeedsReset) || rootNodeId === parents.collapser
+        All child nodes mounting in the same sequence will be +1 - and so
+        won't trigger any treeId resets.  Once we reach the highest mounting
+        node - we increment the counter again.
       */
-      if ((isOrphan && treeNeedsReset)) {
+      const haveReachedTopOfSubtree = id - parents.collapser > 1;
+
+      /*
+        if worst cpomes to worst can opt for a tree reset on every new subtree
+      */
+      if ((isOrphan /* && haveReachedTopOfSubtree */)) {
         this.initiateTreeStateCheck(true);
-        console.log('isOrphan && treeResetNeeded', id, parents.collapser);
+        console.log('isOrphan', id, parents.collapser);
       }
 
-      if (isRootNode || treeNeedsReset) {
+      /* this increments the counter */
+      if (isRootNode || haveReachedTopOfSubtree) {
         providerIdStore('collapser');
       }
-
-      /*
-
-      An attempt at solvoing problem 1.
-
-      const mountingStarted = (id - largestValueFromPrevMountCycle > 1
-        || (id - largestValueFromPrevMountCycle === 1 && !mounting));
-
-
-      const mountingFinished = !mountingStarted && mounting;
-      /* a root node mounted without children
-      if (!mountingStarted && !mountingFinished && !mounting
-        && isRootNode) {
-        /*
-          Another angle on deteecting problem 1:
-
-          cache.setMountInfo({ largestValueFromPrevMountCycle: id });
-          You'd think checking tree state here immediately would be fine -
-          but it causes a state mismatch currently.
-          TODO: ionvestigate.
-
-        return;
-      }
-
-
-      if (mountingStarted) {
-        console.log('mounting started', id);
-        console.log('largestValueFromPrevMountCycle, id - largestValueFromPrevMountCycle', largestValueFromPrevMountCycle, id - largestValueFromPrevMountCycle);
-        cache.setMountInfo({ mounting: mountingStarted });
-      }
-
-      if (mounting && id > largestValueFromThisMountCycle) {
-        console.log('mounting && id > largestValueFromThisMountCycle', id);
-        cache.setMountInfo({ largestValueFromThisMountCycle: id });
-      }
-
-      if (mountingFinished) {
-        console.log('mountingFinished', id);
-        cache.setMountInfo({
-          largestValueFromPrevMountCycle: largestValueFromThisMountCycle,
-        });
-      }
-
-      if (mountingFinished) {
-        this.initiateTreeStateCheck(true);
-        cache.setMountInfo({
-          mounting: false,
-        });
-      }
-
-      if (mountingStarted && !mounting && !isRootNode) {
-      //  setTimeout(this.checkForSingleNodeMount, 100);
-      }
-      */
     }
 
     setExpandedState = () => {

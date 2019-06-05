@@ -37,7 +37,7 @@ class CommentThread extends PureComponent { //eslint-disable-line
       minDepth,
       maxChildren,
       maxDepth,
-      showControls: false,
+      showControls: true,
     };
   }
 
