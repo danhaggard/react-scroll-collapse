@@ -6,7 +6,7 @@ import shallowEqual from 'react-pure-render/shallowEqual';
 import registerConsumer from './registerConsumer';
 import { getIdKey, getParentIdKey } from '../utils/providerKeyManager';
 import { isUndefNull } from '../../utils/selectorUtils';
-
+import { ofObjectTypeOrNothing } from '../../utils/propTypeHelpers';
 
 const extendClass = (subClassFactory, SuperClass) => {
   if (typeof subClassFactory !== 'function') {
@@ -38,19 +38,7 @@ const extendClass = (subClassFactory, SuperClass) => {
 
   wrapper: a HoC function that will wrap the passed Comp with additional logic
    specific to your provider.  Use this if you only need to inject props to the
-   wrapped component - but don't need anything passed deeper into the content.
-*/
-
-/*
-constructor(props, context) {
-  super(props, context);
-  console.log('Find parent class methods?', this.setNextContextProps);
-
-  this.prevContextProps = {};
-  this.nextContextProps = this.prevContextProps;
-  this.compareContextProps = () => shallowEqual(this.prevContextProps, this.nextContextProps);
-  this.setNextContextProps = () => (this.nextContextProps = this.prevContextProps);
-}
+   wrapped component - but don't need anything passed deeper into the context.
 */
 
 const createProvider = (
@@ -141,7 +129,7 @@ const createProvider = (
       this.setReactScrollCollapse();
     }
 
-    getId = () => this.props._reactScrollCollapse.id; // eslint_disable_line
+    getId = () => this.props._reactScrollCollapse.id;
 
     getParentIdObj = (props) => {
 
@@ -182,30 +170,10 @@ const createProvider = (
       return rootNodes;
     }
 
-    getMergedContextMethods = (props) => {
-      const blah = props.contextMethods
-        ? { ...props.contextMethods, ...this.contextMethods }
-        : this.contextMethods;
-      return blah;
-    };
-
     setMergedContextMethods = () => (this.mergedContextMethods = this.props.contextMethods
       ? { ...this.props.contextMethods, ...this.contextMethods }
       : this.contextMethods);
 
-    /*
-      childContext  - create the context to be inserted into the context
-      for children to consume.
-
-      ...mapParentIds(props) - maps parentTypeKeys to idKeys and passes vals
-
-      childRegisterMethods - children need to let the closest ancestors know
-      they have been mounted so ancestors must pass callbacks through
-      the context to do this.
-
-      This property is not actually defined on this class - is currently
-      inherited from Base.  Need to revist this.
-    */
     addRootNodeId = ({ rootNodeId }) => {
       if (this.getId() === this.childContext.rootNodes[typeKey]) {
         this.childContext.rootNodeId = this.getId();
@@ -217,7 +185,7 @@ const createProvider = (
     setChildContext = () => {
       this.setMergedContextMethods();
       this.childContext = {
-        parents: this.getParentIdObj(this.props), // must stay
+        parents: this.getParentIdObj(this.props),
         contextMethods: this.mergedContextMethods,
         contextProps: this.nextContextProps,
         rootNodes: this.getRootNodes(this.props),
@@ -256,13 +224,8 @@ const createProvider = (
     });
 
     render() {
-      if (typeKey === 'collapser') {
-        // console.log(`CreateProvider - id: ${this.getId()} - props, this`, this.props, this);
-
-      }
       this.updateChildContext();
-      const newProps = this.getProps();
-      return /* childTypeKeys.length === 0 ? <Comp {...this.getProps()} /> : */(
+      return childTypeKeys.length === 0 ? <Comp {...this.getProps()} /> : (
         <Context.Provider value={{ ...this.childContext }}>
           <Wrapped
             {...this.getProps()}
@@ -275,11 +238,15 @@ const createProvider = (
 
   Provider.defaultProps = {
     contextMethods: null,
+    _reactScrollCollapseParents: undefined,
     rootNodes: null,
   };
 
   Provider.propTypes = {
+    contextMethods: ofObjectTypeOrNothing,
+    rootNodes: ofObjectTypeOrNothing,
     _reactScrollCollapse: PropTypes.object.isRequired,
+    _reactScrollCollapseParents: ofObjectTypeOrNothing,
   };
 
   Provider.whyDidYouRender = {
