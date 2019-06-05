@@ -39,6 +39,8 @@ const collapserContext = (Base) => {
       Care is being taken here to ensure the generation of a new object
       only if there is a genuine change in state.  Otherwise we reuse the existing
       object container and rely on shallow equality to prevent uneeded renders.
+
+      messy tho - clean.
     */
     getNextContextProps = () => {
       const {

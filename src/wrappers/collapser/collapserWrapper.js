@@ -20,7 +20,6 @@ import { setContextAttrs } from '../../utils/objectUtils';
 import addLoggingDefaultsToComponent from '../../utils/logging/utils';
 
 
-
 export const collapserWrapper = (WrappedComponent) => {
 
   const WrappedComponentRef = forwardRefWrapper(WrappedComponent, 'collapserRef');
@@ -29,24 +28,6 @@ export const collapserWrapper = (WrappedComponent) => {
 
     elem = React.createRef();
 
-
-    /*
-      After mounting a bunch of nodes we need to check state - but this method
-      only does that on mount of first render of the current root node.  Otherwise
-      it just logs the children mounted and the state check is initiated from
-      componentDidUpdate.
-
-      Children mount first so they are added to the targetArray of nodes
-      needing to be checked.
-
-      WHen we hit the root node we check state.
-
-      treeIds are naively regenerated on every mount.  Need to test doing this
-      after root mount only.
-
-      Also - the nodeTargetArray is reset - but not sure why it's before
-      the check tree state.  On mount it probably doesn't matter anyway.
-    */
 
     constructor(props, context) {
       super(props, context);
@@ -99,50 +80,50 @@ export const collapserWrapper = (WrappedComponent) => {
         // https://www.freecodecamp.org/news/all-you-need-to-know-about-tree-data-structures-bceacb85490c/
 
 
-    SetCacheOnMount intialises the mounting related state that it needs to keep track
+      SetCacheOnMount intialises the mounting related state that it needs to keep track
 
-    It needs to know when the current mounting cycle is finishing so it can then
-    check if the tree ides need to be set because a node has orphaned.
+      It needs to know when the current mounting cycle is finishing so it can then
+      check if the tree ides need to be set because a node has orphaned.
 
-    I used a contstructor of a HoC higher up in the heirarchy.
+      I used a contstructor of a HoC higher up in the heirarchy.
 
-    It is sent information about mounting of nodes in normal sort order.
-    Mount orrder is in-order traversal - which doesn't work for my algo for
-    orphan detection.  And gets this info before the collapsers mount.
+      It is sent information about mounting of nodes in normal sort order.
+      Mount orrder is in-order traversal - which doesn't work for my algo for
+      orphan detection.  And gets this info before the collapsers mount.
 
-    Thus I can see in advance how many new child coming down the pipe.
+      Thus it can see in advance how many new child coming down the pipe.
+
+      The cache handles tracking once we've hit the mount node.
+
+      So we only rebuild the tree if there is an orphan and only once per
+      render cycle.
     */
     setCacheOnMount() {
       const { props: { cache: { orphanNodeCache }, _reactScrollCollapse: { parents } }, id } = this;
-
-
       const finishedMounting = orphanNodeCache.registerActualMount(id, parents.collapser);
-
       if (finishedMounting) {
-
         const [orphaned] = orphanNodeCache.checkPendingNodes(
           id, parents.collapser
         );
 
+        /*
+          Cache is cleaned of previous info about the tree - so it can
+          refresh it's state.  initiateTreeStateCheck does the areAllItemsExpanded
+          selection.  Passing true tells it to rebuld the tree while it's going
+          down there.  Nasty couple again - but efficient.
+        */
         if (orphaned) {
           orphanNodeCache.initCache();
           this.initiateTreeStateCheck(true);
         }
-        orphanNodeCache.logCurrentOrphanRange();
       }
-
-      /*
-        If a node adds a new branch after first mount, then anything mounting
-        underneath the original path will be orphaned because the algo will
-        search down the other side of the tree.
-
-        As nodes are mounted we track ranges of ids where orphans will occur
-        and trigger a reset of tree ids when a node is orphaned.
-      */
-
     }
 
-
+    /*
+      Went from firing an action for every collapser to the store,
+      to making a it a single action - and now to local state.
+      I don't wonder which is the most efficient.
+    */
     setExpandedState = () => {
       const { props: { cache }, id } = this;
       const { areAllItemsExpanded } = this.state;
@@ -156,11 +137,12 @@ export const collapserWrapper = (WrappedComponent) => {
 
     expandCollapseAll = () => {
       const { id, rootNodeId } = this;
-      const {
-        addToNodeTargetArray,
-        expandCollapseAll,
-        selectors,
-      } = this.props;
+      /*
+        nodeTargetArray is an array of ids to which the treeStateChecker
+        will bee line before checking every node underneath.  In this case it
+        will be the instance of the component that fired the hanlder.
+      */
+      const { addToNodeTargetArray, expandCollapseAll, selectors } = this.props;
       const { areAllItemsExpanded } = this.state;
 
       /*
@@ -188,8 +170,12 @@ export const collapserWrapper = (WrappedComponent) => {
       this.initiateTreeStateCheck();
     };
 
+    /*
+      Fires of the webworker to query state in parralel to the main thread.
+      passes copies of the caching for the worker to use.
+    */
     initiateTreeStateCheck = (setTreeId = false) => {
-      const { areAllItemsExpandedWorker, cache } = this.props;
+      const { areAllItemsExpandedWorker, cache, isOpenedInit } = this.props;
       const cacheClone = cache.getCache();
       const currentReduxState = cache.getCurrentReduxState();
       const orphanNodeCacheClone = cache.orphanNodeCache.getCache();
@@ -199,12 +185,15 @@ export const collapserWrapper = (WrappedComponent) => {
           cacheClone,
           orphanNodeCacheClone,
           id: this.id,
-          isOpenedInit: this.props.isOpenedInit,
+          isOpenedInit,
           rootNodeId: this.rootNodeId,
           setTreeId,
         }]);
     }
 
+    /*
+      The callback from the webworker.  Receive its' updated state.
+    */
     handleAllItemsExpandedWorkerMessage = (e) => {
       const { orphanNodeCacheClone, recursionCacheClone } = e.data;
       const { cache } = this.props;
@@ -218,10 +207,16 @@ export const collapserWrapper = (WrappedComponent) => {
       this.setExpandedState(this.props);
     }
 
+    /*
+      Methods managed by the context.
+    */
     isActiveSibling = () => this.methods.collapser.checkIfActiveSibling();
 
     noActiveSiblings = () => this.methods.collapser.noActiveSiblings();
 
+    /*
+      Props are mostlye clean now - but still some ot pull.
+    */
     cleanProps = props => cleanHoCProps(
       props,
       {
@@ -269,6 +264,7 @@ export const collapserWrapper = (WrappedComponent) => {
     addToNodeTargetArray: PropTypes.func.isRequired,
     areAllItemsExpanded: PropTypes.bool.isRequired,
     expandCollapseAll: PropTypes.func.isRequired,
+    isOpenedInit: PropTypes.func.isReequired,
     selectors: PropTypes.object.isRequired, // includes nested
     setTreeId: PropTypes.func.isRequired,
     toggleCheckTreeState: PropTypes.func.isRequired,
