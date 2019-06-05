@@ -33,6 +33,11 @@ const collapserManager = (Comp) => {
       return workerCache.getWorker(rootNodeId);
     }
 
+    registerMountWithCache = () => {
+      const { orphanNodeCache } = this.cache;
+
+    }
+
     render() {
       return (
         <Comp
