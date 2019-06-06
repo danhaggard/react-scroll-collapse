@@ -1,11 +1,13 @@
-import { sortArrayAscending, removeFromArray } from '../utils/arrayUtils';
-import { hasOwnProperty } from '../utils/selectorUtils';
+import { removeFromArray } from '../utils/arrayUtils';
+import { hasOwnProperty, isUndefNull } from '../utils/selectorUtils';
 
-const createOrphanedNodeCache = (rootNodeId, treeIdSelector, setTreeIdFunc) => {  // eslint-disable-line
+const createOrphanedNodeCache = (
+  rootNodeId,
+  treeIdSelector,
+  setTreeIdFunc
+) => {  // eslint-disable-line
 
   let CACHE = null;
-
-  const clearCache = () => (CACHE = null);
 
   const getCache = () => CACHE;
 
@@ -16,13 +18,26 @@ const createOrphanedNodeCache = (rootNodeId, treeIdSelector, setTreeIdFunc) => {
     ...obj,
   });
 
+  /*
+    activeForks:
+      nodes currently being use to determinne ranges within which newly mounted
+      nodes will be orphaned if they have any in this range as their parent.
+
+    orphanNodes:
+      Nodes that are currently registered as orphaned on mount.
+
+    checkedParents:
+      If it's in checked parents it has a child - and therefore
+      using this as an additional check for forks.
+      TODO: revise this - probably better to ensure treeIds
+        assigned before mount so the +1 check is always reliable.
+  */
   const createCacheInitObj = () => ({
     activeForks: {},
     largestActiveFork: null,
     lowestActiveFork: null,
     rangeUpperBound: null,
     orphanNodes: {},
-    allForkedNodes: {},
     checkedParents: {},
     nodesMounting: [],
     nodesReadyToCheck: [],
@@ -95,28 +110,6 @@ const createOrphanedNodeCache = (rootNodeId, treeIdSelector, setTreeIdFunc) => {
     Object.entries(activeForks).forEach(([id, fork]) => console.log(`${getRangeString(id, fork.rangeEnd)}`));
   };
 
-  /*
-  const clearCheckedParents = () => (checkedParents = {});
-
-  const getCheckedParents = () => checkedParents;
-
-  const clearOrphanNodes = () => (orphanNodes = {});
-
-  const getOrphanNodes = () => orphanNodes;
-
-  const getAllForkedNodes = () => allForkedNodes;
-
-  const clearAllForkedNodes = () => (allForkedNodes = {});
-
-  const clearAllNodes = () => (
-    clearOrphanNodes() && clearAllForkedNodes() && clearCheckedParents()
-  );
-  */
-
-  /*
-  const logAllNodes = () => console.log('orphanNodes, allForkedNodes', orphanNodes, allForkedNodes);
-  */
-
 
   const addToCheckedParents = (parentNodeId, nodeId) => {
     const { checkedParents } = getCache();
@@ -130,73 +123,77 @@ const createOrphanedNodeCache = (rootNodeId, treeIdSelector, setTreeIdFunc) => {
     } else {
       checkedParents[parentNodeId].children.push(nodeId);
     }
-    // console.log('checkedParents', checkedParents);
   };
 
+  /*
+    If a node is not an orphan we can check if it is forking its parent.  Forked
+    nodes are where orphaned children are created:
+
+            0                     0
+           /                     /
+          1                     1
+         /                     /
+        2                     2
+       /                     / \
+      3                     3   4
+
+      First tree it's safe to mount at any node.
+
+      Second tree is forked at node 2.  Next id is 5.  If that is mounted
+      under 3 - then it will be orphaned because the tree search algo will look
+      for it under 4.  So we create a range between 2 - 4 not inclusive.  If there
+      were more nodes already under three the range would include them as well.
+      i.e. it's from the forked parent node to the last mounted id of the child
+      that does the forking.
+  */
 
   const checkIfFork = (nodeId, parentNodeId) => {
-    let {
-      activeForks,
-      allForkedNodes,
-      checkedParents,
-      lowestActiveFork,
-      largestActiveFork,
-      rangeUpperBound
-    } = getCache();
-
+    const { activeForks, checkedParents } = getCache();
+    let { lowestActiveFork, largestActiveFork, rangeUpperBound } = getCache();
 
     /*
       If in a mount sequence node is > + 1 parent, then it has been mounted
-      higher up in the tree than the last mounted node.  Doesn't always mean a fork
-      though.
+      higher up in the tree than the last mounted node.
+
+      Usually means a fork except in the case where a node has been deleted
+      and the next id added is higher because of that.
+
+      TODO: make sure newly mounted nodes are getting assigned a treeId before
+        being logged as forks or orphans.
     */
     const isFork = nodeId - parentNodeId > 1
-    /*
-      You can't orphan a node by branching from root.
 
-      tch tch - yes you can -
-      */
-    // && parentNodeId !== rootNodeId
       /*
         Check if a parent has a child - since you can fork what doesn't have
         at least one child.
       */
       && hasOwnProperty(checkedParents, parentNodeId);
-      /*
-        You can still fork from the points at which determine the current range
-        within which parents will orphan new nodes.
 
-        So I was counting it.  But we need to update their state if forked multiple
-        times.  So let it through.
-      */
-    // && (parentNodeId !== lowestActiveFork || parentNodeId !== largestActiveFork);
-
-    // basically re caching duplicate info - but this is dirty for now.
+    /*
+      Dirty:  basically re caching duplicate info.  See note above about
+        setting treeIds to avoid this.
+    */
     addToCheckedParents(parentNodeId, nodeId);
-    console.log('isFork - nodeId, parentNodeId', isFork, nodeId, parentNodeId);
+
     if (!isFork) {
       return false;
     }
-    allForkedNodes[parentNodeId] = {
-      parentNodeId,
-      nodeId,
-      lowestActiveFork,
-      largestActiveFork
-    };
-    console.log(`nodeId: ${nodeId} is child of fork parentId: ${parentNodeId}`);
-    // console.log(`largestActiveFork - before set: ${largestActiveFork}`);
-    // console.log(`lowestActiveFork - before set: ${lowestActiveFork}`);
-    lowestActiveFork = // parentNodeId !== rootNodeId &&
-      (lowestActiveFork === null
+
+    /*
+      Need to know what the lowest / highest forks we've found so far.
+    */
+    lowestActiveFork = (lowestActiveFork === null
       || parentNodeId < lowestActiveFork) ? parentNodeId : lowestActiveFork;
 
-
     largestActiveFork = lowestActiveFork !== null
-      && parentNodeId > largestActiveFork // || parentNodeId === prevLargestActiveFork)
+      && parentNodeId > largestActiveFork
       ? parentNodeId
-      : largestActiveFork; // && parentNodeId > lowestActiveFork
+      : largestActiveFork;
 
-
+    /*
+      Store it as an active fork - or update its end range value with
+      the newest child's id.
+    */
     if (!activeForks[parentNodeId]) {
       activeForks[parentNodeId] = {
         id: parentNodeId,
@@ -206,25 +203,41 @@ const createOrphanedNodeCache = (rootNodeId, treeIdSelector, setTreeIdFunc) => {
       activeForks[parentNodeId].rangeEnd = nodeId;
     }
 
+    /*
+                             0
+                            /
+                           1
+                          /
+                         2
+                        / \
+                       3   4
+
+        If I branch from 1 or 0 here then it won't create an orphan.
+        And we would just ordinarily create a fork obj with a range from 1 ->
+        the ID of the newly mounted node.
+
+        But there will be an active fork declaring a range between 2 -> 4
+        This needs to be cleaned up - since anything mounted under 1
+        will be orphaned now.
+
+        TODO: clean this logic up.
+        TODO: doublt check largestActiveFork is doing any real work here.
+        TODO: same with rangeUpperBound
+    */
     let prevActiveForks = Object.keys(activeForks);
     while (parentNodeId < largestActiveFork && prevActiveForks.length !== 0) {
       prevActiveForks = prevActiveForks.slice(0, prevActiveForks.length);
       const prevActiveFork = prevActiveForks.pop();
       if (parentNodeId < prevActiveFork) {
-        // console.log(`removing prev active fork id ${prevActiveFork}`);
         delete activeForks[prevActiveFork];
         largestActiveFork = prevActiveFork;
       }
     }
 
-
-    // console.log(`lowestActiveFork - after set: ${lowestActiveFork}`);
-    // console.log(`largestActiveFork - after set: ${largestActiveFork}`);
     rangeUpperBound = nodeId;
 
     assignCache({
       activeForks,
-      allForkedNodes,
       checkedParents,
       lowestActiveFork,
       largestActiveFork,
@@ -235,17 +248,25 @@ const createOrphanedNodeCache = (rootNodeId, treeIdSelector, setTreeIdFunc) => {
   };
 
 
+  /*
+    Worst var name ever.
+
+    Checks for orphans first - then forks.
+
+    No point checking for forks if its an orphan since the tree
+    is going to get rebuilt anyway.
+  */
   const checkForkOrphan = (nodeId, parentNodeId) => {
 
     const nodeTreeId = treeIdSelector(nodeId);
     const parentNodeTreeId = treeIdSelector(parentNodeId);
-    console.log('');
-    console.log('nodeId, parentNodeId', nodeId, parentNodeId);
-    console.log('nodeTreeId, parentNodeTreeId', nodeTreeId, parentNodeTreeId);
-    if (nodeId === rootNodeId || parentNodeId === undefined || parentNodeId === null) {
+
+    /*
+      Don't bother if root.
+    */
+    if (nodeId === rootNodeId || isUndefNull(parentNodeId)) {
       return false;
     }
-    // const isOrphaned = checkIfOrphanedNode(parentNodeId, nodeId);
 
     const isOrphaned = checkIfOrphanedNode(parentNodeTreeId, nodeTreeId);
 
@@ -256,6 +277,11 @@ const createOrphanedNodeCache = (rootNodeId, treeIdSelector, setTreeIdFunc) => {
   };
 
 
+  /*
+    Used by CollapserManager to advise of incoming collapser mounts.
+
+    TODO: This whole bit of logic needs to be separated into another module.
+  */
   const registerIncomingMount = (nodeId) => {
     const { nodesMounting } = getCache();
     nodesMounting.push(
@@ -263,9 +289,17 @@ const createOrphanedNodeCache = (rootNodeId, treeIdSelector, setTreeIdFunc) => {
     );
   };
 
+  /*
+    Called by CollapserController to register the actual mount
+    now that it has happened.
 
+    The cache can now compare the incoming mount registrations
+    against the actual mount registrations to determine when
+    mounting has finished.
+  */
   const registerActualMount = (nodeId, parentNodeId) => {
-    let { currentlyMounting, nodesMountingCopy, nodesMounting, nodesReadyToCheck } = getCache();
+    const { nodesMounting, nodesReadyToCheck } = getCache();
+    let { currentlyMounting, nodesMountingCopy } = getCache();
 
     if (!currentlyMounting) {
       nodesMountingCopy = [...nodesMounting];
@@ -295,16 +329,12 @@ const createOrphanedNodeCache = (rootNodeId, treeIdSelector, setTreeIdFunc) => {
   };
 
   const checkPendingNodes = () => {
-    let {
-      currentlyMounting,
-      nodesReadyToCheck,
-      nodesMountingCopy,
-      nodesMounting
-    } = getCache();
+    const { currentlyMounting } = getCache();
+    let { nodesReadyToCheck, nodesMountingCopy, nodesMounting } = getCache();
 
     const checkedNodes = {};
     let orphaned = false;
-    Object.entries(nodesReadyToCheck).forEach(([key, { nodeId, parentNodeId }]) => {
+    Object.entries(nodesReadyToCheck).forEach(([, { nodeId, parentNodeId }]) => {
       orphaned = checkForkOrphan(nodeId, parentNodeId);
       checkedNodes[nodeId] = {
         nodeId,
@@ -327,15 +357,14 @@ const createOrphanedNodeCache = (rootNodeId, treeIdSelector, setTreeIdFunc) => {
     return [orphaned, checkedNodes];
   };
 
-
+  /*
+    Called by the main cache when setting treeIds - explained over there.
+    needs cleanup.
+  */
   const setTreeIdWrapper = parentIdSelector => (id, val) => {
     const returnVal = setTreeIdFunc(id, val);
     const parentId = parentIdSelector(id);
     checkForkOrphan(id, parentId);
-    // console.log('All nodes forked', getAllForkedNodes());
-    // console.log('All checked parents', getCheckedParents());
-    // logCurrentOrphanRange();
-    // console.log('');
     return returnVal;
   };
 
@@ -346,26 +375,13 @@ const createOrphanedNodeCache = (rootNodeId, treeIdSelector, setTreeIdFunc) => {
     checkPendingNodes,
     registerActualMount,
     registerIncomingMount,
-    // getAllForkedNodes,
-    // getCheckedParents,
-    // getOrphanNodes,
-    // clearOrphanNodes,
-    // checkPendingNodesForOrphans,
     checkIfOrphanedNode,
-    // clearAllNodes,
     checkForkOrphan,
     initCache,
-    // logAllNodes,
     logCurrentOrphanRange,
     setTreeIdWrapper,
-    // orphanNodes,
-    // activeForks
   };
-  // console.log('orphan cache', returnObj);
-  // console.log('logAllNodes', returnObj.logAllNodes);
-  // console.log('logCurrentOrphanRange', returnObj.logCurrentOrphanRange);
-  // window.logAllNodes = returnObj.logAllNodes;
-  // window.logOrphanRange = returnObj.logCurrentOrphanRange;
+
   return returnObj;
 };
 

@@ -264,7 +264,7 @@ export const collapserWrapper = (WrappedComponent) => {
     addToNodeTargetArray: PropTypes.func.isRequired,
     areAllItemsExpanded: PropTypes.bool.isRequired,
     expandCollapseAll: PropTypes.func.isRequired,
-    isOpenedInit: PropTypes.func.isReequired,
+    isOpenedInit: PropTypes.bool.isRequired,
     selectors: PropTypes.object.isRequired, // includes nested
     setTreeId: PropTypes.func.isRequired,
     toggleCheckTreeState: PropTypes.func.isRequired,

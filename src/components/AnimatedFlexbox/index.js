@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { Motion, spring } from 'react-motion';
 import forwardRefWrapper from '../../utils/forwardRef';
-import { MOTION_SPRINGS, DEFAULT_MOTION_SPRING } from '../../const';
+import { DEFAULT_MOTION_SPRING } from '../../const';
 import { ofChildrenType, ofFuncTypeOrNothing } from '../../utils/propTypeHelpers';
 
 const StaticChild = React.forwardRef(({
@@ -11,9 +11,9 @@ const StaticChild = React.forwardRef(({
   onClick,
   style,
   onKeyDown,
-  onPointerEnter,
-  onPointerLeave,
-  onPointerOver,
+  // onPointerEnter,
+  // onPointerLeave,
+  // onPointerOver,
 }, ref) => (
   <div
     className={className}
@@ -24,10 +24,10 @@ const StaticChild = React.forwardRef(({
     tabIndex={0}
     onKeyDown={onKeyDown}
     type="button"
-    onPointerEnter={onPointerEnter}
-    onPointerLeave={onPointerLeave}
-    onPointerOver={onPointerOver}
-    data-react-scroll-collapse-flex
+    // onPointerEnter={onPointerEnter}
+    // onPointerLeave={onPointerLeave}
+    // onPointerOver={onPointerOver}
+    // data-react-scroll-collapse-flex
   >
     { children }
   </div>
@@ -48,9 +48,9 @@ const FlexMotion = React.forwardRef(({ // eslint-disable-line
   motionStyle,
   onClick,
   onKeyDown,
-  onPointerEnter,
-  onPointerLeave,
-  onPointerOver,
+  // onPointerEnter,
+  // onPointerLeave,
+  // onPointerOver,
   style,
 }, ref) => (
   <Motion
@@ -63,16 +63,15 @@ const FlexMotion = React.forwardRef(({ // eslint-disable-line
           ...style,
           ...getInterpolatedStyle(interpolatedStyle)
         };
-      //  console.log('id, interpolated, parsed', id, interpolatedStyle.width, newStyle.width);
         return (
           <PureStaticChild
             className={className}
             ref={ref}
             style={newStyle}
             onClick={onClick}
-            onPointerEnter={onPointerEnter}
-            onPointerLeave={onPointerLeave}
-            onPointerOver={onPointerOver}
+          //  onPointerEnter={onPointerEnter}
+          //  onPointerLeave={onPointerLeave}
+          //  onPointerOver={onPointerOver}
             onKeyDown={onKeyDown}
           >
             { children }
@@ -234,6 +233,8 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
 
     We use currentTarget (which points to the current instance) vs target (the
     child instance to detect movement across the child AnimatedFlexbox)
+
+    disabling this for now - needs more nuance.
   */
   pointerOver = (e) => {
     if (e.target !== e.currentTarget && e.target.dataset.reactScrollCollapseFlex === 'true') {
@@ -259,9 +260,9 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
     const { style: stateStyle } = this.state;
     return !isRootNode ? (
       <PureFlexMotion
-        onPointerEnter={this.pointerEnter}
-        onPointerLeave={this.pointerLeave}
-        onPointerOver={this.pointerOver}
+        // onPointerEnter={this.pointerEnter}
+        // onPointerLeave={this.pointerLeave}
+        // onPointerOver={this.pointerOver}
         className={className}
         getInterpolatedStyle={this.getInterpolWidthRotation}
         motionStyle={this.getMotionStyle()}

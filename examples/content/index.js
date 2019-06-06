@@ -142,21 +142,21 @@ export const generateCommentThreadData = (
 */
 
 const generateThreadConfig = {
-  minChildren: 2,
-  minDepth: 2,
-  maxChildren: 2,
-  maxDepth: 2,
-};
-
-const generateThreadConfigChild = {
   minChildren: 1,
   minDepth: 1,
   maxChildren: 1,
   maxDepth: 1,
 };
 
+const generateThreadConfigChild = {
+  minChildren: 1,
+  minDepth: 50,
+  maxChildren: 1,
+  maxDepth: 50,
+};
+
 const someData = generateCommentThreadData(generateThreadConfig);
-console.log('someData', someData);
+// console.log('someData', someData);
 
 const example9 = (
   <Example {...COPY[6]} style={{}} key={5}>
@@ -189,8 +189,8 @@ const example11 = (
       <CommentThreadFlex
         key={someData.key}
         childInsertionIndex={0}
-        isOpenedInit={true}
-        childIsOpenedInit={true}
+        isOpenedInit
+        childIsOpenedInit
         nodeData={someData}
         setActiveChildLimit={1}
         {...generateThreadConfigChild}
