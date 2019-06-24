@@ -52,7 +52,6 @@ const collapserManager = (Comp) => {
     })();
 
     render() {
-      debugger;
       return (
         <Comp
           {...this.props}

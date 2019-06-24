@@ -32,10 +32,13 @@ export const collapserWrapper = (WrappedComponent) => {
     constructor(props, context) {
       super(props, context);
       setContextAttrs(this);
+      this.areAllItemsExpandedWorker = this.methods.collapser.areAllItemsExpandedWorker;
+      this.cache = this.methods.collapser.cache;
+
       const {
         areAllItemsExpanded,
-        areAllItemsExpandedWorker,
         setActiveChildLimit,
+        _reactScrollCollapse: { isRootNode },
       } = props;
       this.state = { areAllItemsExpanded };
 
@@ -48,7 +51,11 @@ export const collapserWrapper = (WrappedComponent) => {
         && setActiveChildLimit !== CollapserController.defaultProps.setActiveChildLimit) {
         this.methods.collapser.setActiveChildrenLimit(setActiveChildLimit);
       }
-      areAllItemsExpandedWorker.addEventListener('message', this.handleAllItemsExpandedWorkerMessage);
+      this.areAllItemsExpandedWorker.addEventListener('message', this.handleAllItemsExpandedWorkerMessage);
+
+      if (isRootNode) {
+        this.initiateTreeStateCheck();
+      }
     }
 
     componentDidMount() {
@@ -61,9 +68,9 @@ export const collapserWrapper = (WrappedComponent) => {
     }
 
     componentWillUnmount() {
-      const { props: { areAllItemsExpandedWorker, cache }, id } = this;
-      areAllItemsExpandedWorker.removeEventListener('message', this.handleAllItemsExpandedWorkerMessage);
-      cache.deleteRecursionCacheEntry(id);
+      const { id } = this;
+      this.areAllItemsExpandedWorker.removeEventListener('message', this.handleAllItemsExpandedWorkerMessage);
+      this.cache.deleteRecursionCacheEntry(id);
     }
 
     /*
@@ -99,22 +106,13 @@ export const collapserWrapper = (WrappedComponent) => {
       render cycle.
     */
     setCacheOnMount() {
-      const {
-        props: {
-          cache: { orphanNodeCache },
-          _reactScrollCollapse: { isRootNode, parents }
-        },
-        id
-      } = this;
+      const { props: { _reactScrollCollapse: { parents } }, id } = this;
+      const { orphanNodeCache } = this.cache;
       const finishedMounting = orphanNodeCache.registerActualMount(id, parents.collapser);
       if (finishedMounting) {
         const [orphaned] = orphanNodeCache.checkPendingNodes(
           id, parents.collapser
         );
-
-        if (isRootNode) {
-          // this.initiateTreeStateCheck();
-        }
 
         /*
           Cache is cleaned of previous info about the tree - so it can
@@ -135,9 +133,9 @@ export const collapserWrapper = (WrappedComponent) => {
       I don't wonder which is the most efficient.
     */
     setExpandedState = () => {
-      const { props: { cache }, id } = this;
+      const { props: { /* cache */ }, id } = this;
       const { areAllItemsExpanded } = this.state;
-      const cachedValue = cache.getResultValue(id);
+      const cachedValue = this.cache.getResultValue(id);
       if (areAllItemsExpanded !== cachedValue) {
         this.setState(() => ({
           areAllItemsExpanded: cachedValue
@@ -219,13 +217,13 @@ export const collapserWrapper = (WrappedComponent) => {
     */
     handleAllItemsExpandedWorkerMessage = (e) => {
       const { orphanNodeCacheClone, recursionCacheClone } = e.data;
-      const { cache } = this.props;
+      // const { cache } = this.props;
       if (!e) {
         return;
       }
       if (this.isRootNode) {
-        cache.orphanNodeCache.setCache(orphanNodeCacheClone);
-        cache.setCache(recursionCacheClone);
+        this.cache.orphanNodeCache.setCache(orphanNodeCacheClone);
+        this.cache.setCache(recursionCacheClone);
       }
       this.setExpandedState(this.props);
     }
@@ -255,8 +253,8 @@ export const collapserWrapper = (WrappedComponent) => {
       [
         'activeChildren',
         'activeChildrenLimit',
-        'areAllItemsExpandedWorker',
-        'cache',
+        // 'areAllItemsExpandedWorker',
+        // 'cache',
         'contextProps',
         'rootNodeId',
         'selectors',
@@ -287,12 +285,17 @@ export const collapserWrapper = (WrappedComponent) => {
 
   CollapserController.propTypes = {
     /* provided by collapserControllerWrapper */
-    cache: PropTypes.object.isRequired,
+    // cache: PropTypes.object.isRequired,
 
     /* provided by redux */
     addToNodeTargetArray: PropTypes.func.isRequired,
     areAllItemsExpanded: PropTypes.bool.isRequired,
     expandCollapseAll: PropTypes.func.isRequired,
+
+    /*
+      If all items have been set to be open on first render,
+      set isOpenedInit to true to prevent a render flash.
+    */
     isOpenedInit: PropTypes.bool.isRequired,
     selectors: PropTypes.object.isRequired, // includes nested
     setTreeId: PropTypes.func.isRequired,
@@ -300,7 +303,7 @@ export const collapserWrapper = (WrappedComponent) => {
     _reactScrollCollapse: PropTypes.object.isRequired,
 
     /* provided by scrollerProvider via context */
-    areAllItemsExpandedWorker: PropTypes.object.isRequired,
+    // areAllItemsExpandedWorker: PropTypes.object.isRequired,
 
     /* provided by user */
     setActiveChildLimit: PropTypes.number,
@@ -385,8 +388,8 @@ export const collapserWrapper = (WrappedComponent) => {
     let areAllItemsExpanded = null;
 
     return (state, props) => {
-      const { _reactScrollCollapse: { id, rootNodeId } } = props;
-      const { cache, isOpenedInit } = props;
+      const { _reactScrollCollapse: { id, rootNodeId, methods: { collapser: { cache } } } } = props;
+      const { isOpenedInit } = props;
       selectors.allChildItemIds = () => nestedCollapserItemsRoot(state, props);
       selectors.childCollapsers = () => getCollapserCollapsersRoot(state)(id);
       selectors.nodeTargetArray = () => getNodeTargetArrayRoot(state)(rootNodeId);

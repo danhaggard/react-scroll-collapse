@@ -81,7 +81,6 @@ SimpleCollapserFixed.defaultProps = {
 SimpleCollapserFixed.propTypes = {
   areAllItemsExpanded: PropTypes.bool.isRequired,
   _reactScrollCollapse: PropTypes.object.isRequired,
-  collapserId: PropTypes.number.isRequired,
   collapserRef: PropTypes.object.isRequired,
   expandCollapseAll: PropTypes.func.isRequired,
   initialComments: PropTypes.number,

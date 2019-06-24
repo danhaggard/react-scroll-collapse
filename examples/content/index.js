@@ -56,7 +56,7 @@ const COPY = {
 const example0 = (
   <Example {...COPY[0]} key={0} style={{}}>
     <Scroller style={{ height: '100%' }}>
-      <SimpleCollapser initialComments={6} style={{ margin: 0, overflow: 'auto' }} />
+      <SimpleCollapser isOpenedInit initialComments={6} style={{ margin: 0, overflow: 'auto' }} />
     </Scroller>
   </Example>
 );
@@ -214,7 +214,7 @@ const examples = {
 
 
 const examples = {
-  0: [example11]
+  0: [example0]
 };
 
 export default examples;

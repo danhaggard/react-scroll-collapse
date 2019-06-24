@@ -7,6 +7,9 @@ import { shallowEqualExceptArray } from '../../../utils/equalityUtils';
 import { defaultMergeContextWithProps } from '../../utils/contextUtils';
 import { compareIntArrays } from '../../../utils/arrayUtils';
 
+import createCache from '../../../caching/recursionCache';
+import providerCaches from '../../../caching/providerCaches';
+import providerWorkers from '../../../caching/providerWorkers';
 
 const collapserContext = (Base) => {
 
@@ -134,11 +137,11 @@ const collapserContext = (Base) => {
     );
 
     initiateTreeStateCheck = (setTreeId = false) => {
-      debugger;
-      const { areAllItemsExpandedWorker, cache, isOpenedInit, rootNodeId } = this.props;
-      const cacheClone = cache.getCache();
-      const currentReduxState = cache.getCurrentReduxState();
-      const orphanNodeCacheClone = cache.orphanNodeCache.getCache();
+      const areAllItemsExpandedWorker = this.getWorker();
+      const { isOpenedInit, rootNodeId } = this.props;
+      const cacheClone = this.cache.getCache();
+      const currentReduxState = this.cache.getCurrentReduxState();
+      const orphanNodeCacheClone = this.cache.orphanNodeCache.getCache();
       areAllItemsExpandedWorker.postMessage([
         currentReduxState,
         {
@@ -151,8 +154,45 @@ const collapserContext = (Base) => {
         }]);
     }
 
+    /* former collapserManager methods */
+
+    getCreateCache = () => { // eslint-disable-line
+      const { isRootNode, rootNodeId, type } = this._reactScrollCollapse;
+      const providerCache = providerCaches[type];
+      if (isRootNode) {
+        providerCache[rootNodeId] = createCache(rootNodeId);
+      }
+      return providerCache[rootNodeId];
+    }
+
+    getCache = () => {
+      if (!this.cache) {
+        this.cache = this.getCreateCache();
+      }
+      this.cache.unlockCache();
+      return this.cache;
+    }
+
+    getWorker = () => {
+      const { rootNodeId, type } = this._reactScrollCollapse;
+      const workerCache = providerWorkers[type];
+      return workerCache.getWorker(rootNodeId);
+    }
+
+    registerMountWithCache = (() => {
+      const cache = this.getCache();
+      const { orphanNodeCache } = cache;
+      const {
+        _reactScrollCollapse: { id },
+        _reactScrollCollapseParents: { collapser }
+      } = this.props;
+      orphanNodeCache.registerIncomingMount(id, collapser);
+    })();
+
     contextMethods = {
       collapser: {
+        areAllItemsExpandedWorker: this.getWorker(),
+        cache: this.cache,
         addSelfToActiveSiblings: this.addSelfToActiveSiblings.bind(this),
         checkIfActiveSibling: this.checkIfActiveSibling.bind(this),
         initiateTreeStateCheck: this.initiateTreeStateCheck.bind(this),
