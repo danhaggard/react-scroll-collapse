@@ -113,7 +113,7 @@ export const collapserWrapper = (WrappedComponent) => {
         );
 
         if (isRootNode) {
-          this.initiateTreeStateCheck();
+          // this.initiateTreeStateCheck();
         }
 
         /*
@@ -184,11 +184,23 @@ export const collapserWrapper = (WrappedComponent) => {
       Fires of the webworker to query state in parralel to the main thread.
       passes copies of the caching for the worker to use.
     */
+    /*
     initiateTreeStateCheck = (setTreeId = false) => {
       const { areAllItemsExpandedWorker, cache, isOpenedInit } = this.props;
       const cacheClone = cache.getCache();
       const currentReduxState = cache.getCurrentReduxState();
       const orphanNodeCacheClone = cache.orphanNodeCache.getCache();
+      const blah = [
+        currentReduxState,
+        {
+          cacheClone,
+          orphanNodeCacheClone,
+          id: this.id,
+          isOpenedInit,
+          rootNodeId: this.rootNodeId,
+          setTreeId,
+        }];
+      console.log('blah', blah);
       areAllItemsExpandedWorker.postMessage([
         currentReduxState,
         {
@@ -200,6 +212,7 @@ export const collapserWrapper = (WrappedComponent) => {
           setTreeId,
         }]);
     }
+    */
 
     /*
       The callback from the webworker.  Receive its' updated state.
@@ -220,6 +233,12 @@ export const collapserWrapper = (WrappedComponent) => {
     /*
       Methods managed by the context.
     */
+
+    initiateTreeStateCheck = setTreeId => this.methods.collapser.initiateTreeStateCheck(
+      // this.props,
+      setTreeId
+    );
+
     isActiveSibling = () => this.methods.collapser.checkIfActiveSibling();
 
     noActiveSiblings = () => this.methods.collapser.noActiveSiblings();
@@ -247,7 +266,6 @@ export const collapserWrapper = (WrappedComponent) => {
     );
 
     render() {
-      debugger;
       const { areAllItemsExpanded } = this.state;
       const cleanProps = this.cleanProps(this.props);
       return (

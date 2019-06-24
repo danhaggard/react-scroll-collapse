@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unused-state */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -134,10 +133,29 @@ const collapserContext = (Base) => {
       this.getId(), limit
     );
 
+    initiateTreeStateCheck = (setTreeId = false) => {
+      debugger;
+      const { areAllItemsExpandedWorker, cache, isOpenedInit, rootNodeId } = this.props;
+      const cacheClone = cache.getCache();
+      const currentReduxState = cache.getCurrentReduxState();
+      const orphanNodeCacheClone = cache.orphanNodeCache.getCache();
+      areAllItemsExpandedWorker.postMessage([
+        currentReduxState,
+        {
+          cacheClone,
+          orphanNodeCacheClone,
+          id: this.getId(),
+          isOpenedInit,
+          rootNodeId,
+          setTreeId,
+        }]);
+    }
+
     contextMethods = {
       collapser: {
         addSelfToActiveSiblings: this.addSelfToActiveSiblings.bind(this),
         checkIfActiveSibling: this.checkIfActiveSibling.bind(this),
+        initiateTreeStateCheck: this.initiateTreeStateCheck.bind(this),
         noActiveSiblings: this.noActiveSiblings.bind(this),
         setActiveChildrenLimit: this.setActiveChildrenLimit.bind(this),
       }

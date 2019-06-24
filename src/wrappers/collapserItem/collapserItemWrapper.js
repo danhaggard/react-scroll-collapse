@@ -41,6 +41,7 @@ export const collapserItemWrapper = (WrappedComponent) => {
       }
       expandCollapse(this.id, this.parentCollapserId);
       addToNodeTargetArray(this.parentCollapserId, this.rootNodes.collapser);
+      debugger;
     };
 
     render() {

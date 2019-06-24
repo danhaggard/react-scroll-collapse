@@ -191,8 +191,8 @@ const example11 = (
       <CommentThreadFlex
         key={someData.key}
         childInsertionIndex={0}
-        // isOpenedInit
-        // childIsOpenedInit
+        isOpenedInit
+        childIsOpenedInit
         nodeData={someData}
         setActiveChildLimit={1}
         {...generateThreadConfigChild}
@@ -214,7 +214,7 @@ const examples = {
 
 
 const examples = {
-  0: [example0]
+  0: [example11]
 };
 
 export default examples;
