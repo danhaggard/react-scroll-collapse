@@ -46,10 +46,9 @@ class SimpleCollapserFixed extends Component {
       areAllItemsExpanded,
       expandCollapseAll,
       collapserRef,
-      collapserId,
-      parentCollapserId,
-      parentScrollerId,
-      style
+      style,
+      _reactScrollCollapse: { id: collapserId },
+
     } = this.props;
     const { comments } = this.state;
     const title = ` Collapser ${collapserId.toString()}`;
@@ -76,16 +75,16 @@ class SimpleCollapserFixed extends Component {
 
 SimpleCollapserFixed.defaultProps = {
   initialComments: 1,
-  parentScrollerId: null,
-  parentCollapserId: null,
   style: {},
 };
 
 SimpleCollapserFixed.propTypes = {
+  areAllItemsExpanded: PropTypes.bool.isRequired,
+  _reactScrollCollapse: PropTypes.object.isRequired,
   collapserId: PropTypes.number.isRequired,
+  collapserRef: PropTypes.object.isRequired,
+  expandCollapseAll: PropTypes.func.isRequired,
   initialComments: PropTypes.number,
-  parentCollapserId: PropTypes.number,
-  parentScrollerId: PropTypes.number,
   style: PropTypes.object,
 };
 

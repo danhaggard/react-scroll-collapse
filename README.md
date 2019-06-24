@@ -1,3 +1,13 @@
+# TODOs
+
+1) Clean up ExpandButton (Is being dual used as a button and just a comment title.  Separate out).
+
+2) REmove Scroller from Example 0 and investigate context bug.
+
+3) areAllItemsExpanded not being passed in Example 0.
+
+4) make parent collapser checktreestate method available to collapserItem in context
+
 # react-scroll-collapse
 Component wrappers for auto-scrolling collapsible elements - with smooth animations powered by [react-motion](https://github.com/chenglou/react-motion) and [react-collapse](https://github.com/nkbt/react-collapse).
 

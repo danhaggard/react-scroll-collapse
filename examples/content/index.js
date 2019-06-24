@@ -55,7 +55,9 @@ const COPY = {
 
 const example0 = (
   <Example {...COPY[0]} key={0} style={{}}>
-    <SimpleCollapser initialComments={6} style={{ margin: 0, overflow: 'auto' }} />
+    <Scroller style={{ height: '100%' }}>
+      <SimpleCollapser initialComments={6} style={{ margin: 0, overflow: 'auto' }} />
+    </Scroller>
   </Example>
 );
 
@@ -189,8 +191,8 @@ const example11 = (
       <CommentThreadFlex
         key={someData.key}
         childInsertionIndex={0}
-        isOpenedInit
-        childIsOpenedInit
+        // isOpenedInit
+        // childIsOpenedInit
         nodeData={someData}
         setActiveChildLimit={1}
         {...generateThreadConfigChild}
@@ -212,7 +214,7 @@ const examples = {
 
 
 const examples = {
-  0: example11,
+  0: [example0]
 };
 
 export default examples;

@@ -99,12 +99,22 @@ export const collapserWrapper = (WrappedComponent) => {
       render cycle.
     */
     setCacheOnMount() {
-      const { props: { cache: { orphanNodeCache }, _reactScrollCollapse: { parents } }, id } = this;
+      const {
+        props: {
+          cache: { orphanNodeCache },
+          _reactScrollCollapse: { isRootNode, parents }
+        },
+        id
+      } = this;
       const finishedMounting = orphanNodeCache.registerActualMount(id, parents.collapser);
       if (finishedMounting) {
         const [orphaned] = orphanNodeCache.checkPendingNodes(
           id, parents.collapser
         );
+
+        if (isRootNode) {
+          this.initiateTreeStateCheck();
+        }
 
         /*
           Cache is cleaned of previous info about the tree - so it can
@@ -237,6 +247,7 @@ export const collapserWrapper = (WrappedComponent) => {
     );
 
     render() {
+      debugger;
       const { areAllItemsExpanded } = this.state;
       const cleanProps = this.cleanProps(this.props);
       return (

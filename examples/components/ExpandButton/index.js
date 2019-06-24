@@ -7,6 +7,7 @@ import style from './ExpandButton.scss';
 const ExpandButton = ({
   forwardRef,
   isOpened,
+  onClick,
   onHamburgerClick,
   onKeyDown,
   title
@@ -14,6 +15,7 @@ const ExpandButton = ({
   <div
     className={style.expandButton}
     key={title}
+    onClick={onClick}
     ref={forwardRef}
   >
     <CommentTitle onHamburgerClick={onHamburgerClick} title={title} isOpened={isOpened} />

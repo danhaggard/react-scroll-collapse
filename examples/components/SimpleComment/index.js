@@ -5,7 +5,7 @@ import { presets } from 'react-motion';
 
 import { Collapse } from 'react-collapse';
 import CommentBody from '../CommentBody';
-import ExpanderButton from '../ExpandButton';
+import ExpandButton from '../ExpandButton';
 
 import { collapserItemController } from '../../../src';
 import styles from './SimpleComment.scss';
@@ -15,15 +15,15 @@ const SimpleComment = (props) => {
     collapserItemRef,
     expandCollapse,
     isOpened,
-    itemId,
     text,
-  } = props;
+    _reactScrollCollapse: { id },
 
-  const idStr = itemId.toString();
+  } = props;
+  const idStr = id.toString();
   const title = ` Collapser Item ${idStr}`;
   return (
     <div className={styles.simpleComment} ref={collapserItemRef}>
-      <ExpanderButton
+      <ExpandButton
         isOpened={isOpened}
         onClick={expandCollapse}
         title={title}
@@ -42,7 +42,7 @@ SimpleComment.propTypes = {
   collapserItemRef: PropTypes.object.isRequired, // provided by collapserItemController
   expandCollapse: PropTypes.func.isRequired, // provided by collapserItemController
   isOpened: PropTypes.bool.isRequired, // provided by collapserItemController
-  itemId: PropTypes.number.isRequired, // provided by collapserItemController
+  _reactScrollCollapse: PropTypes.object.isRequired,
   text: PropTypes.string.isRequired,
 };
 
