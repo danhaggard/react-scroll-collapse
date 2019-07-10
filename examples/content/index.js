@@ -55,9 +55,11 @@ const COPY = {
 
 const example0 = (
   <Example {...COPY[0]} key={0} style={{}}>
-    <Scroller style={{ height: '100%' }}>
-      <SimpleCollapser isOpenedInit initialComments={6} style={{ margin: 0, overflow: 'auto' }} />
-    </Scroller>
+    <SimpleCollapser
+      isOpenedInit
+      initialComments={6}
+      style={{ margin: 0, overflow: 'auto' }}
+    />
   </Example>
 );
 
@@ -151,10 +153,10 @@ const generateThreadConfig = {
 };
 
 const generateThreadConfigChild = {
-  minChildren: 1,
-  minDepth: 50,
-  maxChildren: 1,
-  maxDepth: 50,
+  minChildren: 2,
+  minDepth: 2,
+  maxChildren: 2,
+  maxDepth: 2,
 };
 
 const someData = generateCommentThreadData(generateThreadConfig);

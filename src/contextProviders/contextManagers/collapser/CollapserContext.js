@@ -70,18 +70,18 @@ const collapserContext = (Base) => {
     }
 
     checkIfActiveSibling = () => {
-      const { _reactScrollCollapse: { id }, contextProps: { activeSiblings } } = this.props;
       if (this.checkIfRoot()) {
         return false;
       }
+      const { _reactScrollCollapse: { id }, contextProps: { activeSiblings } } = this.props;
       return activeSiblings.includes(id);
     }
 
     noActiveSiblings = () => {
-      const { contextProps: { activeSiblings } } = this.props;
       if (this.checkIfRoot()) {
         return false;
       }
+      const { contextProps: { activeSiblings } } = this.props;
       return activeSiblings.length === 0;
     }
 
@@ -95,6 +95,11 @@ const collapserContext = (Base) => {
       state prop.
     */
     addSelfToActiveSiblings = (state) => {
+      const { parents } = this._reactScrollCollapse;
+      if (!parents) {
+        // cant have siblings if you dont have parents!
+        return;
+      }
       const {
         addActiveChildren,
         _reactScrollCollapse: { id },
@@ -105,6 +110,7 @@ const collapserContext = (Base) => {
         I  think because this is call back - the parents aren't available from
         props after first render. So get them from this.
       */
+
       const { collapser: parentCollapserId } = this._reactScrollCollapse.parents;
       const { activeChildren, contextProps: { activeSiblingLimit } } = this.props;
       /*
@@ -155,7 +161,6 @@ const collapserContext = (Base) => {
     }
 
     /* former collapserManager methods */
-
     getCreateCache = () => { // eslint-disable-line
       const { isRootNode, rootNodeId, type } = this._reactScrollCollapse;
       const providerCache = providerCaches[type];
@@ -184,10 +189,12 @@ const collapserContext = (Base) => {
       const { orphanNodeCache } = cache;
       const {
         _reactScrollCollapse: { id },
-        _reactScrollCollapseParents: { collapser }
+        // _reactScrollCollapseParents: { collapser }
       } = this.props;
-      orphanNodeCache.registerIncomingMount(id, collapser);
+      orphanNodeCache.registerIncomingMount(id);
     })();
+
+    /* end former collapserManager methods */
 
     contextMethods = {
       collapser: {
@@ -266,7 +273,15 @@ const contextRenderer = (Context, Comp, mergeContextProps) => {
     }
 
     addToProps = () => {
-      const { contextMethods: { collapser } } = this.props;
+      /*
+        When collapser not nested in a scroller - contextMethods wont have
+        been inited yet.
+      */
+      const { contextMethods } = this.props;
+      if (!contextMethods) {
+        return this.props;
+      }
+      const { collapser } = contextMethods;
       const newProps = { ...this.props };
       if (collapser && collapser.checkIfActiveSibling) {
         newProps.isActiveSibling = collapser.checkIfActiveSibling();

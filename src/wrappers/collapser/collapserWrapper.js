@@ -107,11 +107,12 @@ export const collapserWrapper = (WrappedComponent) => {
     */
     setCacheOnMount() {
       const { props: { _reactScrollCollapse: { parents } }, id } = this;
+      const parentId = parents && parents.collapser;
       const { orphanNodeCache } = this.cache;
-      const finishedMounting = orphanNodeCache.registerActualMount(id, parents.collapser);
+      const finishedMounting = orphanNodeCache.registerActualMount(id, parentId);
       if (finishedMounting) {
         const [orphaned] = orphanNodeCache.checkPendingNodes(
-          id, parents.collapser
+          id, parentId
         );
 
         /*
@@ -217,12 +218,31 @@ export const collapserWrapper = (WrappedComponent) => {
     */
     handleAllItemsExpandedWorkerMessage = (e) => {
       const { orphanNodeCacheClone, recursionCacheClone } = e.data;
-      // const { cache } = this.props;
+
       if (!e) {
         return;
       }
       if (this.isRootNode) {
-        this.cache.orphanNodeCache.setCache(orphanNodeCacheClone);
+        /*
+          Have to do a careful merge here because by the time this
+          listener is fired, the copy of the orphanNodeCache sent to the
+          web worker is out of date with respect to the info relating
+          to node mounting, but has the latest information about
+          orphaned nodes.
+
+          That's another reason why these need to be split into separate
+          caches.
+        */
+        const newOrphanCache = {
+          ...this.cache.orphanNodeCache.getCache(),
+          activeForks: orphanNodeCacheClone.activeForks,
+          checkedParents: orphanNodeCacheClone.checkedParents,
+          largestActiveFork: orphanNodeCacheClone.largestActiveFork,
+          lowestActiveFork: orphanNodeCacheClone.lowestActiveFork,
+          orphanNodes: orphanNodeCacheClone.orphanNodes,
+          rangeUpperBound: orphanNodeCacheClone.rangeUpperBound,
+        };
+        this.cache.orphanNodeCache.setCache(newOrphanCache);
         this.cache.setCache(recursionCacheClone);
       }
       this.setExpandedState(this.props);
