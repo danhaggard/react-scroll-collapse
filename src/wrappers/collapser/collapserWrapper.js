@@ -233,7 +233,7 @@ export const collapserWrapper = (WrappedComponent) => {
         ...collapserContextActions,
       },
       [
-        'activeChildren',
+        // 'activeChildren',
         'activeChildrenLimit',
         'contextProps',
         'rootNodeId',

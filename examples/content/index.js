@@ -4,6 +4,8 @@ import Scroller from '../../src';
 import SimpleCollapser from '../components/SimpleCollapser';
 import CommentThread from '../components/CommentThread';
 import CommentThreadFlex from '../components/CommentThreadFlex';
+import CommentThreadGrid from '../components/CommentThreadGrid';
+
 import Example from '../components/Example';
 
 import { generateCommentThreadData } from '../../src/utils/randomContentGenerators';
@@ -86,17 +88,17 @@ const example4 = key => (
 
 
 const generateThreadConfig = {
-  minChildren: 2,
-  minDepth: 2,
-  maxChildren: 2,
-  maxDepth: 2,
+  minChildren: 1,
+  minDepth: 1,
+  maxChildren: 1,
+  maxDepth: 1,
 };
 
 const generateThreadConfigChild = {
-  minChildren: 2,
-  minDepth: 2,
-  maxChildren: 2,
-  maxDepth: 2,
+  minChildren: 1,
+  minDepth: 1,
+  maxChildren: 1,
+  maxDepth: 1,
 };
 
 const someData = generateCommentThreadData(generateThreadConfig);
@@ -118,6 +120,23 @@ const example5 = (
   </Example>
 );
 
+const example6 = (
+  <Example showHeader={false} {...COPY[4]} style={{}} key={5}>
+    <Scroller style={style}>
+      <CommentThreadGrid
+        key={someData.key}
+        childInsertionIndex={0}
+        isOpenedInit
+        childIsOpenedInit
+        nodeData={someData}
+        setActiveChildLimit={1}
+        {...generateThreadConfigChild}
+        />
+    </Scroller>
+  </Example>
+);
+
+/*
 const examples = {
   0: [example0],
   1: [example1],
@@ -126,17 +145,17 @@ const examples = {
   4: [example4(4), example4(5)],
   5: [example5],
 };
+*/
 
 
-/*
 const examples = {
   // 0: [example0],
   // 1: [example1],
-  0: [example2],
+  0: [example6],
   // 3: [example3],
   // 4: [example4(4), example4(5)],
 // 5: [example5],
 };
 
-*/
+
 export default examples;

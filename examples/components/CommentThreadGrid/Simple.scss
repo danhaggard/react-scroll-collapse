@@ -1,0 +1,17 @@
+:local(.commentThread) {
+  padding-left: 1em;
+  padding-top: 0.5em;
+  border-top: 1px solid #AAA;
+  border-left: 1px solid #AAA;
+  border-radius: 2px;
+}
+
+:local(.hover) {
+  transition: transform .2s ease, box-shadow .2s ease, padding .2s ease, -webkit-transform .2s ease, -webkit-box-shadow .2s ease;
+  will-change: transform, box-shadow;
+
+  &:hover {
+    box-shadow: 0 0.5em 1em 0 rgba(10,16,34,.2), 0 0 0 transparent;
+    transform: translateY(0px) translateX(0px) translateZ(0px);
+  }
+}
