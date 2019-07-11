@@ -48,8 +48,8 @@ const example0 = (
 
 const example1 = (
   <Example {...COPY[1]} key={0} style={{}}>
-    <SimpleCollapser initialComments={6} style={{ margin: 0, overflow: 'auto' }} />
-    <SimpleCollapser initialComments={6} style={{ margin: 0, overflow: 'auto' }} />
+    <SimpleCollapser isOpenedInit initialComments={6} style={{ maxHeight: '20em', margin: '1em', overflow: 'auto' }} />
+    <SimpleCollapser isOpenedInit initialComments={6} style={{ margin: 0, maxHeight: '20em', overflow: 'auto' }} />
   </Example>
 );
 
@@ -57,9 +57,10 @@ const example2 = (
   <Example {...COPY[2]} key={0} style={{}}>
     <Scroller style={{ height: '100%' }}>
       <CommentThread
-        depth={3}
-        childThreads={2}
+        depth={1}
+        childThreads={1}
         isOpenedInit
+        childIsOpenedInit
         style={{ margin: 0, overflow: 'auto' }}
       />
     </Scroller>
@@ -69,7 +70,7 @@ const example2 = (
 const example3 = (
   <Example {...COPY[3]} key={3}>
     <Scroller style={{ height: '100%' }}>
-      <SimpleCollapser initialComments={10} />
+      <SimpleCollapser isOpenedInit childIsOpenedInit initialComments={10} />
     </Scroller>
   </Example>
 );
@@ -78,17 +79,17 @@ const example3 = (
 const example4 = key => (
   <Example {...COPY[4]} style={{ marginBottom: '3em' }} key={key}>
     <Scroller style={{ height: '100%' }}>
-      <CommentThread depth={0} childNodes={1} />
+      <CommentThread isOpenedInit childIsOpenedInit depth={0} childNodes={1} />
     </Scroller>
   </Example>
 );
 
 
 const generateThreadConfig = {
-  minChildren: 1,
-  minDepth: 1,
-  maxChildren: 1,
-  maxDepth: 1,
+  minChildren: 2,
+  minDepth: 2,
+  maxChildren: 2,
+  maxDepth: 2,
 };
 
 const generateThreadConfigChild = {
@@ -102,7 +103,7 @@ const someData = generateCommentThreadData(generateThreadConfig);
 
 const style = { height: '100%' };
 const example5 = (
-  <Example showHeader={false} {...COPY[6]} style={{}} key={5}>
+  <Example showHeader={false} {...COPY[4]} style={{}} key={5}>
     <Scroller style={style}>
       <CommentThreadFlex
         key={someData.key}
@@ -126,4 +127,16 @@ const examples = {
   5: [example5],
 };
 
+
+/*
+const examples = {
+  // 0: [example0],
+  // 1: [example1],
+  0: [example2],
+  // 3: [example3],
+  // 4: [example4(4), example4(5)],
+// 5: [example5],
+};
+
+*/
 export default examples;

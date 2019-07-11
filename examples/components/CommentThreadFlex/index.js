@@ -13,7 +13,7 @@ import { generateCommentThreadData } from '../../../src/utils/randomContentGener
 import styles from './CommentThread.scss';
 
 
-class CommentThread extends PureComponent { //eslint-disable-line
+class CommentThread extends PureComponent {
 
   buttonStyle = { order: -5 };
 
@@ -197,6 +197,7 @@ class CommentThread extends PureComponent { //eslint-disable-line
           deleteThread={this.removeThread}
           isOpenedInit={isOpenedInit}
           showControls={showControls}
+          showInsertForm={showControls}
           tabFocusButtons={areAllItemsExpanded}
           text={comment}
         />

@@ -35,11 +35,7 @@ export const collapserWrapper = (WrappedComponent) => {
       this.areAllItemsExpandedWorker = this.methods.collapser.areAllItemsExpandedWorker;
       this.cache = this.methods.collapser.cache;
 
-      const {
-        areAllItemsExpanded,
-        setActiveChildLimit,
-        _reactScrollCollapse: { isRootNode },
-      } = props;
+      const { areAllItemsExpanded, setActiveChildLimit } = props;
       this.state = { areAllItemsExpanded };
 
       /*
@@ -53,9 +49,6 @@ export const collapserWrapper = (WrappedComponent) => {
       }
       this.areAllItemsExpandedWorker.addEventListener('message', this.handleAllItemsExpandedWorkerMessage);
 
-      if (isRootNode) {
-        this.initiateTreeStateCheck();
-      }
     }
 
     componentDidMount() {
@@ -106,7 +99,7 @@ export const collapserWrapper = (WrappedComponent) => {
       render cycle.
     */
     setCacheOnMount() {
-      const { props: { _reactScrollCollapse: { parents } }, id } = this;
+      const { props: { _reactScrollCollapse: { isRootNode, parents } }, id } = this;
       const parentId = parents && parents.collapser;
       const { orphanNodeCache } = this.cache;
       const finishedMounting = orphanNodeCache.registerActualMount(id, parentId);
@@ -115,13 +108,17 @@ export const collapserWrapper = (WrappedComponent) => {
           id, parentId
         );
 
+        if (isRootNode) {
+          this.initiateTreeStateCheck();
+        }
+
         /*
           Cache is cleaned of previous info about the tree - so it can
           refresh it's state.  initiateTreeStateCheck does the areAllItemsExpanded
           selection.  Passing true tells it to rebuld the tree while it's going
           down there.  Nasty couple again - but efficient.
         */
-        if (orphaned) {
+        if (orphaned && !isRootNode) {
           orphanNodeCache.initCache();
           this.initiateTreeStateCheck(true);
         }
@@ -134,7 +131,7 @@ export const collapserWrapper = (WrappedComponent) => {
       I don't wonder which is the most efficient.
     */
     setExpandedState = () => {
-      const { props: { /* cache */ }, id } = this;
+      const { id } = this;
       const { areAllItemsExpanded } = this.state;
       const cachedValue = this.cache.getResultValue(id);
       if (areAllItemsExpanded !== cachedValue) {
@@ -178,40 +175,6 @@ export const collapserWrapper = (WrappedComponent) => {
 
       this.initiateTreeStateCheck();
     };
-
-    /*
-      Fires of the webworker to query state in parralel to the main thread.
-      passes copies of the caching for the worker to use.
-    */
-    /*
-    initiateTreeStateCheck = (setTreeId = false) => {
-      const { areAllItemsExpandedWorker, cache, isOpenedInit } = this.props;
-      const cacheClone = cache.getCache();
-      const currentReduxState = cache.getCurrentReduxState();
-      const orphanNodeCacheClone = cache.orphanNodeCache.getCache();
-      const blah = [
-        currentReduxState,
-        {
-          cacheClone,
-          orphanNodeCacheClone,
-          id: this.id,
-          isOpenedInit,
-          rootNodeId: this.rootNodeId,
-          setTreeId,
-        }];
-      console.log('blah', blah);
-      areAllItemsExpandedWorker.postMessage([
-        currentReduxState,
-        {
-          cacheClone,
-          orphanNodeCacheClone,
-          id: this.id,
-          isOpenedInit,
-          rootNodeId: this.rootNodeId,
-          setTreeId,
-        }]);
-    }
-    */
 
     /*
       The callback from the webworker.  Receive its' updated state.
@@ -272,12 +235,10 @@ export const collapserWrapper = (WrappedComponent) => {
       [
         'activeChildren',
         'activeChildrenLimit',
-        // 'areAllItemsExpandedWorker',
-        // 'cache',
         'contextProps',
         'rootNodeId',
         'selectors',
-        // 'setActiveChildLimit',
+        'setActiveChildLimit',
         '_reactScrollCollapseParents'
       ]
     );

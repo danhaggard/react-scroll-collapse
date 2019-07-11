@@ -42,9 +42,9 @@ const CommentWithButtons = ({
   maxDepth,
   childThreads,
   deleteThread,
-  isOpenedInit,
   setChildInsertionConfig,
   showControls,
+  showInsertForm,
   tabFocusButtons,
   text
 }) => (
@@ -54,15 +54,19 @@ const CommentWithButtons = ({
     {
       showControls && (
         <div className={styles.controls}>
-          <InsertChildSettingsForm
-            childInsertionIndex={childInsertionIndex}
-            minChildren={minChildren}
-            maxChildren={maxChildren}
-            minDepth={minDepth}
-            maxDepth={maxDepth}
-            setChildInsertionConfig={setChildInsertionConfig}
-            tabFocusButtons={tabFocusButtons}
-          />
+          {
+            showInsertForm && (
+            <InsertChildSettingsForm
+              childInsertionIndex={childInsertionIndex}
+              minChildren={minChildren}
+              maxChildren={maxChildren}
+              minDepth={minDepth}
+              maxDepth={maxDepth}
+              setChildInsertionConfig={setChildInsertionConfig}
+              tabFocusButtons={tabFocusButtons}
+            />
+            )
+          }
           <ButtonGroupSmall style={{ margin: '0 0 1em 0' }}>
             <PureDeleteThread
               tabIndex={!tabFocusButtons ? -1 : undefined}
@@ -81,18 +85,30 @@ const CommentWithButtons = ({
 );
 
 CommentWithButtons.defaultProps = {
+  childInsertionIndex: 0,
   childThreads: 0,
-  isOpenedInit: true,
+  minChildren: 1,
+  maxChildren: 1,
+  minDepth: 1,
+  maxDepth: 1,
+  setChildInsertionConfig: () => null,
   showControls: false,
+  showInsertForm: false,
   tabFocusButtons: true, // controls whether or not child buttons can be focused.
 };
 
 CommentWithButtons.propTypes = {
-  childThreads: PropTypes.number,
   addToThread: PropTypes.func.isRequired,
+  childInsertionIndex: PropTypes.number,
+  childThreads: PropTypes.number,
   deleteThread: PropTypes.func.isRequired,
-  isOpenedInit: PropTypes.bool,
+  minChildren: PropTypes.number,
+  maxChildren: PropTypes.number,
+  minDepth: PropTypes.number,
+  maxDepth: PropTypes.number,
+  setChildInsertionConfig: PropTypes.func,
   showControls: PropTypes.bool,
+  showInsertForm: PropTypes.bool,
   tabFocusButtons: PropTypes.bool,
   text: PropTypes.string.isRequired,
 };

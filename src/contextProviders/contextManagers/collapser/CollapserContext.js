@@ -311,9 +311,14 @@ const contextRenderer = (Context, Comp, mergeContextProps) => {
 
   }
 
+  ContextRender.defaultProps = {
+    contextProps: {},
+    contextMethods: {},
+  };
+
   ContextRender.propTypes = {
-    contextProps: PropTypes.object.isRequired,
-    contextMethods: PropTypes.object.isRequired,
+    contextProps: PropTypes.object,
+    contextMethods: PropTypes.object,
   };
 
   ContextRender.whyDidYouRender = {

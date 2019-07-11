@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 import styles from './CommentThread.scss';
 
 import CommentWithButtons from '../Comment/CommentWithButtons';
-// import { CollapserExpandButton } from '../ExpandButtonWrapped';
 import ExpandButton from '../ExpandButton';
 import { collapserController } from '../../../src';
 
 import { getRandomTextWithDefaults } from '../../../src/utils/randomUtils';
+import { ofBoolTypeOrNothing } from '../../../src/utils/propTypeHelpers';
 
 
 const getNested = (noOfChildThreads, isOpenedInit) => (
@@ -17,6 +17,7 @@ const getNested = (noOfChildThreads, isOpenedInit) => (
         <WrappedCommentThread
           key={key}
           childThreads={noOfChildThreads - 1}
+          childIsOpenedInit={isOpenedInit}
           isOpenedInit={isOpenedInit}
         />
       )
@@ -51,10 +52,9 @@ class CommentThread extends PureComponent {
     const {
       _reactScrollCollapse: { id: collapserId },
       areAllItemsExpanded,
+      childIsOpenedInit,
       collapserRef,
       isOpenedInit,
-      // parentCollapserId,
-      // parentScrollerId,
       style
     } = this.props;
     const { childThreads } = this.state;
@@ -67,9 +67,6 @@ class CommentThread extends PureComponent {
           isOpened={areAllItemsExpanded}
           onClick={this.handleOnClick}
           onKeyDown={this.handleKeyDown}
-          // collapserId={collapserId}
-          // parentCollapserId={parentCollapserId}
-          // parentScrollerId={parentScrollerId}
           title={title}
         />
         <CommentWithButtons
@@ -80,24 +77,28 @@ class CommentThread extends PureComponent {
           showControls
           text={text}
         />
-        {getNested(childThreads, isOpenedInit)}
+        {getNested(childThreads, childIsOpenedInit)}
       </div>
     );
   }
 }
 
 CommentThread.defaultProps = {
+  areAllItemsExpanded: null,
+  childIsOpenedInit: true,
   childThreads: 1,
-  parentCollapserId: null,
-  parentScrollerId: null,
+  isOpenedInit: true,
   style: {},
 };
 
 CommentThread.propTypes = {
+  _reactScrollCollapse: PropTypes.object.isRequired,
+  areAllItemsExpanded: ofBoolTypeOrNothing,
+  childIsOpenedInit: PropTypes.bool,
   childThreads: PropTypes.number,
-  collapserId: PropTypes.number.isRequired,
-  parentCollapserId: PropTypes.number,
-  parentScrollerId: PropTypes.number,
+  collapserRef: PropTypes.object.isRequired,
+  expandCollapseAll: PropTypes.func.isRequired,
+  isOpenedInit: PropTypes.bool,
   style: PropTypes.object,
 };
 

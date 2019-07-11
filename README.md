@@ -2,7 +2,29 @@
 
 1) Clean up ExpandButton (Is being dual used as a button and just a comment title.  Separate out).
 
-2) REmove Scroller from Example 0 and investigate context bug.
+Example Component Audit:
+
+components/Example
+components/SimpleCollapser
+  /components/ExpandButton
+    /components/CommentTitle
+  /components/CommentBody
+  /components/SimpleComment
+    /components/ExpandButton
+
+components/CommentThread
+  /components/Comment/CommentWithButtons
+    /components/Comment
+      /components/Comment/CommentBody
+    /components/Button/ButtonSmall
+    /components/ButtonGroup/ButtonGroupSmall
+    /components/InsertChildSettingsForm
+  /components/ExpandButton
+
+components/CommentThreadFlex
+  /components/ExpandButton
+  /components/Comment/CommentWithButtons
+
 
 # react-scroll-collapse
 Component wrappers for auto-scrolling collapsible elements - with smooth animations powered by [react-motion](https://github.com/chenglou/react-motion) and [react-collapse](https://github.com/nkbt/react-collapse).
