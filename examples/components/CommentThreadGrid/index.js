@@ -44,7 +44,8 @@ class CommentThread extends PureComponent {
       activeColumnId,
       activeColumnWidth,
       numColumns,
-      currNumColumns: numColumns,
+      currNumColumns: children.length || 1,
+      realNumColumns: children.length || 1,
       columns: mapFromNumber(this.getNumColumns(numColumns), this.getColumnWidth(
         numColumns, activeColumnId, activeColumnWidth
       )),
@@ -55,7 +56,7 @@ class CommentThread extends PureComponent {
   }
 
   componentDidMount() {
-    this.setNumColumns(this.getNumColumns());
+    // this.setNumColumns(-6);
   }
 
   getNumColumns = (modifier = 0) => {
@@ -65,7 +66,7 @@ class CommentThread extends PureComponent {
     } else {
       numColSource = this.props;
     }
-    const { numColumns } = numColSource;
+    const { currNumColumns } = numColSource;
     const { columnId, parentActiveColumnId, children } = this.props;
     const finalChildren = this.state ? this.state.localChildren : children;
     const numChildren = finalChildren.length;
@@ -73,15 +74,15 @@ class CommentThread extends PureComponent {
     const finalNumChildren = numChildren + modifier;
 
     const { _reactScrollCollapse: { id: collapserId } } = this.props;
-    console.log(`this.getNumColumns - collapserId: ${collapserId}, columnId: ${this.props.columnId}, parentActiveColumnId: ${parentActiveColumnId}`);
+    // console.log(`this.getNumColumns - collapserId: ${collapserId}, columnId: ${this.props.columnId}, parentActiveColumnId: ${parentActiveColumnId}`);
 
     if (parentActiveColumnId !== null && parentActiveColumnId !== columnId) {
       return 1;
     }
-    if (finalNumChildren <= numColumns) {
+    if (finalNumChildren <= currNumColumns) {
       return finalNumChildren;
     }
-    return numColumns;
+    return currNumColumns;
   }
 
   getColumnWidth = (numColumns, activeColumnId, activeColumnWidth) => (colIndex) => {
@@ -91,6 +92,11 @@ class CommentThread extends PureComponent {
       return activeColumnWidth / 100;
     }
     const divisor = activeColumnId === null ? numColumns : numColumns - 1;
+
+    if (activeColumnId >= divisor + 1) {
+      const returnValue = maxWidth / (divisor + 1) / 100;
+      return maxWidth / (divisor + 1) / 100;
+    }
 
     /*
       i.e. if the current active column just got removed.
@@ -102,18 +108,18 @@ class CommentThread extends PureComponent {
   }
 
   getColumnId = (childIndex) => {
-    const { columns } = this.state;
-    const numColumns = columns.length;
-    if (childIndex < numColumns) {
+    const { currNumColumns } = this.state;
+    // const numColumns = columns.length;
+    if (childIndex < currNumColumns) {
       return childIndex;
     }
-    return childIndex - numColumns;
+    return childIndex - currNumColumns;
   }
 
   getColumnGap = () => {
-    const { numColumns } = this.state;
-    const currNumCols = this.getNumColumns();
-    if (currNumCols < numColumns) {
+    const { numColumns, currNumColumns } = this.state;
+    // const currNumCols = this.getNumColumns();
+    if (currNumColumns < numColumns) {
       return 0;
     }
     // console.log(`this.getNumRows - columnId: ${this.props.columnId}, newColGap: ${newColGap}`);
@@ -121,20 +127,20 @@ class CommentThread extends PureComponent {
   }
 
   getChildMargins = (childIndex) => {
-    const { numColumns } = this.state;
+    const { numColumns, currNumColumns } = this.state;
     let leftMargin = 0;
     let rightMargin = 0;
     const columnId = this.getColumnId(childIndex);
-    const currNumCols = this.getNumColumns();
+    // const currNumCols = this.getNumColumns();
 
     if (columnId === 0) {
       leftMargin = 1;
     }
-    if (columnId === currNumCols - 1) {
+    if (columnId === currNumColumns - 1) {
       rightMargin = 1;
     }
 
-    if (currNumCols === numColumns) {
+    if (currNumColumns === numColumns) {
       return [leftMargin, rightMargin];
     }
     if (columnId !== 0) {
@@ -144,11 +150,11 @@ class CommentThread extends PureComponent {
   }
 
   getNumRows = () => {
-    const { localChildren } = this.state;
+    const { localChildren, currNumColumns } = this.state;
     // const { columnId, parentActiveColumnId } = this.props;
-    const numColumns = this.getNumColumns();
+    // const numColumns = this.getNumColumns();
     const numChildren = localChildren.length;
-    if (numColumns === 0) {
+    if (currNumColumns === 0) {
       return 2;
     }
     /*
@@ -157,8 +163,8 @@ class CommentThread extends PureComponent {
     }
     */
     const { _reactScrollCollapse: { id: collapserId } } = this.props;
-    console.log(`this.getNumRows - collapserId: ${collapserId}, columnId: ${this.props.columnId}, numRows: ${Math.ceil(numChildren / numColumns) + 1}`);
-    return Math.ceil(numChildren / numColumns) + 1;
+    // console.log(`this.getNumRows - collapserId: ${collapserId}, columnId: ${this.props.columnId}, numRows: ${Math.ceil(numChildren / numColumns) + 1}`);
+    return Math.ceil(numChildren / currNumColumns) + 1;
   }
 
   getGridTemplateRows = () => mapFromNumber(this.getNumRows(), () => 'auto').join(' ');
@@ -174,34 +180,52 @@ class CommentThread extends PureComponent {
   }
 
   setNumColumns = (numColumnsArg) => {
-    const numColumns = numColumnsArg < 1 ? 1 : numColumnsArg;
+    const maxNumColumns = this.props.numColumns;
+    /*
     const { activeColumnId, activeColumnWidth } = this.state;
     const newColumnArray = mapFromNumber(numColumns, this.getColumnWidth(
       numColumns, activeColumnId, activeColumnWidth
     ));
-    console.log(`this.setNumColumns - columnId: ${this.props.columnId}, numColumnsArg: ${numColumnsArg}`);
-    console.log('newColumnArray', newColumnArray);
-    console.log('');
-    this.setState({ columns: newColumnArray });
+    */
+    // console.log(`this.setNumColumns - columnId: ${this.props.columnId}, numColumnsArg: ${numColumnsArg}`);
+    // console.log('newColumnArray', newColumnArray);
+    // console.log('');
+    this.setState(({ currNumColumns, realNumColumns }) => {
+      let numColumns = numColumnsArg + currNumColumns;
+      let newRealNumColumns = numColumnsArg + realNumColumns;
+      // newRealNumColumns = newRealNumColumns > maxNumColumns + 1 ? maxNumColumns + 1 : newRealNumColumns;
+      newRealNumColumns = (newRealNumColumns < 2 && numColumnsArg > 0) ? 2 : newRealNumColumns;
+      // numColumns = numColumns < 1 ? 1 : numColumns;
+      numColumns = newRealNumColumns <= maxNumColumns + 1 ? newRealNumColumns - 1 : maxNumColumns;
+      numColumns = numColumns === 0 ? 1 : numColumns;
+      return { currNumColumns: numColumns, realNumColumns: newRealNumColumns };
+    });
+    // this.setState({ columns: newColumnArray });
   }
 
   setActiveColumnId = (activeColumnId) => {
     // console.log(`this.setActiveColumnId - columnId: ${this.props.columnId}, activeColumnId: ${activeColumnId}`);
     const { activeColumnWidth, columns } = this.state;
+    /*
     const numColumns = columns.length;
     const newColumnArray = mapFromNumber(numColumns, this.getColumnWidth(
       numColumns, activeColumnId, activeColumnWidth
     ));
     this.setState({ activeColumnId, columns: newColumnArray });
+    */
+    this.setState({ activeColumnId });
   }
 
   setActiveColumnWidth = (activeColumnWidth) => {
+    /*
     const { activeColumnId, columns } = this.state;
     const numColumns = columns.length;
     const newColumnArray = mapFromNumber(numColumns, this.getColumnWidth(
       numColumns, activeColumnId, activeColumnWidth
     ));
     this.setState({ activeColumnWidth, columns: newColumnArray });
+    */
+    this.setState({ activeColumnWidth });
   }
 
   /* ------------------- Child Management --------------------- */
@@ -240,12 +264,12 @@ class CommentThread extends PureComponent {
       i => generateCommentThreadData(this.state, count + i, depth + 1)
     );
     this.setState(this.addChildren(newChildren, childInsertionIndex));
-    this.setNumColumns(this.getNumColumns(numNewChildren));
+    this.setNumColumns(numNewChildren);
   };
 
   removeThread = () => {
     this.setState(this.removeChild);
-    this.setNumColumns(this.getNumColumns(-1));
+    this.setNumColumns(-1);
   }
 
   toggleControls = () => this.setState(
@@ -353,6 +377,7 @@ class CommentThread extends PureComponent {
       margins,
       activeChildren,
       setActiveColumnId,
+      parentActiveColumnId,
     } = this.props;
     const {
       // branch,
@@ -376,12 +401,20 @@ class CommentThread extends PureComponent {
     // console.log(`id: ${collapserId}, activeColumnId: ${activeColumnId} columns: ${columns}`);
     // console.log('');
     // console.log(`id: ${collapserId}, activeChildren: ${activeChildren}`);
-    const columnsOnMountVals = mapFromNumber(this.getNumColumns(numColumns), this.getColumnWidth(
+    const columnsOnMountVals = mapFromNumber(numColumns, this.getColumnWidth(
       numColumns, activeColumnId, activeColumnWidth
     ));
-    const gridColumnWidths = mapFromNumber(this.getNumColumns(currNumColumns), this.getColumnWidth(
-      numColumns, activeColumnId, activeColumnWidth
+    const gridColumnWidths = mapFromNumber(currNumColumns, this.getColumnWidth(
+      currNumColumns, activeColumnId, activeColumnWidth
     ));
+
+    if (collapserId === 0) {
+      console.log(`this.render - collapserId: ${collapserId}, columnId: ${columnId}, parentActiveColumnId: ${parentActiveColumnId}`);
+      console.log(`this.render - currNumColumns: ${currNumColumns}, gridColumnWidths: ${gridColumnWidths}, columnsOnMountVals: ${columnsOnMountVals}`);
+      console.log('');
+      console.log('');
+    }
+
     return (
       <AnimatedGrid
         className={this.getClassName(this.props)}
@@ -396,10 +429,10 @@ class CommentThread extends PureComponent {
           ...style,
           gridTemplateRows: this.getGridTemplateRows(),
         }}
-        gridColumnWidths={columns}
+        gridColumnWidths={gridColumnWidths}
         gridColumnGap={this.getColumnGap()}
         margins={margins}
-        columnsOnMount={columnsOnMount}
+        columnsOnMount={columnsOnMountVals}
       >
         <div className={styles.comment} style={this.getCommentStyle()}>
           <ExpandButton
