@@ -218,7 +218,7 @@ export const collapserWrapper = (WrappedComponent) => {
     */
     handleAllItemsExpandedWorkerMessage = (e) => {
       const { orphanNodeCacheClone, recursionCacheClone } = e.data;
-
+      debugger;
       if (!e) {
         return;
       }
