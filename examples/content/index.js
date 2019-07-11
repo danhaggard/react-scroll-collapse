@@ -1,19 +1,10 @@
 import React from 'react';
 
 import Scroller from '../../src';
-
-import SimpleCollapser from '../components/SimpleCollapserTest';
-import EvenSimplerCollapser from '../components/EvenSimplerCollapser';
-
-import SimpleComment from '../components/SimpleComment';
+import SimpleCollapser from '../components/SimpleCollapser';
 import CommentThread from '../components/CommentThread';
-// import CommentThreadPerf from '../components/CommentThreadPerf';
-// import CommentThreadOrig from '../components/CommentThread';
 import CommentThreadFlex from '../components/CommentThreadFlex';
-
 import Example from '../components/Example';
-
-import { getRandomTextWithDefaults } from '../../src/utils/randomUtils';
 
 import { generateCommentThreadData } from '../../src/utils/randomContentGenerators';
 
@@ -42,14 +33,6 @@ const COPY = {
     title: 'Multiple Scrolling Components',
     text: `You can use multiple scrollers as well!
     State is tracked separately for each`
-  },
-  5: {
-    title: 'A single collapser item',
-    text: '',
-  },
-  6: {
-    title: '',
-    text: '',
   }
 };
 
@@ -100,58 +83,6 @@ const example4 = key => (
   </Example>
 );
 
-/*
-const example5 = (
-  <Example {...COPY[5]} style={{ marginBottom: '3em' }} key={5}>
-    <EvenSimplerCollapser>
-      <SimpleComment text={getRandomTextWithDefaults()} />
-    </EvenSimplerCollapser>
-    <EvenSimplerCollapser>
-      <SimpleComment text={getRandomTextWithDefaults()} />
-      <SimpleComment text={getRandomTextWithDefaults()} />
-    </EvenSimplerCollapser>
-  </Example>
-);
-const example6 = (
-  <Example {...COPY[5]} style={{ marginBottom: '3em' }} key={5}>
-    <Scroller style={{ height: '100%' }}>
-      <CommentThread depth={0} childNodes={1} randomChildNodes />
-
-    </Scroller>
-  </Example>
-);
-
-*/
-/*
-const example7 = (
-  <Example {...COPY[5]} style={{ marginBottom: '3em' }} key={5}>
-    <CommentThread depth={0} childNodes={2}>
-      <EvenSimplerCollapser>
-        <EvenSimplerCollapser />
-      </EvenSimplerCollapser>
-      <EvenSimplerCollapser />
-    </CommentThread>
-  </Example>
-);
-const example8 = (
-  <Example {...COPY[6]} style={{ marginBottom: '3em' }} key={5}>
-    <Scroller style={{ height: '100%' }}>
-      <CommentThread depth={0} childNodes={5} />
-    </Scroller>
-  </Example>
-);
-
-*/
-
-/*
-export const generateCommentThreadData = (
-  minChildrenArg,
-  minDepthArg,
-  maxChildren,
-  maxDepth,
-  allowRandom = true
-)
-*/
 
 const generateThreadConfig = {
   minChildren: 1,
@@ -168,38 +99,10 @@ const generateThreadConfigChild = {
 };
 
 const someData = generateCommentThreadData(generateThreadConfig);
-// console.log('someData', someData);
-/*
-const example9 = (
-  <Example {...COPY[6]} style={{}} key={5}>
-    <Scroller style={{ height: '100%' }}>
-      <CommentThreadPerf
-        key={someData.key}
-        isOpenedInit={false}
-        childIsOpenedInit={false}
-        nodeData={someData}
-        activeChildLimit={1}
-        {...generateThreadConfigChild}
-        />
-    </Scroller>
-  </Example>
-);
-*/
-/*
-const example10 = (
-  <Example {...COPY[6]} style={{ marginBottom: '3em' }} key={5}>
-    <Scroller style={{ height: '100%' }}>
-      <CommentThreadOrig childThreads={2} />
-    </Scroller>
-  </Example>
-);
-*/
-
 
 const style = { height: '100%' };
-const example11 = (
+const example5 = (
   <Example showHeader={false} {...COPY[6]} style={{}} key={5}>
-
     <Scroller style={style}>
       <CommentThreadFlex
         key={someData.key}
@@ -211,7 +114,6 @@ const example11 = (
         {...generateThreadConfigChild}
         />
     </Scroller>
-
   </Example>
 );
 
@@ -221,7 +123,7 @@ const examples = {
   2: [example2],
   3: [example3],
   4: [example4(4), example4(5)],
-  5: [example11],
+  5: [example5],
 };
 
 export default examples;
