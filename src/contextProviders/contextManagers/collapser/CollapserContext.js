@@ -144,7 +144,23 @@ const collapserContext = (Base) => {
 
     initiateTreeStateCheck = (setTreeId = false) => {
       const areAllItemsExpandedWorker = this.getWorker();
-      const { isOpenedInit, rootNodeId } = this.props;
+      const { isOpenedInit } = this.props;
+
+      /*
+        This rootNodeId check is handling an edge case where a collapser
+        has no parent and is not a child of a scroller.
+        In that scenario the context render has not been sent all info by
+        a parent provider.
+      */
+      let { rootNodeId } = this.props;
+      if (this.checkIfRoot()) {
+        rootNodeId = this.getId();
+      }
+
+      if (rootNodeId === undefined && !this.checkIfRoot()) {
+        throw new Error('No rootNodeId found');
+      }
+
       const cacheClone = this.cache.getCache();
       const currentReduxState = this.cache.getCurrentReduxState();
       const orphanNodeCacheClone = this.cache.orphanNodeCache.getCache();

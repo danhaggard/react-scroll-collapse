@@ -109,8 +109,7 @@ const createProvider = (
        <Parent />
     */
 
-    idKey = getIdKey(typeKey); // I don't think this or the parentIdKey are really
-        // needed.
+    idKey = getIdKey(typeKey); // I don't think this or the parentIdKey are really needed.
 
     typeKey = typeKey;
 

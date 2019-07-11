@@ -6,9 +6,9 @@ import SimpleCollapser from '../components/SimpleCollapserTest';
 import EvenSimplerCollapser from '../components/EvenSimplerCollapser';
 
 import SimpleComment from '../components/SimpleComment';
-import CommentThread from '../components/CommentThreadFun';
-import CommentThreadPerf from '../components/CommentThreadPerf';
-import CommentThreadOrig from '../components/CommentThread';
+import CommentThread from '../components/CommentThread';
+// import CommentThreadPerf from '../components/CommentThreadPerf';
+// import CommentThreadOrig from '../components/CommentThread';
 import CommentThreadFlex from '../components/CommentThreadFlex';
 
 import Example from '../components/Example';
@@ -72,14 +72,20 @@ const example1 = (
 
 const example2 = (
   <Example {...COPY[2]} key={0} style={{}}>
-    <CommentThread depth={3} style={{ margin: 0, overflow: 'auto' }} />
+    <Scroller style={{ height: '100%' }}>
+      <CommentThread
+        depth={3}
+        childThreads={2}
+        isOpenedInit
+        style={{ margin: 0, overflow: 'auto' }}
+      />
+    </Scroller>
   </Example>
 );
 
 const example3 = (
   <Example {...COPY[3]} key={3}>
     <Scroller style={{ height: '100%' }}>
-      <SimpleCollapser initialComments={10} />
       <SimpleCollapser initialComments={10} />
     </Scroller>
   </Example>
@@ -94,6 +100,7 @@ const example4 = key => (
   </Example>
 );
 
+/*
 const example5 = (
   <Example {...COPY[5]} style={{ marginBottom: '3em' }} key={5}>
     <EvenSimplerCollapser>
@@ -105,7 +112,6 @@ const example5 = (
     </EvenSimplerCollapser>
   </Example>
 );
-
 const example6 = (
   <Example {...COPY[5]} style={{ marginBottom: '3em' }} key={5}>
     <Scroller style={{ height: '100%' }}>
@@ -115,6 +121,8 @@ const example6 = (
   </Example>
 );
 
+*/
+/*
 const example7 = (
   <Example {...COPY[5]} style={{ marginBottom: '3em' }} key={5}>
     <CommentThread depth={0} childNodes={2}>
@@ -125,7 +133,6 @@ const example7 = (
     </CommentThread>
   </Example>
 );
-
 const example8 = (
   <Example {...COPY[6]} style={{ marginBottom: '3em' }} key={5}>
     <Scroller style={{ height: '100%' }}>
@@ -134,6 +141,7 @@ const example8 = (
   </Example>
 );
 
+*/
 
 /*
 export const generateCommentThreadData = (
@@ -161,7 +169,7 @@ const generateThreadConfigChild = {
 
 const someData = generateCommentThreadData(generateThreadConfig);
 // console.log('someData', someData);
-
+/*
 const example9 = (
   <Example {...COPY[6]} style={{}} key={5}>
     <Scroller style={{ height: '100%' }}>
@@ -176,7 +184,8 @@ const example9 = (
     </Scroller>
   </Example>
 );
-
+*/
+/*
 const example10 = (
   <Example {...COPY[6]} style={{ marginBottom: '3em' }} key={5}>
     <Scroller style={{ height: '100%' }}>
@@ -184,6 +193,8 @@ const example10 = (
     </Scroller>
   </Example>
 );
+*/
+
 
 const style = { height: '100%' };
 const example11 = (
@@ -204,19 +215,21 @@ const example11 = (
   </Example>
 );
 
-/*
+
+
 const examples = {
   0: [example0],
   1: [example1],
   2: [example2],
   3: [example3],
-  4: [example4(4), example4(5)]
+  4: [example4(4), example4(5)],
+  5: [example11],
+};
+
+
+/*
+const examples = {
+  0: [example2]
 };
 */
-
-
-const examples = {
-  0: [example0]
-};
-
 export default examples;
