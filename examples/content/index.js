@@ -151,7 +151,7 @@ const examples = {
 const examples = {
   // 0: [example0],
   // 1: [example1],
-  0: [example6],
+  0: [example5],
   // 3: [example3],
   // 4: [example4(4), example4(5)],
 // 5: [example5],
