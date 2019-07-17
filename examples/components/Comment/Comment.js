@@ -26,7 +26,7 @@ const Comment = (props) => {
   return (
     <div className={styles.comment} ref={collapserItemRef}>
       <Collapse
-        isOpened={isOpened}
+        isOpened={false}
         springConfig={DEFAULT_MOTION_SPRING}
       >
         <div className={styles.commentChildren}>

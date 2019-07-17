@@ -111,6 +111,7 @@ class CommentThread extends PureComponent {
   }
 
   getBackgroundRotation = ({ isActiveSibling, noActiveSiblings, areAllItemsExpanded }) => {
+    /*
     if (areAllItemsExpanded && isActiveSibling) {
       return 45 + (this.state.depth * 180);
     }
@@ -120,6 +121,7 @@ class CommentThread extends PureComponent {
     if (areAllItemsExpanded && !isActiveSibling) {
       return 225 + (this.state.depth * 180);
     }
+    */
     return 225 + (this.state.depth * 180);
   }
 
@@ -154,6 +156,8 @@ class CommentThread extends PureComponent {
       _reactScrollCollapse: { id: collapserId, isRootNode },
       isOpenedInit,
       style,
+      isActiveSibling,
+      noActiveSiblings
     } = this.props;
     const {
       // branch,
@@ -167,6 +171,11 @@ class CommentThread extends PureComponent {
       showControls,
       title
     } = this.state;
+    console.log('commentThreadFlex: collapserId, this.props', collapserId, this.props);
+
+    console.log('commentThreadFlex: collapserId, isActiveSibling, noActiveSiblings', collapserId, isActiveSibling, noActiveSiblings);
+    console.log('commentThreadFlex: collapserId, flexBasis', collapserId, this.getFlexBasis(this.props));
+
     return (
       <AnimatedFlexbox
         className={this.getClassName(this.props)}
@@ -235,7 +244,7 @@ CommentThread.defaultProps = {
   maxDepth: 1,
   minChildren: 1,
   minDepth: 1,
-  setActiveChildLimit: 0,
+  setActiveChildLimit: 1,
   style: {},
 };
 
