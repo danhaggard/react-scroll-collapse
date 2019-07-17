@@ -42,6 +42,66 @@ StaticChild.whyDidYouRender = {
 
 const PureStaticChild = React.memo(StaticChild);
 
+const isHeightFixed = (ref, prevHeight, zeroHeightDiffArr = []) => {
+  if (prevHeight === null && ref.current === null) {
+    return [false, null, []];
+  }
+
+  const nextHeight = ref.current.clientHeight;
+
+  if (prevHeight === null) {
+    const { clientWidth } = ref.current;
+    // console.log(`id: ${id}, width diff: `, ref.current.parentNode.clientWidth - clientWidth);
+    /*
+      Covers case where flex child has full width.  170 is a guesstimate value
+      of margins and paddings.  Changes with font scaling.
+
+      Could use the newHeightDiffArr check instead - but that does add a little
+      delay to calculate height.
+    */
+    const heightFixed = ref.current.parentNode.clientWidth - clientWidth < 170;
+    return [heightFixed, nextHeight, []];
+  }
+
+  const heightDiff = 1 - (nextHeight / prevHeight);
+
+  let heightFixed = false;
+  let newHeightDiffArr = zeroHeightDiffArr;
+  // console.log(`id: ${id}, height diff: `, heightDiff);
+
+  /*
+    You will see a drop in height once flex width has been determined and is
+    expanding.
+
+    Could also just rely on newHeightDiffArr - but is sometimes quicker.  Is
+    trade off between fastest time to parent width vs allowing enough
+    time to determine child heights. greater newHeightDiffArr.length allow
+    more time to determine child heights.
+  */
+  if (heightDiff > 0.3) {
+    heightFixed = true;
+    newHeightDiffArr = [];
+  }
+
+  /*
+    zeroHeightDiffArr is measuring the number of times that flex width has
+    animated a frame without a change in height.
+  */
+  if (heightDiff === 0) {
+    newHeightDiffArr = [...zeroHeightDiffArr, 0];
+  }
+
+  /*
+    3 - 4 seems to be a good balance between responsiveness and giving react-collapse
+    enough time to source its first height value.
+  */
+  if (newHeightDiffArr.length > 4) {
+    heightFixed = true;
+  }
+
+  return [heightFixed, nextHeight, newHeightDiffArr];
+};
+
 const FlexMotion = React.forwardRef(({ // eslint-disable-line
   className,
   children,
@@ -50,20 +110,43 @@ const FlexMotion = React.forwardRef(({ // eslint-disable-line
   onClick,
   onKeyDown,
   onRest,
+  // id,
   // onPointerEnter,
   // onPointerLeave,
   // onPointerOver, context = useContext(CONTEXTS.MAIN);
   style,
 }, ref) => {
+  let prevHeight = null;
+  let heightFixed = false;
+  let zeroHeightDiffArr = [];
   const context = useContext(CONTEXTS.MAIN);
+  let finalOnRest = context.contextMethods.collapser.onFlexRest;
+  const getFinalOnRest = () => finalOnRest();
+  // console.log(`id: ${id}, render-  motionStyle`, motionStyle);
   return (
     <Motion
       style={motionStyle}
       onClick={onClick}
-      onRest={context.contextMethods.collapser.onFlexRest}
+      onRest={getFinalOnRest}
     >
       {
         (interpolatedStyle) => {
+
+          // console.log(`id: ${id}, TOP: prevHeight, clientHeight, parentHeight`, prevHeight, ref.current && ref.current.clientHeight, ref.current && ref.current.parentNode.clientHeight);
+          // console.log(`id: ${id}, TOP: clientWidth, parentWidth`, ref.current && ref.current.clientWidth, ref.current && ref.current.parentNode.clientWidth);
+
+          if (!heightFixed) {
+            [heightFixed, prevHeight, zeroHeightDiffArr] = isHeightFixed(
+              ref, prevHeight, zeroHeightDiffArr
+            );
+            // console.log(`id: ${id}, heightFixed, prevHeight, zeroHeightDiffArr`, heightFixed, prevHeight, zeroHeightDiffArr);
+
+            if (heightFixed) {
+              // console.log(`id: ${id}, heightFixed`);
+              context.contextMethods.collapser.onFlexRest();
+              finalOnRest = () => console.log('dummy on rest');
+            }
+          }
           const newStyle = {
             ...style,
             ...getInterpolatedStyle(interpolatedStyle)

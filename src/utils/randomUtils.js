@@ -1,4 +1,4 @@
-import { mapFromNumber, forEachNumber } from './arrayUtils';
+import { mapFromNumber } from './arrayUtils';
 
 const RANDOM_TEXT_DEFAULTS = {
   minWordCount: 20,

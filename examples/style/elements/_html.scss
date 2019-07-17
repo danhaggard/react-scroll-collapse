@@ -14,7 +14,7 @@
   font-size: $base-font-size;
   line-height: var(--baseline);
   font-weight: $base-font-weight;
-
+  /*
   @include respond-to(sm) {
     font-size: 0.75rem;
   }
@@ -30,7 +30,8 @@
   @include respond-to(xl) {
     font-size: 1rem;
   }
-/*
+  */
+
   @include respond-to(sm) {
     font-size: 1rem;
   }
@@ -46,7 +47,7 @@
   @include respond-to(xl) {
     font-size: 1.5rem;
   }
-*/
+
 }
 
 p,

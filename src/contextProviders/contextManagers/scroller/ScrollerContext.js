@@ -32,11 +32,7 @@ const scrollerContext = (Base) => {
       render loop.
     */
     componentDidUpdate() {
-      const { providerMotionStyle } = this.state;
-      console.log('ScrollerContext, didUpdate, providerMotionStyle: ', providerMotionStyle);
-
       if (this.currentChildElem && this.userScrollActive !== null) {
-        console.log('ScrollerContext, didUpdate, calling startScrollAnimation');
         this.startScrollAnimation();
         this.currentChildElem = null;
       }
@@ -113,7 +109,6 @@ const scrollerContext = (Base) => {
       const childDistance = this.getChildDistanceToTop(this.currentChildElem);
       /* User hasn't clicked anything yet and hasn't scrolled and we aren't at the top already */
       if (this.userScrollActive === null && nextY === 0) {
-        console.log('checkReset - (this.userScrollActive === null && nextY === 0) - childDistance, y, nextY', childDistance, y, nextY);
         this.startScrollAnimation();
 
         // [resetNeeded, y]
@@ -125,7 +120,6 @@ const scrollerContext = (Base) => {
         but dont waste a render if we don't need to scroll.
       */
       if (y !== nextY && childDistance !== nextY) {
-        console.log('checkReset - (y !== nextY && childDistance !== nextY) - childDistance, y, nextY', childDistance, y, nextY);
         return [true, nextY];
       }
 
@@ -148,7 +142,6 @@ const scrollerContext = (Base) => {
         to pass a value of null for y into react-motion which caused a hard fail.
       */
       if (y === nextY && childDistance !== nextY) {
-        console.log('checkReset - (y === nextY && childDistance !== nextY) childDistance, y, nextY', childDistance, y, nextY);
         this.startScrollAnimation();
         return [false, null];
       }
@@ -175,7 +168,6 @@ const scrollerContext = (Base) => {
     resetMotionStyle = () => {
       const [resetNeeded, y] = this.checkReset();
       if (resetNeeded) {
-        console.log('resetMotionStyle setting providerMotionStyle state, y', y);
         this.setState({ providerMotionStyle: { needsReset: true, y } });
       }
     }

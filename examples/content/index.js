@@ -95,9 +95,9 @@ const generateThreadConfig = {
 };
 
 const generateThreadConfigChild = {
-  minChildren: 4,
+  minChildren: 2,
   minDepth: 4,
-  maxChildren: 4,
+  maxChildren: 2,
   maxDepth: 4,
 };
 

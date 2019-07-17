@@ -95,8 +95,8 @@ class CommentThread extends PureComponent {
   getClassName = ({ isActiveSibling, children, areAllItemsExpanded }) => cx(
     styles.commentThread, {
       [styles.expanded]: isActiveSibling,
-      [styles.noChildren]: (children.length === 0 && !areAllItemsExpanded)
-        || (children.length > 0 && areAllItemsExpanded),
+      // [styles.noChildren]: (children.length === 0 && !areAllItemsExpanded)
+      //  || (children.length > 0 && areAllItemsExpanded),
     }
   );
 
@@ -203,7 +203,6 @@ class CommentThread extends PureComponent {
           tabFocusButtons={areAllItemsExpanded}
           text={comment}
         />
-        { children.length > 0 && children }
         {
           localChildren.length > 0 && localChildren.map(childNodeData => (
             <WrappedCommentThread

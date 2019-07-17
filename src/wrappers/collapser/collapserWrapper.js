@@ -33,6 +33,7 @@ export const collapserWrapper = (WrappedComponent) => {
       super(props, context);
       setContextAttrs(this);
       this.areAllItemsExpandedWorker = this.methods.collapser.areAllItemsExpandedWorker;
+      this.checkIfActiveSibling = this.methods.collapser.checkIfActiveSibling;
 
       this.addToOnFlexRest = this.methods.collapser.addToOnFlexRest;
       this.removeFromFlexRest = this.methods.collapser.removeFromFlexRest;
@@ -147,20 +148,23 @@ export const collapserWrapper = (WrappedComponent) => {
       }
     }
 
-    doOnFlexRest = areAllItemsExpanded => () => {
+    doOnFlexRest = (areAllItemsExpanded, expand = true, scroll = true) => () => {
 
 
       const { rootNodeId } = this;
       // const { areAllItemsExpanded } = this.state;
       const { expandCollapseAll, selectors } = this.props;
 
-      expandCollapseAll(areAllItemsExpanded, selectors.allChildItemIds(), rootNodeId);
-      if (this.methods.scroller) {
+      if (expand) {
+        expandCollapseAll(areAllItemsExpanded, selectors.allChildItemIds(), rootNodeId);
+      }
+      if (this.methods.scroller && scroll) {
         // console.log(`collapserId: ${this.id} this.elem.current`, this.elem.current);
 
         this.methods.scroller.scrollToTop(this.elem.current);
       }
       // console.log(`collapserId: ${this.id} onFlexRestSubscriberId, areAllItemsExpanded`, this.onFlexRestSubscriberId, areAllItemsExpanded);
+
       this.removeFromFlexRest(this.onFlexRestSubscriberId);
 
     }
@@ -174,6 +178,8 @@ export const collapserWrapper = (WrappedComponent) => {
       */
       const { addToNodeTargetArray, expandCollapseAll, selectors } = this.props;
       const { areAllItemsExpanded } = this.state;
+      const isActiveSibling = this.checkIfActiveSibling();
+      // console.log(`id: ${id}, expandCollapseAll - isActiveSibling`, isActiveSibling);
 
       /*
         Will need a whole object to manage autoscroll once we add more
@@ -194,15 +200,31 @@ export const collapserWrapper = (WrappedComponent) => {
         the selector uses.
       */
       addToNodeTargetArray(id, rootNodeId, true);
-      // expandCollapseAll(areAllItemsExpanded, selectors.allChildItemIds(), rootNodeId);
-      if (!areAllItemsExpanded && rootNodeId !== id) {
-        this.onFlexRestSubscriberId = this.addToOnFlexRest(this.doOnFlexRest(areAllItemsExpanded));
-      } else {
-        expandCollapseAll(areAllItemsExpanded, selectors.allChildItemIds(), rootNodeId);
-      }
-
       if (this.methods.collapser) {
         this.methods.collapser.addSelfToActiveSiblings(this.state);
+      }
+
+      if (!areAllItemsExpanded && rootNodeId !== id && !isActiveSibling) {
+        /*
+          Expanding Everything - wait for width before scroll and expand.
+        */
+        this.onFlexRestSubscriberId = this.addToOnFlexRest(this.doOnFlexRest(areAllItemsExpanded));
+      } else if (rootNodeId !== id && areAllItemsExpanded && isActiveSibling) {
+        /*
+          Handles edge case when closing all children and shrinking width
+          causes the current row wrap to undo.  As such we wait for flex width
+          change before scrolling - but can immediately collapse.
+        */
+        expandCollapseAll(areAllItemsExpanded, selectors.allChildItemIds(), rootNodeId);
+        this.addToOnFlexRest(this.doOnFlexRest(areAllItemsExpanded, false, true));
+      } else {
+        /*
+
+        */
+        if (this.methods.scroller) {
+          this.methods.scroller.scrollToTop(this.elem.current);
+        }
+        expandCollapseAll(areAllItemsExpanded, selectors.allChildItemIds(), rootNodeId);
       }
 
       this.initiateTreeStateCheck();
