@@ -209,14 +209,15 @@ export const collapserWrapper = (WrappedComponent) => {
           Expanding Everything - wait for width before scroll and expand.
         */
         this.onFlexRestSubscriberId = this.addToOnFlexRest(this.doOnFlexRest(areAllItemsExpanded));
+      /*
       } else if (rootNodeId !== id && areAllItemsExpanded && isActiveSibling) {
         /*
           Handles edge case when closing all children and shrinking width
           causes the current row wrap to undo.  As such we wait for flex width
           change before scrolling - but can immediately collapse.
-        */
         expandCollapseAll(areAllItemsExpanded, selectors.allChildItemIds(), rootNodeId);
         this.addToOnFlexRest(this.doOnFlexRest(areAllItemsExpanded, false, true));
+      */
       } else {
         /*
 
