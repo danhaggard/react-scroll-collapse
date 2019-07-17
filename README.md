@@ -1,6 +1,16 @@
 # TODOs
 
 1) Clean up ExpandButton (Is being dual used as a button and just a comment title.  Separate out).
+2) expandCollapseItems is broken.  targetNodeArry does not seem to be mapping
+  correctly to targetNodeTreeIdArray.
+  Instead of [{id: 0, treeId: 0}, {id: 1, treeId: 1}, etc]
+  I get [{id: [0, 1 ,2], treeId: [0,1,2]}]
+  Using a straight map function.  Look in: nestedCollapserItemsExpandedRootEvery
+  in /selectors/collapser.js
+
+  Half workaround in collapserWrapper, where each childId is added
+  in a separate dispatch instead of together as an array.  But there
+  are still bugs.
 
 Example Component Audit:
 

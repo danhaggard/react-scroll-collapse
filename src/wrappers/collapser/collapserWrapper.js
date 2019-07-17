@@ -151,51 +151,33 @@ export const collapserWrapper = (WrappedComponent) => {
     }
 
     doOnFlexRest = (areAllItemsExpanded, childSelector, expand = true, scroll = true) => () => {
-
-
       const { rootNodeId } = this;
-      // const { areAllItemsExpanded } = this.state;
       const { expandCollapseAll } = this.props;
-
       if (expand) {
-        expandCollapseAll(areAllItemsExpanded, childSelector(), rootNodeId);
+        expandCollapseAll(areAllItemsExpanded, childSelector, rootNodeId);
       }
       if (this.methods.scroller && scroll) {
-        // console.log(`collapserId: ${this.id} this.elem.current`, this.elem.current);
-
         this.methods.scroller.scrollToTop(this.elem.current);
       }
-      // console.log(`collapserId: ${this.id} onFlexRestSubscriberId, areAllItemsExpanded`, this.onFlexRestSubscriberId, areAllItemsExpanded);
-
       this.removeFromFlexRest(this.onFlexRestSubscriberId);
-
     }
 
-    expandCollapseAllBase = (expandNested = true) => () => {
+    expandCollapseAll = () => {
       const { id, rootNodeId } = this;
       /*
         nodeTargetArray is an array of ids to which the treeStateChecker
         will bee line before checking every node underneath.  In this case it
         will be the instance of the component that fired the hanlder.
       */
-      const { addToNodeTargetArray, expandCollapseAll, selectors } = this.props;
+      const {
+        addToNodeTargetArray,
+        expandCollapseAll,
+        selectors: { allChildItemIds: allChildItemIdsSelector }
+      } = this.props;
       const { areAllItemsExpanded } = this.state;
       const isActiveSibling = this.checkIfActiveSibling();
+      const allChildItemIds = allChildItemIdsSelector();
 
-      const childSelector = expandNested ? selectors.allChildItemIds : selectors.childItemIds;
-      const expandedState = expandNested ? areAllItemsExpanded : selectors.allChildItemsExpanded()
-      // console.log(`id: ${id}, expandCollapseAll - isActiveSibling`, isActiveSibling);
-
-      /*
-        Will need a whole object to manage autoscroll once we add more
-        configurability.
-      */
-
-      /*
-      if (this.methods.scroller) {
-        this.methods.scroller.scrollToTop(this.elem.current);
-      }
-      */
       /*
         Adding the current collapserId to the targetNodes - tells the
         tree state selector where in the tree to go.
@@ -209,38 +191,64 @@ export const collapserWrapper = (WrappedComponent) => {
         this.methods.collapser.addSelfToActiveSiblings(this.state);
       }
 
-      if (!expandedState && rootNodeId !== id && !isActiveSibling) {
+      if (!areAllItemsExpanded && rootNodeId !== id && !isActiveSibling) {
         /*
           Expanding Everything - wait for width before scroll and expand.
         */
         this.onFlexRestSubscriberId = this.addToOnFlexRest(
-          this.doOnFlexRest(expandedState, childSelector)
+          this.doOnFlexRest(areAllItemsExpanded, allChildItemIds)
         );
-      /*
-      } else if (rootNodeId !== id && areAllItemsExpanded && isActiveSibling) {
-        /*
-          Handles edge case when closing all children and shrinking width
-          causes the current row wrap to undo.  As such we wait for flex width
-          change before scrolling - but can immediately collapse.
-        expandCollapseAll(areAllItemsExpanded, selectors.allChildItemIds(), rootNodeId);
-        this.addToOnFlexRest(this.doOnFlexRest(areAllItemsExpanded, false, true));
-      */
       } else {
-        /*
-
-        */
         if (this.methods.scroller) {
           this.methods.scroller.scrollToTop(this.elem.current);
         }
-        expandCollapseAll(expandedState, childSelector(), rootNodeId);
+        expandCollapseAll(areAllItemsExpanded, allChildItemIds, rootNodeId);
       }
-
       this.initiateTreeStateCheck();
     };
 
-    expandCollapseAll = this.expandCollapseAllBase(); // eslint-disable-line
+    expandCollapseItems = () => {
+      const { id, rootNodeId } = this;
+      const {
+        addToNodeTargetArray,
+        expandCollapseAll,
+        selectors: {
+          childItemIds: childItemIdsSelector,
+          allChildItemsExpanded: allChildItemsExpandedSelector,
+          childCollapsers: childCollapsersSelector,
+        }
+      } = this.props;
+      const isActiveSibling = this.checkIfActiveSibling();
+      const allChildItemsExpanded = allChildItemsExpandedSelector();
+      const childItemIds = childItemIdsSelector();
+      const childCollapsers = childCollapsersSelector();
+      // TODO: investigate why childCollapsers passed as nodeTargetArray
+      // doesn't work.
+      // addToNodeTargetArray(id, rootNodeId, true);
+      childCollapsers.forEach((childId, i) => {
+        const clearTargets = i === 0;
+        addToNodeTargetArray(childId, rootNodeId, clearTargets);
+      });
+      // addToNodeTargetArray(childCollapsers, rootNodeId, true);
 
-    expandCollapseItems = this.expandCollapseAllBase(false);
+      if (this.methods.collapser) {
+        this.methods.collapser.addSelfToActiveSiblings(this.state);
+      }
+      if (!allChildItemsExpanded && rootNodeId !== id && !isActiveSibling) {
+        this.onFlexRestSubscriberId = this.addToOnFlexRest(
+          this.doOnFlexRest(allChildItemsExpanded, childItemIds)
+        );
+      } else {
+        if (this.methods.scroller) {
+          this.methods.scroller.scrollToTop(this.elem.current);
+        }
+        expandCollapseAll(allChildItemsExpanded, childItemIds, rootNodeId);
+      }
+      // second false stops it from flipping values of children of targetNodes
+      this.initiateTreeStateCheck(false, false);
+    };
+
+    // expandCollapseItems = this.expandCollapseAllBase(false);
 
     /*
       The callback from the webworker.  Receive its' updated state.
@@ -280,9 +288,13 @@ export const collapserWrapper = (WrappedComponent) => {
       Methods managed by the context.
     */
 
-    initiateTreeStateCheck = setTreeId => this.methods.collapser.initiateTreeStateCheck(
+    initiateTreeStateCheck = (
+      setTreeId,
+      flipChildValues
+    ) => this.methods.collapser.initiateTreeStateCheck(
       // this.props,
-      setTreeId
+      setTreeId,
+      flipChildValues
     );
 
     isActiveSibling = () => this.methods.collapser.checkIfActiveSibling();

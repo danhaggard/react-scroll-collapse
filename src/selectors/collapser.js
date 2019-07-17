@@ -133,6 +133,7 @@ export const nestedCollapserItemsExpandedRootEvery = (
 ) => {
   const mapIdToTreeId = id => ({ id, treeId: cache.getResultTreeId(id) });
   const targetNodeTreeIdArray = nodeTargetArray.map(mapIdToTreeId);
+
   const getNodeChildren = id => getCollapserCollapsersRoot(state)(id);
   const getNodeChildrenMappedToTreeId = id => getNodeChildren(id).map(mapIdToTreeId);
   const getNodeValue = id => collapserItemsExpandedRootEvery(state)(id);
