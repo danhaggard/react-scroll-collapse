@@ -96,8 +96,8 @@ const createOrphanedNodeCache = (
 
     if (isOrphan || parentIsOrphan) {
       orphanNodes[nodeId] = orphanObj;
-      console.log(`nodeId ${nodeId} is orphaned by parent: ${parentNodeId} because`, orphanObj);
-      console.log('all orphan nodes: ', orphanNodes);
+      // console.log(`nodeId ${nodeId} is orphaned by parent: ${parentNodeId} because`, orphanObj);
+      // console.log('all orphan nodes: ', orphanNodes);
     }
     return isOrphan || parentIsOrphan;
   };

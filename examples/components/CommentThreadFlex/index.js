@@ -156,8 +156,6 @@ class CommentThread extends PureComponent {
       _reactScrollCollapse: { id: collapserId, isRootNode },
       isOpenedInit,
       style,
-      isActiveSibling,
-      noActiveSiblings
     } = this.props;
     const {
       // branch,
@@ -171,11 +169,6 @@ class CommentThread extends PureComponent {
       showControls,
       title
     } = this.state;
-    console.log('commentThreadFlex: collapserId, this.props', collapserId, this.props);
-
-    console.log('commentThreadFlex: collapserId, isActiveSibling, noActiveSiblings', collapserId, isActiveSibling, noActiveSiblings);
-    console.log('commentThreadFlex: collapserId, flexBasis', collapserId, this.getFlexBasis(this.props));
-
     return (
       <AnimatedFlexbox
         className={this.getClassName(this.props)}

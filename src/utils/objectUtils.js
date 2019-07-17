@@ -1,4 +1,4 @@
-
+import { getNextIdFactory } from './selectorUtils';
 
 export const filterObject = (
   objToFilter,
@@ -48,4 +48,31 @@ export const setContextAttrs = (that) => {
     rootNodes,
     type,
   });
+};
+
+export const createSubscriberRegistry = () => {
+  const counter = getNextIdFactory();
+
+  const registry = {};
+
+  const add = (val) => {
+    const id = counter();
+    registry[id] = val;
+    return id;
+  };
+
+  const remove = id => delete registry[id];
+
+  const forEach = callback => Object.values(registry).forEach(
+    (value, index) => callback(value, index)
+  );
+
+  const getRegistry = () => registry;
+
+  return {
+    add,
+    forEach,
+    getRegistry,
+    remove,
+  };
 };

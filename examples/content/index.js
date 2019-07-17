@@ -88,17 +88,17 @@ const example4 = key => (
 
 
 const generateThreadConfig = {
-  minChildren: 3,
-  minDepth: 3,
-  maxChildren: 3,
-  maxDepth: 3,
+  minChildren: 4,
+  minDepth: 4,
+  maxChildren: 4,
+  maxDepth: 4,
 };
 
 const generateThreadConfigChild = {
-  minChildren: 1,
-  minDepth: 1,
-  maxChildren: 1,
-  maxDepth: 1,
+  minChildren: 4,
+  minDepth: 4,
+  maxChildren: 4,
+  maxDepth: 4,
 };
 
 const someData = generateCommentThreadData(generateThreadConfig);

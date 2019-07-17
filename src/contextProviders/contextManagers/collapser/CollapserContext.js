@@ -6,6 +6,7 @@ import { getCollapserActiveChildrenRoot, getCollapserActiveChildrenLimitRoot } f
 import { shallowEqualExceptArray } from '../../../utils/equalityUtils';
 import { defaultMergeContextWithProps } from '../../utils/contextUtils';
 import { compareIntArrays } from '../../../utils/arrayUtils';
+import { createSubscriberRegistry } from '../../../utils/objectUtils';
 
 import createCache from '../../../caching/recursionCache';
 import providerCaches from '../../../caching/providerCaches';
@@ -19,6 +20,8 @@ const collapserContext = (Base) => {
       activeSiblings: [],
       activeSiblingLimit: null,
     }
+
+    onFlexRestRegistry = createSubscriberRegistry();
 
     constructor(props, context) {
       super(props, context);
@@ -212,6 +215,23 @@ const collapserContext = (Base) => {
 
     /* end former collapserManager methods */
 
+    // onFlexRest = () => this.onFlexRestRegistry.forEach(subscriber => subscriber());
+    onFlexRest = () => {
+      const {
+        _reactScrollCollapse: { id },
+        // _reactScrollCollapseParents: { collapser }
+      } = this.props;
+      // console.log(`onFlexRest called id: ${id}, registry: `, this.onFlexRestRegistry.getRegistry());
+      // this.checkIfActiveSibling()
+      this.onFlexRestRegistry.forEach(subscriber => subscriber());
+    }
+
+    addToOnFlexRest = this.onFlexRestRegistry.add;
+
+    getFlexRegistry = this.onFlexRestRegistry.getRegistry;
+
+    removeFromFlexRest = this.onFlexRestRegistry.remove;
+
     contextMethods = {
       collapser: {
         areAllItemsExpandedWorker: this.getWorker(),
@@ -221,6 +241,11 @@ const collapserContext = (Base) => {
         initiateTreeStateCheck: this.initiateTreeStateCheck.bind(this),
         noActiveSiblings: this.noActiveSiblings.bind(this),
         setActiveChildrenLimit: this.setActiveChildrenLimit.bind(this),
+
+        onFlexRest: this.onFlexRest.bind(this),
+        addToOnFlexRest: this.addToOnFlexRest.bind(this),
+        removeFromFlexRest: this.removeFromFlexRest.bind(this),
+        getFlexRegistry: this.getFlexRegistry.bind(this),
       }
     };
 

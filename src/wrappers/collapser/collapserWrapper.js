@@ -33,6 +33,12 @@ export const collapserWrapper = (WrappedComponent) => {
       super(props, context);
       setContextAttrs(this);
       this.areAllItemsExpandedWorker = this.methods.collapser.areAllItemsExpandedWorker;
+
+      this.addToOnFlexRest = this.methods.collapser.addToOnFlexRest;
+      this.removeFromFlexRest = this.methods.collapser.removeFromFlexRest;
+      this.getFlexRegistry = this.methods.collapser.getFlexRegistry;
+
+
       this.cache = this.methods.collapser.cache;
 
       const { areAllItemsExpanded, setActiveChildLimit } = props;
@@ -141,6 +147,24 @@ export const collapserWrapper = (WrappedComponent) => {
       }
     }
 
+    doOnFlexRest = areAllItemsExpanded => () => {
+
+
+      const { rootNodeId } = this;
+      // const { areAllItemsExpanded } = this.state;
+      const { expandCollapseAll, selectors } = this.props;
+
+      expandCollapseAll(areAllItemsExpanded, selectors.allChildItemIds(), rootNodeId);
+      if (this.methods.scroller) {
+        // console.log(`collapserId: ${this.id} this.elem.current`, this.elem.current);
+
+        this.methods.scroller.scrollToTop(this.elem.current);
+      }
+      // console.log(`collapserId: ${this.id} onFlexRestSubscriberId, areAllItemsExpanded`, this.onFlexRestSubscriberId, areAllItemsExpanded);
+      this.removeFromFlexRest(this.onFlexRestSubscriberId);
+
+    }
+
     expandCollapseAll = () => {
       const { id, rootNodeId } = this;
       /*
@@ -155,9 +179,12 @@ export const collapserWrapper = (WrappedComponent) => {
         Will need a whole object to manage autoscroll once we add more
         configurability.
       */
+
+      /*
       if (this.methods.scroller) {
         this.methods.scroller.scrollToTop(this.elem.current);
       }
+      */
       /*
         Adding the current collapserId to the targetNodes - tells the
         tree state selector where in the tree to go.
@@ -167,7 +194,12 @@ export const collapserWrapper = (WrappedComponent) => {
         the selector uses.
       */
       addToNodeTargetArray(id, rootNodeId, true);
-      expandCollapseAll(areAllItemsExpanded, selectors.allChildItemIds(), rootNodeId);
+      // expandCollapseAll(areAllItemsExpanded, selectors.allChildItemIds(), rootNodeId);
+      if (!areAllItemsExpanded && rootNodeId !== id) {
+        this.onFlexRestSubscriberId = this.addToOnFlexRest(this.doOnFlexRest(areAllItemsExpanded));
+      } else {
+        expandCollapseAll(areAllItemsExpanded, selectors.allChildItemIds(), rootNodeId);
+      }
 
       if (this.methods.collapser) {
         this.methods.collapser.addSelfToActiveSiblings(this.state);

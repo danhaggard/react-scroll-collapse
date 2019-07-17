@@ -32,7 +32,11 @@ const scrollerContext = (Base) => {
       render loop.
     */
     componentDidUpdate() {
+      const { providerMotionStyle } = this.state;
+      console.log('ScrollerContext, didUpdate, providerMotionStyle: ', providerMotionStyle);
+
       if (this.currentChildElem && this.userScrollActive !== null) {
+        console.log('ScrollerContext, didUpdate, calling startScrollAnimation');
         this.startScrollAnimation();
         this.currentChildElem = null;
       }
@@ -80,6 +84,9 @@ const scrollerContext = (Base) => {
     */
     getChildDistanceToTop = (childEl) => {
       const el = this.getElem();
+      // const val = this.getRectTop(childEl) - this.getRectTop(el) + this.getScrollTop(el);
+      // console.log('val', val);
+      // return val;
       return this.getRectTop(childEl) - this.getRectTop(el) + this.getScrollTop(el);
     };
 
@@ -106,7 +113,10 @@ const scrollerContext = (Base) => {
       const childDistance = this.getChildDistanceToTop(this.currentChildElem);
       /* User hasn't clicked anything yet and hasn't scrolled and we aren't at the top already */
       if (this.userScrollActive === null && nextY === 0) {
+        console.log('checkReset - (this.userScrollActive === null && nextY === 0) - childDistance, y, nextY', childDistance, y, nextY);
         this.startScrollAnimation();
+
+        // [resetNeeded, y]
         return [false, null];
       }
 
@@ -115,6 +125,7 @@ const scrollerContext = (Base) => {
         but dont waste a render if we don't need to scroll.
       */
       if (y !== nextY && childDistance !== nextY) {
+        console.log('checkReset - (y !== nextY && childDistance !== nextY) - childDistance, y, nextY', childDistance, y, nextY);
         return [true, nextY];
       }
 
@@ -122,12 +133,24 @@ const scrollerContext = (Base) => {
         If y === nextY and we do need to scroll - don't bother
         doing a refresh - everything is in sync - just start the animation.
 
-        Passing a true value to needsReset because it puts state at where
-        it would be otherwise.
+        Note: before delaying scroll to after flex onRest, previously did:
+
+          this.startScrollAnimation(true);
+          return [true, null];
+
+        With the justification:
+
+          Passing a true value to needsReset because it puts state at where
+          it would be otherwise.
+
+        Don't know if was just an un-noticed bug or caused by change to
+        scrollTop call timing, but the above code would cause scrollerMotion
+        to pass a value of null for y into react-motion which caused a hard fail.
       */
       if (y === nextY && childDistance !== nextY) {
-        this.startScrollAnimation(true);
-        return [true, null];
+        console.log('checkReset - (y === nextY && childDistance !== nextY) childDistance, y, nextY', childDistance, y, nextY);
+        this.startScrollAnimation();
+        return [false, null];
       }
 
       /*
@@ -152,6 +175,7 @@ const scrollerContext = (Base) => {
     resetMotionStyle = () => {
       const [resetNeeded, y] = this.checkReset();
       if (resetNeeded) {
+        console.log('resetMotionStyle setting providerMotionStyle state, y', y);
         this.setState({ providerMotionStyle: { needsReset: true, y } });
       }
     }

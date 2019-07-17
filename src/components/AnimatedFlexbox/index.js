@@ -1,9 +1,10 @@
-import React, { PureComponent } from 'react';
+import React, { PureComponent, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { Motion, spring } from 'react-motion';
 import forwardRefWrapper from '../../utils/forwardRef';
 import { DEFAULT_MOTION_SPRING } from '../../const';
 import { ofChildrenType, ofFuncTypeOrNothing } from '../../utils/propTypeHelpers';
+import { CONTEXTS } from '../../contextProviders/constants';
 
 const StaticChild = React.forwardRef(({
   children,
@@ -48,39 +49,65 @@ const FlexMotion = React.forwardRef(({ // eslint-disable-line
   motionStyle,
   onClick,
   onKeyDown,
+  onRest,
   // onPointerEnter,
   // onPointerLeave,
-  // onPointerOver,
+  // onPointerOver, context = useContext(CONTEXTS.MAIN);
   style,
-}, ref) => (
-  <Motion
-    style={motionStyle}
-    onClick={onClick}
-  >
-    {
-      (interpolatedStyle) => {
-        const newStyle = {
-          ...style,
-          ...getInterpolatedStyle(interpolatedStyle)
-        };
-        return (
-          <PureStaticChild
-            className={className}
-            ref={ref}
-            style={newStyle}
-            onClick={onClick}
-          //  onPointerEnter={onPointerEnter}
-          //  onPointerLeave={onPointerLeave}
-          //  onPointerOver={onPointerOver}
-            onKeyDown={onKeyDown}
-          >
-            { children }
-          </PureStaticChild>
-        );
+}, ref) => {
+  const context = useContext(CONTEXTS.MAIN);
+  return (
+    <Motion
+      style={motionStyle}
+      onClick={onClick}
+      onRest={context.contextMethods.collapser.onFlexRest}
+    >
+      {
+        (interpolatedStyle) => {
+          const newStyle = {
+            ...style,
+            ...getInterpolatedStyle(interpolatedStyle)
+          };
+          return (
+            <PureStaticChild
+              className={className}
+              ref={ref}
+              style={newStyle}
+              onClick={onClick}
+            //  onPointerEnter={onPointerEnter}
+            //  onPointerLeave={onPointerLeave}
+            //  onPointerOver={onPointerOver}
+              onKeyDown={onKeyDown}
+            >
+              { children }
+            </PureStaticChild>
+          );
+        }
       }
-    }
-  </Motion>
-));
+    </Motion>
+  );
+});
+
+FlexMotion.defaultProps = {
+  children: [],
+  className: '',
+  onClick: null,
+  onKeyDown: null,
+  onRest: null,
+  style: {},
+};
+
+
+FlexMotion.propTypes = {
+  getInterpolatedStyle: PropTypes.func.isRequired,
+  motionStyle: PropTypes.object.isRequired,
+  onClick: ofFuncTypeOrNothing,
+  onKeyDown: ofFuncTypeOrNothing,
+  onRest: ofFuncTypeOrNothing,
+  children: ofChildrenType,
+  className: PropTypes.string,
+  style: PropTypes.object,
+};
 
 FlexMotion.whyDidYouRender = {
   logOnDifferentValues: false,
