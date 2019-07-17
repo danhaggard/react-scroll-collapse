@@ -39,7 +39,7 @@ export const getCollapserCollapsersRoot = curryCompose(getCollapserCollapsers, g
 const getCollapserItems = collapserObject => getOrArray(collapserObject, 'items');
 
 // rootState => id => collapserItemsArray
-const getCollapserItemsRoot = curryCompose(getCollapserItems, getCollapserRoot);
+export const getCollapserItemsRoot = curryCompose(getCollapserItems, getCollapserRoot);
 
 // --- collapser.treeId:
 const getCollapserTreeId = collapserObject => getOrNull(collapserObject, 'treeId');
@@ -72,11 +72,24 @@ const getCollapserParentId = collapserObject => getOrNull(collapserObject, 'pare
 
 export const getCollapserParentIdRoot = curryCompose(getCollapserParentId, getCollapserRoot);
 
+export const getImmediateChildItemsRoot = rootState => (id) => {
+  const topItems = [...getCollapserItemsRoot(rootState)(id)];
+  const childCollapsers = getCollapserCollapsersRoot(rootState)(id);
+  childCollapsers.forEach((childId) => {
+    const childItems = getCollapserItemsRoot(rootState)(childId);
+    childItems.forEach(item => topItems.push(item));
+  });
+  return topItems;
+};
 
-// getOrDefault
+export const collapserImmediateItemsExpandedRootEvery = passArgsToIteratorEvery(
+  getImmediateChildItemsRoot,
+  getItemExpanded,
+  getItemRoot
+);
 
 // rootState => id => true / false
-const collapserItemsExpandedRootEvery = passArgsToIteratorEvery(
+export const collapserItemsExpandedRootEvery = passArgsToIteratorEvery(
   getCollapserItemsRoot,
   getItemExpanded,
   getItemRoot
@@ -116,6 +129,7 @@ export const nestedCollapserItemsExpandedRootEvery = (
   rootNodeId,
   cache,
   setTreeId = false,
+  flipChildValues = true,
 ) => {
   const mapIdToTreeId = id => ({ id, treeId: cache.getResultTreeId(id) });
   const targetNodeTreeIdArray = nodeTargetArray.map(mapIdToTreeId);
@@ -137,6 +151,7 @@ export const nestedCollapserItemsExpandedRootEvery = (
     rootNodeId,
     targetNodeArray: targetNodeTreeIdArray, // change this arg name to the state key.
     setTreeId,
+    flipChildValues,
   });
 };
 

@@ -15,6 +15,7 @@ const getChildTargetMapping = (childArray, targetNodeArray) => {
     if (foundChildTarget) {
       targetNode = targetNodeArray.shift();
     }
+
     foundChildTarget = currentChildIdObj.treeId <= targetNode.treeId
       && (nextChild === undefined || targetNode.treeId < nextChild.treeId);
     if (foundChildTarget) {
@@ -75,6 +76,13 @@ const recurseToNodeArray = (argsObj) => {
     counter = getNextIdFactory(argsObj.currentNodeIdObj.id - 1),
     setTreeId = false,
     rootNodeId,
+    flipChildValues,
+    /*
+      flipChildValues: once it reaches  targetnode - it will flip all the
+      values of its children if true to save on child selectoring.
+      Added this config because you do not want to flip all child
+      collapsers if you just expanded/collapsed a single item.
+    */
   } = argsObj;
 
   /*
@@ -91,6 +99,7 @@ const recurseToNodeArray = (argsObj) => {
       we can save results along the way.
   */
   const currentNodeId = currentNodeIdObj.id;
+
   const cachedValue = cache.getResultValue(currentNodeId);
   const cachedSources = cache.getResultSources(currentNodeId);
 
@@ -106,7 +115,11 @@ const recurseToNodeArray = (argsObj) => {
   // We have reached the targetNode - just ensure all children have the reverse
   // of the current cached value. NOTE: this cheat won't generalise well.
   // we do this before checking anything else to save on addition child selections
-  if (!setTreeId && targetNodeArray.length === 1 && targetNodeArray[0].id <= currentNodeId) {
+  if (
+    flipChildValues
+    && !setTreeId
+    && targetNodeArray.length === 1 && targetNodeArray[0].id <= currentNodeId
+  ) {
     return setNestedCacheValues(currentNodeIdObj, cachedValue);
   }
 

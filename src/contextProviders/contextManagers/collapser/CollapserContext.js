@@ -145,7 +145,7 @@ const collapserContext = (Base) => {
       this.getId(), limit
     );
 
-    initiateTreeStateCheck = (setTreeId = false) => {
+    initiateTreeStateCheck = (setTreeId = false, flipChildValues = true) => {
       const areAllItemsExpandedWorker = this.getWorker();
       const { isOpenedInit } = this.props;
 
@@ -176,6 +176,7 @@ const collapserContext = (Base) => {
           isOpenedInit,
           rootNodeId,
           setTreeId,
+          flipChildValues,
         }]);
     }
 

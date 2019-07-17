@@ -14,7 +14,7 @@ const createComment = key => ({
   text: getRandomTextWithDefaults()
 });
 
-class SimpleCollapserFixed extends Component {
+class SimpleCollapser extends Component {
 
   constructor(props) {
     super(props);
@@ -73,12 +73,12 @@ class SimpleCollapserFixed extends Component {
   }
 }
 
-SimpleCollapserFixed.defaultProps = {
+SimpleCollapser.defaultProps = {
   initialComments: 1,
   style: {},
 };
 
-SimpleCollapserFixed.propTypes = {
+SimpleCollapser.propTypes = {
   areAllItemsExpanded: PropTypes.bool.isRequired,
   _reactScrollCollapse: PropTypes.object.isRequired,
   collapserRef: PropTypes.object.isRequired,
@@ -87,4 +87,4 @@ SimpleCollapserFixed.propTypes = {
   style: PropTypes.object,
 };
 
-export default collapserController(SimpleCollapserFixed);
+export default collapserController(SimpleCollapser);

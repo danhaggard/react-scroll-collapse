@@ -28,6 +28,11 @@ const Comment = (props) => {
     e.stopPropagation();
     expandCollapse();
   };
+  const handleKeyDown = (e) => {
+    if (e.keyCode === 13) {
+      onClick();
+    }
+  };
   return (
     <div className={styles.comment} ref={collapserItemRef}>
       <Collapse
@@ -36,7 +41,12 @@ const Comment = (props) => {
       >
         <div className={styles.commentChildren}>
           { children }
-          <CommentBody isOpened={isOpened} text={text} onClick={onClick} />
+          <CommentBody
+            isOpened={isOpened}
+            text={text}
+            onClick={onClick}
+            onKeyDown={handleKeyDown}
+          />
         </div>
       </Collapse>
     </div>

@@ -9,21 +9,29 @@ import { CONTEXTS } from '../../contextProviders/constants';
 const StaticChild = React.forwardRef(({
   children,
   className,
-  onClick,
+  // onClick,
+  // onDoubleClick,
   style,
   onKeyDown,
+  onKeyUp,
+  onPointerDown,
+  onPointerUp,
   // onPointerEnter,
   // onPointerLeave,
   // onPointerOver,
 }, ref) => (
   <div
     className={className}
-    onDoubleClick={onClick}
+    onPointerDown={onPointerDown}
+    onPointerUp={onPointerUp}
+    // onClick={onClick}
+    // onDoubleClick={onDoubleClick}
     ref={ref}
     style={style}
     role="button"
     tabIndex={0}
     onKeyDown={onKeyDown}
+    onKeyUp={onKeyUp}
     type="button"
     // onPointerEnter={onPointerEnter}
     // onPointerLeave={onPointerLeave}
@@ -107,8 +115,12 @@ const FlexMotion = React.forwardRef(({ // eslint-disable-line
   children,
   getInterpolatedStyle,
   motionStyle,
-  onClick,
+  // onClick,
+  // onDoubleClick,
+  onPointerDown,
+  onPointerUp,
   onKeyDown,
+  onKeyUp,
   onRest,
   // id,
   // onPointerEnter,
@@ -126,7 +138,7 @@ const FlexMotion = React.forwardRef(({ // eslint-disable-line
   return (
     <Motion
       style={motionStyle}
-      onClick={onClick}
+      // onClick={onClick}
       onRest={getFinalOnRest}
     >
       {
@@ -156,11 +168,16 @@ const FlexMotion = React.forwardRef(({ // eslint-disable-line
               className={className}
               ref={ref}
               style={newStyle}
-              onClick={onClick}
+              onPointerDown={onPointerDown}
+              onPointerUp={onPointerUp}
+            //   onClick={onClick}
+            //  onDoubleClick={onDoubleClick}
             //  onPointerEnter={onPointerEnter}
             //  onPointerLeave={onPointerLeave}
             //  onPointerOver={onPointerOver}
               onKeyDown={onKeyDown}
+              onKeyUp={onKeyUp}
+
             >
               { children }
             </PureStaticChild>
@@ -174,8 +191,9 @@ const FlexMotion = React.forwardRef(({ // eslint-disable-line
 FlexMotion.defaultProps = {
   children: [],
   className: '',
-  onClick: null,
+  // onClick: null,
   onKeyDown: null,
+  onKeyUp: null,
   onRest: null,
   style: {},
 };
@@ -184,8 +202,9 @@ FlexMotion.defaultProps = {
 FlexMotion.propTypes = {
   getInterpolatedStyle: PropTypes.func.isRequired,
   motionStyle: PropTypes.object.isRequired,
-  onClick: ofFuncTypeOrNothing,
+  // onClick: ofFuncTypeOrNothing,
   onKeyDown: ofFuncTypeOrNothing,
+  onKeyUp: ofFuncTypeOrNothing,
   onRest: ofFuncTypeOrNothing,
   children: ofChildrenType,
   className: PropTypes.string,
@@ -278,23 +297,34 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
     return motionStyle;
   }
 
-  handleOnClick = (e) => {
+  handleOnClickBase = clickHandler => (e) => {
     if (!['INPUT', 'BUTTON'].includes(e.target.tagName)) {
       e.stopPropagation();
-      this.props.onClick(e);
+      clickHandler(e);
     }
   }
+
+  handleOnClick = this.handleOnClickBase(this.props.onClick); // eslint-disable-line
+
+  handleOnDoubleClick = this.handleOnClickBase(this.props.onDoubleClick); // eslint-disable-line
+
+  handleOnPointerDown = this.handleOnClickBase(this.props.onPointerDown); // eslint-disable-line
+
+  handleOnPointerUp = this.handleOnClickBase(this.props.onPointerUp); // eslint-disable-line
 
   /*
     Remember stopping propagation can break things above.
   */
-  handleKeyDown = (e) => {
+  handleKeyBase = handler => (e) => {
     if (e.keyCode === 13) {
       e.stopPropagation();
-      this.props.onKeyDown(e);
+      handler(e);
     }
   }
 
+  handleKeyDown = this.handleKeyBase(this.props.onKeyDown);
+
+  handleKeyUp = this.handleKeyBase(this.props.onKeyUp);
 
   setWillChange = () => {
     const { willChangeBackground: changeBg, willChangeWidth: changeW } = this;
@@ -380,8 +410,12 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
         className={className}
         getInterpolatedStyle={this.getInterpolWidthRotation}
         motionStyle={this.getMotionStyle()}
-        onClick={this.handleOnClick}
+        // onClick={this.handleOnClick}
+        // onDoubleClick={this.handleOnDoubleClick}
+        onPointerDown={this.handleOnPointerDown}
+        onPointerUp={this.handleOnPointerUp}
         onKeyDown={this.handleKeyDown}
+        onKeyUp={this.handleKeyUp}
         ref={flexRef}
         style={{ ...style, ...stateStyle }}
       >
@@ -390,7 +424,9 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
     ) : (
       <PureStaticChild
         className={className}
-        onClick={this.handleOnClick}
+        onPointerDown={this.handleOnPointerDown}
+        onPointerUp={this.handleOnPointerUp}
+        // onClick={this.handleOnClick}
         onKeyDown={this.handleKeyDown}
         ref={flexRef}
         style={style}

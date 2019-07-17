@@ -11,6 +11,8 @@ import { cleanHoCProps } from '../../utils/hocUtils/cleanHoCProps';
 
 import { getNodeTargetArrayRoot, getRootUnmountArrayRoot } from '../../selectors/rootNode';
 import {
+  collapserImmediateItemsExpandedRootEvery,
+  getImmediateChildItemsRoot,
   getCollapserCollapsersRoot,
   nestedCollapserItemsRoot,
   setTreeIdsRecursively,
@@ -148,15 +150,15 @@ export const collapserWrapper = (WrappedComponent) => {
       }
     }
 
-    doOnFlexRest = (areAllItemsExpanded, expand = true, scroll = true) => () => {
+    doOnFlexRest = (areAllItemsExpanded, childSelector, expand = true, scroll = true) => () => {
 
 
       const { rootNodeId } = this;
       // const { areAllItemsExpanded } = this.state;
-      const { expandCollapseAll, selectors } = this.props;
+      const { expandCollapseAll } = this.props;
 
       if (expand) {
-        expandCollapseAll(areAllItemsExpanded, selectors.allChildItemIds(), rootNodeId);
+        expandCollapseAll(areAllItemsExpanded, childSelector(), rootNodeId);
       }
       if (this.methods.scroller && scroll) {
         // console.log(`collapserId: ${this.id} this.elem.current`, this.elem.current);
@@ -169,7 +171,7 @@ export const collapserWrapper = (WrappedComponent) => {
 
     }
 
-    expandCollapseAll = () => {
+    expandCollapseAllBase = (expandNested = true) => () => {
       const { id, rootNodeId } = this;
       /*
         nodeTargetArray is an array of ids to which the treeStateChecker
@@ -179,6 +181,9 @@ export const collapserWrapper = (WrappedComponent) => {
       const { addToNodeTargetArray, expandCollapseAll, selectors } = this.props;
       const { areAllItemsExpanded } = this.state;
       const isActiveSibling = this.checkIfActiveSibling();
+
+      const childSelector = expandNested ? selectors.allChildItemIds : selectors.childItemIds;
+      const expandedState = expandNested ? areAllItemsExpanded : selectors.allChildItemsExpanded()
       // console.log(`id: ${id}, expandCollapseAll - isActiveSibling`, isActiveSibling);
 
       /*
@@ -204,11 +209,13 @@ export const collapserWrapper = (WrappedComponent) => {
         this.methods.collapser.addSelfToActiveSiblings(this.state);
       }
 
-      if (!areAllItemsExpanded && rootNodeId !== id && !isActiveSibling) {
+      if (!expandedState && rootNodeId !== id && !isActiveSibling) {
         /*
           Expanding Everything - wait for width before scroll and expand.
         */
-        this.onFlexRestSubscriberId = this.addToOnFlexRest(this.doOnFlexRest(areAllItemsExpanded));
+        this.onFlexRestSubscriberId = this.addToOnFlexRest(
+          this.doOnFlexRest(expandedState, childSelector)
+        );
       /*
       } else if (rootNodeId !== id && areAllItemsExpanded && isActiveSibling) {
         /*
@@ -225,11 +232,15 @@ export const collapserWrapper = (WrappedComponent) => {
         if (this.methods.scroller) {
           this.methods.scroller.scrollToTop(this.elem.current);
         }
-        expandCollapseAll(areAllItemsExpanded, selectors.allChildItemIds(), rootNodeId);
+        expandCollapseAll(expandedState, childSelector(), rootNodeId);
       }
 
       this.initiateTreeStateCheck();
     };
+
+    expandCollapseAll = this.expandCollapseAllBase(); // eslint-disable-line
+
+    expandCollapseItems = this.expandCollapseAllBase(false);
 
     /*
       The callback from the webworker.  Receive its' updated state.
@@ -308,6 +319,7 @@ export const collapserWrapper = (WrappedComponent) => {
           noActiveSiblings={this.noActiveSiblings(this.props)}
           ref={this.elem}
           expandCollapseAll={this.expandCollapseAll}
+          expandCollapseItems={this.expandCollapseItems}
           areAllItemsExpanded={areAllItemsExpanded}
         />
       );
@@ -427,6 +439,8 @@ export const collapserWrapper = (WrappedComponent) => {
       const { isOpenedInit } = props;
       selectors.allChildItemIds = () => nestedCollapserItemsRoot(state, props);
       selectors.childCollapsers = () => getCollapserCollapsersRoot(state)(id);
+      selectors.childItemIds = () => getImmediateChildItemsRoot(state)(id);
+      selectors.allChildItemsExpanded = () => collapserImmediateItemsExpandedRootEvery(state)(id);
       selectors.nodeTargetArray = () => getNodeTargetArrayRoot(state)(rootNodeId);
       selectors.unmountArray = () => getRootUnmountArrayRoot(state)(rootNodeId);
       selectors.setTreeIds = action => setTreeIdsRecursively(

@@ -144,13 +144,47 @@ class CommentThread extends PureComponent {
 
   /* ------------------- Event Handlers --------------------- */
 
-  handleOnClick = () => {
+  handlePointerDownTimeout = () => {
     this.props.expandCollapseAll();
+    if (this.pointerDownTimeoutId) {
+      clearTimeout(this.pointerDownTimeoutId);
+      this.pointerDownTimeoutId = null;
+    }
+  }
+
+  handleOnPointerDown = () => {
+    this.pointerDownTimeoutId = setTimeout(this.handlePointerDownTimeout, 150);
+  }
+
+  handleOnPointerUp = () => {
+    if (this.pointerDownTimeoutId) {
+      clearTimeout(this.pointerDownTimeoutId);
+      this.pointerDownTimeoutId = null;
+      this.props.expandCollapseItems();
+    }
+  }
+
+  handleOnClick = () => {
+    // this.props.expandCollapseItems();
+
+    // this.props.expandCollapseAll();
+  };
+
+  handleOnDoubleClick = () => {
+    // this.props.expandCollapseAll();
+
+    // this.props.expandCollapseItems();
   };
 
   handleKeyDown = (e) => {
     if (e.keyCode === 13) {
-      this.props.expandCollapseAll();
+      this.handleOnPointerDown();
+    }
+  }
+
+  handleKeyUp = (e) => {
+    if (e.keyCode === 13) {
+      this.handleOnPointerUp();
     }
   }
 
@@ -190,8 +224,12 @@ class CommentThread extends PureComponent {
         flexBasis={this.getFlexBasis(this.props)}
         backgroundRotation={this.getBackgroundRotation(this.props)}
         isRootNode={isRootNode}
-        onClick={this.handleOnClick}
+        onPointerDown={this.handleOnPointerDown}
+        onPointerUp={this.handleOnPointerUp}
+        // onClick={this.handleOnClick}
+        // onDoubleClick={this.handleOnDoubleClick}
         onKeyDown={this.handleKeyDown}
+        onKeyUp={this.handleKeyUp}
         ref={collapserRef}
         style={style}
       >

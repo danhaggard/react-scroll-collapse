@@ -39,9 +39,9 @@ export const collapserItemWrapper = (WrappedComponent) => {
       if (this.methods.scroller) {
         this.methods.scroller.scrollToTop(this.elem.current);
       }
+      addToNodeTargetArray(this.parentCollapserId, this.rootNodes.collapser, true);
       expandCollapse(this.id, this.parentCollapserId);
-      addToNodeTargetArray(this.parentCollapserId, this.rootNodes.collapser);
-      this.methods.collapser.initiateTreeStateCheck();
+      this.methods.collapser.initiateTreeStateCheck(false, false);
     };
 
     render() {
