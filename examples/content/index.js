@@ -88,9 +88,9 @@ const example4 = key => (
 
 
 const generateThreadConfig = {
-  minChildren: 4,
+  minChildren: 3,
   minDepth: 4,
-  maxChildren: 4,
+  maxChildren: 3,
   maxDepth: 4,
 };
 

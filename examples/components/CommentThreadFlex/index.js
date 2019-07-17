@@ -100,29 +100,43 @@ class CommentThread extends PureComponent {
     }
   );
 
-  getFlexBasis = ({ isActiveSibling, noActiveSiblings }) => {
+  getFlexBasis = ({ isActiveSibling, noActiveSiblings, collapserRef }) => {
+    const { depth } = this.state;
     if (isActiveSibling) {
+      return 0.55;
+    }
+    if (noActiveSiblings && depth < 4) {
+      return 0.25;
+    }
+    if (noActiveSiblings && depth >= 4) {
       return 0.65;
     }
-    if (noActiveSiblings) {
-      return 0.25;
+    if (depth >= 3) {
+      return 0;
     }
     return 0.15;
   }
 
   getBackgroundRotation = ({ isActiveSibling, noActiveSiblings, areAllItemsExpanded }) => {
+    const { depth } = this.state;
+
+    let direction = 1;
     /*
+    if (depth % 2 !== 0) {
+      direction = 1;
+    }
+
     if (areAllItemsExpanded && isActiveSibling) {
-      return 45 + (this.state.depth * 180);
+      return direction * (45 + (depth * 180));
     }
     if (areAllItemsExpanded && noActiveSiblings) {
-      return 45 + (this.state.depth * 180);
+      return direction * (45 + (depth * 180));
     }
     if (areAllItemsExpanded && !isActiveSibling) {
-      return 225 + (this.state.depth * 180);
+      return direction * (135 + (depth * 180));
     }
     */
-    return 225 + (this.state.depth * 180);
+    return direction * (135 + (depth * 180));
   }
 
   /* ------------------- END - Style / Content - Management - END --------------------- */

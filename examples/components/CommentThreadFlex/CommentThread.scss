@@ -12,7 +12,13 @@
 
   border: 1px solid #AAA;
   border-radius: 1em;
-  background: linear-gradient(225deg, #ddffab, #abe4ff, #d9abff);
+  // purple light: #eedaff  - dark #d9abff
+  // background: linear-gradient(225deg, #f4e7ff, #d9abff);
+  // background: linear-gradient(225deg, #d9abff, #e5c7ff 45% 55%, #d9abff);
+
+  background: linear-gradient(225deg, #abe4ff, #d2f0ff 45% 55%, #abe4ff);
+
+  // background: linear-gradient(225deg, #ddffab, #abe4ff, #d9abff);
   min-width: fit-content;
   min-width: -moz-fit-content;
   margin: 0.5em 0.2em;

@@ -18,7 +18,7 @@ const StaticChild = React.forwardRef(({
 }, ref) => (
   <div
     className={className}
-    onClick={onClick}
+    onDoubleClick={onClick}
     ref={ref}
     style={style}
     role="button"
@@ -225,7 +225,11 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
 
   calcPixels = percentage => (percentage * this.parentWidth);
 
-  getBackgroundString = val => `linear-gradient(${val}deg, #ddffab, #abe4ff, #d9abff)`
+  // getBackgroundString = val => `linear-gradient(${val}deg, #ddffab, #abe4ff, #d9abff)`
+  // getBackgroundString = val => `linear-gradient(${val}deg, #d9abff, #e5c7ff 45% 55%, #d9abff)`
+
+  getBackgroundString = val => `linear-gradient(${val}deg, #abe4ff, #d2f0ff 45% 55%, #abe4ff)`
+
 
   getFlexBasisString = pixelInt => `1 1 ${pixelInt}px`;
 

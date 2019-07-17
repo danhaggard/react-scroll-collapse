@@ -48,10 +48,8 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
       } = this.props;
 
       let { providerMotionStyle: { needsReset, y } } = this.props; // eslint-disable-line prefer-const, max-len
-      console.log('ScrollerMotion y, this.prevY', y, this.prevY);
 
       if (needsReset) {
-        console.log('ScrollerMotion needsReset');
         this.prevY = y;
         return { y };
       }
@@ -66,7 +64,6 @@ const scrollerMotionWrapper = (ScrollerComponent) => {
       }
 
       if (typeof scrollTo === 'number') {
-        console.log('ScrollerMotion, scrollTo', scrollTo);
         y = scrollTo;
       } else {
         y += scrollOffset;

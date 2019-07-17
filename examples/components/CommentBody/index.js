@@ -4,9 +4,9 @@ import PropTypes from 'prop-types';
 import styles from './CommentBody.scss';
 
 const CommentBody = (props) => {
-  const { text } = props;
+  const { isOpened, onClick, text } = props;
   return (
-    <div className={styles.commentBody}>
+    <div tabIndex={isOpened ? 0 : undefined} role="button" onClick={onClick} className={styles.commentBody}>
       {text}
     </div>
   );

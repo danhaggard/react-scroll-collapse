@@ -17,12 +17,17 @@ const Comment = (props) => {
   const {
     children,
     collapserItemRef,
+    expandCollapse,
     isOpened,
     _reactScrollCollapse: { id },
   } = props;
   let { text } = props;
   const idStr = id.toString();
   text = `Collapser Item ${idStr}: --- ${text}`;
+  const onClick = (e) => {
+    e.stopPropagation();
+    expandCollapse();
+  };
   return (
     <div className={styles.comment} ref={collapserItemRef}>
       <Collapse
@@ -31,7 +36,7 @@ const Comment = (props) => {
       >
         <div className={styles.commentChildren}>
           { children }
-          <CommentBody text={text} />
+          <CommentBody isOpened={isOpened} text={text} onClick={onClick} />
         </div>
       </Collapse>
     </div>

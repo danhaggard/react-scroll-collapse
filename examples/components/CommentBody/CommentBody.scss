@@ -3,4 +3,13 @@
   //background: linear-gradient(225deg, #ddffab, #abe4ff, #d9abff);
   //-webkit-background-clip: text;
   //-webkit-text-fill-color: transparent;
+  background-color: transparent;
+  transition: background-color 150ms ease-in-out;
+  padding: 1em;
+  border-radius: 1em;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, .3);
+    transition: background-color 150ms ease-in-out;
+  }
 }
