@@ -8,14 +8,16 @@ import AnimatedFlexbox from '../../../src/components/AnimatedFlexbox';
 import { collapserController } from '../../../src';
 import { ofBoolTypeOrNothing, ofChildrenType, ofNumberTypeOrNothing } from '../../../src/utils/propTypeHelpers';
 import { getRandomInt } from '../../../src/utils/randomUtils';
-import { insertAtIndex, loopArrayIndex, removeFromArray } from '../../../src/utils/arrayUtils';
+import { insertAtIndex, loopArrayIndex, removeFromArray, mapFromNumber } from '../../../src/utils/arrayUtils';
 import { generateCommentThreadData } from '../../../src/utils/randomContentGenerators';
 import styles from './CommentThread.scss';
 
 
 class CommentThread extends PureComponent {
 
-  buttonStyle = { order: -5 };
+  buttonStyle = { order: -2 };
+
+  commentStyle = { order: -1 };
 
   totalAddedChildren = 0;
 
@@ -38,6 +40,7 @@ class CommentThread extends PureComponent {
       maxChildren,
       maxDepth,
       showControls: false,
+      flexOrder: mapFromNumber(children.length, n => ({ order: n })),
     };
   }
 
@@ -176,7 +179,12 @@ class CommentThread extends PureComponent {
     // this.props.expandCollapseItems();
   };
 
+  /*
+    right: 39
+    left: 37
+  */
   handleKeyDown = (e) => {
+    // console.log('e.keyCode', e.keyCode);
     if (e.keyCode === 13) {
       this.handleOnPointerDown();
     }
@@ -198,7 +206,7 @@ class CommentThread extends PureComponent {
     const {
       setActiveChildLimit,
       areAllItemsExpanded,
-      children,
+      // children,
       childIsOpenedInit,
       collapserRef,
       _reactScrollCollapse: { id: collapserId, isRootNode },
@@ -215,7 +223,8 @@ class CommentThread extends PureComponent {
       comment,
       localChildren,
       showControls,
-      title
+      title,
+      flexOrder,
     } = this.state;
     return (
       <AnimatedFlexbox
@@ -254,9 +263,10 @@ class CommentThread extends PureComponent {
           showInsertForm={showControls}
           tabFocusButtons={areAllItemsExpanded}
           text={comment}
+          style={this.commentStyle}
         />
         {
-          localChildren.length > 0 && localChildren.map(childNodeData => (
+          localChildren.length > 0 && localChildren.map((childNodeData, index) => (
             <WrappedCommentThread
               setActiveChildLimit={setActiveChildLimit}
               isOpenedInit={childIsOpenedInit}
@@ -264,6 +274,7 @@ class CommentThread extends PureComponent {
               key={childNodeData.key}
               nodeData={childNodeData}
               childInsertionIndex={childInsertionIndex}
+              style={flexOrder[index]}
               {...{
                 minChildren,
                 minDepth,

@@ -111,6 +111,28 @@ export const removeFromArray = (array, index = 0) => {
   return [...array.slice(0, index), ...array.slice(index + 1, length)];
 };
 
+export const rotateArray = (array, amount) => {
+  // let array =[0, 1, 2, 3, 4];
+  // let amount = 2;
+  const { length } = array;
+  if (amount >= 0) {
+    return [...array.slice(amount, length), ...array.slice(0, amount)];
+  }
+
+  let countDown = amount;
+  let countUp = 1;
+  const newArray = [];
+  while (countDown) {
+    newArray.push(array[length - countUp]);
+    countDown -= 1;
+    countUp += 1;
+  }
+  if (amount < length) {
+    newArray.push(...array.slice(0, length - amount));
+  }
+  return newArray;
+};
+
 // from: https://stackoverflow.com/a/1063027
 export const sortArrayAscending = array => array.sort((a, b) => a - b);
 

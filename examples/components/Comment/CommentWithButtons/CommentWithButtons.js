@@ -45,10 +45,12 @@ const CommentWithButtons = ({
   setChildInsertionConfig,
   showControls,
   showInsertForm,
+  style,
   tabFocusButtons,
-  text
+  text,
 }) => (
   <Comment
+    style={style}
     text={text}
   >
     {
@@ -94,6 +96,7 @@ CommentWithButtons.defaultProps = {
   setChildInsertionConfig: () => null,
   showControls: false,
   showInsertForm: false,
+  style: {},
   tabFocusButtons: true, // controls whether or not child buttons can be focused.
 };
 
@@ -109,6 +112,7 @@ CommentWithButtons.propTypes = {
   setChildInsertionConfig: PropTypes.func,
   showControls: PropTypes.bool,
   showInsertForm: PropTypes.bool,
+  style: PropTypes.object,
   tabFocusButtons: PropTypes.bool,
   text: PropTypes.string.isRequired,
 };

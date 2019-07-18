@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { presets } from 'react-motion';
 import { Collapse } from 'react-collapse';
 // import { UnmountClosed as Collapse } from 'react-collapse';
 
@@ -19,6 +18,7 @@ const Comment = (props) => {
     collapserItemRef,
     expandCollapse,
     isOpened,
+    style,
     _reactScrollCollapse: { id },
   } = props;
   let { text } = props;
@@ -34,7 +34,7 @@ const Comment = (props) => {
     }
   };
   return (
-    <div className={styles.comment} ref={collapserItemRef}>
+    <div className={styles.comment} ref={collapserItemRef} style={style}>
       <Collapse
         isOpened={isOpened}
         springConfig={DEFAULT_MOTION_SPRING}
@@ -55,13 +55,16 @@ const Comment = (props) => {
 
 Comment.defaultProps = {
   children: null,
+  style: {},
 };
 
 Comment.propTypes = {
   _reactScrollCollapse: PropTypes.object.isRequired,
   children: ofChildrenTypeOrNothing,
   collapserItemRef: PropTypes.object.isRequired, // provided by collapserItemController
+  expandCollapse: PropTypes.func.isRequired,
   isOpened: PropTypes.bool.isRequired, // provided by collapserItemController
+  style: PropTypes.object,
   text: PropTypes.string.isRequired,
 };
 

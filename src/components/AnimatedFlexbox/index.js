@@ -316,6 +316,7 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
     Remember stopping propagation can break things above.
   */
   handleKeyBase = handler => (e) => {
+    console.log('e.keyCode', e.keyCode);
     if (e.keyCode === 13) {
       e.stopPropagation();
       handler(e);
