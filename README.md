@@ -12,6 +12,10 @@
   in a separate dispatch instead of together as an array.  But there
   are still bugs.
 
+3) onKeyUp handler doesn't seem to be registering for the root node.  Pressing
+  enter while focused on the root node expands/collapses all nested.  While
+  doing the same on child nodes expands/collapses immediate child items.
+
 Example Component Audit:
 
 components/Example

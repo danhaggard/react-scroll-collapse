@@ -279,6 +279,12 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
     width: this.getWidthStringPer(width)
   });
 
+  getInterpolWidthRotationTranspose = ({ background, left, width }) => ({
+    background: this.getBackgroundString(background),
+    left: this.getWidthStringPer(left),
+    width: this.getWidthStringPer(width)
+  });
+
   getParentWidth = (refresh = false) => {
     if (!this.parentWidth || refresh) {
       this.parentWidth = this.parentNode ? this.parentNode.clientWidth : 500;
@@ -289,9 +295,10 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
   getSpringConfig = () => this.defaultSpringConfig;
 
   getMotionStyle = () => {
-    const { backgroundRotation, flexBasis } = this.props;
+    const { backgroundRotation, flexBasis, transposeLeft } = this.props;
     const motionStyle = {
       background: spring(backgroundRotation, this.getSpringConfig()),
+      left: spring(transposeLeft, this.getSpringConfig()),
       width: spring(flexBasis, this.getSpringConfig())
     };
     return motionStyle;
@@ -316,8 +323,12 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
     Remember stopping propagation can break things above.
   */
   handleKeyBase = handler => (e) => {
-    console.log('e.keyCode', e.keyCode);
-    if (e.keyCode === 13) {
+    const { keyCode } = e;
+    if (keyCode === 39 || keyCode === 37) {
+      e.stopPropagation();
+      handler(e);
+    }
+    if (keyCode === 13) {
       e.stopPropagation();
       handler(e);
     }
@@ -400,8 +411,11 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
       className,
       flexRef,
       isRootNode,
+      renderChildren,
       style
     } = this.props;
+    console.log(`id: ${this.props.id}, transposeLeft: ${this.props.transposeLeft}`);
+
     const { style: stateStyle } = this.state;
     return !isRootNode ? (
       <PureFlexMotion
@@ -409,7 +423,7 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
         // onPointerLeave={this.pointerLeave}
         // onPointerOver={this.pointerOver}
         className={className}
-        getInterpolatedStyle={this.getInterpolWidthRotation}
+        getInterpolatedStyle={this.getInterpolWidthRotationTranspose}
         motionStyle={this.getMotionStyle()}
         // onClick={this.handleOnClick}
         // onDoubleClick={this.handleOnDoubleClick}
@@ -420,7 +434,7 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
         ref={flexRef}
         style={{ ...style, ...stateStyle }}
       >
-        { children }
+        { renderChildren ? renderChildren(children) : children }
       </PureFlexMotion>
     ) : (
       <PureStaticChild
@@ -432,7 +446,7 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
         ref={flexRef}
         style={style}
       >
-        { children }
+        { renderChildren ? renderChildren(children) : children  }
       </PureStaticChild>
     );
 
@@ -445,6 +459,7 @@ AnimatedFlexbox.defaultProps = {
   flexBasis: 0.15,
   onClick: null,
   onKeyDown: null,
+  renderChildren: null,
   style: {},
 };
 
@@ -457,6 +472,7 @@ AnimatedFlexbox.propTypes = {
   className: PropTypes.string,
   flexBasis: PropTypes.number,
   flexRef: PropTypes.object.isRequired,
+  renderChildren: ofFuncTypeOrNothing,
   style: PropTypes.object,
 };
 

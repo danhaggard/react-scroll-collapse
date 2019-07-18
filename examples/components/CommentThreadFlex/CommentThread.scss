@@ -6,6 +6,7 @@
   align-items: flex-start;
   display: flex;
   flex: 1 1 auto;
+  // flex: 1 0 33%;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: flex-start;
@@ -24,6 +25,7 @@
   margin: 0.5em 0.2em;
   margin-left: 1.5em;
   padding: 0.5em;
+  overflow: hidden;
   cursor: pointer;
 
 
@@ -36,10 +38,14 @@
 }
 
 :local(.expanded) {
-  min-width: min-content;
+  // min-width: min-content;
   background: linear-gradient(45deg, #ddffab, #abe4ff, #d9abff);
 }
 
 :local(.noChildren) {
   //padding-bottom: 1em;
+}
+
+:local(.wrapper) {
+  width: 164.5%;
 }

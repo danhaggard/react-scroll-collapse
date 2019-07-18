@@ -111,15 +111,26 @@ export const removeFromArray = (array, index = 0) => {
   return [...array.slice(0, index), ...array.slice(index + 1, length)];
 };
 
-export const rotateArray = (array, amount) => {
-  // let array =[0, 1, 2, 3, 4];
-  // let amount = 2;
+/*
+  e.g.
+  x = 8, y = 5, z = 3;
+  x = -8, y = 5, z = -3;
+*/
+export const wrapXaroundY = (x, y) => {
+  let z = x > y ? x % y : x;
+  z = z < 0 && z * -1 > y ? z % y : z;
+  return z;
+};
+
+export const rotateArray = (array, amountArg) => {
   const { length } = array;
+  const amount = wrapXaroundY(amountArg, length);
+  // let amount = amountArg > length ? amountArg % length : amountArg;
+  // amount = amount < 0 && amount * -1 > length ? amount % length : amount;
   if (amount >= 0) {
     return [...array.slice(amount, length), ...array.slice(0, amount)];
   }
-
-  let countDown = amount;
+  let countDown = -amount;
   let countUp = 1;
   const newArray = [];
   while (countDown) {
@@ -128,7 +139,7 @@ export const rotateArray = (array, amount) => {
     countUp += 1;
   }
   if (amount < length) {
-    newArray.push(...array.slice(0, length - amount));
+    newArray.push(...array.slice(0, length + amount));
   }
   return newArray;
 };

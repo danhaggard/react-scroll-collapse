@@ -99,13 +99,10 @@ const recurseToNodeArray = (argsObj) => {
       we can save results along the way.
   */
   const currentNodeId = currentNodeIdObj.id;
-  debugger;
+
   const cachedValue = cache.getResultValue(currentNodeId);
   const cachedSources = cache.getResultSources(currentNodeId);
 
-  if (currentNodeId === 14) {
-    debugger;
-  }
 
   if (setTreeId && currentNodeId === rootNodeId) {
     counter.resetCounter();
