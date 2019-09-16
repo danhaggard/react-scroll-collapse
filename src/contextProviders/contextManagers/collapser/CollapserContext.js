@@ -216,16 +216,7 @@ const collapserContext = (Base) => {
 
     /* end former collapserManager methods */
 
-    // onFlexRest = () => this.onFlexRestRegistry.forEach(subscriber => subscriber());
-    onFlexRest = () => {
-      const {
-        _reactScrollCollapse: { id },
-        // _reactScrollCollapseParents: { collapser }
-      } = this.props;
-      // console.log(`onFlexRest called id: ${id}, registry: `, this.onFlexRestRegistry.getRegistry());
-      // this.checkIfActiveSibling()
-      this.onFlexRestRegistry.forEach(subscriber => subscriber());
-    }
+    onFlexRest = () => this.onFlexRestRegistry.forEach(subscriber => subscriber());
 
     addToOnFlexRest = this.onFlexRestRegistry.add;
 

@@ -13,7 +13,6 @@ import {
   loopArrayIndex,
   removeFromArray,
   mapFromNumber,
-  rotateArray,
   wrapXaroundY,
 } from '../../../src/utils/arrayUtils';
 import { generateCommentThreadData } from '../../../src/utils/randomContentGenerators';
@@ -27,6 +26,8 @@ class CommentThread extends PureComponent {
   commentStyle = { order: -1 };
 
   totalAddedChildren = 0;
+
+  transposeBase = 0.3333
 
   constructor(props, context) {
     super(props, context);
@@ -50,11 +51,11 @@ class CommentThread extends PureComponent {
       // flexOrder: mapFromNumber(children.length, n => ({ order: n, position: 'relative' })),
       flexOrder: mapFromNumber(children.length, () => ({ position: 'relative' })),
 
-      transposeStyle: {
-        left: 0,
-      },
       transposing: false,
       childTranspositionCount: 0,
+      selfTranspositionCount: 0,
+      hasFocus: false,
+      focusStyle: {},
     };
   }
 
@@ -82,7 +83,6 @@ class CommentThread extends PureComponent {
       ...rest,
     })
   );
-
 
   setChildInsertionIndex = val => this.setState(
     ({ localChildren }) => ({ childInsertionIndex: loopArrayIndex(localChildren, val) })
@@ -128,27 +128,25 @@ class CommentThread extends PureComponent {
     }
   );
 
-  getFlexBasis = ({ isActiveSibling, noActiveSiblings, collapserRef }) => {
-    const { depth } = this.state;
+  getFlexBasis = ({ isActiveSibling, noActiveSiblings }) => {
     if (isActiveSibling) {
-      return 0.55;
-    }
-    if (noActiveSiblings && depth < 4) {
-      return 0.25;
-    }
-    if (noActiveSiblings && depth >= 4) {
       return 0.65;
     }
-    if (depth >= 3) {
-      return 0;
+
+    if (noActiveSiblings) {
+      return 0.33;
     }
-    return 0.15;
+
+    if (!isActiveSibling) {
+      return 0.25;
+    }
+    return 1;
   }
 
   getBackgroundRotation = ({ isActiveSibling, noActiveSiblings, areAllItemsExpanded }) => {
     const { depth } = this.state;
 
-    let direction = 1;
+    const direction = 1;
     /*
     if (depth % 2 !== 0) {
       direction = 1;
@@ -167,13 +165,29 @@ class CommentThread extends PureComponent {
     return direction * (135 + (depth * 180));
   }
 
-  setTransposeStyle = (directionMultiple, base = 0.3333) => {
+  getTransposeStyle = () => {
+    const { childTranspositionCount } = this.state;
+    const transposeMultiple = this.transposeBase * childTranspositionCount;
+    return { left: transposeMultiple };
+  }
+
+  setChildTranspositionCount = directionMultiple => this.setState(
+    ({ childTranspositionCount, localChildren: { length } }) => {
+      const nextTranspositionCount = wrapXaroundY(
+        childTranspositionCount + directionMultiple, length
+      );
+      return { childTranspositionCount: nextTranspositionCount };
+    }
+  );
+
+  /*
+  setTransposeStyle = (directionMultiple) => {
     const { childTranspositionCount, flexOrder, transposeStyle } = this.state;
     const { length } = flexOrder;
     const wrappedTranspositionCount = wrapXaroundY(
       childTranspositionCount + directionMultiple, length
     );
-    const baseMultiple = base * wrappedTranspositionCount;
+    const baseMultiple = this.transposeBase * wrappedTranspositionCount;
     if (transposeStyle.left !== baseMultiple) {
       this.setState(() => ({
         childTranspositionCount: wrappedTranspositionCount,
@@ -182,86 +196,14 @@ class CommentThread extends PureComponent {
       }));
     }
   }
-
-  /* ------------------- END - Style / Content - Management - END --------------------- */
-
-  getFlexWrapper = children => (
-    <div
-      className={styles.wrapper}
-      style={{
-        // overflow: 'hidden',
-      }}>
-      <div style={{
-        display: 'flex',
-        // flexWrap: 'nowrap',
-        flexDirection: 'row',
-        // minWidth: 'fit-content',
-        width: `${this.getFlexBasis(this.props)}%`
-      }}>
-        { children }
-      </div>
-    </div>
-
-  );
-  /*
-  getFlexWrapper = children => (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: '33.33% 33.33% 33.33%',
-      gridAutoFlow: 'column',
-      overflow: 'auto',
-    }}>
-      { children }
-    </div>
-  );
   */
-
-  renderTransposedChildren = (children) => {
-    const { childTranspositionCount, transposing } = this.state;
-
-    try {
-      React.Children.only(children);
-      return children;
-    } catch {
-      const childArray = React.Children.toArray(children);
-      const insertArray = childArray.slice(2, childArray.length);
-      const insertArrayLength = insertArray.length;
-      const headArray = childArray.slice(0, 2);
-      /*
-      const insertIndex = childTranspositionCount > 0 ? 0 : insertArrayLength;
-      const copyIndex = insertArrayLength - wrapXaroundY(
-        childTranspositionCount, insertArrayLength
-      );
-      */
-      console.log('insertArray', insertArray);
-      let cloneA;
-      let cloneB;
-      if (insertArrayLength > 0) {
-        cloneA = [{ ...insertArray[0], key: `${insertArray[0].key}-copy` }];
-        cloneB = [{ ...insertArray[insertArrayLength - 1], key: `${insertArray[insertArrayLength - 1].key}-copy` }];
-      } else {
-        cloneA = [];
-        cloneB = [];
-      }
-
-      /*
-      const cloneA = React.cloneElement(insertArray[0], [{ key: `${insertArray[0].key}-copy` }]);
-      const cloneB = React.cloneElement(
-        insertArray[insertArrayLength - 1], [{ key: `${insertArray[insertArrayLength - 1].key}-copy` }]
-      );
-      */
-      // insertArray = insertAtIndex(insertArray, clone, insertIndex);
-      const finalArray = [...headArray, this.getFlexWrapper([...cloneA, ...insertArray, ...cloneB])];
-      console.log('children, childArray, insertArray, headArray, finalArray', children, childArray, insertArray, headArray, finalArray);
-      return finalArray;
-    }
-  }
+  /* ------------------- END - Style / Content - Management - END --------------------- */
 
 
   /* ------------------- Event Handlers --------------------- */
 
   handlePointerDownTimeout = () => {
-    this.props.expandCollapseAll();
+    this.props.expandCollapseItems();
     if (this.pointerDownTimeoutId) {
       clearTimeout(this.pointerDownTimeoutId);
       this.pointerDownTimeoutId = null;
@@ -276,38 +218,22 @@ class CommentThread extends PureComponent {
     if (this.pointerDownTimeoutId) {
       clearTimeout(this.pointerDownTimeoutId);
       this.pointerDownTimeoutId = null;
-      this.props.expandCollapseItems();
+      this.props.expandCollapseAll();
     }
   }
 
-  handleOnClick = () => {
-    // this.props.expandCollapseItems();
-
-    // this.props.expandCollapseAll();
-  };
-
-  handleOnDoubleClick = () => {
-    // this.props.expandCollapseAll();
-
-    // this.props.expandCollapseItems();
-  };
-
-  /*
-    right: 39
-    left: 37
-  */
   handleShiftOrder = (keyCode) => {
     let direction = 0;
-    if (keyCode === 39) {
+    if (keyCode === 39) { // right arrow key
       direction = 1;
     }
 
-    if (keyCode === 37) {
+    if (keyCode === 37) { // left arrow key
       direction = -1;
     }
     if (direction !== 0) {
       // this.setState(({ flexOrder }) => ({ flexOrder: rotateArray(flexOrder, direction) }));
-      this.setTransposeStyle(direction);
+      this.setChildTranspositionCount(direction);
     }
   }
 
@@ -330,6 +256,27 @@ class CommentThread extends PureComponent {
 
   /* to prevent renders from recreating the style obj everytime */
   // styleObj = { ...this.props.style, zIndex: `${0 - this.state.branch}` };
+
+  handleOnFocus = () => {
+    const { distanceFromCenterSibling, _reactScrollCollapse: { id } } = this.props;
+    console.log(`id: ${id} distanceFromCenterSibling: ${distanceFromCenterSibling}, transpose: ${distanceFromCenterSibling * this.transposeBase}`);
+    const newStyle = { left: distanceFromCenterSibling * this.transposeBase };
+    newStyle.flexWrap = 'nowrap';
+    this.setState(() => ({
+      focusStyle: newStyle,
+      hasFocus: true,
+      selfTranspositionCount: distanceFromCenterSibling,
+    }));
+  }
+
+  handleOnBlur = () => {
+    this.setState(() => ({
+      focusStyle: {},
+      childTranspositionCount: 0,
+      hasFocus: false,
+      // transposeStyle: { left: 0 },
+    }));
+  }
 
   render() {
     const {
@@ -354,21 +301,22 @@ class CommentThread extends PureComponent {
       localChildren,
       showControls,
       title,
-      flexOrder,
-      transposeStyle: { left: transposeLeftState },
+      // transposeStyle: { left: transposeLeftState },
+      focusStyle,
+      selfTranspositionCount,
+      hasFocus,
     } = this.state;
     // console.log(`id: ${collapserId}, flexOrder: [${flexOrder.map(obj => JSON.stringify(obj))}]`);
-    const newStyle = { ...style };
-    if (collapserId === 0) {
-      newStyle.width = '85vw';
-    }
+    const finalTransposeLeft = hasFocus ? selfTranspositionCount * this.transposeBase
+      : transposeLeft;
     return (
       <AnimatedFlexbox
-        className={this.getClassName(this.props)}
+        // className={this.getClassName(this.props)}
+        className={styles.col}
         id={collapserId}
         flexBasis={this.getFlexBasis(this.props)}
         backgroundRotation={this.getBackgroundRotation(this.props)}
-        transposeLeft={transposeLeft}
+        transposeLeft={finalTransposeLeft}
         isRootNode={isRootNode}
         onPointerDown={this.handleOnPointerDown}
         onPointerUp={this.handleOnPointerUp}
@@ -379,51 +327,56 @@ class CommentThread extends PureComponent {
         ref={collapserRef}
         // renderChildren={this.renderTransposedChildren}
         style={style}
+        onFocus={this.handleOnFocus}
+        onBlur={this.handleOnBlur}
       >
-        <ExpandButton
-          isOpened={areAllItemsExpanded}
-          onHamburgerClick={this.toggleControls}
-          style={this.buttonStyle}
-          title={this.appendTitle(collapserId, title)}
-        />
-        <CommentWithButtons
-          addToThread={this.insertThread}
-          childInsertionIndex={childInsertionIndex}
-          minChildren={minChildren}
-          maxChildren={maxChildren}
-          minDepth={minDepth}
-          maxDepth={maxDepth}
-          setChildInsertionConfig={this.setChildInsertionConfig}
-          childThreads={localChildren.length}
-          deleteThread={this.removeThread}
-          isOpenedInit={isOpenedInit}
-          showControls={showControls}
-          showInsertForm={showControls}
-          tabFocusButtons={areAllItemsExpanded}
-          text={comment}
-          style={this.commentStyle}
-        />
-        {
-          localChildren.length > 0 && localChildren.map((childNodeData, index) => (
-            <WrappedCommentThread
-              transposeLeft={transposeLeftState}
-              setActiveChildLimit={setActiveChildLimit}
-              isOpenedInit={childIsOpenedInit}
-              childIsOpenedInit={childIsOpenedInit}
-              key={childNodeData.key}
-              nodeData={childNodeData}
-              childInsertionIndex={childInsertionIndex}
-              style={this.getChildStyle()}
-              // style={flexOrder[index]}
-              {...{
-                minChildren,
-                minDepth,
-                maxChildren,
-                maxDepth,
-              }}
-            />
-          ))
-        }
+        <div className={styles.innerCol}>
+          <ExpandButton
+            isOpened={areAllItemsExpanded}
+            onHamburgerClick={this.toggleControls}
+            style={this.buttonStyle}
+            title={this.appendTitle(collapserId, title)}
+          />
+          <CommentWithButtons
+            addToThread={this.insertThread}
+            childInsertionIndex={childInsertionIndex}
+            minChildren={minChildren}
+            maxChildren={maxChildren}
+            minDepth={minDepth}
+            maxDepth={maxDepth}
+            setChildInsertionConfig={this.setChildInsertionConfig}
+            childThreads={localChildren.length}
+            deleteThread={this.removeThread}
+            isOpenedInit={isOpenedInit}
+            showControls={showControls}
+            showInsertForm={showControls}
+            tabFocusButtons={areAllItemsExpanded}
+            text={comment}
+            style={this.commentStyle}
+          />
+        </div>
+        <div className={styles.commentThread} style={focusStyle}>
+          {
+            localChildren.length > 0 && localChildren.map(childNodeData => (
+              <WrappedCommentThread
+                transposeLeft={this.getTransposeStyle().left}
+                setActiveChildLimit={setActiveChildLimit}
+                isOpenedInit={childIsOpenedInit}
+                childIsOpenedInit={childIsOpenedInit}
+                key={childNodeData.key}
+                nodeData={childNodeData}
+                childInsertionIndex={childInsertionIndex}
+                style={this.getChildStyle()}
+                {...{
+                  minChildren,
+                  minDepth,
+                  maxChildren,
+                  maxDepth,
+                }}
+              />
+            ))
+          }
+        </div>
       </AnimatedFlexbox>
     );
   }
@@ -450,6 +403,7 @@ CommentThread.propTypes = {
   childIsOpenedInit: PropTypes.bool,
   collapserRef: PropTypes.object.isRequired,
   expandCollapseAll: PropTypes.func.isRequired,
+  expandCollapseItems: PropTypes.func.isRequired,
   childInsertionIndex: ofNumberTypeOrNothing,
   isOpenedInit: PropTypes.bool,
   nodeData: PropTypes.object.isRequired,
@@ -465,7 +419,7 @@ CommentThread.propTypes = {
 
 CommentThread.whyDidYouRender = {
   logOnDifferentValues: false,
-  customName: 'CommentThreadPerf'
+  customName: 'CommentThread'
 };
 
 const WrappedCommentThread = collapserController(CommentThread);

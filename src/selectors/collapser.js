@@ -7,6 +7,7 @@ import {
   getOrNull,
   passArgsToIteratorEvery,
 } from '../utils/selectorUtils';
+import { getDistanceFromCenter } from '../utils/arrayUtils';
 import { getEntitiesRoot } from './common';
 
 import { getItemExpanded, getItemRoot } from './collapserItem';
@@ -95,6 +96,16 @@ export const collapserItemsExpandedRootEvery = passArgsToIteratorEvery(
   getItemRoot
 );
 
+export const getCollapserSiblingDataRoot = rootState => parentId => (childId) => {
+  const siblings = getCollapserCollapsersRoot(rootState)(parentId);
+  const siblingIndex = siblings.indexOf(childId);
+  return {
+    count: siblings.length,
+    siblingIndex,
+    siblings,
+    distanceFromCenter: getDistanceFromCenter(siblings, siblingIndex, childId),
+  };
+};
 
 /*
   Used to set values below the target node as cheaply as possible.

@@ -1,16 +1,10 @@
 @import '../../style/settings/index';
 @import '../../style/tools/index';
 
-:local(.commentThread) {
-  align-content: start;
-  align-items: flex-start;
+:local(.col) {
   display: flex;
-  flex: 1 1 auto;
-  // flex: 1 0 33%;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-
+  flex-direction: column;
+  flex: 1 0 auto;
   border: 1px solid #AAA;
   border-radius: 1em;
   // purple light: #eedaff  - dark #d9abff
@@ -18,22 +12,51 @@
   // background: linear-gradient(225deg, #d9abff, #e5c7ff 45% 55%, #d9abff);
 
   background: linear-gradient(225deg, #abe4ff, #d2f0ff 45% 55%, #abe4ff);
+  // min-width: fit-content;
+  // min-width: -moz-fit-content;
+  //margin: 0.5em 0.2em;
+  //margin-left: 1.5em;
+  //padding: 0.5em;
+  overflow: hidden;
+  margin: 0 1em 1em 1em;
 
-  // background: linear-gradient(225deg, #ddffab, #abe4ff, #d9abff);
+  cursor: pointer;
+}
+
+:local(.innerCol) {
+  flex-direction: column;
+  padding: 1.5em 1.5em 0 1.5em;
+}
+
+:local(.commentThread) {
+  align-content: start;
+  align-items: flex-start;
+  display: flex;
+  flex: 1 1 33%;
+  // flex: 1 0 33%;
+  overflow: hidden;
+  flex-direction: row;
+  flex-wrap: wrap;
+  // justify-content: space-around;
   min-width: fit-content;
   min-width: -moz-fit-content;
-  margin: 0.5em 0.2em;
-  margin-left: 1.5em;
-  padding: 0.5em;
-  overflow: hidden;
-  cursor: pointer;
+  //border: 1px solid #AAA;
+  //border-radius: 1em;
+  // purple light: #eedaff  - dark #d9abff
+  // background: linear-gradient(225deg, #f4e7ff, #d9abff);
+  // background: linear-gradient(225deg, #d9abff, #e5c7ff 45% 55%, #d9abff);
+
+  //background: linear-gradient(225deg, #abe4ff, #d2f0ff 45% 55%, #abe4ff);
+
+  // background: linear-gradient(225deg, #ddffab, #abe4ff, #d9abff);
+
 
 
   @include respond-to(md) {
     border-radius: 1.5em;
     min-width: min-content;
     margin: 1.5em;
-    padding: 1.5em;
+    // padding: 1.5em;
   }
 }
 

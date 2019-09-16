@@ -16,6 +16,8 @@ const StaticChild = React.forwardRef(({
   onKeyUp,
   onPointerDown,
   onPointerUp,
+  onBlur,
+  onFocus,
   // onPointerEnter,
   // onPointerLeave,
   // onPointerOver,
@@ -24,6 +26,8 @@ const StaticChild = React.forwardRef(({
     className={className}
     onPointerDown={onPointerDown}
     onPointerUp={onPointerUp}
+    onBlur={onBlur}
+    onFocus={onFocus}
     // onClick={onClick}
     // onDoubleClick={onDoubleClick}
     ref={ref}
@@ -122,6 +126,8 @@ const FlexMotion = React.forwardRef(({ // eslint-disable-line
   onKeyDown,
   onKeyUp,
   onRest,
+  onBlur,
+  onFocus,
   // id,
   // onPointerEnter,
   // onPointerLeave,
@@ -156,7 +162,7 @@ const FlexMotion = React.forwardRef(({ // eslint-disable-line
             if (heightFixed) {
               // console.log(`id: ${id}, heightFixed`);
               context.contextMethods.collapser.onFlexRest();
-              finalOnRest = () => console.log('dummy on rest');
+              finalOnRest = () => null;
             }
           }
           const newStyle = {
@@ -177,6 +183,8 @@ const FlexMotion = React.forwardRef(({ // eslint-disable-line
             //  onPointerOver={onPointerOver}
               onKeyDown={onKeyDown}
               onKeyUp={onKeyUp}
+              onBlur={onBlur}
+              onFocus={onFocus}
 
             >
               { children }
@@ -411,10 +419,11 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
       className,
       flexRef,
       isRootNode,
-      renderChildren,
-      style
+      style,
+      onBlur,
+      onFocus,
     } = this.props;
-    console.log(`id: ${this.props.id}, transposeLeft: ${this.props.transposeLeft}`);
+    // console.log(`id: ${this.props.id}, transposeLeft: ${this.props.transposeLeft}`);
 
     const { style: stateStyle } = this.state;
     return !isRootNode ? (
@@ -433,8 +442,10 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
         onKeyUp={this.handleKeyUp}
         ref={flexRef}
         style={{ ...style, ...stateStyle }}
+        onBlur={onBlur}
+        onFocus={onFocus}
       >
-        { renderChildren ? renderChildren(children) : children }
+        { children }
       </PureFlexMotion>
     ) : (
       <PureStaticChild
@@ -445,8 +456,10 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
         onKeyDown={this.handleKeyDown}
         ref={flexRef}
         style={style}
+        onBlur={onBlur}
+        onFocus={onFocus}
       >
-        { renderChildren ? renderChildren(children) : children  }
+        { children }
       </PureStaticChild>
     );
 
@@ -457,23 +470,29 @@ AnimatedFlexbox.defaultProps = {
   children: [],
   className: '',
   flexBasis: 0.15,
+  onBlur: null,
   onClick: null,
+  onFocus: null,
   onKeyDown: null,
-  renderChildren: null,
+  onKeyUp: null,
   style: {},
+  transposeLeft: 0,
 };
 
 AnimatedFlexbox.propTypes = {
   backgroundRotation: PropTypes.number.isRequired,
   isRootNode: PropTypes.bool.isRequired,
+  onBlur: ofFuncTypeOrNothing,
   onClick: ofFuncTypeOrNothing,
+  onFocus: ofFuncTypeOrNothing,
   onKeyDown: ofFuncTypeOrNothing,
+  onKeyUp: ofFuncTypeOrNothing,
   children: ofChildrenType,
   className: PropTypes.string,
   flexBasis: PropTypes.number,
   flexRef: PropTypes.object.isRequired,
-  renderChildren: ofFuncTypeOrNothing,
   style: PropTypes.object,
+  transposeLeft: PropTypes.number,
 };
 
 AnimatedFlexbox.whyDidYouRender = {

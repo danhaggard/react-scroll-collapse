@@ -14,6 +14,7 @@ import {
   collapserImmediateItemsExpandedRootEvery,
   getImmediateChildItemsRoot,
   getCollapserCollapsersRoot,
+  getCollapserSiblingDataRoot,
   nestedCollapserItemsRoot,
   setTreeIdsRecursively,
 } from '../../selectors/collapser';
@@ -323,12 +324,15 @@ export const collapserWrapper = (WrappedComponent) => {
 
     render() {
       const { areAllItemsExpanded } = this.state;
+      const { selectors: { collapserSiblingData } } = this.props;
+      const siblingData = collapserSiblingData();
       const cleanProps = this.cleanProps(this.props);
       return (
         <WrappedComponentRef
           {...cleanProps}
           isActiveSibling={this.isActiveSibling(this.props)}
           noActiveSiblings={this.noActiveSiblings(this.props)}
+          distanceFromCenterSibling={siblingData.distanceFromCenter}
           ref={this.elem}
           expandCollapseAll={this.expandCollapseAll}
           expandCollapseItems={this.expandCollapseItems}
@@ -447,12 +451,19 @@ export const collapserWrapper = (WrappedComponent) => {
     let areAllItemsExpanded = null;
 
     return (state, props) => {
-      const { _reactScrollCollapse: { id, rootNodeId, methods: { collapser: { cache } } } } = props;
+      const { _reactScrollCollapse: {
+        id,
+        parents: { collapser: parentCollapserId },
+        rootNodeId,
+        methods: { collapser: { cache } }
+      } } = props;
       const { isOpenedInit } = props;
       selectors.allChildItemIds = () => nestedCollapserItemsRoot(state, props);
+      selectors.allChildItemsExpanded = () => collapserImmediateItemsExpandedRootEvery(state)(id);
       selectors.childCollapsers = () => getCollapserCollapsersRoot(state)(id);
       selectors.childItemIds = () => getImmediateChildItemsRoot(state)(id);
-      selectors.allChildItemsExpanded = () => collapserImmediateItemsExpandedRootEvery(state)(id);
+      selectors.collapserSiblingData = (
+      ) => getCollapserSiblingDataRoot(state)(parentCollapserId)(id);
       selectors.nodeTargetArray = () => getNodeTargetArrayRoot(state)(rootNodeId);
       selectors.unmountArray = () => getRootUnmountArrayRoot(state)(rootNodeId);
       selectors.setTreeIds = action => setTreeIdsRecursively(

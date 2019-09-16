@@ -117,16 +117,14 @@ export const removeFromArray = (array, index = 0) => {
   x = -8, y = 5, z = -3;
 */
 export const wrapXaroundY = (x, y) => {
-  let z = x > y ? x % y : x;
-  z = z < 0 && z * -1 > y ? z % y : z;
+  let z = x > y ? (x % y) - 1 : x;
+  z = z < 0 && z * -1 > y ? (z % y) + 1 : z;
   return z;
 };
 
 export const rotateArray = (array, amountArg) => {
   const { length } = array;
   const amount = wrapXaroundY(amountArg, length);
-  // let amount = amountArg > length ? amountArg % length : amountArg;
-  // amount = amount < 0 && amount * -1 > length ? amount % length : amount;
   if (amount >= 0) {
     return [...array.slice(amount, length), ...array.slice(0, amount)];
   }
@@ -142,6 +140,25 @@ export const rotateArray = (array, amountArg) => {
     newArray.push(...array.slice(0, length + amount));
   }
   return newArray;
+};
+
+export const getCenterIndex = (array) => {
+  const { length } = array;
+  if (length === 0 || length === 1) {
+    return 0;
+  }
+  const isEven = length % 2 === 0;
+  if (isEven) {
+    return (length / 2) - 1;
+  }
+
+  return Math.floor(length / 2);
+};
+
+export const getDistanceFromCenter = (array, index, id) => {
+  const centerIndex = getCenterIndex(array);
+  // console.log(`id: ${id}, index: ${index}, centerIndex: ${centerIndex}, centerDistance: ${centerIndex - index}, array: ${array}`);
+  return centerIndex - index;
 };
 
 // from: https://stackoverflow.com/a/1063027
