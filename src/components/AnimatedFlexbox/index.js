@@ -6,7 +6,8 @@ import { DEFAULT_MOTION_SPRING } from '../../const';
 import { ofChildrenType, ofFuncTypeOrNothing } from '../../utils/propTypeHelpers';
 import { CONTEXTS } from '../../contextProviders/constants';
 
-const StaticChild = React.forwardRef(({
+// const StaticChild = React.forwardRef();
+const StaticChild = ({
   children,
   className,
   // onClick,
@@ -40,15 +41,16 @@ const StaticChild = React.forwardRef(({
   >
     { children }
   </div>
-));
-
+);
 
 StaticChild.whyDidYouRender = {
   logOnDifferentValues: false,
   customName: 'StaticChild'
 };
 
-const PureStaticChild = React.memo(StaticChild);
+const RefStaticChild = React.forwardRef(StaticChild);
+
+const PureStaticChild = React.memo(RefStaticChild);
 
 const isHeightFixed = (ref, prevHeight, zeroHeightDiffArr = []) => {
   if (prevHeight === null && ref.current === null) {
@@ -110,7 +112,9 @@ const isHeightFixed = (ref, prevHeight, zeroHeightDiffArr = []) => {
   return [heightFixed, nextHeight, newHeightDiffArr];
 };
 
-const FlexMotion = React.forwardRef(({ // eslint-disable-line
+// const FlexMotion = React.forwardRef();
+
+const FlexMotion = ({ // eslint-disable-line
   className,
   children,
   getInterpolatedStyle,
@@ -186,7 +190,7 @@ const FlexMotion = React.forwardRef(({ // eslint-disable-line
       }
     </Motion>
   );
-});
+};
 
 FlexMotion.defaultProps = {
   children: [],
@@ -216,7 +220,9 @@ FlexMotion.whyDidYouRender = {
   customName: 'FlexMotion'
 };
 
-const PureFlexMotion = React.memo(FlexMotion);
+const RefFlexMotion = React.forwardRef(FlexMotion);
+
+const PureFlexMotion = React.memo(RefFlexMotion);
 
 class AnimatedFlexbox extends PureComponent { // eslint-disable-line
 
@@ -414,7 +420,7 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
       renderChildren,
       style
     } = this.props;
-    console.log(`id: ${this.props.id}, transposeLeft: ${this.props.transposeLeft}`);
+    // console.log(`id: ${this.props.id}, transposeLeft: ${this.props.transposeLeft}`);
 
     const { style: stateStyle } = this.state;
     return !isRootNode ? (

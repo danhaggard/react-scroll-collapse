@@ -233,7 +233,7 @@ class CommentThread extends PureComponent {
         childTranspositionCount, insertArrayLength
       );
       */
-      console.log('insertArray', insertArray);
+      // console.log('insertArray', insertArray);
       let cloneA;
       let cloneB;
       if (insertArrayLength > 0) {
@@ -269,15 +269,18 @@ class CommentThread extends PureComponent {
   }
 
   handleOnPointerDown = () => {
-    this.pointerDownTimeoutId = setTimeout(this.handlePointerDownTimeout, 150);
+    this.props.expandCollapseAll();
+    // this.pointerDownTimeoutId = setTimeout(this.handlePointerDownTimeout, 150);
   }
 
   handleOnPointerUp = () => {
+    /*
     if (this.pointerDownTimeoutId) {
       clearTimeout(this.pointerDownTimeoutId);
       this.pointerDownTimeoutId = null;
       this.props.expandCollapseItems();
     }
+    */
   }
 
   handleOnClick = () => {
