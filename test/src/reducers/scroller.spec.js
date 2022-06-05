@@ -88,6 +88,8 @@ const scrollersReducerAddScroller = () => {
   const stateAfter = {
     0: {
       offsetTop: 0,
+      scrollOnClose: true,
+      scrollOnOpen: true,
       scrollTop: 0,
       id: 0,
       collapsers: [],
@@ -100,7 +102,9 @@ const scrollersReducerAddScroller = () => {
       scroller: {
         id: 0,
       },
-      scrollerId: 0
+      scrollerId: 0,
+      scrollOnClose: true,
+      scrollOnOpen: true,
     },
   };
   Object.freeze(stateBefore);
@@ -115,6 +119,8 @@ const scrollersReducerAddCollapser = () => {
     0: {
       offsetTop: 0,
       scrollTop: 0,
+      scrollOnClose: true,
+      scrollOnOpen: true,
       id: 0,
       collapsers: [],
       toggleScroll: false,
@@ -124,6 +130,8 @@ const scrollersReducerAddCollapser = () => {
     0: {
       offsetTop: 0,
       scrollTop: 0,
+      scrollOnClose: true,
+      scrollOnOpen: true,
       id: 0,
       collapsers: [0],
       toggleScroll: false,
