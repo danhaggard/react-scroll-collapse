@@ -7,9 +7,11 @@ import forwardRefWrapper from '../../utils/forwardRef';
 import { checkForRef } from '../../utils/errorUtils';
 
 import { itemWrapperActions } from '../../actions';
-import { item as selectors } from '../../selectors';
+import { item as selectors, scroller as scrollerSelectors } from '../../selectors';
 
 const { selectors: { expandedSelector } } = selectors;
+const { selectors: { scrollOnOpenSelector, scrollOnCloseSelector } } = scrollerSelectors;
+
 
 /*
   collapserItemWrapper is an HoC that is to be used to wrap components which make use
@@ -46,17 +48,22 @@ export const collapserItemWrapper = (WrappedComponent) => {
       const {
         itemId,
         expandCollapse: expandCollapseAction,
+        isOpened,
         parentScrollerId,
         parentCollapserId,
+        scrollOnOpen,
+        scrollOnClose,
         setOffsetTop,
         watchCollapser,
       } = this.props;
       watchCollapser(parentCollapserId);
-      setOffsetTop(
-        () => this.elem.current.offsetTop,
-        parentScrollerId,
-        parentCollapserId,
-      );
+      if ((isOpened && scrollOnClose) || (!isOpened && scrollOnOpen)) {
+        setOffsetTop(
+          () => this.elem.current.offsetTop,
+          parentScrollerId,
+          parentCollapserId,
+        );
+      }
       expandCollapseAction(itemId);
     };
 
@@ -98,14 +105,20 @@ export const collapserItemWrapper = (WrappedComponent) => {
     parentScrollerId: PropTypes.number,
     heightReady: PropTypes.func.isRequired,
     expandCollapse: PropTypes.func.isRequired,
+    scrollOnOpen: PropTypes.bool.isRequired,
+    scrollOnClose: PropTypes.bool.isRequired,
     setOffsetTop: PropTypes.func.isRequired,
     watchCollapser: PropTypes.func.isRequired,
   };
 
   const mapStateToProps = () => (state, ownProps) => {
     const expandedSelectorInstance = expandedSelector();
+    const scrollOnOpenSelectorInstance = scrollOnOpenSelector();
+    const scrollOnCloseSelectorInstance = scrollOnCloseSelector();
     return {
       isOpened: expandedSelectorInstance(state)(ownProps.itemId),
+      scrollOnOpen: scrollOnOpenSelectorInstance(state)(ownProps.parentScrollerId),
+      scrollOnClose: scrollOnCloseSelectorInstance(state)(ownProps.parentScrollerId)
     };
   };
 

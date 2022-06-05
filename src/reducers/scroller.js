@@ -72,10 +72,32 @@ export const toggleScrollReducer = (state = false, action) => {
   }
 };
 
+export const scrollOnOpenReducer = (state = true, action) => {
+  const { scrollOnOpen } = checkAttr(action, 'payload');
+  switch (action.type) {
+    case ADD_SCROLLER:
+      return scrollOnOpen;
+    default:
+      return state;
+  }
+};
+
+export const scrollOnCloseReducer = (state = true, action) => {
+  const { scrollOnClose } = checkAttr(action, 'payload');
+  switch (action.type) {
+    case ADD_SCROLLER:
+      return scrollOnClose;
+    default:
+      return state;
+  }
+};
+
 const scrollerReducer = combineReducers({
   collapsers: scrollerCollapsersIdArrayReducer,
   id: scrollerIdReducer,
   offsetTop: offsetTopReducer,
+  scrollOnOpen: scrollOnOpenReducer,
+  scrollOnClose: scrollOnCloseReducer,
   scrollTop: scrollTopReducer,
   toggleScroll: toggleScrollReducer,
 });

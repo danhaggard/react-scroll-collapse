@@ -55,7 +55,7 @@ const example2 = (
 
 const example3 = (
   <Example {...COPY[3]} key={3}>
-    <Scroller style={{ height: '100%' }}>
+    <Scroller style={{ height: '100%' }} scrollOnClose={false}>
       <SimpleCollapser initialComments={10} />
       <SimpleCollapser initialComments={10} />
     </Scroller>

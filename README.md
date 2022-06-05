@@ -137,6 +137,16 @@ Scroller will scroll to the offsetTop value of the nested collapserControllerIte
 
 Alternatively you can set an offset that will be added to the offsetTop value.
 
+##### scrollOnOpen : PropTypes.bool (default: true)
+
+If true Scroller will auto scroll collapserItem on call of expandCollapse when collapserItem is
+being opened (going from closed to open state).
+
+##### scrollOnClose : PropTypes.bool (default: true)
+
+If true Scroller will auto scroll collapserItem on call of expandCollapse when collapserItem is
+being closed (going from open to closed state).
+
 ##### springConfig : PropTypes.object (default: {stiffness: 170, damping: 20})
 
 You can change the style of animation using the springConfig prop.  Consult the react-motion docs on using animation springs.

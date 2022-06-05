@@ -7,7 +7,7 @@ import {
 const scroller = createEntityTypeSelectors(
   'scrollers',
   entitiesSelector,
-  ['collapsers', 'offsetTop', 'scrollTop', 'toggleScroll'],
+  ['collapsers', 'offsetTop', 'scrollTop', 'toggleScroll', 'scrollOnOpen', 'scrollOnClose'],
 );
 
 export default scroller;

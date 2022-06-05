@@ -24,9 +24,14 @@ export const scrollerWrapper = (ScrollerComponent) => {
     }
 
     addScroller() {
-      const { addScroller, scrollerId } = this.props;
+      const {
+        addScroller,
+        scrollerId,
+        scrollOnOpen,
+        scrollOnClose
+      } = this.props;
       const scroller = { id: scrollerId };
-      addScroller(scroller, scrollerId);
+      addScroller(scroller, scrollerId, scrollOnOpen, scrollOnClose);
     }
 
     render() {
@@ -49,12 +54,16 @@ export const scrollerWrapper = (ScrollerComponent) => {
 
   WrappedScroller.defaultProps = {
     scrollerId: null,
+    scrollOnClose: true,
+    scrollOnOpen: true,
   };
 
   WrappedScroller.propTypes = {
     addScroller: PropTypes.func.isRequired,
-    scrollerId: ofNumberTypeOrNothing,
     removeScroller: PropTypes.func.isRequired,
+    scrollerId: ofNumberTypeOrNothing,
+    scrollOnClose: PropTypes.bool,
+    scrollOnOpen: PropTypes.bool,
   };
 
   return connect(undefined, scrollerWrapperActions)(scrollerProvider(WrappedScroller));
