@@ -8,6 +8,8 @@ import { checkForRef } from '../../utils/errorUtils';
 
 import { itemWrapperActions } from '../../actions';
 import { getItemExpandedRoot } from '../../selectors/collapserItem';
+import { getScrollerScrollOnOpenRoot, getScrollerScrollOnCloseRoot } from '../../selectors/scroller';
+import { getScrollerRootNode } from '../../selectors/_reactScrollCollapse';
 import { setContextAttrs } from '../../utils/objectUtils';
 
 /*
@@ -35,9 +37,17 @@ export const collapserItemWrapper = (WrappedComponent) => {
     }
 
     expandCollapse = () => {
-      const { addToNodeTargetArray, expandCollapse } = this.props;
+      const {
+        addToNodeTargetArray,
+        expandCollapse,
+        scrollOnOpen,
+        scrollOnClose,
+        isOpened
+      } = this.props;
       if (this.methods.scroller) {
-        this.methods.scroller.scrollToTop(this.elem.current);
+        if ((isOpened && scrollOnClose) || (!isOpened && scrollOnOpen)) {
+          this.methods.scroller.scrollToTop(this.elem.current);
+        }
       }
       addToNodeTargetArray(this.parentCollapserId, this.rootNodes.collapser, true);
       expandCollapse(this.id, this.parentCollapserId);
@@ -63,6 +73,8 @@ export const collapserItemWrapper = (WrappedComponent) => {
     addToNodeTargetArray: PropTypes.func.isRequired,
     isOpened: PropTypes.bool.isRequired,
     expandCollapse: PropTypes.func.isRequired,
+    scrollOnOpen: PropTypes.bool.isRequired,
+    scrollOnClose: PropTypes.bool.isRequired,
   };
 
   CollapserItemController.whyDidYouRender = {
@@ -72,6 +84,8 @@ export const collapserItemWrapper = (WrappedComponent) => {
 
   const mapStateToProps = (state, ownProps) => ({
     isOpened: getItemExpandedRoot(state)(ownProps._reactScrollCollapse.id),
+    scrollOnOpen: getScrollerScrollOnOpenRoot(state)(getScrollerRootNode(ownProps)),
+    scrollOnClose: getScrollerScrollOnCloseRoot(state)(getScrollerRootNode(ownProps)),
   });
 
   const CollapserItemControllerConnect = connect(

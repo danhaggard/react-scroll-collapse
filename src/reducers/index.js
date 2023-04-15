@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 
-import { scrollers, scrollersReducer } from './scroller';
+import { scrollersReducer } from './scroller';
 import { collapsersReducer } from './collapser';
 import { itemsReducer } from './collapserItem';
 import { rootNodesReducer } from './rootNode';
@@ -14,5 +14,5 @@ export const entities = combineReducers({
 
 export const reactScrollCollapse = combineReducers({
   entities,
-  scrollers,
+  // scrollers,
 });

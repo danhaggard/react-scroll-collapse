@@ -61,7 +61,7 @@ export const scrollOnCloseReducer = (state = true, action) => {
 const scrollerReducer = combineReducers({
   collapsers: scrollerCollapsersIdArrayReducer,
   id: scrollerIdReducer,
-  crollOnOpen: scrollOnOpenReducer,
+  scrollOnOpen: scrollOnOpenReducer,
   scrollOnClose: scrollOnCloseReducer,
 });
 

@@ -25,8 +25,8 @@ export const scrollerWrapper = (ScrollerComponent) => {
     }
 
     addScroller() {
-      const { addScroller } = this.props;
-      addScroller(this.id);
+      const { addScroller, scrollOnOpen, scrollOnClose } = this.props;
+      addScroller(this.id, scrollOnOpen, scrollOnClose);
     }
 
     render() {
@@ -42,12 +42,17 @@ export const scrollerWrapper = (ScrollerComponent) => {
     }
   }
 
-  WrappedScroller.defaultProps = {};
+  WrappedScroller.defaultProps = {
+    scrollOnClose: true,
+    scrollOnOpen: true,
+  };
 
   WrappedScroller.propTypes = {
     _reactScrollCollapse: PropTypes.object.isRequired,
     addScroller: PropTypes.func.isRequired,
     removeScroller: PropTypes.func.isRequired,
+    scrollOnClose: PropTypes.bool,
+    scrollOnOpen: PropTypes.bool,
   };
 
   WrappedScroller.whyDidYouRender = {
