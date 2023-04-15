@@ -1,10 +1,9 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import classnames from 'classnames';
 
 import { ofChildrenType } from '../../utils/propTypeHelpers';
 import { targetIsScrollBar } from '../../utils/domUtils';
-import styles from './Scroller.scss';
+import { setContextAttrs } from '../../utils/objectUtils';
 
 
 /*
@@ -25,8 +24,13 @@ import styles from './Scroller.scss';
   the sagas to be called when needed.str.slice(0, -1);
 */
 
-
 class Scroller extends PureComponent {
+
+  state = {
+    style: {}
+  }
+
+  setAttrs = (() => setContextAttrs(this))();
 
   callIfAnimating = callback => (...args) => { // eslint-disable-line react/sort-comp
     if (!this.props.getUserScrollActive()) {
@@ -47,50 +51,45 @@ class Scroller extends PureComponent {
     these to be called again until the next animation starts.
   */
   handleMouseDown = this.callIfAnimating(
-    e => this.breakScrollAnimation(targetIsScrollBar(e.clientX, this.elem))
+    e => this.breakScrollAnimation(targetIsScrollBar(e.clientX, this.getElem()))
   );
 
   handleWheel = this.callIfAnimating(() => this.breakScrollAnimation(true));
 
   handleKeyDown = this.callIfAnimating(
-    e => this.breakScrollAnimation(e.keyCode === 38 || e.keyCode === 40)
+    e => this.breakScrollAnimation([33, 34, 38, 40].includes(e.keyCode))
   );
 
-  getClassName = (className) => {
-    const initClassName = {};
-    initClassName[styles.scroller] = true;
-    return classnames({
-      ...initClassName,
-    }, className);
-  }
+  context = this.methods.scroller;
 
-  getScrollTop = () => (this.elem ? this.elem.scrollTop : null);
+  getElem = this.context.getElem;
 
-  setScrollTop = (val) => {
-    if (this.elem && val >= 0) {
-      this.elem.scrollTop = val;
-    }
-    return null;
+  getRef = this.context.getRef;
+
+  getProps = ({
+    children,
+    className,
+    style
+  }) => {
+    const newProps = {
+      children,
+      className,
+      onKeyDown: this.handleKeyDown,
+      onMouseDown: this.handleMouseDown,
+      onWheel: this.handleWheel,
+      ref: this.getRef(),
+      role: 'presentation',
+      style: {
+        overflow: 'auto',
+        postion: 'relative',
+        ...this.state.style,
+        ...style
+      },
+    };
+    return newProps;
   };
 
-  render() {
-    const { className, children, style } = this.props;
-    return (
-      <div
-        className={this.getClassName(className)}
-        onKeyDown={this.handleKeyDown}
-        onMouseDown={this.handleMouseDown}
-        onWheel={this.handleWheel}
-        ref={(elemArg) => {
-          this.elem = elemArg;
-        }}
-        role="presentation"
-        style={style}
-      >
-        { children }
-      </div>
-    );
-  }
+  render = () => <div {...this.getProps(this.props)} />;
 }
 
 Scroller.defaultProps = {
@@ -100,11 +99,16 @@ Scroller.defaultProps = {
 };
 
 Scroller.propTypes = {
+  breakScrollAnimation: PropTypes.func.isRequired,
   children: ofChildrenType,
   className: PropTypes.string,
-  breakScrollAnimation: PropTypes.func.isRequired,
   getUserScrollActive: PropTypes.func.isRequired,
   style: PropTypes.object,
+};
+
+Scroller.whyDidYouRender = {
+  logOnDifferentValues: false,
+  customName: 'Scroller'
 };
 
 export default Scroller;

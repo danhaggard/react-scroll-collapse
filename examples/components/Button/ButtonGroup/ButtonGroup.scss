@@ -2,13 +2,14 @@
 @import '../../../style/tools/index';
 
 :local(.button-group) {
-  display:flex;
-  flex-wrap: nowrap;
-  width: fit-content;
   background: rgba(0, 0, 0, .1);
   border-bottom: 1px solid rgba(0, 0, 0, .1);
-  padding: 0.5em;
   border-radius: 6px;
+  display:flex;
+  flex-wrap: nowrap;
+  max-width: min-content;
+  padding: 0.5em;
+  width: fit-content;
 
   > button {
     &:last-child {

@@ -1,11 +1,11 @@
 import { ADD_ITEM } from '../const';
 
-const addItem = (collapserId, item, itemId) => ({
+const addItem = (collapserId, itemId, expanded = true) => ({
   type: ADD_ITEM,
   payload: {
     collapserId,
-    item,
     itemId,
+    expanded
   }
 });
 

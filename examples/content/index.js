@@ -1,10 +1,13 @@
 import React from 'react';
 
 import Scroller from '../../src';
-
 import SimpleCollapser from '../components/SimpleCollapser';
 import CommentThread from '../components/CommentThread';
+import CommentThreadFlex from '../components/CommentThreadFlex';
+
 import Example from '../components/Example';
+
+import { generateCommentThreadData } from '../../src/utils/randomContentGenerators';
 
 const COPY = {
   0: {
@@ -31,33 +34,49 @@ const COPY = {
     title: 'Multiple Scrolling Components',
     text: `You can use multiple scrollers as well!
     State is tracked separately for each`
-  }
+  },
+  5: {
+    title: 'Experimental Flexbox Component',
+    text: ''
+  },
 };
 
 const example0 = (
   <Example {...COPY[0]} key={0} style={{}}>
-    <SimpleCollapser initialComments={6} style={{ margin: 0, overflow: 'auto' }} />
+    <SimpleCollapser
+      boop
+      isOpenedInit
+      initialComments={6}
+      style={{ margin: 0, overflow: 'auto' }}
+    />
   </Example>
 );
 
 const example1 = (
   <Example {...COPY[1]} key={0} style={{}}>
-    <SimpleCollapser initialComments={6} style={{ margin: 0, overflow: 'auto' }} />
-    <SimpleCollapser initialComments={6} style={{ margin: 0, overflow: 'auto' }} />
+    <SimpleCollapser isOpenedInit initialComments={6} style={{ maxHeight: '20em', margin: '1em', overflow: 'auto' }} />
+    <SimpleCollapser isOpenedInit initialComments={6} style={{ margin: 0, maxHeight: '20em', overflow: 'auto' }} />
   </Example>
 );
 
 const example2 = (
   <Example {...COPY[2]} key={0} style={{}}>
-    <CommentThread childThreads={3} style={{ margin: 0, overflow: 'auto' }} />
+    <Scroller style={{ height: '100%' }}>
+      <CommentThread
+        depth={1}
+        childThreads={1}
+        isOpenedInit
+        childIsOpenedInit
+        style={{ margin: 0, overflow: 'auto' }}
+      />
+    </Scroller>
   </Example>
 );
 
 const example3 = (
   <Example {...COPY[3]} key={3}>
     <Scroller style={{ height: '100%' }} scrollOnClose={false}>
-      <SimpleCollapser initialComments={10} />
-      <SimpleCollapser initialComments={10} />
+      <SimpleCollapser isOpenedInit childIsOpenedInit initialComments={10} />
     </Scroller>
   </Example>
 );
@@ -66,7 +85,42 @@ const example3 = (
 const example4 = key => (
   <Example {...COPY[4]} style={{ marginBottom: '3em' }} key={key}>
     <Scroller style={{ height: '100%' }}>
-      <CommentThread childThreads={3} />
+      <CommentThread isOpenedInit childIsOpenedInit depth={0} childNodes={1} />
+    </Scroller>
+  </Example>
+);
+
+
+const generateThreadConfig = {
+  minChildren: 3,
+  minDepth: 4,
+  maxChildren: 3,
+  maxDepth: 4,
+};
+
+const generateThreadConfigChild = {
+  minChildren: 2,
+  minDepth: 4,
+  maxChildren: 2,
+  maxDepth: 4,
+};
+
+const someData = generateCommentThreadData(generateThreadConfig);
+
+const style = { height: '100%' };
+const example5 = (
+  <Example showHeader {...COPY[5]} key={5}>
+    <Scroller style={style}>
+      <CommentThreadFlex
+        boop
+        key={someData.key}
+        childInsertionIndex={0}
+        isOpenedInit
+        childIsOpenedInit
+        nodeData={someData}
+        setActiveChildLimit={1}
+        {...generateThreadConfigChild}
+        />
     </Scroller>
   </Example>
 );
@@ -76,7 +130,9 @@ const examples = {
   1: [example1],
   2: [example2],
   3: [example3],
-  4: [example4(4), example4(5)]
+  4: [example4(4), example4(5)],
+  5: [example5],
 };
+
 
 export default examples;

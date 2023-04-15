@@ -4,10 +4,7 @@ module.exports = (opts) => {
   const {
     DEVELOPMENT, PRODUCTION, DIST_PATH
   } = opts;
-  // const entry = [path.join(SRC_PATH, 'index.js')];
 
-  // environment vars - passed when running node e.g.
-  // NODE_ENV=development node dev-server.js
   const define = new webpack.DefinePlugin({
     DEVELOPMENT: JSON.stringify(DEVELOPMENT),
     PRODUCTION: JSON.stringify(PRODUCTION),
@@ -18,11 +15,17 @@ module.exports = (opts) => {
       test: /\.(jpg|png|gif)$/,
       exclude: /node_modules/,
       loaders: ['url-loader?limit=10000&name=images/[hash:12].[ext]'],
+    },
+    {
+      test: /\.worker\.js$/,
+      use: {
+        loader: 'worker-loader',
+        options: { inline: 'no-fallback' }
+      }
     }
   ];
 
   return {
-    // entry,
     plugins: [define],
     module: {
       rules

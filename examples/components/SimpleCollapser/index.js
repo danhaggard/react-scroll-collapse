@@ -4,17 +4,17 @@ import styles from './SimpleCollapser.scss';
 
 import ButtonGroup from '../Button/ButtonGroup/ButtonGroupSmall';
 import CommentBody from '../CommentBody';
-import { CollapserExpandButton } from '../ExpandButtonWrapped';
+import ExpandButton from '../ExpandButton';
 import SimpleComment from '../SimpleComment';
-import { collapserIdentity } from '../../../src';
-import { genRandText } from '../../utils';
+import { collapserController } from '../../../src';
+import { getRandomTextWithDefaults } from '../../../src/utils/randomUtils';
 
 const createComment = key => ({
   key,
-  text: genRandText()
+  text: getRandomTextWithDefaults()
 });
 
-class SimpleCollapserFixed extends Component {
+class SimpleCollapser extends Component {
 
   constructor(props) {
     super(props);
@@ -43,19 +43,20 @@ class SimpleCollapserFixed extends Component {
 
   render() {
     const {
-      collapserId,
-      parentCollapserId,
-      parentScrollerId,
-      style
+      areAllItemsExpanded,
+      expandCollapseAll,
+      collapserRef,
+      style,
+      _reactScrollCollapse: { id: collapserId },
+
     } = this.props;
     const { comments } = this.state;
     const title = ` Collapser ${collapserId.toString()}`;
     return (
-      <div className={styles.simpleCollapser} style={style}>
-        <CollapserExpandButton
-          collapserId={collapserId}
-          parentCollapserId={parentCollapserId}
-          parentScrollerId={parentScrollerId}
+      <div className={styles.simpleCollapser} ref={collapserRef} style={style}>
+        <ExpandButton
+          isOpened={areAllItemsExpanded}
+          onClick={expandCollapseAll}
           title={title}
         />
         <CommentBody text="Collapser controls state for all nested collapserItem children." />
@@ -72,19 +73,18 @@ class SimpleCollapserFixed extends Component {
   }
 }
 
-SimpleCollapserFixed.defaultProps = {
+SimpleCollapser.defaultProps = {
   initialComments: 1,
-  parentScrollerId: null,
-  parentCollapserId: null,
   style: {},
 };
 
-SimpleCollapserFixed.propTypes = {
-  collapserId: PropTypes.number.isRequired,
+SimpleCollapser.propTypes = {
+  areAllItemsExpanded: PropTypes.bool.isRequired,
+  _reactScrollCollapse: PropTypes.object.isRequired,
+  collapserRef: PropTypes.object.isRequired,
+  expandCollapseAll: PropTypes.func.isRequired,
   initialComments: PropTypes.number,
-  parentCollapserId: PropTypes.number,
-  parentScrollerId: PropTypes.number,
   style: PropTypes.object,
 };
 
-export default collapserIdentity(SimpleCollapserFixed);
+export default collapserController(SimpleCollapser);

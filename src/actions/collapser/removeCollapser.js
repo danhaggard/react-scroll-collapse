@@ -1,11 +1,12 @@
 import { REMOVE_COLLAPSER } from '../const';
 
-const removeCollapser = (parentCollapserId, scrollerId, collapserId) => ({
+const removeCollapser = (parentScrollerId, parentCollapserId, collapserId, isRootNode) => ({
   type: REMOVE_COLLAPSER,
   payload: {
     collapserId,
     parentCollapserId,
-    scrollerId,
+    parentScrollerId,
+    isRootNode,
   },
 });
 

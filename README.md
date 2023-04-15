@@ -7,11 +7,22 @@ https://danhaggard.github.io/react-scroll-collapse/examples/
 
 ## What's New!
 
-13th April 2019
+16th April 2023
 
-Dependencies have been updated to their latest version as of: 13th April 2019 - including react-redux@7.0.1 and react@16.8.4
+### Version 2 Release!
 
-The reliance on the legacy context api has been removed.  This means versions 1.0.0 of react-scroll-collapse won't work with versions of react < 16.  You can still use v0.2.0 if you need an older version of react.
+#### WARNING! V2 is Experimental.  Advise use 1.4.1 [readme v1.4.1](https://danhaggard.github.io/react-scroll-collapse/README_v1-4-1.md)
+
+This release has breaking changes:
+
+- The redux-saga dependency has been removed.
+- "offsetScrollTo" prop in Scroller renamed to "scrollOffset"
+- "collapserId", "parentCollapserId", "parentScrollerId" props passed by collapserController to wrapped components have been removed. See _reactScrollCollapse prop for replacements.
+- "itemId", "parentCollapserId", "parentScrollerId" props passed by collapserController to wrapped components have been removed. See _reactScrollCollapse prop for replacements.
+
+Other notable differences:
+
+- Scroller no longer needs to be the first relatively positioned parent.
 
 ## Overview
 
@@ -25,6 +36,10 @@ collapserControllerItem provides controls to expand/collapse a single element.
 
 ## Installation
 
+### Node Version
+
+16.13.0
+
 ### NPM
 ```bash
 npm install --save react-scroll-collapse
@@ -34,7 +49,7 @@ npm install --save react-scroll-collapse
 If you use npm@3 you'll need to install the peer dependencies
 
 ```bash
-npm install --save classnames react react-collapse react-dom react-height react-motion react-redux redux redux-saga reselect
+npm install --save classnames react react-collapse react-dom react-height react-motion react-redux redux
 ```
 
 ### redux Integration
@@ -48,42 +63,18 @@ import {reactScrollCollapse} from 'react-scroll-collapse';
 
 You will need to include the 'reactScrollCollapse' reducer in your top level reducer with the same state key (i.e. reactScrollCollapse).  [See example](https://github.com/danhaggard/react-scroll-collapse/blob/master/examples/reducers/index.js)
 
-### redux-saga Integration
 
-react-scroll-collapse also relies on [redux-saga](https://github.com/yelouafi/redux-saga)
+## Components
 
-#### Importing the sagas:
+### \<AnimatedFlexbox>
+
+Experimental Animated Flex Component.  Production use not advised.
+
 ```javascript
-import {reactScrollCollapseSagas} from 'react-scroll-collapse';
+import { AnimatedFlexbox } from 'react-scroll-collapse';
 ```
 
-You will need to include 'reactScrollCollapseSagas' in your root saga - [See example](https://github.com/danhaggard/react-scroll-collapse/blob/master/examples/sagas/index.js) - which in turn must be included in your redux middleware [See example](https://github.com/danhaggard/react-scroll-collapse/blob/master/examples/stores/index.js)
-
-*Handy tip:*
-redux-sagas uses generators which aren't supported widely by browsers at the moment.  If you are using webpack - install the transform runtime via npm:
-
-```bash
-npm install --save-dev babel-plugin-transform-runtime
-```
-
-...and add it to your .babelrc file in the root of your project.  It should look something like:
-
-```json
-{
-  "presets": [
-    "@babel/preset-env",
-    "@babel/preset-react"
-  ],
-  "plugins": [
-    "@babel/plugin-transform-runtime",
-    "your-other-plugins"
-  ]
-}
-```
-
-Consult both the redux and redux-saga docs for more information about installing and using those libraries.
-
-## Component Wrappers
+[See example usage](https://github.com/danhaggard/react-scroll-collapse/blob/master/examples/components/CommentThreadFlex/index.js)
 
 ### \<Scroller>
 
@@ -121,6 +112,8 @@ You can see this component implemented in the examples folder [here](https://git
 
 #### \<Scroller> - Props
 
+##### autoScrollDisabled : PropTypes.bool (default: false)
+
 ##### onAnimationCancel : PropTypes.function
 
 This callback will be fired when the user cancels the scroll animation by initiating a scroll event of their own.
@@ -133,7 +126,7 @@ Scroller makes use of the [react-motion](https://github.com/chenglou/react-motio
 
 Scroller will scroll to the offsetTop value of the nested collapserControllerItem that has its expandCollapse function called.  You can over ride this completely by setting a value for this prop.
 
-##### offsetScrollTo : PropTypes.number
+##### scrollOffset : PropTypes.number
 
 Alternatively you can set an offset that will be added to the offsetTop value.
 
@@ -153,10 +146,10 @@ You can change the style of animation using the springConfig prop.  Consult the 
 
 ##### className, style
 
-You can use the usual react className and style props to style the component.  A default style is applied using css modules:
+You can use the usual react className and style props to style the component.  A default style is applied:
 
 ```
-:local(.scroller) {
+{
   overflow: auto;
   position: relative;
 }
@@ -164,8 +157,7 @@ You can use the usual react className and style props to style the component.  A
 
 It is possible to overwrite this default - but will probably break things.
 
-The scroll to top functionality relies on the <Scroller> DOM element being the first relatively positioned parent.  Other then this limitation - wrapped child collapserController and collapserItemController elements can be as deeply nested in other components as you like.
-
+## Component HoC Wrappers
 
 ### collapserController()
 
@@ -203,9 +195,9 @@ export default collapserController(YourComponent);
 You can see full implementations of the wrapper in the [SimpleCollapser component example](https://github.com/danhaggard/react-scroll-collapse/blob/master/examples/components/SimpleCollapser/index.js) and the [CommentThread component example](https://github.com/danhaggard/react-scroll-collapse/blob/master/examples/components/CommentThread/index.js)
 
 
-#### collapserController - Props
+#### collapserController - Passed Props
 
-Because it's a HoC wrapper - collapserController passes props to your component.
+Because it's a HoC wrapper - collapserController passes the following props to your component.
 
 ##### areAllItemsExpanded : PropTypes.bool
 
@@ -224,9 +216,17 @@ Calling this function in your component will scroll your component to the top of
 If some children are expanded and some collapsed then it will expand them all.
 
 
-##### collapserId, parentCollapserId, parentScrollerId : PropTypes.number
+##### _reactScrollCollapse: 
 
-These are the ids used in redux to track components.
+```
+{
+  id: number,
+  parents: { collapser: number }
+  rootNodes: {scroller: number, collapser: number}
+}
+```
+
+These are the ids used in redux to track components.  Note if your component is not nested within a Scroller or collapser then attrs under parents, rootNodes will be undefined.
 
 
 ### collapserControllerItem()
@@ -283,7 +283,7 @@ export default collapserControler(ItemController(YourComponent));  // wrap the i
 You can see full implementations of the wrapper in the [SimpleComment component example](https://github.com/danhaggard/react-scroll-collapse/blob/master/examples/components/SimpleComment/index.js) and the [Comment component example](https://github.com/danhaggard/react-scroll-collapse/blob/master/examples/components/Comment/index.js)
 
 
-#### collapserControllerItem - Props
+#### collapserControllerItem - Passes Props
 
 Because it's a HoC wrapper - collapserItemController passes props to your component.
 
@@ -299,7 +299,15 @@ A boolean to pass into the <Collapse> component (also uses isOpened) which contr
 
 Flips the value of the isOpened boolean - and scrolls your component to the top of the <Scroller> component.
 
-##### itemId, parentCollapserId, parentScrollerId : PropTypes.number
+##### _reactScrollCollapse: 
+
+```
+{
+  id: number,
+  parents: { collapser: number }
+  rootNodes: {scroller: number, collapser: number}
+}
+```
 
 These are the ids used in redux to track components.
 

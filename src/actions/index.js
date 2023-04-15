@@ -1,64 +1,67 @@
 /* Scroller Actions */
-import scrollTo from './scroller/scrollTo';
-import watchInitialise from './scroller/watchInitialise';
-import setOffsetTop from './scroller/setOffsetTop';
 import removeScroller from './scroller/removeScroller';
 import addScroller from './scroller/addScroller';
-import addScrollerChild from './scroller/addScrollerChild';
-import removeScrollerChild from './scroller/removeScrollerChild';
 
 /* collapser actions */
-import heightReadyAll from './collapser/heightReadyAll';
+import addToUnmountArray from './collapser/addToUnmountArray';
+import removeFromUnmountArray from './collapser/removeFromUnmountArray';
 import expandCollapseAll from './collapser/expandCollapseAll';
 import removeCollapser from './collapser/removeCollapser';
-import removeCollapserChild from './collapser/removeCollapserChild';
 import addCollapser from './collapser/addCollapser';
-import addCollapserChild from './collapser/addCollapserChild';
-import watchCollapser from './collapser/watchCollapser';
-import watchInitCollapser from './collapser/watchInitCollapser';
+import setTreeId from './collapser/setTreeId';
+import toggleCheckTreeState from './collapser/toggleCheckTreeState';
+
+/* collapser context actions */
+import addActiveChildren from './collapser/addActiveChildren';
+import removeActiveChildren from './collapser/removeActiveChildren';
+import setActiveChildrenLimit from './collapser/setActiveChildrenLimit';
 
 /* collapserItem actions */
-import heightReady from './collapserItem/heightReady';
 import expandCollapse from './collapserItem/expandCollapse';
 import removeItem from './collapserItem/removeItem';
 import addItem from './collapserItem/addItem';
 
+/* shared actions */
+import addToNodeTargetArray from './collapser/addToNodeTargetArray';
+
+
 const actions = {
+  addActiveChildren,
   addCollapser,
-  addCollapserChild,
-  removeCollapser,
-  removeCollapserChild,
-  expandCollapseAll,
-  heightReadyAll,
-  watchCollapser,
-  watchInitCollapser,
   addItem,
-  removeItem,
-  expandCollapse,
-  heightReady,
   addScroller,
-  addScrollerChild,
+  addToNodeTargetArray,
+  expandCollapse,
+  expandCollapseAll,
+  removeActiveChildren,
+  removeCollapser,
+  removeItem,
   removeScroller,
-  removeScrollerChild,
-  setOffsetTop,
-  watchInitialise,
-  scrollTo,
+  setTreeId,
+  toggleCheckTreeState,
 };
 
 export const collapserControllerActions = {
   addCollapser,
-  addCollapserChild,
   removeCollapser,
-  removeCollapserChild,
-  addScrollerChild,
-  removeScrollerChild,
+};
+
+export const collapserContextActions = {
+  addActiveChildren,
+  removeActiveChildren,
+  setActiveChildrenLimit
 };
 
 export const collapserWrapperActions = {
+  addActiveChildren,
+  addToUnmountArray,
+  addToNodeTargetArray,
   expandCollapseAll,
-  setOffsetTop,
-  watchCollapser,
-  watchInitCollapser,
+  removeActiveChildren,
+  removeCollapser,
+  removeFromUnmountArray,
+  setTreeId,
+  toggleCheckTreeState,
 };
 
 export const itemControllerActions = {
@@ -68,10 +71,8 @@ export const itemControllerActions = {
 
 
 export const itemWrapperActions = {
-  heightReady,
+  addToNodeTargetArray,
   expandCollapse,
-  setOffsetTop,
-  watchCollapser,
 };
 
 export const scrollerWrapperActions = {

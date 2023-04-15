@@ -1,58 +1,179 @@
-
 import {
-  arrSelector,
-  createEntityTypeSelectors,
-  entitiesSelector,
-  getAllNested,
-  createAllNestedOfTypeSelector,
-  createAllNestedDependentSelector,
-  dependentGetterFactory,
-  createAllSelector,
-  createNoneSelector,
-  concatDependents
-} from './utils';
+  compose,
+  curryCompose,
+  everyReducer,
+  getOrArray,
+  getOrDefault,
+  getOrNull,
+  passArgsToIteratorEvery,
+} from '../utils/selectorUtils';
+import { getEntitiesRoot } from './common';
 
-import itemSelectors from './collapserItem';
+import { getItemExpanded, getItemRoot } from './collapserItem';
+import recurseToNodeArray from './recurseToNodeArray';
+import recurseAllChildren from './recurseAllChildren';
+import recurseTreeIds from './recurseTreeIds';
+import recurseSetCacheValues from './recurseSetCacheValues';
 
-const {
-  itemsInstanceSelector,
-  selectors: { waitingForHeightSelector, expandedSelector }
-} = itemSelectors;
+const getCollapsers = entitiesObject => getOrNull(entitiesObject, 'collapsers');
 
-const collapser = createEntityTypeSelectors(
-  'collapsers',
-  entitiesSelector,
-  ['collapsers', 'items'],
-  arrSelector
+// rootState => collapsersObject
+const getCollapsersRoot = compose(getCollapsers, getEntitiesRoot);
+
+const getCollapser = collapsersObject => id => getOrNull(collapsersObject, id);
+
+
+// rootState => id => collapserObject
+const getCollapserRoot = compose(getCollapser, getCollapsersRoot);
+
+/*
+  -------------------------------- collapser.attr getters -----------------------------
+*/
+
+// --- collapser.collapsers:
+const getCollapserCollapsers = collapserObject => getOrArray(collapserObject, 'collapsers');
+
+export const getCollapserCollapsersRoot = curryCompose(getCollapserCollapsers, getCollapserRoot);
+
+// --- collapser.items: => array
+const getCollapserItems = collapserObject => getOrArray(collapserObject, 'items');
+
+// rootState => id => collapserItemsArray
+export const getCollapserItemsRoot = curryCompose(getCollapserItems, getCollapserRoot);
+
+// --- collapser.treeId:
+const getCollapserTreeId = collapserObject => getOrNull(collapserObject, 'treeId');
+
+export const getCollapserTreeIdRoot = curryCompose(getCollapserTreeId, getCollapserRoot);
+
+// --- collapser.activeChildren: => array
+const getCollapserActiveChildren = collapserObject => getOrArray(collapserObject, 'activeChildren');
+
+// rootState, id => collapserActiveChildren
+export const getCollapserActiveChildrenRoot = curryCompose(
+  getCollapserActiveChildren,
+  getCollapserRoot
 );
 
-const { selectors: { collapsersSelector, itemsSelector } } = collapser;
-
-export const allNestedCollapsersSelector = createAllNestedOfTypeSelector(
-  collapsersSelector, getAllNested
+// --- collapser.activeChildrenLimit: => number
+const getCollapserActiveChildrenLimit = collapserObject => getOrDefault(1)(
+  collapserObject,
+  'activeChildrenLimit'
 );
 
-// state => id => { all nested item ids of scrollerCollapser.entities.collapsers[id] }
-export const allChildItemsIdSelector = createAllNestedDependentSelector(
-  allNestedCollapsersSelector, itemsSelector
-)(dependentGetterFactory(concatDependents));
-
-const getterFactory = dependentGetterFactory();
-export const allChildItemsSelector = createAllNestedDependentSelector(
-  allChildItemsIdSelector, itemsInstanceSelector
-)(getterFactory);
-
-export const itemExpandedArrSelector = createAllNestedDependentSelector(
-  allChildItemsIdSelector, expandedSelector
-)(getterFactory);
-
-export const itemWaitingForHeightArrSelector = createAllNestedDependentSelector(
-  allChildItemsIdSelector, waitingForHeightSelector
-)(getterFactory);
-
-export const areAllItemsExpandedSelector = createAllSelector(itemExpandedArrSelector);
-export const haveAllItemsReportedHeightSelector = createNoneSelector(
-  itemWaitingForHeightArrSelector
+// rootState => id => collapserActiveChildrenLimit
+export const getCollapserActiveChildrenLimitRoot = curryCompose(
+  getCollapserActiveChildrenLimit,
+  getCollapserRoot
 );
 
-export default collapser;
+// --- collapser.collapserParentId:
+const getCollapserParentId = collapserObject => getOrNull(collapserObject, 'parentCollapserId');
+
+export const getCollapserParentIdRoot = curryCompose(getCollapserParentId, getCollapserRoot);
+
+export const getImmediateChildItemsRoot = rootState => (id) => {
+  const topItems = [...getCollapserItemsRoot(rootState)(id)];
+  const childCollapsers = getCollapserCollapsersRoot(rootState)(id);
+  childCollapsers.forEach((childId) => {
+    const childItems = getCollapserItemsRoot(rootState)(childId);
+    childItems.forEach(item => topItems.push(item));
+  });
+  return topItems;
+};
+
+export const collapserImmediateItemsExpandedRootEvery = passArgsToIteratorEvery(
+  getImmediateChildItemsRoot,
+  getItemExpanded,
+  getItemRoot
+);
+
+// rootState => id => true / false
+export const collapserItemsExpandedRootEvery = passArgsToIteratorEvery(
+  getCollapserItemsRoot,
+  getItemExpanded,
+  getItemRoot
+);
+
+
+/*
+  Used to set values below the target node as cheaply as possible.
+*/
+export const setNestedCollapserValuesRoot = (
+  cache,
+  getNodeChildrenMappedToTreeId,
+) => (collapserIdObj, cachedValue) => {
+  const valueToSet = !cachedValue;
+
+  const getNodeChildren = (idObj) => {
+    const prevResultSources = cache.getResultSources(idObj.id);
+    // if we are expanding everything - then only go into false branches.
+    if (valueToSet) return prevResultSources;
+    // else go into branches that were expanded.
+    return getNodeChildrenMappedToTreeId(idObj.id);
+  };
+
+  const setCache = (idObj, nextChildren) => {
+    // if everything below is expanded - then there are no sources of falsity.
+    // otherwise they are all sources of falsity.
+    const resultSources = valueToSet ? [] : nextChildren;
+    cache.addResult(idObj.id, valueToSet, resultSources);
+  };
+  recurseSetCacheValues(getNodeChildren, setCache, collapserIdObj);
+  return valueToSet;
+};
+
+export const nestedCollapserItemsExpandedRootEvery = (
+  state,
+  nodeTargetArray,
+  rootNodeId,
+  cache,
+  setTreeId = false,
+  flipChildValues = true,
+) => {
+  const mapIdToTreeId = id => ({ id, treeId: cache.getResultTreeId(id) });
+  const targetNodeTreeIdArray = nodeTargetArray.map(mapIdToTreeId);
+
+  const getNodeChildren = id => getCollapserCollapsersRoot(state)(id);
+  const getNodeChildrenMappedToTreeId = id => getNodeChildren(id).map(mapIdToTreeId);
+  const getNodeValue = id => collapserItemsExpandedRootEvery(state)(id);
+  const setNestedCacheValues = setNestedCollapserValuesRoot(
+    cache,
+    getNodeChildrenMappedToTreeId,
+  );
+  return recurseToNodeArray({
+    cache,
+    getNodeChildrenMappedToTreeId,
+    setNestedCacheValues,
+    currentNodeIdObj: mapIdToTreeId(rootNodeId),
+    resultReducer: everyReducer(true),
+    getNodeValue,
+    getTreeId: cache.getResultTreeId,
+    rootNodeId,
+    targetNodeArray: targetNodeTreeIdArray, // change this arg name to the state key.
+    setTreeId,
+    flipChildValues,
+  });
+};
+
+export const nestedCollapserItemsRoot = (
+  state,
+  { _reactScrollCollapse: { id: collapserId } }
+) => recurseAllChildren(
+  id => getCollapserCollapsersRoot(state)(id),
+  id => getCollapserItemsRoot(state)(id),
+  (result, nextResult) => [...result, ...nextResult],
+  collapserId,
+);
+
+export const setTreeIdsRecursively = (state, collapserId, action) => recurseTreeIds(
+  id => getCollapserCollapsersRoot(state)(id),
+  action,
+  collapserId,
+);
+
+export const setTreeIdsRecursivelyToCache = (state, collapserId, cache) => recurseTreeIds(
+  id => getCollapserCollapsersRoot(state)(id),
+  cache.setResultTreeId,
+  collapserId,
+);

@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-
-import { ofNumberTypeOrNothing } from '../../utils/propTypeHelpers';
-import { collapserControllerActions } from '../../actions';
-import cleanHoCProps from '../../utils/cleanHoCProps';
+import { collapserControllerActions, collapserContextActions } from '../../actions';
+import { cleanHoCProps } from '../../utils/hocUtils/cleanHoCProps';
+import { setContextAttrs } from '../../utils/objectUtils';
 
 export const collapserControllerWrapper = (CollapserController) => {
 
@@ -12,70 +11,59 @@ export const collapserControllerWrapper = (CollapserController) => {
 
     constructor(props) {
       super(props);
+      /* grab the context attrs under props._reactScrollCollapse and attach */
+      setContextAttrs(this);
       this.addCollapser();
     }
 
     componentWillUnmount() {
-      const { removeCollapserChild, removeScrollerChild, removeCollapser } = this.props;
-      const { collapserId, parentCollapserId, parentScrollerId } = this.props;
-      if (parentCollapserId >= 0) {
-        removeCollapserChild(parentCollapserId, collapserId);
-      }
-      if (parentScrollerId >= 0) {
-        removeScrollerChild(parentScrollerId, collapserId);
-      }
-      removeCollapser(parentCollapserId, parentScrollerId, collapserId);
+      const {
+        props: { removeCollapser },
+        parentScrollerId,
+        parentCollapserId,
+        id,
+        isRootNode
+      } = this;
+      removeCollapser(parentScrollerId, parentCollapserId, id, isRootNode);
     }
 
+
     addCollapser() {
-      const { addCollapser, addScrollerChild, addCollapserChild } = this.props;
-      const { collapserId, parentCollapserId, parentScrollerId } = this.props;
-      const collapser = { id: collapserId };
-      addCollapser(parentScrollerId, parentCollapserId, collapser, collapserId);
-      if (parentScrollerId >= 0) {
-        addScrollerChild(parentScrollerId, collapser);
-      }
-      if (parentCollapserId >= 0) {
-        addCollapserChild(parentCollapserId, collapser);
-      }
+      const {
+        props: { addCollapser },
+        parentScrollerId,
+        parentCollapserId,
+        id,
+        isRootNode
+      } = this;
+      addCollapser(parentScrollerId, parentCollapserId, id, isRootNode);
     }
 
     render() {
-      const { collapserId, parentScrollerId } = this.props;
-      if (collapserId >= 0 && parentScrollerId >= 0) {
-        return (
-          <CollapserController
-            {...cleanHoCProps(
-              this.props,
-              WrappedCollapserController.defaultProps,
-              collapserControllerActions
-            )}
-          />
-        );
-      }
-      return <div />;
+      const newProps = cleanHoCProps(
+        this.props,
+        { ...collapserControllerActions, ...collapserContextActions }
+      );
+      return (
+        <CollapserController
+          {...newProps}
+        />
+      );
     }
   }
 
-  WrappedCollapserController.defaultProps = {
-    collapserId: null,
-    parentCollapserId: null,
-    parentScrollerId: null,
-  };
+  WrappedCollapserController.defaultProps = {};
 
   WrappedCollapserController.propTypes = {
+    _reactScrollCollapse: PropTypes.object.isRequired,
     addCollapser: PropTypes.func.isRequired,
-    addCollapserChild: PropTypes.func.isRequired,
     removeCollapser: PropTypes.func.isRequired,
-    removeCollapserChild: PropTypes.func.isRequired,
-    addScrollerChild: PropTypes.func.isRequired,
-    removeScrollerChild: PropTypes.func.isRequired,
-
-    collapserId: ofNumberTypeOrNothing,
-    parentCollapserId: ofNumberTypeOrNothing,
-    parentScrollerId: ofNumberTypeOrNothing,
   };
 
+  WrappedCollapserController.whyDidYouRender = {
+    logOnDifferentValues: false,
+    customName: 'WrappedCollapserController'
+  };
 
   return connect(undefined, collapserControllerActions)(WrappedCollapserController);
 };

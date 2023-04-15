@@ -1,12 +1,12 @@
 import { ADD_COLLAPSER } from '../const';
 
-const addCollapser = (scrollerId, parentCollapserId, collapser, collapserId) => ({
+const addCollapser = (parentScrollerId, parentCollapserId, collapserId, isRootNode) => ({
   type: ADD_COLLAPSER,
   payload: {
-    collapser,
     collapserId,
     parentCollapserId,
-    scrollerId,
+    parentScrollerId,
+    isRootNode,
   }
 });
 

@@ -18,9 +18,6 @@ const server = new WebpackDevServer(compiler, {
   hot: true,
   filename: config.output.filename,
   publicPath: config.output.publicPath,
-  stats: {
-    colors: true
-  },
 });
 server.listen(portNumber, 'localhost', (err) => {
   if (err) {

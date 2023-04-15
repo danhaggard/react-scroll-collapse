@@ -14,6 +14,6 @@ module.exports = {
   testMatch: [
     '**/*.spec.js',
   ],
-
+  rootDir: 'src',
   setupFiles: [],
 };

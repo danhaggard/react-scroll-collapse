@@ -4,6 +4,7 @@ import providers from '../../contextProviders';
 
 const { collapserProvider } = providers;
 
+
 export const collapserController = wrappedComponent => collapserProvider(collapserControllerWrapper(
   collapserWrapper(wrappedComponent)
 ));

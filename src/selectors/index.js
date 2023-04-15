@@ -1,11 +1,11 @@
-import * as utils from './utils';
-import * as collapserSelectors from './collapser';
-
-export collapser from './collapser';
-export item from './collapserItem';
-export scroller from './scroller';
+import * as collapser from './collapser';
+import * as collapserItem from './collapserItem';
+import * as scroller from './scroller';
+import * as _reactScrollCollapse from './_reactScrollCollapse';
 
 export default {
-  collapser: collapserSelectors,
-  utils,
+  collapser,
+  collapserItem,
+  scroller,
+  _reactScrollCollapse,
 };

@@ -1,10 +1,19 @@
 @import '../../node_modules/normalize.css/normalize.css';
-@import '/settings/index';
-@import '/settings/layout';
-@import '/elements/index';
+@import './settings/index';
+@import './settings/layout';
+@import './elements/index';
 
 
-:global {
 
 
+@keyframes Rainbow {
+  0% {
+    background-position: 94% 0%;
+  }
+  50% {
+    background-position: 7% 100%;
+  }
+  100% {
+    background-position: 94% 0%;
+  }
 }

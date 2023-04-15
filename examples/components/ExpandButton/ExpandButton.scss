@@ -1,3 +1,7 @@
-:local(.expandButton) {
+@import '../../style/settings/index';
+@import '../../style/tools/index';
 
+
+:local(.expandButton) {
+  width: 100%;
 }

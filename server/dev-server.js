@@ -13,12 +13,12 @@ const compiler = webpack(config);
 
 const server = new WebpackDevServer(compiler, {
   historyApiFallback: true,
-  contentBase: config.entry,
-  filename: config.output.filename,
-  publicPath: config.output.publicPath,
-  stats: {
-    colors: true
+  devMiddleware: {
+    publicPath: config.output.publicPath,
   },
+  static: {
+    directory: config.entry[0],
+  }
 });
 server.listen(portNumber, 'localhost', (err) => {
   if (err) {

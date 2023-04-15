@@ -1,3 +1,12 @@
 :local(.commentBody) {
-  color: rgba(80, 80, 80, 0.870588);
+  color: rgba(40, 40, 40, 1);
+  background-color: transparent;
+  transition: background-color 150ms ease-in-out;
+  padding: 1em;
+  border-radius: 1em;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, .3);
+    transition: background-color 150ms ease-in-out;
+  }
 }

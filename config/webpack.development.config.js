@@ -1,4 +1,3 @@
-const webpack = require('webpack');
 const baseConfig = require('./webpack.base.config.js');
 
 
@@ -10,11 +9,6 @@ module.exports = (opts) => {
     SRC_PATH
   } = opts;
   const config = baseConfig(opts);
-  // Swaps out newly changed code on the fly and updates the browser.
-  const hotModuleReplacement = new webpack.HotModuleReplacementPlugin();
-
-  // used in conjunction with HMR - just names the modules reported in console.
-  const namedModulesPlugin = new webpack.NamedModulesPlugin();
 
   const cssIdentifier = '[path][name]---[local]';
 
@@ -24,13 +18,6 @@ module.exports = (opts) => {
   // const devtool = 'cheap-module-eval-source-map';
 
   const entry = [
-    // activate HMR for React.  HMR entry points have to come before the others.
-    'react-hot-loader/patch',
-
-    // bundle the client for hot reloading
-    // only- means to only hot reload for successful updates
-    'webpack/hot/only-dev-server',
-
     // add in our base config entry points.  Must come after HMR
     EXAMPLES_PATH,
 
@@ -62,9 +49,11 @@ module.exports = (opts) => {
     {
       loader: 'sass-loader',
       options: {
-        localIdentName: cssIdentifier,
-        sourceMap: DEVELOPMENT,
-        modules: true
+        sassOptions: {
+          localIdentName: cssIdentifier,
+          sourceMap: DEVELOPMENT,
+          modules: true
+        }
       }
     }
   ];
@@ -96,8 +85,6 @@ module.exports = (opts) => {
     },
     plugins: [
       ...config.plugins,
-      hotModuleReplacement,
-      namedModulesPlugin
     ]
   };
 };

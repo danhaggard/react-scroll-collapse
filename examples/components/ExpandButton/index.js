@@ -2,40 +2,47 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import forwardRefWrapper from '../../../src/utils/forwardRef';
 import CommentTitle from '../CommentTitle';
-import style from './ExpandButton.scss';
+import { ofFuncTypeOrNothing } from '../../../src/utils/propTypeHelpers';
+import styles from './ExpandButton.scss';
 
 const ExpandButton = ({
   forwardRef,
   isOpened,
   onClick,
+  onHamburgerClick,
   onKeyDown,
+  style,
   title
 }) => (
   <div
-    className={style.expandButton}
+    className={styles.expandButton}
+    key={title}
+    onKeyDown={onKeyDown || undefined}
     onClick={onClick}
-    onKeyDown={onKeyDown}
     ref={forwardRef}
-    role="button"
-    tabIndex={0}
-    type="button"
+    role={onKeyDown || onClick ? 'button' : undefined}
+    style={style}
   >
-    <CommentTitle title={title} isOpened={isOpened} />
+    <CommentTitle onHamburgerClick={onHamburgerClick} title={title} isOpened={isOpened} />
   </div>
 );
 
 ExpandButton.defaultProps = {
   forwardRef: {},
-  onClick: () => undefined,
-  onKeyDown: () => undefined,
+  onHamburgerClick: null,
+  onClick: null,
+  onKeyDown: null,
+  style: {},
   title: '',
 };
 
 ExpandButton.propTypes = {
   forwardRef: PropTypes.object,
   isOpened: PropTypes.bool.isRequired,
-  onClick: PropTypes.func,
-  onKeyDown: PropTypes.func,
+  onClick: ofFuncTypeOrNothing,
+  onHamburgerClick: ofFuncTypeOrNothing,
+  onKeyDown: ofFuncTypeOrNothing,
+  style: PropTypes.object,
   title: PropTypes.string,
 };
 

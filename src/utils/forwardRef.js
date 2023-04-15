@@ -10,8 +10,9 @@ const forwardRefWrapper = (Component, refProp) => {
   };
   const name = Component.displayName || Component.name;
   forwardRef.displayName = name;
-
-  return React.forwardRef(forwardRef);
+  const ForwardRefComponent = React.forwardRef(forwardRef);
+  ForwardRefComponent.displayName = name;
+  return ForwardRefComponent;
 };
 
 export default forwardRefWrapper;

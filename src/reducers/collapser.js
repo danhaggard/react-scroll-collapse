@@ -2,19 +2,25 @@ import { combineReducers } from 'redux';
 
 import {
   ADD_COLLAPSER,
-  ADD_COLLAPSER_CHILD,
   ADD_ITEM,
   REMOVE_ITEM,
   REMOVE_COLLAPSER,
-  REMOVE_COLLAPSER_CHILD
+  ADD_ACTIVE_CHILDREN,
+  REMOVE_ACTIVE_CHILDREN,
+  SET_ACTIVE_CHILDREN_LIMIT,
+  SET_TREE_ID,
 } from '../actions/const';
 
+import { getOrObject, isUndefNull } from '../utils/selectorUtils';
+import { addShiftArray, dedupeArraysByFilter } from '../utils/arrayUtils';
+
 import {
-  checkAttr,
   addToState,
+  injectPayload,
   removeFromState,
-  updateState
+  updateState,
 } from './utils';
+
 
 /*
   Some notes regarding state:
@@ -31,12 +37,61 @@ import {
   arbitrarily deep in other components in the DOM.
 */
 
+export const activeChildrenLimitReducer = (state = 1, action) => {
+  const { activeChildrenLimit } = getOrObject(action, 'payload');
+  switch (action.type) {
+    case SET_ACTIVE_CHILDREN_LIMIT:
+      return activeChildrenLimit;
+    default:
+      return state;
+  }
+};
+
+export const activeChildrenReducer = (state = [], action) => {
+  const { activeChildrenToAdd, activeChildrenToRemove, activeChildrenLimit } = getOrObject(action, 'payload');
+  switch (action.type) {
+    case ADD_ACTIVE_CHILDREN:
+      return addShiftArray(state, activeChildrenToAdd, activeChildrenLimit);
+    case REMOVE_ACTIVE_CHILDREN:
+      return dedupeArraysByFilter(state, activeChildrenToRemove);
+    case SET_ACTIVE_CHILDREN_LIMIT:
+      return addShiftArray(state, [], activeChildrenLimit);
+    default:
+      return state;
+  }
+};
+
 // handles the id attr for collapsers.
 export const collapserIdReducer = (state = null, action) => {
-  const { collapser } = checkAttr(action, 'payload');
+  const { collapserId } = getOrObject(action, 'payload');
   switch (action.type) {
     case ADD_COLLAPSER:
-      return collapser.id;
+      return collapserId;
+    default:
+      return state;
+  }
+};
+
+// handles the id attr for collapsers.
+export const collapserParentIdReducer = (state = null, action) => {
+  const { parentCollapserId, parentUpdate } = getOrObject(action, 'payload');
+  switch (action.type) {
+    case ADD_COLLAPSER:
+      return (
+        typeof parentCollapserId === 'undefined' || parentUpdate
+      ) ? state : parentCollapserId;
+    default:
+      return state;
+  }
+};
+
+export const collapserTreeIdReducer = (state = null, action) => {
+  const { collapserId, treeId } = getOrObject(action, 'payload');
+  switch (action.type) {
+    case ADD_COLLAPSER:
+      return collapserId;
+    case SET_TREE_ID:
+      return treeId;
     default:
       return state;
   }
@@ -44,11 +99,11 @@ export const collapserIdReducer = (state = null, action) => {
 
 //  handles the collapsers attr in collapsers entities.
 export const collapsersIdArray = (state = [], action) => {
-  const { collapser, collapserId } = checkAttr(action, 'payload');
+  const { collapserId, childCollapserId } = getOrObject(action, 'payload');
   switch (action.type) {
-    case ADD_COLLAPSER_CHILD:
-      return [...state, collapser.id];
-    case REMOVE_COLLAPSER_CHILD:
+    case ADD_COLLAPSER:
+      return !isUndefNull(childCollapserId) ? [...state, childCollapserId] : state;
+    case REMOVE_COLLAPSER:
       return state.filter(val => val !== collapserId);
     default:
       return state;
@@ -57,10 +112,10 @@ export const collapsersIdArray = (state = [], action) => {
 
 // handles the list of immediate child items nested under a collapser.
 export const itemsIdArray = (state = [], action) => {
-  const { item, itemId } = checkAttr(action, 'payload');
+  const { itemId } = getOrObject(action, 'payload');
   switch (action.type) {
     case ADD_ITEM:
-      return [...state, item.id];
+      return [...state, itemId];
     case REMOVE_ITEM:
       return state.filter(val => val !== itemId);
     default:
@@ -69,24 +124,41 @@ export const itemsIdArray = (state = [], action) => {
 };
 
 export const collapserReducer = combineReducers({
+  activeChildren: activeChildrenReducer,
+  activeChildrenLimit: activeChildrenLimitReducer,
   collapsers: collapsersIdArray,
   id: collapserIdReducer,
   items: itemsIdArray,
+  parentCollapserId: collapserParentIdReducer,
+  treeId: collapserTreeIdReducer,
 });
 
 /* handles reactScrollCollapse.entities.collapsers state */
 export const collapsersReducer = (state = {}, action) => {
-  const { collapserId, parentCollapserId } = checkAttr(action, 'payload');
+  const { collapserId, parentCollapserId } = getOrObject(action, 'payload');
   switch (action.type) {
-    case ADD_COLLAPSER:
-      return addToState(state, action, collapserId, collapserReducer);
-    case ADD_COLLAPSER_CHILD:
-    case REMOVE_COLLAPSER_CHILD:
-      return updateState(state, action, parentCollapserId, collapserReducer);
-    case REMOVE_COLLAPSER:
-      return removeFromState(state, collapserId);
+    case ADD_COLLAPSER: {
+      let newState = addToState(state, action, collapserId, collapserReducer);
+      if (!isUndefNull(parentCollapserId)) {
+        const newAction = injectPayload(action, {
+          collapserId: parentCollapserId,
+          childCollapserId: collapserId,
+          parentUpdate: true,
+        });
+        newState = updateState(newState, newAction, parentCollapserId, collapserReducer);
+      }
+      return newState;
+    }
+    case REMOVE_COLLAPSER: {
+      const newState = updateState(state, action, parentCollapserId, collapserReducer);
+      return removeFromState(newState, collapserId);
+    }
     case ADD_ITEM:
     case REMOVE_ITEM:
+    case SET_TREE_ID:
+    case ADD_ACTIVE_CHILDREN:
+    case REMOVE_ACTIVE_CHILDREN:
+    case SET_ACTIVE_CHILDREN_LIMIT:
       return updateState(state, action, collapserId, collapserReducer);
     default:
       return state;

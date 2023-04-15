@@ -1,5 +1,6 @@
 const baseConfig = require('./webpack.base.config');
 
+
 module.exports = (opts) => {
   const { DEVELOPMENT, DIST_PATH, SRC_PATH } = opts;
   const config = baseConfig(opts);
@@ -33,8 +34,10 @@ module.exports = (opts) => {
       {
         loader: 'sass-loader',
         options: {
-          localIdentName: cssIdentifier,
-          modules: true
+          sassOptions: {
+            localIdentName: cssIdentifier,
+            modules: true
+          }
         }
       }
     ],
@@ -49,8 +52,6 @@ module.exports = (opts) => {
     'react-motion': 'react-motion',
     'react-redux': 'react-redux',
     redux: 'redux',
-    'redux-saga': 'redux-saga',
-    reselect: 'reselect',
   };
 
   const resolve = {
