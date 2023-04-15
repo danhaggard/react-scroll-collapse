@@ -10,8 +10,6 @@ module.exports = (opts) => {
     SRC_PATH
   } = opts;
   const config = baseConfig(opts);
-  // Swaps out newly changed code on the fly and updates the browser.
-  const hotModuleReplacement = new webpack.HotModuleReplacementPlugin();
 
   // used in conjunction with HMR - just names the modules reported in console.
   const namedModulesPlugin = new webpack.NamedModulesPlugin();
@@ -98,7 +96,6 @@ module.exports = (opts) => {
     },
     plugins: [
       ...config.plugins,
-      hotModuleReplacement,
       namedModulesPlugin
     ]
   };

@@ -95,8 +95,8 @@
     "style-loader": "^0.19.1",
     "url-loader": "^1.1.2",
     "webpack": "^4.46.0",
-    "webpack-cli": "^3.3.12",
-    "webpack-dev-server": "^3.11.3",
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^4.13.2",
     "worker-loader": "^3.0.8"
   },
   "peerDependencies": {
@@ -109,9 +109,9 @@
     "redux": "^4.0.1"
   },
   "dependencies": {
-    "react": "^16.14.0",
-    "react-dom": "^16.14.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
     "react-motion": "^0.5.2",
-    "react-redux": "^7.2.9"
+    "react-redux": "^7.0.2"
   }
 }
