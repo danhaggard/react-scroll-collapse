@@ -36,6 +36,10 @@ collapserControllerItem provides controls to expand/collapse a single element.
 
 ## Installation
 
+### Node Version
+
+16.13.0
+
 ### NPM
 ```bash
 npm install --save react-scroll-collapse
