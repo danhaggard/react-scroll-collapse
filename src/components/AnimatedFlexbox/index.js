@@ -43,10 +43,12 @@ const StaticChild = ({
   </div>
 );
 
+/*
 StaticChild.whyDidYouRender = {
   logOnDifferentValues: false,
   customName: 'StaticChild'
 };
+*/
 
 const RefStaticChild = React.forwardRef(StaticChild);
 
@@ -192,7 +194,9 @@ const FlexMotion = ({ // eslint-disable-line
   );
 };
 
-FlexMotion.defaultProps = {
+const RefFlexMotion = React.forwardRef(FlexMotion);
+
+RefFlexMotion.defaultProps = {
   children: [],
   className: '',
   // onClick: null,
@@ -203,7 +207,7 @@ FlexMotion.defaultProps = {
 };
 
 
-FlexMotion.propTypes = {
+RefFlexMotion.propTypes = {
   getInterpolatedStyle: PropTypes.func.isRequired,
   motionStyle: PropTypes.object.isRequired,
   // onClick: ofFuncTypeOrNothing,
@@ -215,12 +219,11 @@ FlexMotion.propTypes = {
   style: PropTypes.object,
 };
 
-FlexMotion.whyDidYouRender = {
+RefFlexMotion.whyDidYouRender = {
   logOnDifferentValues: false,
   customName: 'FlexMotion'
 };
 
-const RefFlexMotion = React.forwardRef(FlexMotion);
 
 const PureFlexMotion = React.memo(RefFlexMotion);
 

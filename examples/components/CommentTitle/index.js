@@ -24,9 +24,13 @@ const CommentTitle = (props) => {
   );
 };
 
+CommentTitle.defaultProps = {
+  onHamburgerClick: null,
+};
+
 CommentTitle.propTypes = {
   isOpened: PropTypes.bool.isRequired,
-  onHamburgerClick: PropTypes.func.isRequired,
+  onHamburgerClick: PropTypes.func,
   title: PropTypes.string.isRequired,
 };
 

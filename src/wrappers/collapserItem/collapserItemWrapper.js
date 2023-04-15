@@ -67,14 +67,17 @@ export const collapserItemWrapper = (WrappedComponent) => {
     }
   }
 
-  CollapserItemController.defaultProps = {};
+  CollapserItemController.defaultProps = {
+    scrollOnOpen: null,
+    scrollOnClose: null,
+  };
 
   CollapserItemController.propTypes = {
     addToNodeTargetArray: PropTypes.func.isRequired,
     isOpened: PropTypes.bool.isRequired,
     expandCollapse: PropTypes.func.isRequired,
-    scrollOnOpen: PropTypes.bool.isRequired,
-    scrollOnClose: PropTypes.bool.isRequired,
+    scrollOnOpen: PropTypes.bool,
+    scrollOnClose: PropTypes.bool,
   };
 
   CollapserItemController.whyDidYouRender = {
