@@ -19,8 +19,6 @@ const server = new WebpackDevServer(compiler, {
   static: {
     directory: config.entry[0],
   }
-  // contentBase: config.entry,
-  // filename: config.output.filename,
 });
 server.listen(portNumber, 'localhost', (err) => {
   if (err) {
