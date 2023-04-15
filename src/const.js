@@ -10,10 +10,3 @@ export const MOTION_SPRINGS = {
 };
 
 export const DEFAULT_MOTION_SPRING = MOTION_SPRINGS.noWobble; // eslint-disable-line
-
-/*
-noWobble
-gentle
-wobbly
-stiff
-*/

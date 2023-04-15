@@ -33,12 +33,9 @@ export const nodeTargetArrayReducer = (state = [], action) => {
       if (collapserId === null) {
         return [];
       }
-      // const collapserIdArr = Array.isArray(collapserId) ? collapserId : [collapserId];
       if (clearBeforeAdding) {
-        // return collapserIdArr;
         return [collapserId];
       }
-      // return [...state, ...collapserIdArr];
       return [...state, collapserId];
 
     default:

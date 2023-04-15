@@ -14,5 +14,4 @@ export const entities = combineReducers({
 
 export const reactScrollCollapse = combineReducers({
   entities,
-  // scrollers,
 });

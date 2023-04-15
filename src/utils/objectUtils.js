@@ -17,13 +17,6 @@ export const filterObject = (
 
 export const addPropertiesToObject = (objA, objB) => Object.entries(objB).forEach(([key, value]) => (objA[key] = value));  // eslint-disable-line
 
-/*
-{
-  collapser: parentCollapserId, scroller: parentScrollerId
-},
-*/
-
-
 export const setContextAttrs = (that) => {
   const {
     props: {

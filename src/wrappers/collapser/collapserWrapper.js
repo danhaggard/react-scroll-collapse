@@ -226,12 +226,10 @@ export const collapserWrapper = (WrappedComponent) => {
       const childCollapsers = childCollapsersSelector();
       // TODO: investigate why childCollapsers passed as nodeTargetArray
       // doesn't work.
-      // addToNodeTargetArray(id, rootNodeId, true);
       childCollapsers.forEach((childId, i) => {
         const clearTargets = i === 0;
         addToNodeTargetArray(childId, rootNodeId, clearTargets);
       });
-      // addToNodeTargetArray(childCollapsers, rootNodeId, true);
 
       if (this.methods.collapser) {
         this.methods.collapser.addSelfToActiveSiblings(this.state);
@@ -249,8 +247,6 @@ export const collapserWrapper = (WrappedComponent) => {
       // second false stops it from flipping values of children of targetNodes
       this.initiateTreeStateCheck(false, false);
     };
-
-    // expandCollapseItems = this.expandCollapseAllBase(false);
 
     /*
       The callback from the webworker.  Receive its' updated state.
@@ -294,7 +290,6 @@ export const collapserWrapper = (WrappedComponent) => {
       setTreeId,
       flipChildValues
     ) => this.methods.collapser.initiateTreeStateCheck(
-      // this.props,
       setTreeId,
       flipChildValues
     );
@@ -313,8 +308,6 @@ export const collapserWrapper = (WrappedComponent) => {
         ...collapserContextActions,
       },
       [
-        // 'activeChildren',
-        // 'activeChildrenLimit',
         'contextProps',
         'rootNodeId',
         'selectors',
@@ -347,7 +340,6 @@ export const collapserWrapper = (WrappedComponent) => {
 
   CollapserController.propTypes = {
     /* provided by collapserControllerWrapper */
-    // cache: PropTypes.object.isRequired,
 
     /* provided by redux */
     addToNodeTargetArray: PropTypes.func.isRequired,
@@ -365,7 +357,6 @@ export const collapserWrapper = (WrappedComponent) => {
     _reactScrollCollapse: PropTypes.object.isRequired,
 
     /* provided by scrollerProvider via context */
-    // areAllItemsExpandedWorker: PropTypes.object.isRequired,
 
     /* provided by user */
     setActiveChildLimit: PropTypes.number,

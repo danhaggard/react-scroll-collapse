@@ -106,7 +106,6 @@ const collapserContext = (Base) => {
       const {
         addActiveChildren,
         _reactScrollCollapse: { id },
-        // isActiveSibling,
         removeActiveChildren
       } = this.props;
       /*
@@ -209,7 +208,6 @@ const collapserContext = (Base) => {
       const { orphanNodeCache } = cache;
       const {
         _reactScrollCollapse: { id },
-        // _reactScrollCollapseParents: { collapser }
       } = this.props;
       orphanNodeCache.registerIncomingMount(id);
     })();

@@ -4,10 +4,7 @@ module.exports = (opts) => {
   const {
     DEVELOPMENT, PRODUCTION, DIST_PATH
   } = opts;
-  // const entry = [path.join(SRC_PATH, 'index.js')];
 
-  // environment vars - passed when running node e.g.
-  // NODE_ENV=development node dev-server.js
   const define = new webpack.DefinePlugin({
     DEVELOPMENT: JSON.stringify(DEVELOPMENT),
     PRODUCTION: JSON.stringify(PRODUCTION),
@@ -29,7 +26,6 @@ module.exports = (opts) => {
   ];
 
   return {
-    // entry,
     plugins: [define],
     module: {
       rules

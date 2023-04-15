@@ -1,7 +1,5 @@
 /* eslint-disable max-len */
 import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
-
 import providerIdStore from '../utils/providerCounter';
 import {
   defaultMergeContextWithProps,

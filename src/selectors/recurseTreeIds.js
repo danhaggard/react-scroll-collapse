@@ -6,7 +6,6 @@ const recurseTreeIds = (
   id,
 ) => {
   const concatChildren = (currentNodeId, counter) => {
-    console.log(`recurseTreeIds at node ${currentNodeId} and counter value: ${counter.getCurrent() + 1}`);
     resultReducer(currentNodeId, counter());
     const nextChildren = getNodeChildren(currentNodeId);
     nextChildren.forEach(childId => concatChildren(childId, counter));

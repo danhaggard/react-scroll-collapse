@@ -38,5 +38,6 @@ export { collapserItemIdentity } from './wrappers/collapserItem';
   });
 */
 export { reactScrollCollapse } from './reducers';
+export { default as AnimatedFlexbox } from './components/AnimatedFlexbox';
 
 export default Scroller;

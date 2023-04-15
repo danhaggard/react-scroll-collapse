@@ -2,14 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Collapse } from 'react-collapse';
-// import { UnmountClosed as Collapse } from 'react-collapse';
 
 import CommentBody from '../CommentBody';
 import { ofChildrenTypeOrNothing } from '../../../src/utils/propTypeHelpers';
 
 import { collapserItemController } from '../../../src';
 import styles from './Comment.scss';
-import { /* MOTION_SPRINGS */ DEFAULT_MOTION_SPRING } from '../../../src/const';
+import { DEFAULT_MOTION_SPRING } from '../../../src/const';
 
 
 const Comment = (props) => {

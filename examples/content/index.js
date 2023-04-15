@@ -4,7 +4,6 @@ import Scroller from '../../src';
 import SimpleCollapser from '../components/SimpleCollapser';
 import CommentThread from '../components/CommentThread';
 import CommentThreadFlex from '../components/CommentThreadFlex';
-import CommentThreadGrid from '../components/CommentThreadGrid';
 
 import Example from '../components/Example';
 
@@ -37,8 +36,8 @@ const COPY = {
     State is tracked separately for each`
   },
   5: {
-    title: 'Experimental',
-    text: 'Take barbershop to strange new places'
+    title: 'Experimental Flexbox Component',
+    text: ''
   },
 };
 
@@ -125,35 +124,6 @@ const example5 = (
     </Scroller>
   </Example>
 );
-
-const example6 = (
-  <Example showHeader={false} {...COPY[4]} style={{}} key={6}>
-    <Scroller style={style}>
-      <CommentThreadGrid
-
-        key={someData.key}
-        childInsertionIndex={0}
-        isOpenedInit
-        childIsOpenedInit
-        nodeData={someData}
-        setActiveChildLimit={1}
-        {...generateThreadConfigChild}
-        />
-    </Scroller>
-  </Example>
-);
-
-/*
-const examples = {
-  0: [example0],
-  1: [example1],
-  2: [example2],
-  3: [example3],
-  4: [example4(4), example4(5)],
-  5: [example5],
-};
-*/
-
 
 const examples = {
   0: [example0],

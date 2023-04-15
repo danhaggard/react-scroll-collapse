@@ -1,12 +1,6 @@
 import { compareIntArrays } from './arrayUtils';
 import { hasOwnProperty } from './selectorUtils';
 
-/*
-const createCompareCondition = defaultCondition => condition => (objB, objA) => key => (
-  !hasOwnProperty(objB, key) || !condition(objB[key], objA[key], defaultCondition)
-);
-*/
-
 const createCompareCondition = defaultCondition => condition => (objB, objA) => (key) => {
   const a = !hasOwnProperty(objB, key);
   const b = !condition(objB[key], objA[key], defaultCondition);

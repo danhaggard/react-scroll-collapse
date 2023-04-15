@@ -6,27 +6,19 @@ import { DEFAULT_MOTION_SPRING } from '../../const';
 import { ofChildrenType, ofFuncTypeOrNothing } from '../../utils/propTypeHelpers';
 import { CONTEXTS } from '../../contextProviders/constants';
 
-// const StaticChild = React.forwardRef();
 const StaticChild = ({
   children,
   className,
-  // onClick,
-  // onDoubleClick,
   style,
   onKeyDown,
   onKeyUp,
   onPointerDown,
   onPointerUp,
-  // onPointerEnter,
-  // onPointerLeave,
-  // onPointerOver,
 }, ref) => (
   <div
     className={className}
     onPointerDown={onPointerDown}
     onPointerUp={onPointerUp}
-    // onClick={onClick}
-    // onDoubleClick={onDoubleClick}
     ref={ref}
     style={style}
     role="button"
@@ -34,21 +26,10 @@ const StaticChild = ({
     onKeyDown={onKeyDown}
     onKeyUp={onKeyUp}
     type="button"
-    // onPointerEnter={onPointerEnter}
-    // onPointerLeave={onPointerLeave}
-    // onPointerOver={onPointerOver}
-    // data-react-scroll-collapse-flex
   >
     { children }
   </div>
 );
-
-/*
-StaticChild.whyDidYouRender = {
-  logOnDifferentValues: false,
-  customName: 'StaticChild'
-};
-*/
 
 const RefStaticChild = React.forwardRef(StaticChild);
 
@@ -63,7 +44,6 @@ const isHeightFixed = (ref, prevHeight, zeroHeightDiffArr = []) => {
 
   if (prevHeight === null) {
     const { clientWidth } = ref.current;
-    // console.log(`id: ${id}, width diff: `, ref.current.parentNode.clientWidth - clientWidth);
     /*
       Covers case where flex child has full width.  170 is a guesstimate value
       of margins and paddings.  Changes with font scaling.
@@ -79,7 +59,6 @@ const isHeightFixed = (ref, prevHeight, zeroHeightDiffArr = []) => {
 
   let heightFixed = false;
   let newHeightDiffArr = zeroHeightDiffArr;
-  // console.log(`id: ${id}, height diff: `, heightDiff);
 
   /*
     You will see a drop in height once flex width has been determined and is
@@ -88,9 +67,9 @@ const isHeightFixed = (ref, prevHeight, zeroHeightDiffArr = []) => {
     Could also just rely on newHeightDiffArr - but is sometimes quicker.  Is
     trade off between fastest time to parent width vs allowing enough
     time to determine child heights. greater newHeightDiffArr.length allow
-    more time to determine child heights.
+    more time to determine child heights. 0.3
   */
-  if (heightDiff > 0.3) {
+  if (heightDiff > 30) {
     heightFixed = true;
     newHeightDiffArr = [];
   }
@@ -105,33 +84,25 @@ const isHeightFixed = (ref, prevHeight, zeroHeightDiffArr = []) => {
 
   /*
     3 - 4 seems to be a good balance between responsiveness and giving react-collapse
-    enough time to source its first height value.
+    enough time to source its first height value. 4
   */
-  if (newHeightDiffArr.length > 4) {
+  if (newHeightDiffArr.length > 40) {
     heightFixed = true;
   }
 
   return [heightFixed, nextHeight, newHeightDiffArr];
 };
 
-// const FlexMotion = React.forwardRef();
-
-const FlexMotion = ({ // eslint-disable-line
+const FlexMotion = ({
   className,
   children,
   getInterpolatedStyle,
   motionStyle,
-  // onClick,
-  // onDoubleClick,
   onPointerDown,
   onPointerUp,
   onKeyDown,
   onKeyUp,
   onRest,
-  // id,
-  // onPointerEnter,
-  // onPointerLeave,
-  // onPointerOver, context = useContext(CONTEXTS.MAIN);
   style,
 }, ref) => {
   let prevHeight = null;
@@ -140,27 +111,19 @@ const FlexMotion = ({ // eslint-disable-line
   const context = useContext(CONTEXTS.MAIN);
   let finalOnRest = context.contextMethods.collapser.publishExpandAll;
   const getFinalOnRest = () => finalOnRest();
-  // console.log(`id: ${id}, render-  motionStyle`, motionStyle);
   return (
     <Motion
       style={motionStyle}
-      // onClick={onClick}
       onRest={getFinalOnRest}
     >
       {
         (interpolatedStyle) => {
-
-          // console.log(`id: ${id}, TOP: prevHeight, clientHeight, parentHeight`, prevHeight, ref.current && ref.current.clientHeight, ref.current && ref.current.parentNode.clientHeight);
-          // console.log(`id: ${id}, TOP: clientWidth, parentWidth`, ref.current && ref.current.clientWidth, ref.current && ref.current.parentNode.clientWidth);
-
           if (!heightFixed) {
             [heightFixed, prevHeight, zeroHeightDiffArr] = isHeightFixed(
               ref, prevHeight, zeroHeightDiffArr
             );
-            // console.log(`id: ${id}, heightFixed, prevHeight, zeroHeightDiffArr`, heightFixed, prevHeight, zeroHeightDiffArr);
 
             if (heightFixed) {
-              // console.log(`id: ${id}, heightFixed`);
               context.contextMethods.collapser.publishExpandAll();
               finalOnRest = () => null;
             }
@@ -176,11 +139,6 @@ const FlexMotion = ({ // eslint-disable-line
               style={newStyle}
               onPointerDown={onPointerDown}
               onPointerUp={onPointerUp}
-            //   onClick={onClick}
-            //  onDoubleClick={onDoubleClick}
-            //  onPointerEnter={onPointerEnter}
-            //  onPointerLeave={onPointerLeave}
-            //  onPointerOver={onPointerOver}
               onKeyDown={onKeyDown}
               onKeyUp={onKeyUp}
 
@@ -199,7 +157,6 @@ const RefFlexMotion = React.forwardRef(FlexMotion);
 RefFlexMotion.defaultProps = {
   children: [],
   className: '',
-  // onClick: null,
   onKeyDown: null,
   onKeyUp: null,
   onRest: null,
@@ -210,7 +167,6 @@ RefFlexMotion.defaultProps = {
 RefFlexMotion.propTypes = {
   getInterpolatedStyle: PropTypes.func.isRequired,
   motionStyle: PropTypes.object.isRequired,
-  // onClick: ofFuncTypeOrNothing,
   onKeyDown: ofFuncTypeOrNothing,
   onKeyUp: ofFuncTypeOrNothing,
   onRest: ofFuncTypeOrNothing,
@@ -253,11 +209,7 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
 
   calcPixels = percentage => (percentage * this.parentWidth);
 
-  // getBackgroundString = val => `linear-gradient(${val}deg, #ddffab, #abe4ff, #d9abff)`
-  // getBackgroundString = val => `linear-gradient(${val}deg, #d9abff, #e5c7ff 45% 55%, #d9abff)`
-
   getBackgroundString = val => `linear-gradient(${val}deg, #abe4ff, #d2f0ff 45% 55%, #abe4ff)`
-
 
   getFlexBasisString = pixelInt => `1 1 ${pixelInt}px`;
 
@@ -423,19 +375,13 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
       renderChildren,
       style
     } = this.props;
-    // console.log(`id: ${this.props.id}, transposeLeft: ${this.props.transposeLeft}`);
 
     const { style: stateStyle } = this.state;
     return !isRootNode ? (
       <PureFlexMotion
-        // onPointerEnter={this.pointerEnter}
-        // onPointerLeave={this.pointerLeave}
-        // onPointerOver={this.pointerOver}
         className={className}
         getInterpolatedStyle={this.getInterpolWidthRotationTranspose}
         motionStyle={this.getMotionStyle()}
-        // onClick={this.handleOnClick}
-        // onDoubleClick={this.handleOnDoubleClick}
         onPointerDown={this.handleOnPointerDown}
         onPointerUp={this.handleOnPointerUp}
         onKeyDown={this.handleKeyDown}
@@ -450,7 +396,6 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
         className={className}
         onPointerDown={this.handleOnPointerDown}
         onPointerUp={this.handleOnPointerUp}
-        // onClick={this.handleOnClick}
         onKeyDown={this.handleKeyDown}
         ref={flexRef}
         style={style}

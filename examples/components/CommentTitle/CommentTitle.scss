@@ -17,7 +17,6 @@
 }
 
 :local(.hamburger) {
-  // padding: 1em;
   align-self: center;
   display: inline-block;
   cursor: pointer;
@@ -59,7 +58,6 @@
 :local(.hamburger-inner) {
   cursor: pointer;
   display: block;
-  // top: 50%;
   width: 1.7em;
   height: 0.2em;
   background-color: #fff;

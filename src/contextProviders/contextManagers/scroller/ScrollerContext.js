@@ -80,9 +80,6 @@ const scrollerContext = (Base) => {
     */
     getChildDistanceToTop = (childEl) => {
       const el = this.getElem();
-      // const val = this.getRectTop(childEl) - this.getRectTop(el) + this.getScrollTop(el);
-      // console.log('val', val);
-      // return val;
       return this.getRectTop(childEl) - this.getRectTop(el) + this.getScrollTop(el);
     };
 
@@ -110,8 +107,6 @@ const scrollerContext = (Base) => {
       /* User hasn't clicked anything yet and hasn't scrolled and we aren't at the top already */
       if (this.userScrollActive === null && nextY === 0) {
         this.startScrollAnimation();
-
-        // [resetNeeded, y]
         return [false, null];
       }
 

@@ -35,7 +35,6 @@ export const declareType = function declareType(propertyNamesInOrder) {
 
     // create new object with given properties of given order, and matching initial values
     construct(initialValues) {
-      // var o = { _type: self };     // also store type information?
       const o = {};
       propertyNamesInOrder.forEach(name => (o[name] = initialValues[name]));
       return o;
@@ -43,29 +42,3 @@ export const declareType = function declareType(propertyNamesInOrder) {
   };
   return self;
 };
-
-/*
-// ########################################################################
-// Declare any amount of types (once per application run)
-// ########################################################################
-
-var MyType = declareType(['a', 'b', 'c']);
-
-
-// ########################################################################
-// Run-time stuff (we might do these things again and again during run-time)
-// ########################################################################
-
-// Object `o` (if not overtly tempered with) will always have the same hidden class,
-// thereby making life for the optimizer easier:
-var o = MyType.construct({a: 1, b: 5, c: 123});
-
-// Sum over all properties of `o`
-var x = 0;
-MyType.forEach(o, function(key, value) {
-  // console.log([key, value]);
-  x += value;
-});
-console.log(x);
-
-*/
