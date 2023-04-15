@@ -50,9 +50,11 @@ module.exports = (opts) => {
     {
       loader: 'sass-loader',
       options: {
-        localIdentName: cssIdentifier,
-        sourceMap: DEVELOPMENT,
-        modules: true
+        sassOptions: {
+          localIdentName: cssIdentifier,
+          sourceMap: DEVELOPMENT,
+          modules: true
+        }
       }
     }
   ];
