@@ -473,4 +473,8 @@ CommentThread.whyDidYouRender = {
 
 const WrappedCommentThread = collapserController(CommentThread);
 
+WrappedCommentThread.defaultProps = {
+  susbcribeToExpandAll: true,
+};
+
 export default WrappedCommentThread;

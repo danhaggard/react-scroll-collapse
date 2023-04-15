@@ -35,12 +35,17 @@ const COPY = {
     title: 'Multiple Scrolling Components',
     text: `You can use multiple scrollers as well!
     State is tracked separately for each`
-  }
+  },
+  5: {
+    title: 'Experimental',
+    text: 'Take barbershop to strange new places'
+  },
 };
 
 const example0 = (
   <Example {...COPY[0]} key={0} style={{}}>
     <SimpleCollapser
+      boop
       isOpenedInit
       initialComments={6}
       style={{ margin: 0, overflow: 'auto' }}
@@ -71,7 +76,7 @@ const example2 = (
 
 const example3 = (
   <Example {...COPY[3]} key={3}>
-    <Scroller style={{ height: '100%' }}>
+    <Scroller style={{ height: '100%' }} scrollOnClose={false}>
       <SimpleCollapser isOpenedInit childIsOpenedInit initialComments={10} />
     </Scroller>
   </Example>
@@ -105,9 +110,10 @@ const someData = generateCommentThreadData(generateThreadConfig);
 
 const style = { height: '100%' };
 const example5 = (
-  <Example showHeader={false} {...COPY[4]} style={{}} key={5}>
+  <Example showHeader {...COPY[5]} key={5}>
     <Scroller style={style}>
       <CommentThreadFlex
+        boop
         key={someData.key}
         childInsertionIndex={0}
         isOpenedInit
@@ -121,9 +127,10 @@ const example5 = (
 );
 
 const example6 = (
-  <Example showHeader={false} {...COPY[4]} style={{}} key={5}>
+  <Example showHeader={false} {...COPY[4]} style={{}} key={6}>
     <Scroller style={style}>
       <CommentThreadGrid
+
         key={someData.key}
         childInsertionIndex={0}
         isOpenedInit
@@ -149,12 +156,12 @@ const examples = {
 
 
 const examples = {
-  // 0: [example0],
-  // 1: [example1],
-  0: [example5],
-  // 3: [example3],
-  // 4: [example4(4), example4(5)],
-// 5: [example5],
+  0: [example0],
+  1: [example1],
+  2: [example2],
+  3: [example3],
+  4: [example4(4), example4(5)],
+  5: [example5],
 };
 
 

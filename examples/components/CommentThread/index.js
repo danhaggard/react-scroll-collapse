@@ -61,6 +61,7 @@ class CommentThread extends PureComponent {
     const idStr = collapserId.toString();
     const text = `${this.randText}`;
     const title = ` Collapser ${idStr}`;
+
     return (
       <div ref={collapserRef} className={styles.commentThread} style={style}>
         <ExpandButton

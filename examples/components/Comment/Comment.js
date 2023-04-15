@@ -69,7 +69,7 @@ Comment.propTypes = {
 };
 
 Comment.whyDidYouRender = {
-  logOnDifferentValues: false,
+  logOnDifferentValues: true,
   customName: 'Comment'
 };
 

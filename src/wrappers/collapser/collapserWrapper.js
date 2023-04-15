@@ -37,9 +37,9 @@ export const collapserWrapper = (WrappedComponent) => {
       this.areAllItemsExpandedWorker = this.methods.collapser.areAllItemsExpandedWorker;
       this.checkIfActiveSibling = this.methods.collapser.checkIfActiveSibling;
 
-      this.addToOnFlexRest = this.methods.collapser.addToOnFlexRest;
-      this.removeFromFlexRest = this.methods.collapser.removeFromFlexRest;
-      this.getFlexRegistry = this.methods.collapser.getFlexRegistry;
+      this.subscribeToExpandAll = this.methods.collapser.subscribeToExpandAll;
+      this.unsubscribeFromExpandAll = this.methods.collapser.unsubscribeFromExpandAll;
+      this.getExpandAllRegistry = this.methods.collapser.getExpandAllRegistry;
 
 
       this.cache = this.methods.collapser.cache;
@@ -150,7 +150,7 @@ export const collapserWrapper = (WrappedComponent) => {
       }
     }
 
-    doOnFlexRest = (areAllItemsExpanded, childSelector, expand = true, scroll = true) => () => {
+    doOnExpandAll = (areAllItemsExpanded, childSelector, expand = true, scroll = true) => () => {
       const { rootNodeId } = this;
       const { expandCollapseAll } = this.props;
       if (expand) {
@@ -159,7 +159,7 @@ export const collapserWrapper = (WrappedComponent) => {
       if (this.methods.scroller && scroll) {
         this.methods.scroller.scrollToTop(this.elem.current);
       }
-      this.removeFromFlexRest(this.onFlexRestSubscriberId);
+      this.unsubscribeFromExpandAll(this.expandAllSubscriberId);
     }
 
     expandCollapseAll = () => {
@@ -172,6 +172,7 @@ export const collapserWrapper = (WrappedComponent) => {
       const {
         addToNodeTargetArray,
         expandCollapseAll,
+        susbcribeToExpandAll,
         selectors: { allChildItemIds: allChildItemIdsSelector }
       } = this.props;
       const { areAllItemsExpanded } = this.state;
@@ -191,12 +192,12 @@ export const collapserWrapper = (WrappedComponent) => {
         this.methods.collapser.addSelfToActiveSiblings(this.state);
       }
 
-      if (!areAllItemsExpanded && rootNodeId !== id && !isActiveSibling) {
+      if (!areAllItemsExpanded && rootNodeId !== id && !isActiveSibling && susbcribeToExpandAll) {
         /*
           Expanding Everything - wait for width before scroll and expand.
         */
-        this.onFlexRestSubscriberId = this.addToOnFlexRest(
-          this.doOnFlexRest(areAllItemsExpanded, allChildItemIds)
+        this.expandAllSubscriberId = this.subscribeToExpandAll(
+          this.doOnExpandAll(areAllItemsExpanded, allChildItemIds)
         );
       } else {
         if (this.methods.scroller) {
@@ -216,7 +217,8 @@ export const collapserWrapper = (WrappedComponent) => {
           childItemIds: childItemIdsSelector,
           allChildItemsExpanded: allChildItemsExpandedSelector,
           childCollapsers: childCollapsersSelector,
-        }
+        },
+        susbcribeToExpandAll,
       } = this.props;
       const isActiveSibling = this.checkIfActiveSibling();
       const allChildItemsExpanded = allChildItemsExpandedSelector();
@@ -234,9 +236,9 @@ export const collapserWrapper = (WrappedComponent) => {
       if (this.methods.collapser) {
         this.methods.collapser.addSelfToActiveSiblings(this.state);
       }
-      if (!allChildItemsExpanded && rootNodeId !== id && !isActiveSibling) {
-        this.onFlexRestSubscriberId = this.addToOnFlexRest(
-          this.doOnFlexRest(allChildItemsExpanded, childItemIds)
+      if (!allChildItemsExpanded && rootNodeId !== id && !isActiveSibling && susbcribeToExpandAll) {
+        this.expandAllSubscriberId = this.subscribeToExpandAll(
+          this.doOnExpandAll(allChildItemsExpanded, childItemIds)
         );
       } else {
         if (this.methods.scroller) {
@@ -340,6 +342,7 @@ export const collapserWrapper = (WrappedComponent) => {
 
   CollapserController.defaultProps = {
     setActiveChildLimit: 1,
+    susbcribeToExpandAll: false,
   };
 
   CollapserController.propTypes = {
@@ -366,6 +369,7 @@ export const collapserWrapper = (WrappedComponent) => {
 
     /* provided by user */
     setActiveChildLimit: PropTypes.number,
+    susbcribeToExpandAll: PropTypes.bool,
   };
 
   addLoggingDefaultsToComponent(

@@ -21,7 +21,7 @@ const collapserContext = (Base) => {
       activeSiblingLimit: null,
     }
 
-    onFlexRestRegistry = createSubscriberRegistry();
+    onExpandAllRegistry = createSubscriberRegistry();
 
     constructor(props, context) {
       super(props, context);
@@ -216,22 +216,13 @@ const collapserContext = (Base) => {
 
     /* end former collapserManager methods */
 
-    // onFlexRest = () => this.onFlexRestRegistry.forEach(subscriber => subscriber());
-    onFlexRest = () => {
-      const {
-        _reactScrollCollapse: { id },
-        // _reactScrollCollapseParents: { collapser }
-      } = this.props;
-      // console.log(`onFlexRest called id: ${id}, registry: `, this.onFlexRestRegistry.getRegistry());
-      // this.checkIfActiveSibling()
-      this.onFlexRestRegistry.forEach(subscriber => subscriber());
-    }
+    publishExpandAll = () => this.onExpandAllRegistry.forEach(subscriber => subscriber());
 
-    addToOnFlexRest = this.onFlexRestRegistry.add;
+    subscribeToExpandAll = this.onExpandAllRegistry.add;
 
-    getFlexRegistry = this.onFlexRestRegistry.getRegistry;
+    getExpandAllRegistry = this.onExpandAllRegistry.getRegistry;
 
-    removeFromFlexRest = this.onFlexRestRegistry.remove;
+    unsubscribeFromExpandAll = this.onExpandAllRegistry.remove;
 
     contextMethods = {
       collapser: {
@@ -243,10 +234,10 @@ const collapserContext = (Base) => {
         noActiveSiblings: this.noActiveSiblings.bind(this),
         setActiveChildrenLimit: this.setActiveChildrenLimit.bind(this),
 
-        onFlexRest: this.onFlexRest.bind(this),
-        addToOnFlexRest: this.addToOnFlexRest.bind(this),
-        removeFromFlexRest: this.removeFromFlexRest.bind(this),
-        getFlexRegistry: this.getFlexRegistry.bind(this),
+        publishExpandAll: this.publishExpandAll.bind(this),
+        subscribeToExpandAll: this.subscribeToExpandAll.bind(this),
+        unsubscribeFromExpandAll: this.unsubscribeFromExpandAll.bind(this),
+        getExpandAllRegistry: this.getExpandAllRegistry.bind(this),
       }
     };
 

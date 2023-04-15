@@ -136,7 +136,7 @@ const FlexMotion = ({ // eslint-disable-line
   let heightFixed = false;
   let zeroHeightDiffArr = [];
   const context = useContext(CONTEXTS.MAIN);
-  let finalOnRest = context.contextMethods.collapser.onFlexRest;
+  let finalOnRest = context.contextMethods.collapser.publishExpandAll;
   const getFinalOnRest = () => finalOnRest();
   // console.log(`id: ${id}, render-  motionStyle`, motionStyle);
   return (
@@ -159,7 +159,7 @@ const FlexMotion = ({ // eslint-disable-line
 
             if (heightFixed) {
               // console.log(`id: ${id}, heightFixed`);
-              context.contextMethods.collapser.onFlexRest();
+              context.contextMethods.collapser.publishExpandAll();
               finalOnRest = () => console.log('dummy on rest');
             }
           }
