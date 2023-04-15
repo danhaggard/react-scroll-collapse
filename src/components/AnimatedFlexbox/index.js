@@ -162,7 +162,7 @@ const FlexMotion = ({ // eslint-disable-line
             if (heightFixed) {
               // console.log(`id: ${id}, heightFixed`);
               context.contextMethods.collapser.publishExpandAll();
-              finalOnRest = () => console.log('dummy on rest');
+              finalOnRest = () => null;
             }
           }
           const newStyle = {

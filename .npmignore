@@ -8,3 +8,6 @@
 /karma.conf.babel.js
 /karma.conf.js
 /webpack.config.babel.js
+/stats/
+/config/
+/server/

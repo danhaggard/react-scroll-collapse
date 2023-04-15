@@ -1,43 +1,3 @@
-# TODOs
-
-1) Clean up ExpandButton (Is being dual used as a button and just a comment title.  Separate out).
-2) expandCollapseItems is broken.  targetNodeArry does not seem to be mapping
-  correctly to targetNodeTreeIdArray.
-  Instead of [{id: 0, treeId: 0}, {id: 1, treeId: 1}, etc]
-  I get [{id: [0, 1 ,2], treeId: [0,1,2]}]
-  Using a straight map function.  Look in: nestedCollapserItemsExpandedRootEvery
-  in /selectors/collapser.js
-
-  Half workaround in collapserWrapper, where each childId is added
-  in a separate dispatch instead of together as an array.  But there
-  are still bugs.
-
-3) onKeyUp handler doesn't seem to be registering for the root node.  Pressing
-  enter while focused on the root node expands/collapses all nested.  While
-  doing the same on child nodes expands/collapses immediate child items.
-
-Example Component Audit:
-
-components/Example
-components/SimpleCollapser
-  /components/ExpandButton
-    /components/CommentTitle
-  /components/CommentBody
-  /components/SimpleComment
-    /components/ExpandButton
-
-components/CommentThread
-  /components/Comment/CommentWithButtons
-    /components/Comment
-      /components/Comment/CommentBody
-    /components/Button/ButtonSmall
-    /components/ButtonGroup/ButtonGroupSmall
-    /components/InsertChildSettingsForm
-  /components/ExpandButton
-
-components/CommentThreadFlex
-  /components/ExpandButton
-  /components/Comment/CommentWithButtons
 
 
 # react-scroll-collapse
@@ -76,7 +36,7 @@ npm install --save react-scroll-collapse
 If you use npm@3 you'll need to install the peer dependencies
 
 ```bash
-npm install --save classnames react react-collapse react-dom react-height react-motion react-redux redux redux-saga reselect
+npm install --save classnames react react-collapse react-dom react-height react-motion react-redux redux
 ```
 
 ### redux Integration

@@ -51,8 +51,6 @@ module.exports = (opts) => {
     'react-motion': 'react-motion',
     'react-redux': 'react-redux',
     redux: 'redux',
-    'redux-saga': 'redux-saga',
-    reselect: 'reselect',
   };
 
   const resolve = {

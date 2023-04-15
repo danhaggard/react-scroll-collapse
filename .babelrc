@@ -2,7 +2,7 @@
   "presets": [
     ["@babel/preset-env", {
       "targets": {
-        "browsers": ["last 2 versions", "> 0.25%, not dead"],
+        "browsers": ["last 2 versions", "> 0.25%, not dead"]
       },
       "modules": false
     }],
@@ -12,8 +12,7 @@
     "@babel/plugin-proposal-object-rest-spread",
     "@babel/plugin-proposal-export-default-from",
     "@babel/plugin-proposal-export-namespace-from",
-    "@babel/plugin-proposal-class-properties",
-    "@babel/plugin-transform-runtime"
+    "@babel/plugin-proposal-class-properties"
   ],
   "env": {
     "development": {

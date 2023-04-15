@@ -23,7 +23,7 @@ module.exports = (opts) => {
       test: /\.worker\.js$/,
       use: {
         loader: 'worker-loader',
-        options: { inline: true }
+        options: { inline: 'no-fallback' }
       }
     }
   ];
