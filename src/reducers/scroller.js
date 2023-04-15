@@ -38,9 +38,31 @@ export const scrollerIdReducer = (state = null, action) => {
   }
 };
 
+export const scrollOnOpenReducer = (state = true, action) => {
+  const { scrollOnOpen } = getOrObject(action, 'payload');
+  switch (action.type) {
+    case ADD_SCROLLER:
+      return scrollOnOpen;
+    default:
+      return state;
+  }
+};
+
+export const scrollOnCloseReducer = (state = true, action) => {
+  const { scrollOnClose } = getOrObject(action, 'payload');
+  switch (action.type) {
+    case ADD_SCROLLER:
+      return scrollOnClose;
+    default:
+      return state;
+  }
+};
+
 const scrollerReducer = combineReducers({
   collapsers: scrollerCollapsersIdArrayReducer,
   id: scrollerIdReducer,
+  crollOnOpen: scrollOnOpenReducer,
+  scrollOnClose: scrollOnCloseReducer,
 });
 
 export const scrollersReducer = (state = {}, action) => {
