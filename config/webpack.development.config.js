@@ -1,13 +1,7 @@
-const baseConfig = require('./webpack.base.config.js');
-
+const baseConfig = require('./webpack.base.config');
 
 module.exports = (opts) => {
-  const {
-    DEVELOPMENT,
-    BUNDLES_PATH,
-    EXAMPLES_PATH,
-    SRC_PATH
-  } = opts;
+  const { DEVELOPMENT, BUNDLES_PATH, EXAMPLES_PATH, SRC_PATH } = opts;
   const config = baseConfig(opts);
 
   const cssIdentifier = '[path][name]---[local]';
@@ -27,35 +21,33 @@ module.exports = (opts) => {
   ];
   const cssLoader = [
     {
-      loader: 'style-loader',
-      options: {
-        sourceMap: DEVELOPMENT
-      }
+      loader: require.resolve('style-loader'),
     },
     {
-      loader: 'css-loader',
+      loader: require.resolve('css-loader'),
       options: {
-        // This setting allows the use of hyphen in css class names in css
-        // modules.  It gets converted into camel case when exported as the
-        // object property name when the style is imported as a JS object.
-        camelCase: true,
-        localIdentName: cssIdentifier,
-
         // Turns on CSS modules.
-        modules: true,
-        sourceMap: DEVELOPMENT
-      }
+        modules: {
+          mode: 'global',
+          // This setting allows the use of hyphen in css class names in css
+          // modules.  It gets converted into camel case when exported as the
+          // object property name when the style is imported as a JS object.
+          localIdentName: cssIdentifier,
+          exportLocalsConvention: 'camelCase',
+        },
+        sourceMap: DEVELOPMENT,
+      },
     },
     {
-      loader: 'sass-loader',
+      loader: require.resolve('sass-loader'),
       options: {
         sassOptions: {
           localIdentName: cssIdentifier,
           sourceMap: DEVELOPMENT,
-          modules: true
-        }
-      }
-    }
+          modules: true,
+        },
+      },
+    },
   ];
   // Here we compose the development webpack config object using the base config
   return {
@@ -70,21 +62,19 @@ module.exports = (opts) => {
           test: /\.js$/,
           include: [EXAMPLES_PATH, SRC_PATH],
           exclude: /node_modules/,
-          loader: 'babel-loader'
+          loader: require.resolve('babel-loader'),
         },
         {
           test: /\.s?[ac]ss$/,
           use: cssLoader,
         },
-      ]
+      ],
     },
     output: {
       path: BUNDLES_PATH,
       filename: 'app.js',
-      publicPath: '/bundles/'
+      publicPath: '/bundles/',
     },
-    plugins: [
-      ...config.plugins,
-    ]
+    plugins: [...config.plugins],
   };
 };

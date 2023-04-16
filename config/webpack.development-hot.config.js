@@ -1,14 +1,8 @@
 const webpack = require('webpack');
-const baseConfig = require('./webpack.base.config.js');
-
+const baseConfig = require('./webpack.base.config');
 
 module.exports = (opts) => {
-  const {
-    DEVELOPMENT,
-    BUNDLES_PATH,
-    EXAMPLES_PATH,
-    SRC_PATH
-  } = opts;
+  const { DEVELOPMENT, BUNDLES_PATH, EXAMPLES_PATH, SRC_PATH } = opts;
   const config = baseConfig(opts);
 
   // used in conjunction with HMR - just names the modules reported in console.
@@ -40,8 +34,8 @@ module.exports = (opts) => {
     {
       loader: 'style-loader',
       options: {
-        sourceMap: DEVELOPMENT
-      }
+        sourceMap: DEVELOPMENT,
+      },
     },
     {
       loader: 'css-loader',
@@ -54,8 +48,8 @@ module.exports = (opts) => {
 
         // Turns on CSS modules.
         modules: true,
-        sourceMap: DEVELOPMENT
-      }
+        sourceMap: DEVELOPMENT,
+      },
     },
     {
       loader: 'sass-loader',
@@ -63,10 +57,10 @@ module.exports = (opts) => {
         sassOptions: {
           localIdentName: cssIdentifier,
           sourceMap: DEVELOPMENT,
-          modules: true
-        }
-      }
-    }
+          modules: true,
+        },
+      },
+    },
   ];
   // Here we compose the development webpack config object using the base config
   return {
@@ -81,22 +75,19 @@ module.exports = (opts) => {
           test: /\.js$/,
           include: [EXAMPLES_PATH, SRC_PATH],
           exclude: /node_modules/,
-          loader: 'babel-loader'
+          loader: 'babel-loader',
         },
         {
           test: /\.s?[ac]ss$/,
           use: cssLoader,
         },
-      ]
+      ],
     },
     output: {
       path: BUNDLES_PATH,
       filename: 'app.js',
-      publicPath: '/bundles/'
+      publicPath: '/bundles/',
     },
-    plugins: [
-      ...config.plugins,
-      namedModulesPlugin
-    ]
+    plugins: [...config.plugins, namedModulesPlugin],
   };
 };

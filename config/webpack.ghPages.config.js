@@ -11,14 +11,12 @@ module.exports = (opts) => {
     entry: EXAMPLES_PATH,
     externals: {},
     module: {
-      rules: [
-        ...devConfig.module.rules,
-      ]
+      rules: [...devConfig.module.rules],
     },
     output: {
       path: BUNDLES_PATH,
       filename: 'app.js',
-      publicPath: '/bundles/'
-    }
+      publicPath: '/bundles/',
+    },
   };
 };

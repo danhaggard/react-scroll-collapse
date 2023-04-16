@@ -1,6 +1,5 @@
 const baseConfig = require('./webpack.base.config');
 
-
 module.exports = (opts) => {
   const { DEVELOPMENT, DIST_PATH, SRC_PATH } = opts;
   const config = baseConfig(opts);
@@ -11,35 +10,40 @@ module.exports = (opts) => {
     test: /\.(js|jsx)$/,
     include: [SRC_PATH],
     exclude: /node_modules/,
-    loader: 'babel-loader'
+    loader: require.resolve('babel-loader'),
   };
 
   const cssLoader = {
     test: /\.s?[ac]ss$/,
     use: [
       {
-        loader: 'style-loader',
-        options: {
-          sourceMap: DEVELOPMENT
-        }
+        loader: require.resolve('style-loader'),
       },
       {
-        loader: 'css-loader',
+        loader: require.resolve('css-loader'),
         options: {
-          camelCase: true,
-          localIdentName: cssIdentifier,
-          modules: true,
-        }
+          // Turns on CSS modules.
+          modules: {
+            mode: 'global',
+            // This setting allows the use of hyphen in css class names in css
+            // modules.  It gets converted into camel case when exported as the
+            // object property name when the style is imported as a JS object.
+            localIdentName: cssIdentifier,
+            exportLocalsConvention: 'camelCase',
+          },
+          sourceMap: DEVELOPMENT,
+        },
       },
       {
-        loader: 'sass-loader',
+        loader: require.resolve('sass-loader'),
         options: {
           sassOptions: {
             localIdentName: cssIdentifier,
-            modules: true
-          }
-        }
-      }
+            sourceMap: DEVELOPMENT,
+            modules: true,
+          },
+        },
+      },
     ],
   };
 
@@ -55,7 +59,7 @@ module.exports = (opts) => {
   };
 
   const resolve = {
-    extensions: ['.js', '.jsx']
+    extensions: ['.js', '.jsx'],
   };
 
   return {
@@ -64,21 +68,15 @@ module.exports = (opts) => {
     entry: SRC_PATH,
     externals,
     module: {
-      rules: [
-        ...config.module.rules,
-        jsLoader,
-        cssLoader,
-      ]
+      rules: [...config.module.rules, jsLoader, cssLoader],
     },
     output: {
       path: DIST_PATH,
       filename: 'index.js',
       libraryTarget: 'umd',
-      library: 'ReactScrollCollapse'
+      library: 'ReactScrollCollapse',
     },
-    plugins: [
-      ...config.plugins,
-    ],
+    plugins: [...config.plugins],
     resolve,
   };
 };

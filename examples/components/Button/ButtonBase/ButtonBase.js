@@ -1,23 +1,13 @@
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 
 import { ofChildrenType } from '../../../../src/utils/propTypeHelpers';
 
-
 const ButtonBase = (props, ref) => {
-  const {
-    children,
-    className,
-    ...rest
-  } = props;
+  const { children, className, ...rest } = props;
   return (
-    <button
-      className={className}
-      ref={ref}
-      type="button"
-      {...rest}
-    >
-      { children }
+    <button className={className} ref={ref} type="button" {...rest}>
+      {children}
     </button>
   );
 };
