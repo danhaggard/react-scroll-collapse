@@ -1,22 +1,25 @@
 {
   "extends": [
     "airbnb",
-    "plugin:jsx-a11y/recommended"
+    "plugin:jsx-a11y/recommended",
+    "plugin:prettier/recommended"
   ],
-  "parser": "babel-eslint",
+  "parser": "@babel/eslint-parser",
   "env": {
     "browser": true,
     "node": true,
     "jest": true
   },
   "plugins": [
+      "prettier",
+      "@babel",
       "import",
       "jsx-a11y",
       "react",
       "react-hooks"
   ],
   "parserOptions": {
-    "ecmaVersion": 8,
+    "ecmaVersion": 12,
     "sourcetype": "module",
     "ecmaFeatures": {
       "experimentalObjectRestSpread": true,
@@ -24,6 +27,7 @@
     }
   },
   "rules": {
+    "prettier/prettier": ["error"],
     "comma-dangle": ["off"],
     "import/no-unresolved": ["error", {
       "ignore": [
@@ -39,6 +43,10 @@
     "no-unused-vars": ["warn"],
     "object-curly-newline": ["error", { "minProperties": 6, "consistent": true }],
     "padded-blocks": ["off"],
+    "react/function-component-definition": ["error", {
+      "namedComponents": ["function-declaration", "arrow-function"],
+      "unnamedComponents": ["function-expression", "arrow-function"]
+    }],
     "react/jsx-closing-bracket-location": ["off"],
     "react/jsx-space-before-closing": ["off"],
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],

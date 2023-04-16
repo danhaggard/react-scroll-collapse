@@ -1,22 +1,20 @@
 import { removeFromArray } from '../utils/arrayUtils';
 import { hasOwnProperty, isUndefNull } from '../utils/selectorUtils';
 
-const createOrphanedNodeCache = (
-  rootNodeId,
-  treeIdSelector,
-  setTreeIdFunc
-) => {  // eslint-disable-line
+const createOrphanedNodeCache = (rootNodeId, treeIdSelector, setTreeIdFunc) => {
+  // eslint-disable-line
 
   let CACHE = null;
 
   const getCache = () => CACHE;
 
-  const setCache = newCache => (CACHE = newCache);
+  const setCache = (newCache) => (CACHE = newCache);
 
-  const assignCache = obj => setCache({
-    ...getCache(),
-    ...obj,
-  });
+  const assignCache = (obj) =>
+    setCache({
+      ...getCache(),
+      ...obj,
+    });
 
   /*
     activeForks:
@@ -50,7 +48,6 @@ const createOrphanedNodeCache = (
   };
 
   initCache();
-
 
   const checkIfOrphanedNode = (parentNodeId, nodeId) => {
     const { activeForks, lowestActiveFork, orphanNodes } = getCache();
@@ -103,11 +100,13 @@ const createOrphanedNodeCache = (
   const logCurrentOrphanRange = () => {
     const { activeForks } = getCache();
 
-    const getRangeString = (start, end) => `rangeStart: ${start} - rangeEnd: ${end}.`;
+    const getRangeString = (start, end) =>
+      `rangeStart: ${start} - rangeEnd: ${end}.`;
     console.log('Current Active Orphan ranges are: ');
-    Object.entries(activeForks).forEach(([id, fork]) => console.log(`${getRangeString(id, fork.rangeEnd)}`));
+    Object.entries(activeForks).forEach(([id, fork]) =>
+      console.log(`${getRangeString(id, fork.rangeEnd)}`),
+    );
   };
-
 
   const addToCheckedParents = (parentNodeId, nodeId) => {
     const { checkedParents } = getCache();
@@ -159,13 +158,13 @@ const createOrphanedNodeCache = (
       TODO: make sure newly mounted nodes are getting assigned a treeId before
         being logged as forks or orphans.
     */
-    const isFork = nodeId - parentNodeId > 1
-
+    const isFork =
+      nodeId - parentNodeId > 1 &&
       /*
         Check if a parent has a child - since you can fork what doesn't have
         at least one child.
       */
-      && hasOwnProperty(checkedParents, parentNodeId);
+      hasOwnProperty(checkedParents, parentNodeId);
 
     /*
       Dirty:  basically re caching duplicate info.  See note above about
@@ -180,13 +179,15 @@ const createOrphanedNodeCache = (
     /*
       Need to know what the lowest / highest forks we've found so far.
     */
-    lowestActiveFork = (lowestActiveFork === null
-      || parentNodeId < lowestActiveFork) ? parentNodeId : lowestActiveFork;
+    lowestActiveFork =
+      lowestActiveFork === null || parentNodeId < lowestActiveFork
+        ? parentNodeId
+        : lowestActiveFork;
 
-    largestActiveFork = lowestActiveFork !== null
-      && parentNodeId > largestActiveFork
-      ? parentNodeId
-      : largestActiveFork;
+    largestActiveFork =
+      lowestActiveFork !== null && parentNodeId > largestActiveFork
+        ? parentNodeId
+        : largestActiveFork;
 
     /*
       Store it as an active fork - or update its end range value with
@@ -195,7 +196,7 @@ const createOrphanedNodeCache = (
     if (!activeForks[parentNodeId]) {
       activeForks[parentNodeId] = {
         id: parentNodeId,
-        rangeEnd: nodeId
+        rangeEnd: nodeId,
       };
     } else {
       activeForks[parentNodeId].rangeEnd = nodeId;
@@ -239,12 +240,11 @@ const createOrphanedNodeCache = (
       checkedParents,
       lowestActiveFork,
       largestActiveFork,
-      rangeUpperBound
+      rangeUpperBound,
     });
 
     return true;
   };
-
 
   /*
     Worst var name ever.
@@ -255,7 +255,6 @@ const createOrphanedNodeCache = (
     is going to get rebuilt anyway.
   */
   const checkForkOrphan = (nodeId, parentNodeId) => {
-
     const nodeTreeId = treeIdSelector(nodeId);
     const parentNodeTreeId = treeIdSelector(parentNodeId);
 
@@ -274,7 +273,6 @@ const createOrphanedNodeCache = (
     return isOrphaned;
   };
 
-
   /*
     Used by CollapserManager to advise of incoming collapser mounts.
 
@@ -282,9 +280,7 @@ const createOrphanedNodeCache = (
   */
   const registerIncomingMount = (nodeId) => {
     const { nodesMounting } = getCache();
-    nodesMounting.push(
-      nodeId
-    );
+    nodesMounting.push(nodeId);
   };
 
   /*
@@ -313,14 +309,14 @@ const createOrphanedNodeCache = (
       nodeId,
       parentNodeId,
       checked: false,
-      orphaned: null
+      orphaned: null,
     };
 
     assignCache({
       currentlyMounting,
       nodesMountingCopy,
       nodesMounting,
-      nodesReadyToCheck
+      nodesReadyToCheck,
     });
 
     return !currentlyMounting;
@@ -332,15 +328,17 @@ const createOrphanedNodeCache = (
 
     const checkedNodes = {};
     let orphaned = false;
-    Object.entries(nodesReadyToCheck).forEach(([, { nodeId, parentNodeId }]) => {
-      orphaned = checkForkOrphan(nodeId, parentNodeId);
-      checkedNodes[nodeId] = {
-        nodeId,
-        parentNodeId,
-        checked: true,
-        orphaned,
-      };
-    });
+    Object.entries(nodesReadyToCheck).forEach(
+      ([, { nodeId, parentNodeId }]) => {
+        orphaned = checkForkOrphan(nodeId, parentNodeId);
+        checkedNodes[nodeId] = {
+          nodeId,
+          parentNodeId,
+          checked: true,
+          orphaned,
+        };
+      },
+    );
 
     nodesReadyToCheck = {};
     nodesMountingCopy = null;
@@ -350,7 +348,7 @@ const createOrphanedNodeCache = (
       currentlyMounting,
       nodesReadyToCheck,
       nodesMountingCopy,
-      nodesMounting
+      nodesMounting,
     });
     return [orphaned, checkedNodes];
   };
@@ -359,7 +357,7 @@ const createOrphanedNodeCache = (
     Called by the main cache when setting treeIds - explained over there.
     needs cleanup.
   */
-  const setTreeIdWrapper = parentIdSelector => (id, val) => {
+  const setTreeIdWrapper = (parentIdSelector) => (id, val) => {
     const returnVal = setTreeIdFunc(id, val);
     const parentId = parentIdSelector(id);
     checkForkOrphan(id, parentId);
