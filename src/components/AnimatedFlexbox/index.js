@@ -1,25 +1,27 @@
 import React, { PureComponent, useContext } from 'react';
-import PropTypes from 'prop-types';
 import { Motion, spring } from 'react-motion';
 import forwardRefWrapper from '../../utils/forwardRef';
 import { DEFAULT_MOTION_SPRING } from '../../const';
-import { ofChildrenType, ofFuncTypeOrNothing } from '../../utils/propTypeHelpers';
+import PropTypes, { ofChildrenType, ofFuncTypeOrNothing } from '../../utils/propTypeHelpers';
 import { CONTEXTS } from '../../contextProviders/constants';
 
 const StaticChild = ({
   children,
   className,
+  forwardRef,
   style,
   onKeyDown,
   onKeyUp,
   onPointerDown,
   onPointerUp,
-}, ref) => (
+}) => (
   <div
     className={className}
+    // eslint-disable-next-line
     onPointerDown={onPointerDown}
+    // eslint-disable-next-line
     onPointerUp={onPointerUp}
-    ref={ref}
+    ref={forwardRef}
     style={style}
     role="button"
     tabIndex={0}
@@ -31,7 +33,29 @@ const StaticChild = ({
   </div>
 );
 
-const RefStaticChild = React.forwardRef(StaticChild);
+StaticChild.defaultProps = {
+  children: null,
+  className: '',
+  forwardRef: {},
+  onKeyDown: null,
+  onKeyUp: null,
+  onPointerDown: null,
+  onPointerUp: null,
+  style: {},
+};
+
+StaticChild.propTypes = {
+  children: PropTypes.node,
+  className: PropTypes.string,
+  forwardRef: PropTypes.object,
+  onKeyDown: ofFuncTypeOrNothing,
+  onKeyUp: ofFuncTypeOrNothing,
+  onPointerDown: ofFuncTypeOrNothing,
+  onPointerUp: ofFuncTypeOrNothing,
+  style: PropTypes.object,
+};
+
+const RefStaticChild = forwardRefWrapper(StaticChild, 'forwardRef');
 
 const PureStaticChild = React.memo(RefStaticChild);
 
@@ -96,15 +120,15 @@ const isHeightFixed = (ref, prevHeight, zeroHeightDiffArr = []) => {
 const FlexMotion = ({
   className,
   children,
+  forwardRef,
   getInterpolatedStyle,
   motionStyle,
   onPointerDown,
   onPointerUp,
   onKeyDown,
   onKeyUp,
-  onRest,
   style,
-}, ref) => {
+}) => {
   let prevHeight = null;
   let heightFixed = false;
   let zeroHeightDiffArr = [];
@@ -120,7 +144,7 @@ const FlexMotion = ({
         (interpolatedStyle) => {
           if (!heightFixed) {
             [heightFixed, prevHeight, zeroHeightDiffArr] = isHeightFixed(
-              ref, prevHeight, zeroHeightDiffArr
+              forwardRef, prevHeight, zeroHeightDiffArr
             );
 
             if (heightFixed) {
@@ -135,7 +159,7 @@ const FlexMotion = ({
           return (
             <PureStaticChild
               className={className}
-              ref={ref}
+              ref={forwardRef}
               style={newStyle}
               onPointerDown={onPointerDown}
               onPointerUp={onPointerUp}
@@ -152,34 +176,37 @@ const FlexMotion = ({
   );
 };
 
-const RefFlexMotion = React.forwardRef(FlexMotion);
-
-RefFlexMotion.defaultProps = {
+FlexMotion.defaultProps = {
   children: [],
   className: '',
+  forwardRef: {},
   onKeyDown: null,
   onKeyUp: null,
-  onRest: null,
+  onPointerDown: null,
+  onPointerUp: null,
   style: {},
 };
 
 
-RefFlexMotion.propTypes = {
+FlexMotion.propTypes = {
+  children: ofChildrenType,
+  className: PropTypes.string,
+  forwardRef: PropTypes.object,
   getInterpolatedStyle: PropTypes.func.isRequired,
   motionStyle: PropTypes.object.isRequired,
   onKeyDown: ofFuncTypeOrNothing,
   onKeyUp: ofFuncTypeOrNothing,
-  onRest: ofFuncTypeOrNothing,
-  children: ofChildrenType,
-  className: PropTypes.string,
+  onPointerDown: ofFuncTypeOrNothing,
+  onPointerUp: ofFuncTypeOrNothing,
   style: PropTypes.object,
 };
 
-RefFlexMotion.whyDidYouRender = {
+FlexMotion.whyDidYouRender = {
   logOnDifferentValues: false,
   customName: 'FlexMotion'
 };
 
+const RefFlexMotion = forwardRefWrapper(FlexMotion, 'forwardRef');
 
 const PureFlexMotion = React.memo(RefFlexMotion);
 
@@ -365,7 +392,6 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
     }
   }
 
-
   render() {
     const {
       children,
@@ -400,10 +426,9 @@ class AnimatedFlexbox extends PureComponent { // eslint-disable-line
         ref={flexRef}
         style={style}
       >
-        { renderChildren ? renderChildren(children) : children  }
+        { renderChildren ? renderChildren(children) : children }
       </PureStaticChild>
     );
-
   }
 }
 
@@ -413,8 +438,10 @@ AnimatedFlexbox.defaultProps = {
   flexBasis: 0.15,
   onClick: null,
   onKeyDown: null,
+  onKeyUp: null,
   renderChildren: null,
   style: {},
+  transposeLeft: 0,
 };
 
 AnimatedFlexbox.propTypes = {
@@ -422,12 +449,14 @@ AnimatedFlexbox.propTypes = {
   isRootNode: PropTypes.bool.isRequired,
   onClick: ofFuncTypeOrNothing,
   onKeyDown: ofFuncTypeOrNothing,
+  onKeyUp: ofFuncTypeOrNothing,
   children: ofChildrenType,
   className: PropTypes.string,
   flexBasis: PropTypes.number,
   flexRef: PropTypes.object.isRequired,
   renderChildren: ofFuncTypeOrNothing,
   style: PropTypes.object,
+  transposeLeft: PropTypes.number,
 };
 
 AnimatedFlexbox.whyDidYouRender = {

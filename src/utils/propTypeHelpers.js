@@ -31,3 +31,5 @@ export const ofNumberTypeOrNothing = ofTypeOrNothing(PropTypes.number);
 export const ofNumberStringTypeOrNothing = ofTypeOrNothing(
   undefined, [PropTypes.number, PropTypes.string]
 );
+
+export default PropTypes;

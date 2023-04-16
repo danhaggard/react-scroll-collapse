@@ -192,7 +192,10 @@ class CommentThread extends PureComponent {
         cloneA = [];
         cloneB = [];
       }
-      const finalArray = [...headArray, this.getFlexWrapper([...cloneA, ...insertArray, ...cloneB])];
+      const finalArray = [
+        ...headArray,
+        this.getFlexWrapper([...cloneA, ...insertArray, ...cloneB])
+      ];
       return finalArray;
     }
   }
